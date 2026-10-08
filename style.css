@@ -230,3 +230,40 @@ main {
 .topbar h1 { order: 1; }
 .icons { order: 2; display: flex; gap: 4px; }
 .modes { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; }
+
+/* Linha atual: quadrado selecionado para receber a letra */
+.tile.cursor { border-bottom-width: 5px; border-color: var(--fg); }
+.board .row .tile { cursor: default; }
+
+/* Créditos (mesmo conteúdo do Sintonia: foto redonda + "criado por: @dmwnezes") */
+.credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+}
+.credit img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255, 255, 255, 0.7); }
+.credit b { color: #fff; text-decoration: underline; }
+.modal-box hr { border: none; border-top: 1px solid var(--tile-border); margin: 16px 0; }
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: splash-in 0.7s ease both;
+  transition: opacity 0.4s;
+}
+.splash.hide { opacity: 0; pointer-events: none; }
+.splash h1 { font-size: 3rem; letter-spacing: 0.2em; margin: 0; }
+.splash-credit { position: absolute; bottom: calc(48px + env(safe-area-inset-bottom)); }
+@keyframes splash-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }

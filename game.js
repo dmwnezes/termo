@@ -98,7 +98,8 @@
     answer: "",
     key: "",
     guesses: [], // { word, display, result }
-    current: "",
+    current: Array(WORD_LENGTH).fill(""), // uma letra por posição
+    cursor: 0, // posição selecionada na linha atual
     over: false,
     won: false,
     busy: false,
@@ -137,8 +138,13 @@
     game.guesses = saved ? saved.guesses : [];
     game.over = saved ? saved.over : false;
     game.won = saved ? saved.won : false;
-    game.current = "";
+    clearRow();
     game.busy = false;
+  }
+
+  function clearRow() {
+    game.current = Array(WORD_LENGTH).fill("");
+    game.cursor = 0;
   }
 
   function saveState() {
@@ -228,7 +234,8 @@
     if (!game.over && currentRow < MAX_TRIES) {
       [...rows[currentRow].children].forEach((tile, c) => {
         tile.textContent = game.current[c] || "";
-        tile.className = "tile" + (game.current[c] ? " filled" : "");
+        tile.className = "tile" + (game.current[c] ? " filled" : "") +
+          (c === game.cursor && !game.busy ? " cursor" : "");
       });
     }
     paintKeyboard();
@@ -266,26 +273,53 @@
   }
 
   // ---------- ações ----------
+  // Coloca a letra na posição do cursor e avança para o próximo espaço vazio.
   function typeLetter(letter) {
-    if (game.over || game.busy || game.current.length >= WORD_LENGTH) return;
-    game.current += letter;
+    if (game.over || game.busy) return;
+    game.current[game.cursor] = letter;
+    const next = nextEmpty(game.cursor + 1);
+    game.cursor = next === -1 ? Math.min(game.cursor + 1, WORD_LENGTH - 1) : next;
     render();
   }
 
+  function nextEmpty(from) {
+    for (let i = from; i < WORD_LENGTH; i++) if (!game.current[i]) return i;
+    for (let i = 0; i < from && i < WORD_LENGTH; i++) if (!game.current[i]) return i;
+    return -1;
+  }
+
+  // Apaga a letra do cursor; se o quadrado já estiver vazio, apaga a anterior.
   function deleteLetter() {
     if (game.over || game.busy) return;
-    game.current = game.current.slice(0, -1);
+    if (game.current[game.cursor]) {
+      game.current[game.cursor] = "";
+    } else if (game.cursor > 0) {
+      game.cursor--;
+      game.current[game.cursor] = "";
+    }
+    render();
+  }
+
+  function moveCursor(delta) {
+    if (game.over || game.busy) return;
+    game.cursor = Math.max(0, Math.min(WORD_LENGTH - 1, game.cursor + delta));
+    render();
+  }
+
+  function selectTile(index) {
+    if (game.over || game.busy) return;
+    game.cursor = index;
     render();
   }
 
   function submit() {
     if (game.over || game.busy) return;
-    if (game.current.length < WORD_LENGTH) {
+    if (game.current.some((l) => !l)) {
       toast("Palavra incompleta");
       shakeRow();
       return;
     }
-    const guess = game.current;
+    const guess = game.current.join("");
     if (!ACCEPTED.has(guess)) {
       toast("Palavra não aceita");
       shakeRow();
@@ -295,7 +329,7 @@
     game.busy = true;
     const result = evaluate(guess, game.answer);
     game.guesses.push({ word: guess, display: show(guess), result });
-    game.current = "";
+    clearRow();
     render();
 
     const row = $("board").children[game.guesses.length - 1];
@@ -364,7 +398,9 @@
   function onKey(key) {
     if (/^[a-zA-ZçÇ]$/.test(key)) return typeLetter(normalize(key));
     if (key === "Enter") return submit();
-    if (key === "Backspace") return deleteLetter();
+    if (key === "Backspace" || key === "Delete") return deleteLetter();
+    if (key === "ArrowLeft") return moveCursor(-1);
+    if (key === "ArrowRight") return moveCursor(1);
   }
 
   document.addEventListener("keydown", (e) => {
@@ -375,6 +411,14 @@
       return;
     }
     onKey(e.key);
+  });
+
+  $("board").addEventListener("click", (e) => {
+    const tile = e.target.closest(".tile");
+    if (!tile) return;
+    const row = tile.parentElement;
+    if ([...$("board").children].indexOf(row) !== game.guesses.length) return;
+    selectTile([...row.children].indexOf(tile));
   });
 
   $("keyboard").addEventListener("click", (e) => {
@@ -399,6 +443,20 @@
   document.querySelectorAll(".modal").forEach((m) =>
     m.addEventListener("click", (e) => { if (e.target === m) closeModals(); })
   );
+
+  // ---------- abertura com créditos ----------
+  // Some sozinha depois de ~2,8 s ou ao tocar fora do link (igual ao Sintonia).
+  (function splash() {
+    const el = $("splash");
+    if (!el) return;
+    const close = () => { el.classList.add("hide"); setTimeout(() => el.remove(), 400); };
+    const timer = setTimeout(close, 2800);
+    el.addEventListener("click", (e) => {
+      if (e.target.closest(".credit")) return;
+      clearTimeout(timer);
+      close();
+    });
+  })();
 
   // ---------- início ----------
   buildKeyboard();
