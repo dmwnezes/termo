@@ -1,4 +1,9 @@
-# Termo em Português
+# Palavreiro
+
+Jogo de palavras em português, estilo Termo, com versão web e app Android.
+
+- **Site:** https://dmwnezes.github.io/termo/
+- **App Android:** baixe o `Palavreiro.apk` mais recente em Releases. O app avisa sozinho quando há versão nova.
 
 Jogo estilo Termo, com palavras de 5 letras.
 
@@ -14,7 +19,9 @@ Para testar: abra o arquivo index.html no navegador.
 
 Estrutura:
 - index.html, style.css: interface
-- words.js: ANSWERS (respostas) e VALID (tentativas extras aceitas)
+- shared/words.js: ANSWERS (respostas) e VALID (tentativas extras aceitas), usado pelo site e pelo app
+- app/: app Android (Kotlin + Compose)
+- DESIGN.md: decisões de design
 - game.js: regras do jogo e estatísticas
 
 Próximos modos previstos: Dueto e Quarteto.

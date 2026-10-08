@@ -1,7 +1,6 @@
 # Palavreiro — plano de design do app de celular
 
-Regra do projeto: nenhuma decisão de design é tomada sem consulta ao Daniel.
-Este arquivo registra só o que ele já decidiu e o que ainda falta decidir.
+Em 08/10/2026 o Daniel decidiu as escolhas principais e depois passou as demais decisões de design para o Claude.
 
 ## Decidido
 
@@ -20,18 +19,32 @@ Este arquivo registra só o que ele já decidiu e o que ainda falta decidir.
 | Ícone do app | **Cinco quadradinhos**: uma fileira de 5 quadrados arredondados, alguns verdes e um amarelo |
 | Reações | Vibração (ao errar e ao acertar), sons curtos (ao digitar e revelar) e confete na vitória |
 
+## Detalhes definidos pelo Claude
+
+| Item | Decisão |
+|---|---|
+| Tons da Noite suave | Fundo em degradê `#2A2058` → `#120E2B`; superfícies `#231C48` / `#2F275C`; texto `#F4F1FF`; destaque lilás `#9B8CFF` |
+| Verde e amarelo | `#5FB873` (lugar certo) e `#E6C14F` (fora do lugar, com letra escura para ler bem) |
+| Fonte | Outfit (geométrica, arredondada, gratuita) |
+| Cantos | Quadrados 14 dp, teclas 12 dp, cartões 28 dp, janelas 32 dp |
+| Cartões | Termo (com selo Novo / Feito hoje), Infinito, Dueto e Quarteto (em breve); cada um com mini tabuleiro |
+| Conquistas | 8: primeira palavra, de primeira, em duas, sequências de 3/7/30, 25 no Infinito, 100 no total |
+| Configurações | Sons e vibração podem ser desligados; Como jogar; Buscar atualização |
+| Ícone | Fundo roxo em degradê com 5 quadradinhos: verde, verde, amarelo, verde, verde |
+| Formato | App Android nativo (Kotlin + Compose), como o Sintonia |
+| Atualização | Dentro do app: verifica ao abrir e em Perfil > Buscar atualização; baixa o APK das Releases do GitHub e abre o instalador |
+
+## App Android
+
+- Código em `app/`; a lista de palavras é a mesma do site (`shared/words.js`), então a palavra do dia é igual nos dois.
+- Cada envio ao GitHub que muda o app gera um APK novo em Releases (`Palavreiro.apk`).
+
 ## Já funcionando na versão web
 
 - Letra em qualquer posição: toque num quadrado da linha para escolher onde a letra entra.
 - Modos Diário e Infinito; Dueto e Quarteto ainda "em breve".
 - Créditos na abertura e na janela "Como jogar".
 
-## Ainda em aberto (perguntar antes de fazer)
+## Próximos passos
 
-- Tons exatos da paleta Noite suave (mostrar opções lado a lado).
-- Qual fonte geométrica, entre algumas opções para comparar.
-- Ordem e visual dos cartões de jogos na tela inicial.
-- Que conquistas entram no Perfil.
-- Estilo do confete e dos sons; se dá para desligar som e vibração nas Configurações.
-- Disposição do ícone (quais quadrados ficam verdes e qual fica amarelo, e a cor de fundo).
-- Formato do app: Android nativo como o Sintonia (com atualização pelo próprio app) ou outra opção.
+- Modos Dueto e Quarteto.
