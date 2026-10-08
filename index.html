@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#121213" />
+  <meta http-equiv="Cache-Control" content="no-cache" />
   <title>Termo em Português</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
   <header class="topbar">
@@ -42,7 +43,10 @@
       <h3>Distribuição de tentativas</h3>
       <div id="dist" class="dist"></div>
       <button id="stats-new" class="primary" hidden>Jogar nova palavra ↻</button>
-      <p id="stats-next" class="note" hidden>Volte amanhã para uma nova palavra, ou jogue no modo Infinito.</p>
+      <div id="stats-next" hidden>
+        <p class="note">Volte amanhã para uma nova palavra.</p>
+        <button id="stats-inf" class="primary">Jogar no modo Infinito ∞</button>
+      </div>
     </div>
   </div>
 
@@ -62,7 +66,7 @@
     </div>
   </div>
 
-  <script src="words.js"></script>
-  <script src="game.js"></script>
+  <script src="words.js?v=3"></script>
+  <script src="game.js?v=3"></script>
 </body>
 </html>

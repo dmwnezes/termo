@@ -16,3 +16,5 @@ Estrutura:
 - game.js: regras do jogo e estatísticas
 
 Próximos modos previstos: Dueto e Quarteto.
+
+Publicar uma atualização: aumente o número `?v=` dos arquivos no index.html, para o navegador baixar a versão nova.

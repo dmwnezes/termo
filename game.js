@@ -392,6 +392,7 @@
 
   $("btn-new").addEventListener("click", newInfiniteWord);
   $("stats-new").addEventListener("click", newInfiniteWord);
+  $("stats-inf").addEventListener("click", () => { closeModals(); startMode("infinito"); });
   $("btn-stats").addEventListener("click", openStats);
   $("btn-help").addEventListener("click", () => ($("modal-help").hidden = false));
   document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", closeModals));
