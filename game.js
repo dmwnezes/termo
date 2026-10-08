@@ -1,21 +1,33 @@
-// Motor do jogo Termo. Estrutura preparada para outros modos (Dueto, Quarteto).
+// Motor do jogo Termo. Modos: Diário (uma palavra por dia) e Infinito (quantas quiser).
+// A estrutura já está preparada para Dueto e Quarteto (vários tabuleiros).
 (function () {
   "use strict";
 
   const WORD_LENGTH = 5;
   const MAX_TRIES = 6;
-  const STATS_KEY = "termo-stats-v1";
-  const STATE_KEY = "termo-state-v1";
   const ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-
   const $ = (id) => document.getElementById(id);
 
-  // ---------- utilidades ----------
+  // ---------- palavras ----------
   function normalize(text) {
     return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
   }
 
-  // Número de dias desde 01/01/2026, usado para escolher a palavra do dia.
+  // Respostas possíveis (sem acento) e a forma com acento para exibir.
+  const ACCENTED = {};
+  const ANSWER_LIST = [];
+  ANSWERS.forEach((w) => {
+    const n = normalize(w);
+    if (n.length === WORD_LENGTH && !ACCENTED[n]) {
+      ACCENTED[n] = w.toUpperCase();
+      ANSWER_LIST.push(n);
+    }
+  });
+  const ACCEPTED = new Set([...ANSWER_LIST, ...VALID.map(normalize)]);
+
+  const show = (w) => ACCENTED[w] || w;
+
+  // ---------- datas ----------
   function dayIndex(date = new Date()) {
     const start = Date.UTC(2026, 0, 1);
     const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
@@ -28,26 +40,28 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
-  // Lista limpa: só palavras de 5 letras, sem repetição.
-  const LIST = [...new Set(WORDS.map(normalize))].filter(
-    (w) => w.length === WORD_LENGTH && /^[A-Z]+$/.test(w)
-  );
-
-  function wordOfTheDay() {
-    return LIST[dayIndex() % LIST.length];
+  // Embaralhamento fixo, para a ordem das palavras do dia não seguir a lista.
+  function dailyWord() {
+    const i = dayIndex();
+    const idx = (i * 7919 + 104729) % ANSWER_LIST.length;
+    return ANSWER_LIST[(idx + ANSWER_LIST.length) % ANSWER_LIST.length];
   }
 
-  // Avalia a tentativa em duas passadas, tratando letras repetidas corretamente.
+  function randomWord(avoid) {
+    let w;
+    do {
+      w = ANSWER_LIST[Math.floor(Math.random() * ANSWER_LIST.length)];
+    } while (w === avoid && ANSWER_LIST.length > 1);
+    return w;
+  }
+
+  // ---------- regras ----------
   function evaluate(guess, answer) {
     const result = Array(WORD_LENGTH).fill("absent");
     const counts = {};
-
     for (let i = 0; i < WORD_LENGTH; i++) {
-      if (guess[i] === answer[i]) {
-        result[i] = "correct";
-      } else {
-        counts[answer[i]] = (counts[answer[i]] || 0) + 1;
-      }
+      if (guess[i] === answer[i]) result[i] = "correct";
+      else counts[answer[i]] = (counts[answer[i]] || 0) + 1;
     }
     for (let i = 0; i < WORD_LENGTH; i++) {
       if (result[i] === "correct") continue;
@@ -59,60 +73,109 @@
     return result;
   }
 
-  // ---------- estado ----------
-  const game = {
-    answer: wordOfTheDay(),
-    key: todayKey(),
-    guesses: [],     // { word, result }
-    current: "",
-    over: false,
-    won: false,
-    busy: false,
+  // ---------- armazenamento ----------
+  const store = {
+    get(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (_) { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* indisponível */ }
+    },
   };
 
-  function loadState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STATE_KEY) || "null");
-      if (saved && saved.key === game.key) {
-        Object.assign(game, { guesses: saved.guesses, over: saved.over, won: saved.won });
-      }
-    } catch (_) { /* ignora dados corrompidos */ }
-  }
-
-  function saveState() {
-    try {
-      localStorage.setItem(STATE_KEY, JSON.stringify({
-        key: game.key, guesses: game.guesses, over: game.over, won: game.won,
-      }));
-    } catch (_) { /* armazenamento indisponível */ }
-  }
-
-  function loadStats() {
-    try {
-      return JSON.parse(localStorage.getItem(STATS_KEY)) || defaultStats();
-    } catch (_) {
-      return defaultStats();
-    }
-  }
+  const MODES = {
+    diario: { stateKey: "termo-diario-state-v2", statsKey: "termo-diario-stats-v2", label: "Diário" },
+    infinito: { stateKey: "termo-infinito-state-v2", statsKey: "termo-infinito-stats-v2", label: "Infinito" },
+  };
 
   function defaultStats() {
     return { played: 0, won: 0, streak: 0, maxStreak: 0, lastWinDay: null, dist: [0, 0, 0, 0, 0, 0] };
   }
 
+  // ---------- estado ----------
+  const game = {
+    mode: store.get("termo-mode", "diario"),
+    answer: "",
+    key: "",
+    guesses: [], // { word, display, result }
+    current: "",
+    over: false,
+    won: false,
+    busy: false,
+  };
+  if (!MODES[game.mode]) game.mode = "diario";
+
+  function startMode(mode) {
+    game.mode = mode;
+    store.set("termo-mode", mode);
+    const saved = store.get(MODES[mode].stateKey, null);
+
+    if (mode === "diario") {
+      game.key = todayKey();
+      game.answer = dailyWord();
+      const valid = saved && saved.key === game.key;
+      restore(valid ? saved : null);
+    } else {
+      const valid = saved && ANSWER_LIST.includes(saved.answer);
+      game.key = "infinito";
+      game.answer = valid ? saved.answer : randomWord();
+      restore(valid ? saved : null);
+    }
+
+    document.querySelectorAll(".mode[data-mode]").forEach((b) => {
+      const on = b.dataset.mode === mode;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on);
+    });
+    $("btn-new").hidden = !(mode === "infinito" && game.over);
+    buildBoard();
+    render();
+    if (game.over && mode === "diario") setTimeout(openStats, 300);
+  }
+
+  function restore(saved) {
+    game.guesses = saved ? saved.guesses : [];
+    game.over = saved ? saved.over : false;
+    game.won = saved ? saved.won : false;
+    game.current = "";
+    game.busy = false;
+  }
+
+  function saveState() {
+    store.set(MODES[game.mode].stateKey, {
+      key: game.key, answer: game.answer, guesses: game.guesses, over: game.over, won: game.won,
+    });
+  }
+
+  function newInfiniteWord() {
+    game.answer = randomWord(game.answer);
+    restore(null);
+    saveState();
+    $("btn-new").hidden = true;
+    closeModals();
+    buildBoard();
+    render();
+  }
+
   function recordResult(won, tries) {
-    const stats = loadStats();
+    const key = MODES[game.mode].statsKey;
+    const stats = store.get(key, defaultStats());
     stats.played++;
     if (won) {
       stats.won++;
       stats.dist[tries - 1]++;
-      const yesterday = dayIndex(new Date(Date.now() - 86400000));
-      stats.streak = stats.lastWinDay === yesterday ? stats.streak + 1 : 1;
-      stats.lastWinDay = dayIndex();
+      if (game.mode === "diario") {
+        const yesterday = dayIndex(new Date(Date.now() - 86400000));
+        stats.streak = stats.lastWinDay === yesterday ? stats.streak + 1 : 1;
+        stats.lastWinDay = dayIndex();
+      } else {
+        stats.streak++; // no Infinito, a sequência conta vitórias seguidas
+      }
       stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
     } else {
       stats.streak = 0;
     }
-    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (_) {}
+    store.set(key, stats);
   }
 
   // ---------- interface ----------
@@ -155,8 +218,9 @@
   function render() {
     const rows = $("board").children;
     game.guesses.forEach((g, r) => {
+      const letters = [...(g.display || g.word)];
       [...rows[r].children].forEach((tile, c) => {
-        tile.textContent = g.word[c];
+        tile.textContent = letters[c];
         tile.className = "tile " + g.result[c];
       });
     });
@@ -222,19 +286,18 @@
       return;
     }
     const guess = game.current;
-    if (!LIST.includes(guess)) {
-      toast("Palavra não está na lista");
+    if (!ACCEPTED.has(guess)) {
+      toast("Palavra não aceita");
       shakeRow();
       return;
     }
 
     game.busy = true;
     const result = evaluate(guess, game.answer);
-    game.guesses.push({ word: guess, result });
+    game.guesses.push({ word: guess, display: show(guess), result });
     game.current = "";
     render();
 
-    // Espera a animação de revelação antes de encerrar a rodada.
     const row = $("board").children[game.guesses.length - 1];
     [...row.children].forEach((tile, i) => {
       setTimeout(() => tile.classList.add("flip"), i * 250);
@@ -248,7 +311,7 @@
         toast(["Genial!", "Muito bem!", "Boa!", "Uau!", "Acertou!", "Por pouco!"][game.guesses.length - 1]);
       } else if (game.guesses.length === MAX_TRIES) {
         finish(false);
-        toast(game.answer, 4000);
+        toast("A palavra era " + show(game.answer), 4000);
       }
       saveState();
     }, WORD_LENGTH * 250 + 200);
@@ -258,13 +321,14 @@
     game.over = true;
     game.won = won;
     recordResult(won, game.guesses.length);
-    renderStats();
-    setTimeout(openStats, 1200);
+    if (game.mode === "infinito") $("btn-new").hidden = false;
+    setTimeout(openStats, 1400);
   }
 
   // ---------- estatísticas ----------
   function renderStats() {
-    const s = loadStats();
+    const s = store.get(MODES[game.mode].statsKey, defaultStats());
+    $("stats-title").textContent = "Estatísticas · " + MODES[game.mode].label;
     $("s-played").textContent = s.played;
     $("s-winpct").textContent = s.played ? Math.round((s.won / s.played) * 100) : 0;
     $("s-streak").textContent = s.streak;
@@ -276,11 +340,15 @@
     s.dist.forEach((count, i) => {
       const row = document.createElement("div");
       row.className = "dist-row";
-      const hit = game.won && game.guesses.length === i + 1;
+      const hit = game.over && game.won && game.guesses.length === i + 1;
       row.innerHTML = `<span class="n">${i + 1}</span>
         <span class="bar${hit ? " hit" : ""}" style="width:${Math.max(8, (count / max) * 100)}%">${count}</span>`;
       dist.appendChild(row);
     });
+
+    const isInf = game.mode === "infinito";
+    $("stats-new").hidden = !(isInf && game.over);
+    $("stats-next").hidden = !(game.mode === "diario" && game.over);
   }
 
   function openStats() {
@@ -294,13 +362,15 @@
 
   // ---------- eventos ----------
   function onKey(key) {
-    if (/^[a-zA-Z]$/.test(key)) return typeLetter(normalize(key));
+    if (/^[a-zA-ZçÇ]$/.test(key)) return typeLetter(normalize(key));
     if (key === "Enter") return submit();
     if (key === "Backspace") return deleteLetter();
   }
 
   document.addEventListener("keydown", (e) => {
-    if (!$("modal-stats").hidden || !$("modal-help").hidden) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const modalOpen = [...document.querySelectorAll(".modal")].some((m) => !m.hidden);
+    if (modalOpen) {
       if (e.key === "Escape") closeModals();
       return;
     }
@@ -309,9 +379,19 @@
 
   $("keyboard").addEventListener("click", (e) => {
     const btn = e.target.closest(".key");
-    if (btn) onKey(btn.dataset.key);
+    if (btn) { onKey(btn.dataset.key); btn.blur(); }
   });
 
+  document.querySelectorAll(".mode[data-mode]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (game.busy || b.dataset.mode === game.mode) return;
+      b.blur();
+      startMode(b.dataset.mode);
+    })
+  );
+
+  $("btn-new").addEventListener("click", newInfiniteWord);
+  $("stats-new").addEventListener("click", newInfiniteWord);
   $("btn-stats").addEventListener("click", openStats);
   $("btn-help").addEventListener("click", () => ($("modal-help").hidden = false));
   document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", closeModals));
@@ -320,9 +400,6 @@
   );
 
   // ---------- início ----------
-  buildBoard();
   buildKeyboard();
-  loadState();
-  render();
-  if (game.over) setTimeout(openStats, 400);
+  startMode(game.mode);
 })();

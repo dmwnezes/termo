@@ -1,12 +1,18 @@
 # Termo em Português
 
-Jogo estilo Termo, com palavras de 5 letras e uma palavra nova por dia.
+Jogo estilo Termo, com palavras de 5 letras.
+
+Modos:
+- Diário: uma palavra por dia, igual para todos.
+- Infinito: quantas palavras quiser, com estatísticas separadas.
+
+Vocabulário: 1000 palavras possíveis como resposta e cerca de 14.900 aceitas como tentativa. Os acentos aparecem sozinhos.
 
 Para testar: abra o arquivo index.html no navegador.
 
 Estrutura:
 - index.html, style.css: interface
-- words.js: lista de palavras (acrescente aqui)
+- words.js: ANSWERS (respostas) e VALID (tentativas extras aceitas)
 - game.js: regras do jogo e estatísticas
 
 Próximos modos previstos: Dueto e Quarteto.

@@ -210,3 +210,23 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .tile.flip, .tile.shake { animation: none; }
 }
+
+.primary {
+  background: var(--correct);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.primary[hidden] { display: none; }
+.modal-box .primary { display: block; width: 100%; margin-top: 16px; }
+.modal-box .primary[hidden] { display: none; }
+.note { color: var(--muted); font-size: 0.85rem; text-align: center; margin: 16px 0 0; }
+
+/* Cabeçalho: título e ícones na primeira linha, modos logo abaixo */
+.topbar h1 { order: 1; }
+.icons { order: 2; display: flex; gap: 4px; }
+.modes { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; }
