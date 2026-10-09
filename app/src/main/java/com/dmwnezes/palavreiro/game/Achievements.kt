@@ -32,7 +32,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won",
             "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
             "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best",
-            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right",
+            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best",
             "arch_played", "arch_won", "alldone_days",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
@@ -67,6 +67,7 @@ object Achievements {
             a("🤖", "Mais esperto que o app", "Vença o Reverso", r["rev_userwins"], 1),
             a("📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", r["def_best"], 10),
             a("⛓️", "Corrente forte", "Faça uma cadeia de 20 sinônimos", r["syn_best"], 20),
+            a("🔄", "Do avesso", "Faça uma cadeia de 20 antônimos", r["ant_best"], 20),
             a("🕵️", "Detetive", "Faça 10 pontos no Intruso", r["intr_best"], 10),
             a("✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", r["ort_best"], 20),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),

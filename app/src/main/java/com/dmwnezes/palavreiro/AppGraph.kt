@@ -40,6 +40,11 @@ object AppGraph {
         private set
     lateinit var families: List<Set<String>>
         private set
+    /** Antônimos (pares nos dois sentidos) e famílias que bloqueiam alternativas ambíguas. */
+    lateinit var antonyms: List<com.dmwnezes.palavreiro.game.SynPair>
+        private set
+    lateinit var antonymFamilies: List<Set<String>>
+        private set
     /** Famílias de assunto dos grupos do Conexões (para o modo infinito). */
     lateinit var connFamilies: Map<String, Set<String>>
         private set
@@ -69,6 +74,7 @@ object AppGraph {
         spelling = com.dmwnezes.palavreiro.game.SpellingData.parse(asset("ortografia.txt"))
         definitions = QuizData.definitions(asset("definicoes.txt"))
         QuizData.synonyms(asset("sinonimos.txt")).let { (p, f) -> synonyms = p; families = f }
+        QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
         ready = true
     }

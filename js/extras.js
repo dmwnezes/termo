@@ -55,6 +55,7 @@
       ["🤖", "Mais esperto que o site", "Vença o Reverso", n("rev-user"), 1],
       ["📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", n("def-best"), 10],
       ["⛓️", "Corrente forte", "Faça uma cadeia de 20 sinônimos", n("syn-best"), 20],
+      ["🔄", "Do avesso", "Faça uma cadeia de 20 antônimos", n("ant-best"), 20],
       ["🕵️", "Detetive", "Faça 10 pontos no Intruso", n("intr-best"), 10],
       ["✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", n("ort-best"), 20],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
@@ -89,7 +90,7 @@
   // Nome canônico (app) → chave do site.
   const COUNTERS = ["conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won", "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
     "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best", "intr_played", "intr_best", "intr_right",
-    "ort_played", "ort_best", "ort_right", "arch_played", "arch_won", "alldone_days"];
+    "ort_played", "ort_best", "ort_right", "ant_best", "arch_played", "arch_won", "alldone_days"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));
   const MODES = ["termo", "infinito", "dueto", "quarteto"];
   const toB64 = (str) => { let bin = ""; new TextEncoder().encode(str).forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };

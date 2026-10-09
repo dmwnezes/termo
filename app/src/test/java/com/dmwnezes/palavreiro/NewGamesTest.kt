@@ -154,4 +154,23 @@ class NewGamesTest {
         }
         assertTrue(names.size > 50)
     }
+
+    @Test
+    fun antonimos() {
+        val (_, synFam) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (pairs, fam) = QuizData.antonyms(asset("antonimos.txt"), synFam)
+        assertTrue(pairs.size >= 280)
+        // Cada palavra tem um único antônimo (senão a pergunta ao contrário teria duas respostas).
+        assertEquals(pairs.size, pairs.map { it.word }.toSet().size)
+        val g = com.dmwnezes.palavreiro.game.SynonymGame(pairs, fam, seed = 7)
+        repeat(300) {
+            val q = g.question
+            assertEquals(4, g.options.size); assertEquals(4, g.options.toSet().size)
+            assertTrue(q.synonym in g.options)
+            // Nenhuma alternativa errada é antônimo registrado da palavra.
+            val antOf = pairs.filter { it.word == q.word }.map { it.synonym }.toSet()
+            assertEquals(1, g.options.count { it in antOf })
+            assertTrue(g.answer(q.synonym)); g.next()
+        }
+    }
 }

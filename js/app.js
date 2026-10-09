@@ -20,6 +20,7 @@
     caca: `<div style="font-weight:600;font-size:12px;line-height:1.5;letter-spacing:6px;position:relative">CAS<br>OLE<br>PAJ<span style="position:absolute;left:-2px;top:6px;width:58px;height:10px;border-radius:9px;background:rgba(230,193,79,.6);transform:rotate(38deg);transform-origin:left"></span></div>`,
     reverso: `<div style="text-align:center"><b style="color:var(--accent);font-size:18px">?</b><div class="mini" style="grid-template-columns:repeat(5,9px)">${["--correct", "--absent", "--present", "--absent", "--correct"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div></div>`,
     definicao: `<div style="display:grid;gap:5px;justify-items:center"><i style="display:block;width:46px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><i style="display:block;width:34px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><div class="mini" style="grid-template-columns:repeat(4,11px)">${["--surface-high", "--present", "--surface-high", "--surface-high"].map((c) => `<i style="width:11px;height:11px;background:var(${c})"></i>`).join("")}</div></div>`,
+    antonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">ALTO</span>≠<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--red)">BAIXO</span></div>`,
     sinonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">BELO</span>=<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--correct)">LINDO</span></div>`,
     intruso: `<div class="mini" style="grid-template-columns:repeat(5,9px);gap:3px">${["--absent", "--absent", "--red", "--absent", "--absent"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div>`,
     ortografia: `<div style="display:flex;gap:5px;font-weight:800;font-size:15px"><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--correct);color:var(--dark-text)">✓</span><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--red);color:var(--dark-text)">✗</span></div>`,
@@ -44,6 +45,7 @@
       ["reverso", "Reverso", "O site tenta adivinhar a sua palavra", ""],
       ["definicao", "Qual é a Palavra?", "Descubra a palavra pela definição", ""],
       ["sinonimos", "Sinônimos", "Corrente de sinônimos contra o tempo", ""],
+      ["antonimos", "Antônimos", "Ache o contrário antes do tempo acabar", ""],
       ["desafiar", "Desafiar um amigo", "Escolha uma palavra e mande o link", ""],
     ];
     const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
@@ -76,6 +78,7 @@
       reverso: () => P.games.reverso(app),
       definicao: () => P.games.definicao(app),
       sinonimos: () => P.games.sinonimos(app),
+      antonimos: () => P.games.antonimos(app),
       desafiar: () => P.games.challengeCreate(app),
       perfil: () => P.games.perfil(app),
       intruso: () => P.games.intruso(app),

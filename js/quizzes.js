@@ -139,15 +139,26 @@
     draw();
   };
 
-  // ---------- Sinônimos em cadeia ----------
-  P.games.sinonimos = async function (root) {
-    const pairs = [], fams = [];
-    (await P.text("sinonimos.txt")).split("\n").forEach((raw) => {
-      const l = raw.trim();
-      if (!l || l.startsWith("#")) return;
-      if (l.startsWith("=")) fams.push(new Set(l.slice(1).split(",").map((s) => s.trim())));
-      else if (l.includes("|")) pairs.push({ word: l.split("|")[0].trim(), syn: l.split("|")[1].trim() });
-    });
+  // ---------- Sinônimos e Antônimos em cadeia ----------
+  const KINDS = {
+    sinonimos: { title: "Sinônimos", intro: "Escolha o sinônimo certo", explain: "tem o mesmo sentido", question: "Qual é o sinônimo de", sign: "=", best: "syn-best" },
+    antonimos: { title: "Antônimos", intro: "Escolha o antônimo certo", explain: "tem o sentido contrário", question: "Qual é o antônimo de", sign: "≠", best: "ant-best" },
+  };
+  const parseChain = (text, pairs, fams) => text.split("\n").forEach((raw) => {
+    const l = raw.trim();
+    if (!l || l.startsWith("#")) return;
+    if (l.startsWith("=")) fams.push(new Set(l.slice(1).split(",").map((s) => s.trim())));
+    else if (pairs && l.includes("|")) pairs.push({ word: l.split("|")[0].trim(), syn: l.split("|")[1].trim() });
+  });
+  P.games.antonimos = (root) => P.games.sinonimos(root, "antonimos");
+  P.games.sinonimos = async function (root, kindKey = "sinonimos") {
+    const K = KINDS[kindKey], pairs = [], fams = [];
+    if (kindKey === "antonimos") {
+      // Pares nos dois sentidos; as famílias dos sinônimos também bloqueiam alternativas ambíguas.
+      parseChain(await P.text("antonimos.txt"), pairs, fams);
+      pairs.slice().forEach((p) => pairs.push({ word: p.syn, syn: p.word }));
+      parseChain(await P.text("sinonimos.txt"), null, fams);
+    } else parseChain(await P.text("sinonimos.txt"), pairs, fams);
     const famOf = (w) => { const s = new Set([w]); fams.forEach((f) => f.has(w) && f.forEach((x) => s.add(x))); return s; };
     const SECS = 10;
     let deck, idx, chain, over, picked, options, started = false, raf, t0;
@@ -160,7 +171,7 @@
     const reset = () => { deck = P.shuffle(pairs); idx = 0; chain = 0; over = false; build(); };
     reset();
 
-    root.innerHTML = P.topbar("Sinônimos") + `<div class="game" data-body style="padding-bottom:16px"></div>`;
+    root.innerHTML = P.topbar(K.title) + `<div class="game" data-body style="padding-bottom:16px"></div>`;
     const body = P.$("[data-body]", root);
     function tick() {
       if (!document.body.contains(body) || over || picked) return;
@@ -170,21 +181,21 @@
       if (left <= 0) { over = true; P.fx.lose(); end(); draw(); return; }
       raf = requestAnimationFrame(tick);
     }
-    const end = () => { P.store.max("syn-best", chain); P.logActivity(); };
+    const end = () => { P.store.max(K.best, chain); P.logActivity(); };
     function draw() {
-      const best = P.store.get("syn-best", 0), q = deck[idx];
+      const best = P.store.get(K.best, 0), q = deck[idx];
       if (!started) {
         body.innerHTML = `${P.statsHTML([[0, "Cadeia"], [best, "Recorde"]], "two")}<div class="center" style="margin:auto 0">
-          <h2>Escolha o sinônimo certo</h2><p class="muted">Aparece uma palavra e quatro opções. Toque na que tem o mesmo sentido. Você tem ${SECS} segundos por palavra, e a cadeia continua até o primeiro erro.</p>
+          <h2>${K.intro}</h2><p class="muted">Aparece uma palavra e quatro opções. Toque na que ${K.explain}. Você tem ${SECS} segundos por palavra, e a cadeia continua até o primeiro erro.</p>
           <button class="pill wide" data-go>Começar</button></div>`;
         P.$("[data-go]", body).onclick = () => { started = true; t0 = performance.now(); draw(); raf = requestAnimationFrame(tick); };
         return;
       }
       body.innerHTML = `${P.statsHTML([[chain, "Cadeia"], [Math.max(best, chain), "Recorde"]], "two")}
         <div class="timer"><i style="width:100%"></i></div>
-        <p class="center muted" style="margin-top:24px">Qual é o sinônimo de</p><div class="word-big">${P.esc(q.word)}</div>
+        <p class="center muted" style="margin-top:24px">${K.question}</p><div class="word-big">${P.esc(q.word)}</div>
         ${options.map((o) => { const cls = picked == null && !over ? "" : o === q.syn ? "right" : o === picked ? "wrong" : "dim"; return `<button class="opt ${cls}" data-o="${P.esc(o)}">${P.esc(o)}</button>`; }).join("")}
-        ${over ? `<h2 class="center">${picked == null ? "O tempo acabou!" : "Fim da cadeia!"}</h2><p class="center muted">${P.esc(q.word)} = ${P.esc(q.syn)}</p><button class="pill wide" data-again>Jogar de novo</button>` : ""}`;
+        ${over ? `<h2 class="center">${picked == null ? "O tempo acabou!" : "Fim da cadeia!"}</h2><p class="center muted">${P.esc(q.word)} ${K.sign} ${P.esc(q.syn)}</p><button class="pill wide" data-again>Jogar de novo</button>` : ""}`;
       body.querySelectorAll("[data-o]").forEach((b) => (b.onclick = () => {
         if (over || picked) return;
         picked = b.dataset.o; cancelAnimationFrame(raf);

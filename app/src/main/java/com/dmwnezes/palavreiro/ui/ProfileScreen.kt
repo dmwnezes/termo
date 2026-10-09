@@ -142,6 +142,7 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
         RecordRow("Reverso", "app ${records.revApp} × ${records.revUser} você")
         RecordRow("Qual é a Palavra?", "recorde ${records.defBest} seguidas · ${records.defRight} acertos")
         RecordRow("Sinônimos", "maior cadeia: ${records.synBest}")
+        RecordRow("Antônimos", "maior cadeia: ${records["ant_best"]}")
         RecordRow("Arquivo", "${records["arch_played"]} ${if (records["arch_played"] == 1) "desafio" else "desafios"}")
     }
 }

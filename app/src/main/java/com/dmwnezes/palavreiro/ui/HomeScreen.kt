@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR, INTRUSO, ORTOGRAFIA, ARQUIVO }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, ANTONIMOS, DESAFIAR, INTRUSO, ORTOGRAFIA, ARQUIVO }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -77,6 +77,7 @@ fun HomeScreen(
         GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
+        GameCardInfo(Dest.ANTONIMOS, "Antônimos", "Ache o contrário antes do tempo acabar", null),
         GameCardInfo(Dest.DESAFIAR, "Desafiar um amigo", "Escolha uma palavra e mande o link", null),
     )
     Box(Modifier.fillMaxSize().background(Night.background)) {
@@ -272,6 +273,11 @@ private fun CardIcon(dest: Dest) {
             }
         }
         Dest.ARQUIVO -> Text("🗂️", fontSize = 26.sp)
+        Dest.ANTONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Pill("ALTO", Night.surfaceHigh)
+            Text("≠", color = Night.muted, fontSize = 12.sp)
+            Pill("BAIXO", Night.red)
+        }
         Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Pill("BELO", Night.surfaceHigh)
             Text("=", color = Night.muted, fontSize = 12.sp)
@@ -284,7 +290,7 @@ private fun CardIcon(dest: Dest) {
 private fun Pill(text: String, bg: Color) {
     Text(
         text, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
-        color = if (bg == Night.correct) Color(0xFF1A1438) else Night.text,
+        color = if (bg == Night.correct || bg == Night.red) Color(0xFF1A1438) else Night.text,
         modifier = Modifier.clip(Shapes.pill).background(bg).padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }

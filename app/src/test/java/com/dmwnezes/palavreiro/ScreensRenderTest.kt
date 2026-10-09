@@ -151,6 +151,15 @@ class ScreensRenderTest {
     }
 
     @Test
+    fun antonimos() {
+        rule.mainClock.autoAdvance = false
+        val (_, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (p, f) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        rule.setContent { PalavreiroTheme { SynonymScreen(p, f, null, null, {}, seed = 4, kind = com.dmwnezes.palavreiro.ui.ChainKind.ANTONIMOS) } }
+        save("23-antonimos")
+    }
+
+    @Test
     fun arquivo() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.ArchiveScreen(null, {}, { _, _ -> }, today = day) } }

@@ -164,10 +164,11 @@ fun SynonymScreen(
     feedback: Feedback?,
     onBack: () -> Unit,
     seed: Long = System.nanoTime(),
+    kind: ChainKind = ChainKind.SINONIMOS,
 ) {
     var round by remember { mutableIntStateOf(0) }
     val game = remember(round) { SynonymGame(pairs, families, seed + round) }
-    var best by remember { mutableIntStateOf(store?.int("syn_best") ?: 0) }
+    var best by remember { mutableIntStateOf(store?.int(kind.bestKey) ?: 0) }
     val timer = remember(round) { Animatable(1f) }
     val scope = rememberCoroutineScope()
     var started by remember { mutableStateOf(false) }
@@ -186,14 +187,14 @@ fun SynonymScreen(
     LaunchedEffect(game.over) {
         if (game.over) {
             store?.logActivity()
-            store?.max("syn_best", game.chain)
+            store?.max(kind.bestKey, game.chain)
             best = maxOf(best, game.chain)
         }
     }
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Sinônimos", onBack)
+            TopBar(kind.title, onBack)
             Column(
                 Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -204,10 +205,10 @@ fun SynonymScreen(
                 }
                 Spacer(Modifier.height(22.dp))
                 if (!started) {
-                    Text("Escolha o sinônimo certo", color = Night.text, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text(kind.intro, color = Night.text, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "Aparece uma palavra e quatro opções. Toque na que tem o mesmo sentido. Você tem ${game.secondsPerQuestion} segundos por palavra, e a cadeia continua até o primeiro erro.",
+                        "Aparece uma palavra e quatro opções. Toque na que ${kind.explain}. Você tem ${game.secondsPerQuestion} segundos por palavra, e a cadeia continua até o primeiro erro.",
                         color = Night.muted, fontSize = 15.sp, textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(28.dp))
@@ -221,7 +222,7 @@ fun SynonymScreen(
                         )
                     }
                     Spacer(Modifier.height(26.dp))
-                    Text("Qual é o sinônimo de", color = Night.muted, fontSize = 15.sp)
+                    Text(kind.question, color = Night.muted, fontSize = 15.sp)
                     Spacer(Modifier.height(6.dp))
                     Text(game.question.word, color = Night.text, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(24.dp))
@@ -258,7 +259,7 @@ fun SynonymScreen(
                             if (game.picked == null) "O tempo acabou!" else "Fim da cadeia!",
                             color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold,
                         )
-                        Text("${game.question.word} = ${game.question.synonym}", color = Night.muted, fontSize = 15.sp)
+                        Text("${game.question.word} ${kind.sign} ${game.question.synonym}", color = Night.muted, fontSize = 15.sp)
                         Spacer(Modifier.height(14.dp))
                         PillButton("Jogar de novo", Night.correct, modifier = Modifier.fillMaxWidth()) { round++ }
                     }
@@ -267,4 +268,10 @@ fun SynonymScreen(
             }
         }
     }
+}
+
+/** Os dois jogos de cadeia: Sinônimos (mesmo sentido) e Antônimos (sentido contrário). */
+enum class ChainKind(val title: String, val intro: String, val explain: String, val question: String, val sign: String, val bestKey: String) {
+    SINONIMOS("Sinônimos", "Escolha o sinônimo certo", "tem o mesmo sentido", "Qual é o sinônimo de", "=", "syn_best"),
+    ANTONIMOS("Antônimos", "Escolha o antônimo certo", "tem o sentido contrário", "Qual é o antônimo de", "≠", "ant_best"),
 }

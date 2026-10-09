@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "12"; // versão dos arquivos de conteúdo
+  const V = "13"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };

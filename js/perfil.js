@@ -66,6 +66,7 @@
           <div class="rec"><span>Reverso</span><span>site ${g("rev-app")} × ${g("rev-user")} você</span></div>
           <div class="rec"><span>Qual é a Palavra?</span><span>recorde ${g("def-best")} seguidas · ${g("def-right")} acertos</span></div>
           <div class="rec"><span>Sinônimos</span><span>maior cadeia: ${g("syn-best")}</span></div>
+          <div class="rec"><span>Antônimos</span><span>maior cadeia: ${g("ant-best")}</span></div>
           <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div></div>`;
       body.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = +b.dataset.tab; draw(); }));
       body.querySelectorAll("[data-evo]").forEach((b) => (b.onclick = () => { evo = b.dataset.evo; draw(); }));

@@ -36,6 +36,15 @@ object QuizData {
         }
         return pairs to families
     }
+
+    /**
+     * Antônimos: pares nos dois sentidos (ALTO→BAIXO e BAIXO→ALTO) e famílias do arquivo
+     * somadas às dos sinônimos, para nenhuma alternativa errada servir também como resposta.
+     */
+    fun antonyms(text: String, synonymFamilies: List<Set<String>>): Pair<List<SynPair>, List<Set<String>>> {
+        val (pairs, families) = synonyms(text)
+        return (pairs + pairs.map { SynPair(it.synonym, it.word) }) to (families + synonymFamilies)
+    }
 }
 
 /**

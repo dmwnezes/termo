@@ -198,6 +198,7 @@ fun PalavreiroApp() {
                         Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
+                        Dest.ANTONIMOS -> SynonymScreen(AppGraph.antonyms, AppGraph.antonymFamilies, store, AppGraph.feedback, back, kind = com.dmwnezes.palavreiro.ui.ChainKind.ANTONIMOS)
                         Dest.DESAFIAR -> ChallengeScreen(AppGraph.words, AppGraph.feedback, back)
                         Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
