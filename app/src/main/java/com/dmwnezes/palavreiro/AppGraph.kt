@@ -40,6 +40,12 @@ object AppGraph {
         private set
     lateinit var families: List<Set<String>>
         private set
+    /** Famílias de assunto dos grupos do Conexões (para o modo infinito). */
+    lateinit var connFamilies: Map<String, Set<String>>
+        private set
+    /** Temas do Caça-Palavras Infinito: os do dia + os extras. */
+    lateinit var themesInfinite: List<SearchTheme>
+        private set
     /** Significado de cada palavra do Termo (chave sem acento). */
     lateinit var meanings: Map<String, String>
         private set
@@ -55,6 +61,8 @@ object AppGraph {
         fun asset(name: String) = app.assets.open(name).bufferedReader().use { it.readText() }
         connections = ConnectionsData.parse(asset("conexoes.txt"))
         themes = WordSearchData.parse(asset("caca.txt"))
+        connFamilies = ConnectionsData.families(asset("conexoes-familias.txt"))
+        themesInfinite = themes + WordSearchData.parse(asset("caca-extra.txt"))
         definitions = QuizData.definitions(asset("definicoes.txt"))
         QuizData.synonyms(asset("sinonimos.txt")).let { (p, f) -> synonyms = p; families = f }
         meanings = QuizData.meanings(asset("significados.txt"))

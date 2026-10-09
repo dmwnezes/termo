@@ -138,15 +138,29 @@ class ScreensRenderTest {
     @Test
     fun conexoes() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { ConnectionsScreen(ConnectionsData.parse(asset("conexoes.txt")), null, null, {}, day) } }
+        rule.setContent { PalavreiroTheme { ConnectionsScreen(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), null, null, {}, day) } }
         save("11-conexoes")
+    }
+
+    @Test
+    fun conexoesInfinito() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { ConnectionsScreen(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), null, null, {}, day, startInfinite = true) } }
+        save("11b-conexoes-infinito")
     }
 
     @Test
     fun caca() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), null, null, {}, day) } }
+        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day) } }
         save("12-caca")
+    }
+
+    @Test
+    fun cacaInfinito() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day, startInfinite = true) } }
+        save("12b-caca-infinito")
     }
 
     @Test

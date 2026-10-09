@@ -22,6 +22,21 @@ object WordSearchData {
             SearchTheme(line.substring(0, i).trim(), line.substring(i + 1).split(',').map { it.trim() }.filter { it.isNotEmpty() })
         }
 
+    /**
+     * Caça-Palavras Infinito: sorteia um tema (dos do dia + extras) e 8 palavras dele.
+     * Mesma semente = mesma grade.
+     */
+    fun infinite(pool: List<SearchTheme>, seed: Long): WordSearch {
+        val rnd = Random(seed)
+        var lastError: Exception? = null
+        repeat(30) {
+            val theme = pool[rnd.nextInt(pool.size)]
+            val words = theme.words.distinct().shuffled(rnd).take(8)
+            try { return WordSearch(SearchTheme(theme.name, words), rnd.nextLong()) } catch (e: IllegalStateException) { lastError = e }
+        }
+        throw lastError ?: IllegalStateException()
+    }
+
     fun dailyIndex(date: LocalDate, count: Int): Int {
         val i = Words.dayIndex(date)
         return (((i * 11L + 3L) % count + count) % count).toInt()
@@ -42,6 +57,7 @@ class WordSearch(val theme: SearchTheme, seed: Long, val size: Int = 10) {
         var result: Pair<Array<CharArray>, List<Placed>>? = null
         var attempt = 0
         while (result == null) {
+            check(attempt < 400) { "Não coube na grade" }
             result = tryBuild(Random(rnd.nextLong()), allowBackwards = attempt < 40)
             attempt++
         }

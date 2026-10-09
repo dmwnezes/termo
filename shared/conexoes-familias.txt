@@ -1,0 +1,123 @@
+# Conexões Infinito: cada grupo do conexoes.txt com as "famílias" de assunto em que suas palavras caberiam.
+# Um desafio infinito junta 4 grupos de desafios diferentes, um de cada cor, sem famílias em comum
+# (assim nenhuma palavra cabe em dois grupos ao mesmo tempo). "fora" = nunca entra no modo infinito.
+Frutas: comida, natureza
+Cores: cor, comida
+Instrumentos do forró: musica, forma
+Pé de ___: lacuna, animal, comida, roupa, natureza
+Planetas: ceu, mito
+Bichos do sertão: animal
+Comidas nordestinas: comida
+Quebra-___: lacuna, corpo, comida
+Ritmos brasileiros: musica
+Peças de xadrez: jogo
+Partes do corpo: corpo, comida
+Guarda-___: lacuna, ceu, roupa, corpo
+Esportes: esporte, roupa
+Móveis: casa
+Signos: signo, animal, ceu
+Bate-___: lacuna, corpo, esporte
+Profissões: trabalho
+Cômodos da casa: casa
+Notas musicais: musica
+Sem-___: lacuna, casa
+Aves: animal
+Insetos: animal
+Peixes: animal
+Porta-___: lacuna, transporte
+Transportes: transporte
+Calçados: roupa
+Utensílios de cozinha: casa, praia
+Palíndromos: fora
+Bebidas: comida
+Material escolar: escola
+Flores: natureza, cor
+Capitais do Nordeste: lugar
+Ferramentas: casa
+Árvores: natureza, casa
+Meses de número ímpar: tempo
+Cores do arco-íris: cor, comida
+Roupas: roupa
+Coisas de praia: praia, esporte
+Animais marinhos: animal
+Mal-___: lacuna
+Naipes: jogo
+Moedas: dinheiro
+Doces de festa: comida
+Olho de ___: lacuna, animal, comida
+Esportes com bola: esporte
+Partes do carro: transporte
+Instrumentos de sopro: musica
+Cara de ___: lacuna, casa, mito
+Animais da fazenda: animal
+Legumes: comida
+Temperos: comida
+Pão de ___: lacuna, comida
+Estações do ano: ceu, tempo
+Fenômenos do tempo: ceu
+Pontos cardeais: ceu, lugar
+Para-___: lacuna, ceu, transporte
+Animais da savana: animal
+Formas geométricas: forma, escola
+Partes do computador: tecnologia
+Arroz de ___: lacuna, comida, animal
+Cereais: comida
+Laticínios: comida
+Partes da árvore: natureza
+Fim de ___: lacuna, tempo
+Deuses gregos: mito
+Continentes: lugar
+Rios brasileiros: lugar
+Mão de ___: lacuna, animal, mineral, casa
+Profissões da saúde: trabalho
+Animais de estimação: animal
+Jogos de cartas: jogo
+Bom ___: lacuna, tempo
+Partes da casa: casa
+Coisas de banheiro: casa
+Animais que botam ovos: animal
+Água ___: lacuna, animal
+Danças: musica
+Unidades de medida: medida, natureza, tempo, transporte
+Brinquedos: jogo
+Cabeça de ___: lacuna, animal, comida, casa, ceu
+Metais: mineral, cor
+Pedras preciosas: mineral, cor
+Partes do olho: corpo
+Linha de ___: lacuna, esporte, transporte
+Répteis: animal
+Frutas cítricas: comida, natureza
+Material de construção: casa
+Ponto de ___: lacuna, transporte, escola, lugar
+Esportes aquáticos: esporte, praia
+Datas comemorativas: tempo
+Corpos celestes: ceu
+Tira-___: lacuna, casa
+Trabalhos manuais: artesanato, roupa
+Aves de rapina: animal
+Sobremesas: comida
+Bem-___: lacuna
+Partes do pé: corpo
+Café da manhã: comida
+Ferramentas de jardim: casa, natureza
+Ponta-___: lacuna, corpo, esporte
+Insetos que voam: animal
+Lugares da cidade: lugar
+Partes do livro: escola, roupa
+Sangue ___: lacuna, cor, ceu, corpo
+Comidas de São João: comida, tempo
+Partes da bicicleta: transporte
+Expressões cearenses: palavra, comida
+Banho de ___: lacuna, ceu, praia, lugar, natureza
+Animais herbívoros: animal
+Profissões da escola: trabalho, escola
+Mudam de sentido com acento: fora
+Fogo ___: lacuna, natureza
+Peças de bateria: musica, casa
+Matérias da escola: escola
+Bichinhos do jardim: animal, natureza
+Dor de ___: lacuna, corpo
+Frutos do mar: animal, comida
+Instrumentos de percussão: musica
+Coisas do futebol: esporte
+Ficar de ___: lacuna, corpo, comida

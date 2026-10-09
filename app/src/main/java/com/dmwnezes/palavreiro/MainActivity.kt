@@ -180,8 +180,8 @@ fun PalavreiroApp() {
                 is Screen.Other -> {
                     val back: () -> Unit = { screen = Screen.Home; refresh++ }
                     when (s.dest) {
-                        Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, store, AppGraph.feedback, back)
-                        Dest.CACA -> WordSearchScreen(AppGraph.themes, store, AppGraph.feedback, back)
+                        Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
+                        Dest.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back)
                         Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)

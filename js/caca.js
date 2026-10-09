@@ -36,19 +36,45 @@
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   P.fmtTime = fmt;
 
-  P.games.caca = async function (root) {
-    const themes = (await P.text("caca.txt")).split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"))
-      .map((l) => { const i = l.indexOf(":"); return { name: l.slice(0, i).trim(), words: l.slice(i + 1).split(",").map((s) => s.trim()).filter(Boolean) }; });
-    const day = P.dayKey(), i = P.dayIndex();
-    const theme = themes[((i * 11 + 3) % themes.length + themes.length) % themes.length];
-    const { g, placed } = build(theme.words, P.rng(i * 31 + 17));
-    const st = P.store.get("ws-state", null);
-    let found = st && st.day === day ? st.found : [];
-    let seconds = st && st.day === day ? st.seconds || 0 : 0;
-    const done = () => found.length === placed.length;
+  const parseThemes = (t) => t.split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"))
+    .map((l) => { const i = l.indexOf(":"); return { name: l.slice(0, i).trim(), words: l.slice(i + 1).split(",").map((s) => s.trim()).filter(Boolean) }; });
+  // Infinito: tema sorteado (dos do dia + extras) e 8 palavras dele; mesma semente = mesma grade.
+  const infinite = (pool, seed) => {
+    const rnd = P.rng(seed);
+    for (let k = 0; k < 30; k++) {
+      const theme = pool[Math.floor(rnd() * pool.length)];
+      const words = P.shuffle([...new Set(theme.words)], rnd).slice(0, 8);
+      const b = build(words, rnd);
+      if (b) return { theme: { name: theme.name, words }, ...b };
+    }
+    return null;
+  };
+  const newSeed = () => Math.floor(Math.random() * 2147483647);
 
-    root.innerHTML = P.topbar("Caça-Palavras", { extra: `<b class="muted" data-time style="padding-right:10px">${fmt(seconds)}</b>` }) +
-      `<div class="game"><div class="ws-theme"><small>Tema de hoje</small><h2>${P.esc(theme.name)}</h2></div>
+  P.games.caca = async function (root, inf = false) {
+    const [themes, extra] = await Promise.all([P.text("caca.txt").then(parseThemes), P.text("caca-extra.txt").then(parseThemes)]);
+    const pool = themes.concat(extra);
+    const day = P.dayKey(), i = P.dayIndex();
+    const st = P.store.get(inf ? "ws-inf-state" : "ws-state", null);
+    const seed = inf ? (st && st.seed != null ? st.seed : newSeed()) : null;
+    let theme, g, placed;
+    if (inf) ({ theme, g, placed } = infinite(pool, seed));
+    else { theme = themes[((i * 11 + 3) % themes.length + themes.length) % themes.length]; ({ g, placed } = build(theme.words, P.rng(i * 31 + 17))); }
+    const mine = st && (inf ? st.seed === seed : st.day === day);
+    let found = mine ? st.found : [];
+    let seconds = mine ? st.seconds || 0 : 0;
+    const done = () => found.length === placed.length;
+    // Próxima grade infinita, sempre com tema diferente da atual.
+    const next = () => {
+      let s; do { s = newSeed(); } while (infinite(pool, s).theme.name === theme.name);
+      P.store.set("ws-inf-state", { seed: s, found: [], seconds: 0 });
+      document.querySelectorAll(".overlay").forEach((o) => o.remove());
+      P.games.caca(root, true);
+    };
+    if (inf && done()) return next();
+
+    root.innerHTML = P.topbar("Caça-Palavras", { extra: `<b class="muted" data-time style="padding-right:10px">${fmt(seconds)}</b>` }) + P.modeSwitch(inf) +
+      `<div class="game"><div class="ws-theme"><small>${inf ? "Tema sorteado" : "Tema de hoje"}</small><h2>${P.esc(theme.name)}</h2></div>
       <div class="ws-wrap"><canvas></canvas><div class="ws-grid" style="grid-template-columns:repeat(${N},1fr)"></div></div>
       <div class="chips" data-chips></div><p class="center muted" data-count></p><div class="center" data-after style="padding-bottom:16px"></div></div>`;
     const wrap = P.$(".ws-wrap", root), canvas = P.$("canvas", wrap), gridEl = P.$(".ws-grid", wrap);
@@ -60,7 +86,8 @@
       if (done()) return;
       seconds++; P.$("[data-time]", root).textContent = fmt(seconds); save();
     }, 1000);
-    function save() { P.store.set("ws-state", { day, found, seconds }); }
+    function save() { if (document.body.contains(wrap)) P.store.set(inf ? "ws-inf-state" : "ws-state", inf ? { seed, found, seconds } : { day, found, seconds }); }
+    P.bindModeSwitch(root, (v) => { clearInterval(timer); P.games.caca(root, v); });
 
     function paint() {
       const dpr = devicePixelRatio || 1, size = wrap.clientWidth;
@@ -73,7 +100,10 @@
       P.$("[data-chips]", root).innerHTML = placed.map((p) => `<span class="${found.includes(p.w) ? "found" : ""}">${P.esc(p.d)}</span>`).join("");
       P.$("[data-count]", root).textContent = `${found.length} de ${placed.length} palavras`;
       const after = P.$("[data-after]", root);
-      if (done() && !after.innerHTML) { const b = P.h(`<button class="pill">Ver resultado</button>`); b.onclick = result; after.appendChild(b); }
+      if (done() && !after.innerHTML) {
+        const b = P.h(`<button class="pill${inf ? " ghost" : ""}">Ver resultado</button>`); b.onclick = result; after.appendChild(b);
+        if (inf) { const n = P.h(`<button class="pill" style="margin-left:8px">Próxima grade</button>`); n.onclick = next; after.appendChild(n); }
+      }
     }
     const cellAt = (e) => {
       const r = wrap.getBoundingClientRect(), cell = r.width / N;
@@ -99,7 +129,8 @@
         found.push(hit.w); save(); P.fx.reveal(2, "c"); P.toast(hit.d);
         if (done()) {
           P.fx.win(); P.confetti();
-          if (P.store.get("ws-done") !== day) { P.store.set("ws-done", day); P.store.add("ws-played"); P.store.min("ws-best", seconds); P.logActivity(); }
+          if (inf) { P.store.add("ws-inf-played"); P.store.min("ws-inf-best", seconds); P.logActivity(); }
+          else if (P.store.get("ws-done") !== day) { P.store.set("ws-done", day); P.store.add("ws-played"); P.store.min("ws-best", seconds); P.logActivity(); }
           setTimeout(result, 1600);
         }
       }
@@ -108,16 +139,17 @@
     wrap.addEventListener("pointerup", up); wrap.addEventListener("pointercancel", () => { start = end = null; paint(); });
 
     function result() {
-      const best = P.store.get("ws-best", 0);
+      const best = P.store.get(inf ? "ws-inf-best" : "ws-best", 0), played = P.store.get(inf ? "ws-inf-played" : "ws-played", 0);
       const ui = P.sheet(`<h2>Você achou todas!</h2><p class="subtitle">Tema: ${P.esc(theme.name)}</p>
-        ${P.statsHTML([[fmt(seconds), "Tempo"], [best ? fmt(best) : "—", "Melhor tempo"], [P.store.get("ws-played", 0), "Grades"]], "three")}
+        ${P.statsHTML([[fmt(seconds), "Tempo"], [best ? fmt(best) : "—", "Melhor tempo"], [played, "Grades"]], "three")}
         <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>Stories</button></div>
-        <p class="note">Uma grade nova aparece amanhã.</p>`);
+        ${inf ? `<button class="pill" data-next style="width:100%;margin-top:10px">Próxima grade</button>` : `<p class="note">Uma grade nova aparece amanhã.</p>`}`);
+      if (inf) P.$("[data-next]", ui.el).onclick = next;
       P.$("[data-share]", ui.el).onclick = () => P.share(`Palavreiro · Caça-Palavras\nTema: ${theme.name}\nAchei as ${placed.length} palavras em ${fmt(seconds)} 🔎`);
       P.$("[data-story]", ui.el).onclick = () => P.story({
-        game: "Caça-Palavras do dia", headline: `Achei tudo em ${fmt(seconds)}`, detail: `Tema: ${theme.name}`,
+        game: inf ? "Caça-Palavras Infinito" : "Caça-Palavras do dia", headline: `Achei tudo em ${fmt(seconds)}`, detail: `Tema: ${theme.name}`,
         grids: [placed.map((_, k) => COLORS[k % COLORS.length]).reduce((a, c, k) => { (a[Math.floor(k / 4)] = a[Math.floor(k / 4)] || []).push(c); return a; }, [])],
-        stats: [[best ? fmt(best) : "—", "Melhor tempo"], [String(P.store.get("ws-played", 0)), "Grades"]],
+        stats: [[best ? fmt(best) : "—", "Melhor tempo"], [String(played), "Grades"]],
       });
     }
     window.addEventListener("resize", () => document.body.contains(wrap) && paint());

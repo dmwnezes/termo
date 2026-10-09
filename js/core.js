@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "10"; // versão dos arquivos de conteúdo
+  const V = "11"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -144,6 +144,10 @@
   P.topbar = (title, { help, extra = "" } = {}) => `<div class="topbar">
       <button class="icon-btn" data-back aria-label="Voltar">←</button>
       <h1>${title}</h1>${extra}${help ? `<button class="icon-btn" data-help aria-label="Como jogar">?</button>` : ""}</div>`;
+
+  // Seletor "Do dia | Infinito" (Conexões e Caça-Palavras).
+  P.modeSwitch = (inf) => `<div class="mode-switch"><button data-mode="0" class="${inf ? "" : "on"}">Do dia</button><button data-mode="1" class="${inf ? "on" : ""}">Infinito</button></div>`;
+  P.bindModeSwitch = (root, go) => root.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => { if (!b.classList.contains("on")) { P.fx.type(); go(b.dataset.mode === "1"); } }));
 
   P.statsHTML = (items, cls = "") => `<div class="stats ${cls}">${items.map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join("")}</div>`;
   P.distHTML = (dist, highlight, rows) => {

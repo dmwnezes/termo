@@ -283,3 +283,20 @@ fun LetterBox(
         Text(ch?.toString().orEmpty(), fontSize = (size.value * 0.5f).sp, fontWeight = FontWeight.SemiBold, color = textColor)
     }
 }
+
+/** Seletor "Do dia | Infinito" no topo de Conexões e Caça-Palavras. */
+@Composable
+fun ModeSwitch(infinite: Boolean, modifier: Modifier = Modifier, onChange: (Boolean) -> Unit) {
+    Row(modifier.fillMaxWidth().clip(Shapes.pill).background(Night.surface).padding(4.dp)) {
+        listOf(false to "Do dia", true to "Infinito").forEach { (value, label) ->
+            val on = value == infinite
+            Box(
+                Modifier.weight(1f).clip(Shapes.pill).background(if (on) Night.accent else Color.Transparent)
+                    .clickable { if (!on) onChange(value) }.padding(vertical = 9.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (on) Color(0xFF14102C) else Night.muted, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            }
+        }
+    }
+}

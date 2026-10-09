@@ -120,4 +120,38 @@ class NewGamesTest {
         }
         assertEquals(60, s.chain)
     }
+
+    @Test
+    fun conexoesInfinito() {
+        val puzzles = ConnectionsData.parse(asset("conexoes.txt"))
+        val fam = ConnectionsData.families(asset("conexoes-familias.txt"))
+        // Todo grupo tem família cadastrada.
+        puzzles.flatMap { it.groups }.forEach { assertNotNull(it.name, fam[it.name]) }
+        val seen = HashSet<String>()
+        for (seed in 0L until 500L) {
+            val p = ConnectionsData.remix(puzzles, fam, seed)
+            assertEquals(listOf(0, 1, 2, 3), p.groups.map { it.level })
+            val all = p.allWords.map { Words.normalize(it) }
+            assertEquals(16, all.toSet().size)
+            val fs = p.groups.flatMap { fam.getValue(it.name) }
+            assertEquals(fs.size, fs.toSet().size)
+            assertFalse(p.groups.any { "fora" in fam.getValue(it.name) })
+            assertEquals(p, ConnectionsData.remix(puzzles, fam, seed))
+            seen += p.groups.joinToString { it.name }
+        }
+        assertTrue(seen.size > 450)
+    }
+
+    @Test
+    fun cacaInfinito() {
+        val pool = WordSearchData.parse(asset("caca.txt")) + WordSearchData.parse(asset("caca-extra.txt"))
+        val names = HashSet<String>()
+        for (seed in 0L until 300L) {
+            val w = WordSearchData.infinite(pool, seed)
+            assertEquals(8, w.placed.size)
+            names += w.theme.name
+            assertEquals(w.grid.map { String(it) }, WordSearchData.infinite(pool, seed).grid.map { String(it) })
+        }
+        assertTrue(names.size > 50)
+    }
 }

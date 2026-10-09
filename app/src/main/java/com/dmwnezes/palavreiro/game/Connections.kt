@@ -35,6 +35,38 @@ object ConnectionsData {
         return puzzles
     }
 
+    /** Lê conexoes-familias.txt: nome do grupo -> famílias de assunto. */
+    fun families(text: String): Map<String, Set<String>> = text.lines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() && !it.startsWith("#") && ':' in it }
+        .associate { l -> l.substringBefore(':').trim() to l.substringAfter(':').split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet() }
+
+    /**
+     * Conexões Infinito: junta 4 grupos de desafios diferentes, um de cada cor,
+     * sem assunto em comum e sem palavra repetida. Mesma semente = mesmo desafio.
+     */
+    fun remix(puzzles: List<ConnPuzzle>, families: Map<String, Set<String>>, seed: Long): ConnPuzzle {
+        val rnd = Random(seed)
+        val byLevel = (0..3).map { lv ->
+            puzzles.mapNotNull { p -> p.groups.getOrNull(lv) }
+                .filter { g -> val f = families[g.name]; f != null && "fora" !in f && g.words.size == 4 }
+        }
+        repeat(5000) {
+            val pick = ArrayList<ConnGroup>()
+            val usedFam = HashSet<String>()
+            val usedWords = HashSet<String>()
+            for (lv in 0..3) {
+                val g = byLevel[lv][rnd.nextInt(byLevel[lv].size)]
+                val fam = families.getValue(g.name)
+                val norm = g.words.map { Words.normalize(it) }
+                if (fam.any { it in usedFam } || norm.any { it in usedWords }) break
+                usedFam += fam; usedWords += norm; pick += g
+            }
+            if (pick.size == 4) return ConnPuzzle(pick)
+        }
+        return puzzles[rnd.nextInt(puzzles.size)]
+    }
+
     /** Desafio do dia, sempre o mesmo para todos na mesma data. */
     fun dailyIndex(date: LocalDate, count: Int): Int {
         val i = Words.dayIndex(date)

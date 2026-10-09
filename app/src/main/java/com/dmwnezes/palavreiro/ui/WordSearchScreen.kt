@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,6 +50,7 @@ import com.dmwnezes.palavreiro.game.Words
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.random.Random
 
 fun formatTime(seconds: Int): String = "%d:%02d".format(seconds / 60, seconds % 60)
 
@@ -57,44 +59,71 @@ fun formatTime(seconds: Int): String = "%d:%02d".format(seconds / 60, seconds % 
 @Composable
 fun WordSearchScreen(
     themes: List<SearchTheme>,
+    infiniteThemes: List<SearchTheme>,
     store: Store?,
     feedback: Feedback?,
     onBack: () -> Unit,
     date: LocalDate = LocalDate.now(),
+    startInfinite: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
     val toast = rememberToast()
     val day = date.toString()
-    val theme = themes[WordSearchData.dailyIndex(date, themes.size)]
-    val ws = remember(day) {
-        WordSearch(theme, seed = Words.dayIndex(date) * 31 + 17).also { w ->
-            val saved = store?.text("ws_state")
-            if (saved != null && saved.substringBefore('|') == day) {
+    var infinite by remember { mutableStateOf(startInfinite) }
+    var infSeed by remember {
+        mutableLongStateOf(store?.text("ws_inf_state")?.substringBefore('|')?.toLongOrNull() ?: Random.nextLong())
+    }
+    val stateKey = if (infinite) "ws_inf_state" else "ws_state"
+    val tag = if (infinite) infSeed.toString() else day
+    val ws = remember(infinite, infSeed, day) {
+        val built = if (infinite) WordSearchData.infinite(infiniteThemes, infSeed)
+        else WordSearch(themes[WordSearchData.dailyIndex(date, themes.size)], seed = Words.dayIndex(date) * 31 + 17)
+        built.also { w ->
+            val saved = store?.text(stateKey)
+            if (saved != null && saved.substringBefore('|') == tag) {
                 saved.substringAfter('|').split(',').filter { it.isNotBlank() }.forEach { if (it !in w.found) w.found += it }
             }
         }
     }
-    var seconds by remember { mutableIntStateOf(if (store?.text("ws_day") == day) store.int("ws_elapsed") else 0) }
-    var showResult by remember { mutableStateOf(ws.done) }
+    val theme = ws.theme
+    var seconds by remember(ws) {
+        mutableIntStateOf(
+            if (infinite) store?.text("ws_inf_time")?.takeIf { it.substringBefore('|') == tag }?.substringAfter('|')?.toIntOrNull() ?: 0
+            else if (store?.text("ws_day") == day) store.int("ws_elapsed") else 0
+        )
+    }
+    var showResult by remember(ws) { mutableStateOf(ws.done && !infinite) }
     var confetti by remember { mutableIntStateOf(0) }
 
+    /** Próxima grade infinita, sempre com um tema diferente da atual. */
+    fun next() {
+        var s: Long
+        do { s = Random.nextLong() } while (infiniteThemes.size > 1 && WordSearchData.infinite(infiniteThemes, s).theme.name == theme.name)
+        infSeed = s
+    }
+    LaunchedEffect(ws) { if (infinite && ws.done) next() }
+
     // Cronômetro: conta enquanto a tela está aberta e a grade não terminou.
-    LaunchedEffect(ws.done) {
+    LaunchedEffect(ws, ws.done) {
         while (!ws.done) {
             delay(1000)
             seconds++
-            store?.setText("ws_day", day)
-            store?.setInt("ws_elapsed", seconds)
+            if (infinite) store?.setText("ws_inf_time", "$tag|$seconds")
+            else { store?.setText("ws_day", day); store?.setInt("ws_elapsed", seconds) }
         }
     }
 
     fun onFound() {
-        store?.setText("ws_state", day + "|" + ws.found.joinToString(","))
+        store?.setText(stateKey, tag + "|" + ws.found.joinToString(","))
         if (ws.done) {
             feedback?.win()
             confetti++
-            if (store != null && store.text("ws_done") != day) {
+            if (store != null && infinite) {
+                store.add("ws_inf_played")
+                store.logActivity(day)
+                store.min("ws_inf_best", seconds)
+            } else if (store != null && store.text("ws_done") != day) {
                 store.setText("ws_done", day)
                 store.add("ws_played")
                 store.logActivity(day)
@@ -103,18 +132,22 @@ fun WordSearchScreen(
             scope.launch { delay(1600); showResult = true }
         }
     }
+    val bestKey = if (infinite) "ws_inf_best" else "ws_best"
+    val playedKey = if (infinite) "ws_inf_played" else "ws_played"
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             TopBar("Caça-Palavras", onBack, trailing = {
                 Text(formatTime(seconds), color = Night.muted, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(end = 12.dp))
             })
+            ModeSwitch(infinite, Modifier.padding(horizontal = 14.dp)) { infinite = it }
+            Spacer(Modifier.height(10.dp))
             Column(
                 // Sem rolagem: o arrasto na grade não pode virar rolagem da tela.
                 Modifier.weight(1f).padding(horizontal = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("Tema de hoje", color = Night.muted, fontSize = 13.sp)
+                Text(if (infinite) "Tema sorteado" else "Tema de hoje", color = Night.muted, fontSize = 13.sp)
                 Text(theme.name, color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
                 Spacer(Modifier.height(12.dp))
                 SearchGrid(ws) { p ->
@@ -146,7 +179,10 @@ fun WordSearchScreen(
                 ToastView(toast)
                 if (ws.done) {
                     Spacer(Modifier.height(10.dp))
-                    PillButton("Ver resultado", Night.correct) { showResult = true }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PillButton("Ver resultado", if (infinite) Night.surfaceHigh else Night.correct, if (infinite) Night.text else Color(0xFF14102C)) { showResult = true }
+                        if (infinite) PillButton("Próxima grade", Night.correct) { next() }
+                    }
                 }
                 Spacer(Modifier.height(12.dp))
             }
@@ -158,22 +194,23 @@ fun WordSearchScreen(
                 Spacer(Modifier.height(16.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     StatItem(formatTime(seconds), "Tempo")
-                    StatItem(store?.int("ws_best")?.takeIf { it > 0 }?.let(::formatTime) ?: "—", "Melhor tempo")
-                    StatItem("${store?.int("ws_played") ?: 0}", "Grades")
+                    StatItem(store?.int(bestKey)?.takeIf { it > 0 }?.let(::formatTime) ?: "—", "Melhor tempo")
+                    StatItem("${store?.int(playedKey) ?: 0}", "Grades")
                 }
                 Spacer(Modifier.height(16.dp))
-                Text("Uma grade nova aparece amanhã.", fontSize = 13.sp, color = Night.muted)
+                if (infinite) PillButton("Próxima grade", Night.present, modifier = Modifier.fillMaxWidth()) { showResult = false; next() }
+                else Text("Uma grade nova aparece amanhã.", fontSize = 13.sp, color = Night.muted)
                 Spacer(Modifier.height(12.dp))
                 PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {
                     val colors = ws.placed.indices.map { colorFor(it) }
                     StoryCard.share(
                         context,
                         StoryData(
-                            game = "Caça-Palavras do dia",
+                            game = if (infinite) "Caça-Palavras Infinito" else "Caça-Palavras do dia",
                             headline = "Achei tudo em ${formatTime(seconds)}",
                             detail = "Tema: ${theme.name}",
                             grids = listOf(colors.chunked(4)),
-                            stats = listOf((store?.int("ws_best")?.takeIf { it > 0 }?.let(::formatTime) ?: "—") to "Melhor tempo", "${store?.int("ws_played") ?: 0}" to "Grades"),
+                            stats = listOf((store?.int(bestKey)?.takeIf { it > 0 }?.let(::formatTime) ?: "—") to "Melhor tempo", "${store?.int(playedKey) ?: 0}" to "Grades"),
                         ),
                     )
                 }
