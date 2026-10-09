@@ -2,88 +2,37 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#121213" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2A2058" />
   <meta http-equiv="Cache-Control" content="no-cache" />
-  <title>Termo em Português</title>
-  <link rel="stylesheet" href="style.css?v=7" />
+  <title>Palavreiro</title>
+  <meta name="description" content="Jogos de palavras em português: Termo, Dueto, Quarteto, Conexões, Caça-Palavras e mais." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%232A2058'/%3E%3Cg%3E%3Crect x='8' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3Crect x='26' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3Crect x='44' y='41' width='14' height='18' rx='4' fill='%23E6C14F'/%3E%3Crect x='62' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3Crect x='80' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <div id="splash" class="splash" role="dialog" aria-label="Abertura">
-    <div class="splash-main">
-      <h1>TERMO</h1>
-    </div>
-    <div class="splash-credit">
-      <a class="credit" href="https://www.instagram.com/dmwnezes/" target="_blank" rel="noopener">
-        <img src="img/criador.jpg?v=7" alt="Foto de @dmwnezes" width="34" height="34" />
-        <span>criado por: <b>@dmwnezes</b></span>
-      </a>
-    </div>
-  </div>
-  <header class="topbar">
-    <h1>TERMO</h1>
-    <nav class="modes" aria-label="Modos de jogo">
-      <button class="mode active" data-mode="diario" aria-pressed="true">Diário</button>
-      <button class="mode" data-mode="infinito" aria-pressed="false">Infinito</button>
-      <button class="mode" disabled title="Em breve">Dueto</button>
-      <button class="mode" disabled title="Em breve">Quarteto</button>
-    </nav>
-    <div class="icons">
-      <button id="btn-stats" aria-label="Estatísticas">📊</button>
-      <button id="btn-help" aria-label="Como jogar">❔</button>
-    </div>
-  </header>
-
-  <main>
-    <div id="board" class="board" aria-label="Tabuleiro"></div>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <button id="btn-new" class="primary" hidden>Nova palavra ↻</button>
-    <div id="keyboard" class="keyboard" aria-label="Teclado"></div>
-  </main>
-
-  <div id="modal-stats" class="modal" hidden>
-    <div class="modal-box">
-      <button class="close" data-close aria-label="Fechar">✕</button>
-      <h2 id="stats-title">Estatísticas</h2>
-      <div class="stats-grid">
-        <div><span id="s-played">0</span><small>Jogos</small></div>
-        <div><span id="s-winpct">0</span><small>% Vitórias</small></div>
-        <div><span id="s-streak">0</span><small>Sequência</small></div>
-        <div><span id="s-max">0</span><small>Melhor</small></div>
-      </div>
-      <h3>Distribuição de tentativas</h3>
-      <div id="dist" class="dist"></div>
-      <button id="stats-new" class="primary" hidden>Jogar nova palavra ↻</button>
-      <div id="stats-next" hidden>
-        <p class="note">Volte amanhã para uma nova palavra.</p>
-        <button id="stats-inf" class="primary">Jogar no modo Infinito ∞</button>
-      </div>
-    </div>
+    <div class="mark bounce"><span></span><span></span><span></span><span></span><span></span></div>
+    <h1>Palavreiro</h1>
+    <a class="credit" href="https://www.instagram.com/dmwnezes/" target="_blank" rel="noopener">
+      <img src="img/criador.jpg?v=7" alt="Foto de @dmwnezes" width="34" height="34" />
+      <span>criado por: <b>@dmwnezes</b></span>
+    </a>
   </div>
 
-  <div id="modal-help" class="modal" hidden>
-    <div class="modal-box">
-      <button class="close" data-close aria-label="Fechar">✕</button>
-      <h2>Como jogar</h2>
-      <p>Descubra a palavra de 5 letras em até 6 tentativas.</p>
-      <ul>
-        <li><b>Verde:</b> a letra está na posição certa.</li>
-        <li><b>Amarelo:</b> a letra está na palavra, em outra posição.</li>
-        <li><b>Cinza:</b> a letra não está na palavra.</li>
-      </ul>
-      <p>Os acentos são preenchidos sozinhos: digite sem acento.</p>
-      <p><b>Diário:</b> uma palavra por dia, igual para todos.<br>
-      <b>Infinito:</b> jogue quantas palavras quiser, com estatísticas separadas.</p>
-      <p>Toque em um quadrado da linha para escolher onde colocar a letra.</p>
-      <hr />
-      <a class="credit" href="https://www.instagram.com/dmwnezes/" target="_blank" rel="noopener">
-        <img src="img/criador.jpg?v=7" alt="Foto de @dmwnezes" width="34" height="34" />
-        <span>criado por: <b>@dmwnezes</b></span>
-      </a>
-    </div>
-  </div>
+  <div id="app"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="shared/words.js?v=7"></script>
-  <script src="game.js?v=7"></script>
+  <script src="shared/words.js?v=8"></script>
+  <script src="js/core.js?v=8"></script>
+  <script src="js/termo.js?v=8"></script>
+  <script src="js/conexoes.js?v=8"></script>
+  <script src="js/caca.js?v=8"></script>
+  <script src="js/quizzes.js?v=8"></script>
+  <script src="js/perfil.js?v=8"></script>
+  <script src="js/app.js?v=8"></script>
 </body>
 </html>

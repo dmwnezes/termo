@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícone de notificação: os cinco quadradinhos em branco -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M1,9.5h3.4a0.8,0.8 0 0 1 0.8,0.8v3.4a0.8,0.8 0 0 1 -0.8,0.8h-3.4a0.8,0.8 0 0 1 -0.8,-0.8v-3.4a0.8,0.8 0 0 1 0.8,-0.8z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M5.8,9.5h3.4a0.8,0.8 0 0 1 0.8,0.8v3.4a0.8,0.8 0 0 1 -0.8,0.8h-3.4a0.8,0.8 0 0 1 -0.8,-0.8v-3.4a0.8,0.8 0 0 1 0.8,-0.8z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M10.6,7.5h3.4a0.8,0.8 0 0 1 0.8,0.8v3.4a0.8,0.8 0 0 1 -0.8,0.8h-3.4a0.8,0.8 0 0 1 -0.8,-0.8v-3.4a0.8,0.8 0 0 1 0.8,-0.8z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M15.4,9.5h3.4a0.8,0.8 0 0 1 0.8,0.8v3.4a0.8,0.8 0 0 1 -0.8,0.8h-3.4a0.8,0.8 0 0 1 -0.8,-0.8v-3.4a0.8,0.8 0 0 1 0.8,-0.8z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M20.2,9.5h2.6a0.8,0.8 0 0 1 0.8,0.8v3.4a0.8,0.8 0 0 1 -0.8,0.8h-2.6a0.8,0.8 0 0 1 -0.8,-0.8v-3.4a0.8,0.8 0 0 1 0.8,-0.8z" />
+</vector>

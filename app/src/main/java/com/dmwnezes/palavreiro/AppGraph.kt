@@ -40,6 +40,9 @@ object AppGraph {
         private set
     lateinit var families: List<Set<String>>
         private set
+    /** Significado de cada palavra do Termo (chave sem acento). */
+    lateinit var meanings: Map<String, String>
+        private set
 
     private var ready = false
 
@@ -54,6 +57,7 @@ object AppGraph {
         themes = WordSearchData.parse(asset("caca.txt"))
         definitions = QuizData.definitions(asset("definicoes.txt"))
         QuizData.synonyms(asset("sinonimos.txt")).let { (p, f) -> synonyms = p; families = f }
+        meanings = QuizData.meanings(asset("significados.txt"))
         ready = true
     }
 }

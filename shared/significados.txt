@@ -1,0 +1,1000 @@
+MUITO|Em grande quantidade ou intensidade.
+SOBRE|Em cima de; também: a respeito de.
+AINDA|Até este momento; também: além disso.
+FAZER|Criar, produzir ou realizar algo.
+AGORA|Neste momento.
+ASSIM|Deste modo, desta maneira.
+MUNDO|O planeta Terra e tudo o que existe nele.
+TEMPO|Duração das coisas; também: o clima de um momento.
+ENTÃO|Naquele momento; também: por isso.
+FORMA|Aparência, formato de algo; também: maneira.
+MAIOR|Que é mais grande que outro.
+FALAR|Expressar-se com palavras.
+FICAR|Permanecer em um lugar ou estado.
+POUCO|Em pequena quantidade.
+NOITE|Período entre o pôr e o nascer do sol.
+ESTAR|Encontrar-se em um lugar ou situação.
+DIZER|Expressar algo por palavras.
+SABER|Ter conhecimento de algo.
+LUGAR|Espaço ocupado por alguém ou algo; local.
+GENTE|Pessoas; também: nós, no uso do dia a dia.
+FINAL|Último; também: a partida que decide um campeonato.
+QUASE|Por pouco; perto de.
+TANTO|Em quantidade ou grau tão grande.
+HOMEM|Ser humano do sexo masculino; também: a humanidade.
+VÍDEO|Gravação de imagens em movimento.
+PODER|Ter capacidade ou permissão; também: autoridade.
+MORTE|Fim da vida.
+LOCAL|Lugar; também: que é de uma região específica.
+FILME|Obra de cinema; também: película fina.
+GERAL|Que vale para todos; comum ao conjunto.
+FAVOR|Ajuda ou gentileza feita a alguém.
+SÉRIE|Sequência de coisas; também: programa em episódios.
+CORPO|A estrutura física de uma pessoa ou animal.
+CINCO|O número 5.
+CLARO|Cheio de luz; também: fácil de entender.
+NORTE|Ponto cardeal oposto ao sul.
+GOSTO|Sabor; também: preferência pessoal.
+FELIZ|Contente, alegre.
+MANHÃ|Parte do dia entre o nascer do sol e o meio-dia.
+PORÉM|Mas, contudo.
+PAPEL|Folha fina para escrever; também: função de alguém.
+FÁCIL|Que se faz sem esforço.
+FORTE|Que tem força; resistente.
+MARÇO|Terceiro mês do ano.
+LONGO|Que tem grande comprimento ou duração.
+LEGAL|De acordo com a lei; também: bom, bacana.
+JUNHO|Sexto mês do ano, das festas juninas.
+CAMPO|Terreno aberto fora da cidade; também: área de jogo.
+OUVIR|Perceber sons pelos ouvidos.
+ÚNICO|Só um; sem igual.
+PERTO|A pouca distância.
+LEVAR|Transportar de um lugar para outro.
+ONTEM|No dia anterior a hoje.
+JOVEM|Que tem pouca idade.
+SÉRIO|Que não brinca; também: importante, grave.
+LIVRE|Que não está preso; com liberdade.
+FESTA|Reunião para comemorar algo.
+TOTAL|Inteiro, completo; também: a soma de tudo.
+NÍVEL|Grau, altura ou etapa.
+ABRIL|Quarto mês do ano.
+IRMÃO|Filho dos mesmos pais que outra pessoa.
+VIVER|Estar vivo; também: morar.
+JULHO|Sétimo mês do ano.
+ORDEM|Arrumação; também: comando dado a alguém.
+TOMAR|Pegar; também: beber.
+IDADE|Tempo de vida de alguém.
+MUDAR|Trocar, alterar; também: ir morar em outro lugar.
+VALOR|Preço ou importância de algo.
+JEITO|Maneira de ser ou de fazer.
+PARAR|Deixar de se mover ou de fazer algo.
+TIRAR|Retirar, remover.
+TEXTO|Conjunto de frases escritas.
+ÉPOCA|Período de tempo.
+COMUM|Frequente, normal; também: compartilhado.
+CRIAR|Dar origem a algo novo.
+LONGE|A grande distância.
+OLHAR|Dirigir os olhos para algo.
+ATUAL|Do tempo presente.
+CIVIL|Relativo aos cidadãos; que não é militar.
+PEDIR|Solicitar algo a alguém.
+PEGAR|Segurar com a mão; também: apanhar.
+CANAL|Passagem de água; também: estação de TV.
+CHEFE|Quem comanda um grupo.
+COMER|Ingerir alimentos.
+RAZÃO|Capacidade de pensar; também: motivo.
+UNIÃO|Junção; ato de unir.
+PAGAR|Dar dinheiro em troca de algo.
+PRAIA|Faixa de areia à beira do mar.
+BANCO|Assento; também: instituição que guarda dinheiro.
+CLUBE|Associação de pessoas com interesses comuns; time.
+CURSO|Conjunto de aulas; também: direção de um rio.
+FUNDO|A parte mais baixa ou de trás de algo.
+VERDE|Cor das folhas das plantas.
+AUTOR|Quem cria uma obra.
+RÁDIO|Aparelho que recebe transmissões de som.
+NATAL|Festa do nascimento de Jesus; também: relativo ao nascimento.
+FONTE|Nascente de água; também: origem de uma informação.
+CRIME|Ato que vai contra a lei.
+VELHO|Que tem muita idade.
+JOGAR|Participar de um jogo; também: lançar.
+MONTE|Elevação de terra; também: grande quantidade.
+GLOBO|Esfera; também: o planeta Terra.
+MASSA|Mistura pastosa; também: macarrão.
+LÍDER|Quem guia ou comanda um grupo.
+MÉDIO|Que fica no meio.
+PREÇO|Valor em dinheiro de algo.
+CORTE|Ato de cortar; também: ferimento.
+MENOR|Que é mais pequeno que outro.
+VISÃO|Capacidade de ver.
+ABRIR|Deixar aberto o que estava fechado.
+MATAR|Tirar a vida.
+CAPAZ|Que consegue fazer algo.
+ACHAR|Encontrar; também: ter uma opinião.
+SANTO|Pessoa reconhecida pela Igreja por sua vida virtuosa; sagrado.
+MORTO|Que não tem mais vida.
+ANDAR|Caminhar; também: pavimento de um prédio.
+SINAL|Marca ou indicação; também: semáforo.
+CRISE|Momento difícil ou de mudança brusca.
+PRAÇA|Espaço público aberto na cidade.
+IGUAL|Que não tem diferença.
+CASAL|Par formado por duas pessoas.
+HOTEL|Lugar que hospeda viajantes.
+BREVE|Curto, rápido.
+LIDAR|Enfrentar ou cuidar de uma situação.
+CHAVE|Objeto que abre fechaduras.
+ÓTIMO|Muito bom.
+GRAÇA|Charme; também: algo engraçado.
+BANHO|Ato de se lavar com água.
+CHEIO|Que não tem mais espaço.
+OBTER|Conseguir, alcançar.
+OPÇÃO|Escolha possível.
+PERDA|Ato de perder algo.
+CLIMA|Condições do tempo de uma região; também: ambiente.
+MÍDIA|Meios de comunicação, como TV e internet.
+BEBER|Ingerir líquidos.
+TERMO|Palavra; também: fim, limite.
+POBRE|Que tem pouco dinheiro.
+ÁLBUM|Livro de fotos; também: coletânea de músicas.
+CHUVA|Água que cai das nuvens.
+HAVER|Existir; ter.
+SETOR|Parte de uma área ou atividade.
+TOCAR|Encostar; também: fazer soar um instrumento.
+OESTE|Ponto cardeal onde o sol se põe.
+LOUCO|Que perdeu o juízo; também: muito animado.
+LEITE|Líquido branco produzido pelas fêmeas dos mamíferos.
+LUTAR|Combater; também: esforçar-se por algo.
+MORAL|Conjunto de valores sobre o certo e o errado.
+LIGAR|Unir; também: acionar um aparelho ou telefonar.
+GOLPE|Pancada; também: trapaça.
+PALCO|Lugar onde artistas se apresentam.
+PRAZO|Tempo limite para fazer algo.
+HUMOR|Estado de ânimo; também: comédia.
+MUSEU|Lugar que guarda e expõe obras e objetos históricos.
+BATER|Dar pancadas; também: o coração pulsar.
+CALOR|Temperatura alta.
+ENFIM|Finalmente.
+SÍTIO|Pequena propriedade rural.
+CASAR|Unir-se em casamento.
+RURAL|Do campo.
+GRAVE|Sério, perigoso; também: som baixo.
+FRASE|Conjunto de palavras com sentido completo.
+CURTO|De pequeno comprimento ou duração.
+BRAÇO|Membro do corpo entre o ombro e a mão.
+RAPAZ|Homem jovem.
+MOTOR|Máquina que produz movimento.
+AONDE|Para qual lugar.
+NAÇÃO|Povo de um país.
+VINTE|O número 20.
+SUBIR|Ir para cima.
+AVIÃO|Veículo que voa com asas e motores.
+VOTAR|Escolher por meio de voto.
+ÁUDIO|Som gravado ou transmitido.
+ETAPA|Fase, parte de um processo.
+VÍRUS|Micro-organismo que causa doenças; também: programa nocivo.
+DISCO|Objeto redondo e chato; também: álbum de música.
+ANUAL|Que acontece uma vez por ano.
+AVISO|Comunicado de alerta.
+CONTO|História curta.
+NAVIO|Embarcação grande.
+FUGIR|Escapar.
+VIRAR|Girar; também: transformar-se.
+SOLAR|Relativo ao Sol.
+FÓRUM|Lugar de debates; também: prédio da Justiça.
+SEÇÃO|Parte de um todo; divisão.
+PENAL|Relativo a crimes e penas.
+CENTO|Cem; uma centena.
+ÓRGÃO|Parte do corpo com função própria; também: instrumento musical.
+RECÉM|Há pouco tempo.
+HERÓI|Pessoa admirada por coragem ou grandes feitos.
+ALIÁS|Por sinal; a propósito.
+CICLO|Série de fatos que se repetem.
+SALÃO|Sala grande; também: lugar de cabeleireiro.
+MOEDA|Peça de metal usada como dinheiro.
+DRAMA|Situação triste ou tensa; também: peça de teatro.
+ACASO|Coincidência, sorte.
+TURNO|Período de trabalho; vez.
+BRIGA|Discussão ou luta.
+MORAR|Viver em um lugar.
+SENÃO|Caso contrário.
+COROA|Enfeite de rei usado na cabeça.
+ARROZ|Grão branco muito comum nas refeições.
+METAL|Material duro e brilhante, como ferro e ouro.
+NARIZ|Parte do rosto por onde se respira e se sente cheiro.
+ROCHA|Pedra grande e dura.
+AREIA|Grãos finos de pedra, como os da praia.
+FLUXO|Movimento contínuo de algo.
+DEVER|Obrigação; também: estar devendo.
+FALSO|Que não é verdadeiro.
+EXAME|Prova; também: análise médica.
+TEMER|Ter medo.
+IDEAL|Perfeito; também: objetivo maior.
+ARENA|Lugar de espetáculos e competições.
+MAJOR|Posto militar acima de capitão.
+SENSO|Capacidade de julgar; juízo.
+TÊNIS|Esporte de raquete; também: calçado esportivo.
+NOÇÃO|Ideia, conhecimento básico.
+METRÔ|Trem urbano, geralmente subterrâneo.
+GANHO|Lucro, vantagem.
+PLENO|Completo, cheio.
+CÓPIA|Reprodução de algo.
+LAVAR|Limpar com água.
+ELITE|Grupo considerado o melhor ou mais privilegiado.
+LIÇÃO|Ensinamento; também: tarefa de escola.
+GERAR|Produzir, criar.
+FRACO|Que tem pouca força.
+PRATO|Recipiente para comida; também: uma refeição.
+FIRME|Estável, que não balança.
+GREVE|Paralisação do trabalho em protesto.
+MEXER|Mover; também: misturar.
+PLACA|Chapa com informações, como a de carro.
+TCHAU|Despedida informal.
+ADEUS|Despedida.
+ÓBVIO|Evidente, claro.
+BAILE|Festa com dança.
+NOBRE|De família aristocrática; também: digno.
+METER|Colocar dentro.
+BARCO|Embarcação pequena ou média.
+FROTA|Conjunto de veículos ou navios.
+SÓCIO|Quem divide uma empresa com outros.
+DIABO|Espírito do mal.
+ALUNO|Quem estuda em uma escola.
+DIETA|Regime de alimentação.
+FEBRE|Temperatura do corpo acima do normal.
+SUAVE|Leve, macio, delicado.
+POEMA|Texto escrito em versos.
+NEGAR|Dizer que não; recusar.
+LIMPO|Sem sujeira.
+ATUAR|Agir; também: representar um papel.
+FATOR|Elemento que contribui para um resultado.
+VIGOR|Força, energia.
+AMPLO|Espaçoso, largo.
+MÓVEL|Peça de mobília; também: que pode se mover.
+BOTÃO|Peça que fecha a roupa; também: tecla que se aperta.
+VALER|Ter valor; também: ser válido.
+FRUTO|Parte da planta que guarda as sementes; também: resultado.
+DUPLO|Que vale por dois.
+ÁCIDO|De sabor azedo; também: substância química corrosiva.
+MILHO|Cereal de grãos amarelos presos numa espiga.
+SABOR|Gosto de um alimento.
+CALAR|Ficar em silêncio.
+EXPOR|Mostrar, apresentar.
+CLIPE|Vídeo de uma música; também: prendedor de papel.
+TRIBO|Grupo de pessoas com a mesma origem e costumes.
+CHATO|Que causa tédio ou incômodo; também: plano.
+FUMAR|Aspirar a fumaça do cigarro.
+EXATO|Correto, preciso.
+JUÍZO|Bom senso; também: julgamento.
+PIZZA|Massa redonda assada com cobertura, de origem italiana.
+AÉREO|Relativo ao ar ou a aviões.
+CULTO|Cerimônia religiosa; também: pessoa instruída.
+GORDO|Que tem muita gordura ou peso.
+NOTAR|Perceber.
+LUCRO|Ganho financeiro.
+MISSA|Celebração religiosa católica.
+COLAR|Joia usada no pescoço; também: grudar.
+DOBRO|Duas vezes a mesma quantidade.
+MACHO|Animal do sexo masculino.
+NORMA|Regra.
+LESÃO|Ferimento, machucado.
+DURAR|Continuar existindo por um tempo.
+LENTO|Devagar.
+PIANO|Instrumento musical de teclas.
+BURRO|Animal de carga parecido com o cavalo; também: pouco esperto.
+DENTE|Cada uma das peças duras da boca usadas para mastigar.
+DÓLAR|Moeda dos Estados Unidos.
+DETER|Fazer parar; prender.
+DOIDO|Maluco.
+OMBRO|Parte do corpo onde o braço se liga ao tronco.
+CRUEL|Que faz sofrer sem piedade.
+VÔLEI|Esporte em que se passa a bola por cima da rede com as mãos.
+VITAL|Essencial para a vida.
+TURNÊ|Série de apresentações em várias cidades.
+CIRCO|Espetáculo com palhaços, malabaristas e acrobatas.
+ÊXITO|Sucesso.
+CITAR|Mencionar.
+CENSO|Contagem da população.
+PORCO|Animal de fazenda criado para carne; também: sujo.
+PUXAR|Trazer para si com força.
+RIVAL|Adversário.
+PÁTIO|Área aberta dentro de uma construção.
+BRUTO|Grosseiro; também: em estado natural.
+BRAVO|Zangado; também: corajoso.
+DIGNO|Que merece respeito.
+TIGRE|Grande felino de pelo laranja com listras pretas.
+GESTO|Movimento do corpo que expressa algo.
+LAZER|Tempo livre para diversão.
+NUVEM|Massa de vapor de água no céu.
+CONDE|Título de nobreza.
+ÍCONE|Símbolo; também: figura de destaque.
+APELO|Pedido insistente.
+PULAR|Saltar.
+LAGOA|Pequeno lago.
+LIMÃO|Fruta cítrica e azeda.
+CORAL|Animal marinho que forma recifes; também: grupo de canto.
+FOCAR|Concentrar a atenção.
+MOVER|Mudar de lugar.
+CURAR|Fazer sarar.
+TÚNEL|Passagem subterrânea.
+COURO|Pele de animal tratada.
+FUSÃO|União de duas coisas em uma.
+VAPOR|Água em forma de gás.
+CREDO|Crença; também: expressão de espanto.
+GRADE|Estrutura de barras; também: tabela de horários.
+ATLAS|Livro de mapas.
+DUQUE|Título de nobreza acima de conde.
+VÍCIO|Hábito ruim e difícil de largar.
+DELTA|Foz de rio dividida em vários braços.
+VILÃO|Personagem malvado de uma história.
+BICHO|Animal.
+CAÇAR|Perseguir animais para capturar.
+SEXTO|Que ocupa a posição de número 6.
+BÔNUS|Prêmio ou vantagem extra.
+GÊNIO|Pessoa de inteligência extraordinária; também: temperamento.
+RADAR|Aparelho que detecta objetos à distância.
+REZAR|Fazer orações.
+MEDIR|Calcular o tamanho ou a quantidade.
+ÍDOLO|Pessoa muito admirada.
+DUELO|Combate entre duas pessoas.
+DÚZIA|Conjunto de doze unidades.
+GASTO|Despesa; também: desgastado.
+BALÃO|Bola de borracha cheia de ar; também: o das festas juninas.
+IMPOR|Obrigar a aceitar.
+SELVA|Floresta densa e selvagem.
+FORNO|Parte do fogão onde se assa comida.
+LORDE|Título de nobreza inglês.
+FATAL|Que causa morte; também: decisivo.
+TREZE|O número 13.
+MANTO|Capa longa.
+FÚRIA|Raiva muito forte.
+BATOM|Cosmético para colorir os lábios.
+FAROL|Torre com luz que guia navios; também: luz do carro.
+ALTAR|Mesa onde se celebram cerimônias religiosas.
+ODIAR|Sentir ódio.
+GRATO|Agradecido.
+BOTAR|Pôr, colocar.
+SÁBIO|Que tem muito conhecimento.
+BARÃO|Título de nobreza.
+MONGE|Religioso que vive num mosteiro.
+BALDE|Recipiente com alça para carregar líquidos.
+BERÇO|Cama de bebê.
+LÁPIS|Instrumento de escrever com grafite.
+NAVAL|Relativo a navios ou à Marinha.
+SECAR|Tirar a umidade.
+ÚTERO|Órgão onde o bebê se desenvolve na gravidez.
+ÓPERA|Peça de teatro toda cantada.
+ÁGUIA|Grande ave de rapina de visão aguçada.
+ROLAR|Girar sobre si mesmo.
+MISTO|Misturado; também: sanduíche de queijo e presunto.
+BLUSA|Peça de roupa para o tronco.
+PRADO|Campo coberto de grama.
+PILAR|Coluna de sustentação.
+FORRÓ|Ritmo e dança nordestinos com sanfona, zabumba e triângulo.
+SUÍTE|Quarto com banheiro próprio.
+VOCAL|Relativo à voz.
+ASILO|Abrigo; também: lar de idosos.
+CACAU|Fruto de onde se faz o chocolate.
+TUMOR|Crescimento anormal de células.
+VERBO|Palavra que indica ação ou estado.
+PESAR|Medir o peso; também: tristeza.
+VÁCUO|Espaço sem ar.
+LATIM|Língua da Roma antiga, mãe do português.
+PUNHO|Mão fechada; também: pulso.
+MOTEL|Hospedagem à beira de estradas.
+PODRE|Estragado.
+FARSA|Mentira, fingimento.
+CEDER|Dar, entregar; também: desistir.
+TRAIR|Ser desleal.
+NADAR|Mover-se na água.
+AFETO|Carinho.
+RUBRO|Vermelho intenso.
+PESTE|Doença contagiosa grave; também: pessoa travessa.
+PÓDIO|Plataforma dos vencedores de uma competição.
+SERVO|Quem serve a alguém.
+ASTRO|Corpo celeste; também: grande estrela da fama.
+CAUDA|Rabo.
+FERIR|Machucar.
+SÓDIO|Elemento químico presente no sal.
+RODAR|Girar.
+GERIR|Administrar.
+HÉLIO|Gás leve usado para encher balões.
+BRISA|Vento fraco e agradável.
+MANIA|Hábito exagerado.
+ERRAR|Cometer um erro.
+PUNIR|Castigar.
+RIGOR|Severidade, precisão.
+SABÃO|Produto para lavar.
+FOGÃO|Aparelho de cozinha para cozinhar alimentos.
+MAGRO|Que tem pouca gordura.
+VIRAL|Que se espalha rápido, como um vídeo na internet.
+IDOSO|Pessoa de idade avançada.
+PISAR|Pôr os pés sobre algo.
+JEJUM|Período sem comer.
+TENSO|Nervoso; também: esticado.
+CABRA|Animal de chifres criado por leite e carne; também: sujeito.
+SUTIL|Delicado, quase imperceptível.
+REFÉM|Pessoa mantida presa como garantia.
+ETNIA|Grupo com a mesma cultura e origem.
+ÂNIMO|Disposição, entusiasmo.
+SOMAR|Juntar quantidades.
+SUGAR|Puxar com a boca; chupar.
+MÁFIA|Organização criminosa.
+GENRO|Marido da filha.
+FREIO|Peça que faz um veículo parar.
+MURAL|Painel na parede; também: pintura em parede.
+USUAL|Habitual.
+SUMIR|Desaparecer.
+MÚTUO|Recíproco.
+RENAL|Relativo aos rins.
+OPTAR|Escolher.
+FOLIA|Festa animada, como o carnaval.
+LETAL|Mortal.
+MANGÁ|História em quadrinhos japonesa.
+GIRAR|Rodar.
+MIRIM|Pequeno; infantil.
+TEMOR|Medo.
+CATAR|Apanhar um por um.
+ARAME|Fio de metal.
+CIÚME|Medo de perder alguém querido para outra pessoa.
+SUTIÃ|Peça íntima que sustenta os seios.
+LOUÇA|Pratos, xícaras e travessas.
+LUNAR|Relativo à Lua.
+BAZAR|Loja de objetos variados.
+IMUNE|Protegido contra uma doença.
+MAGNO|Grande, ilustre.
+SUPOR|Imaginar como possível.
+SACAR|Tirar dinheiro; também: entender, na gíria.
+CLONE|Cópia idêntica.
+ÉPICO|Grandioso, heroico.
+FIXAR|Prender; também: memorizar.
+AFORA|Exceto; também: para fora.
+GUIAR|Conduzir, orientar.
+CALDO|Líquido de cozimento; sopa rala.
+PUDIM|Sobremesa cremosa com calda de caramelo.
+DEPOR|Dar depoimento; também: tirar do poder.
+VINIL|Disco de música de plástico preto.
+ADIAR|Deixar para depois.
+COFRE|Caixa forte para guardar valores.
+RUMOR|Boato.
+MOÇÃO|Proposta apresentada numa assembleia.
+ÉTICO|Que segue princípios morais.
+QUILO|Mil gramas.
+ÁPICE|O ponto mais alto.
+MERCÊ|Favor; à mercê de: dependente de.
+LITRO|Medida de volume igual a mil mililitros.
+FUZIL|Arma de fogo de cano longo.
+ÊXODO|Saída em massa de pessoas de um lugar.
+LOIRO|De cabelo claro, amarelado.
+FLUIR|Correr como um líquido.
+FURAR|Fazer um buraco.
+CUECA|Peça íntima masculina.
+RETER|Segurar, conservar.
+CORVO|Ave de penas pretas.
+RAMPA|Superfície inclinada.
+POLAR|Relativo aos polos da Terra.
+FEROZ|Selvagem, agressivo.
+MOTIM|Revolta de um grupo contra a autoridade.
+APITO|Instrumento que produz som agudo ao soprar.
+LEQUE|Objeto que se abana para refrescar.
+TÁBUA|Peça plana de madeira.
+TÉDIO|Sensação de aborrecimento, falta de interesse.
+POMBO|Ave comum nas praças das cidades.
+ÓBITO|Morte.
+RAÇÃO|Comida de animais; também: porção.
+ESQUI|Esporte de deslizar na neve; também: a prancha usada.
+PINHO|Madeira do pinheiro; também: violão, na gíria.
+BONDE|Veículo sobre trilhos movido a eletricidade.
+CANOA|Barco estreito movido a remo.
+LAUDO|Documento com parecer técnico.
+TORTO|Que não é reto.
+CUPOM|Comprovante ou vale-desconto.
+VAZAR|Escorrer para fora; também: espalhar um segredo.
+ÚMIDO|Levemente molhado.
+NUDEZ|Estado de quem está sem roupa.
+LENÇO|Pano para limpar o nariz ou enfeitar.
+GANSO|Ave aquática grande e barulhenta.
+FOSSO|Vala funda.
+XEQUE|Lance de xadrez que ameaça o rei.
+FORCA|Estrutura usada para enforcar; também: jogo de adivinhar palavras.
+BLITZ|Fiscalização de surpresa no trânsito.
+HÁBIL|Que tem habilidade; jeitoso.
+FARAÓ|Rei do Egito antigo.
+LÁBIO|Cada uma das bordas da boca.
+PENTE|Objeto com dentes para arrumar o cabelo.
+CLERO|Conjunto dos padres e religiosos.
+TÓRAX|Parte do corpo entre o pescoço e o abdômen; peito.
+TUTOR|Responsável legal por alguém; também: quem orienta estudos.
+FUNGO|Ser vivo como o mofo e o cogumelo.
+MIÚDO|Pequeno; também: miúdos são vísceras de animais.
+ÍMPAR|Número que não é divisível por dois; também: único.
+GALHO|Ramo de árvore.
+VETOR|Grandeza com direção e sentido; também: transmissor de doença.
+VERME|Animal de corpo mole e alongado, como a minhoca.
+AÇUDE|Represa que guarda água, muito comum no sertão.
+ARMAR|Montar; também: equipar com armas.
+NERVO|Fibra que leva sensações e comandos pelo corpo.
+TARSO|Conjunto de ossos do pé, perto do tornozelo.
+RUÍNA|Restos de uma construção destruída.
+TUFÃO|Tempestade com ventos muito fortes.
+MURRO|Soco.
+CABER|Ter espaço suficiente dentro de algo.
+GRUTA|Caverna.
+SUJAR|Deixar sujo.
+POLVO|Animal marinho de oito braços com ventosas.
+AGUDO|Pontudo; também: som fino e alto.
+RUIVO|De cabelo avermelhado.
+MELÃO|Fruta grande e doce de polpa clara.
+VELOZ|Muito rápido.
+BAMBU|Planta de caule alto, oco e resistente.
+MOLDE|Modelo usado para dar forma a algo.
+DUETO|Música cantada ou tocada por duas pessoas.
+CRAVO|Flor perfumada; também: tempero; também: ponto preto na pele.
+BRASA|Carvão ou lenha em fogo.
+LOURO|Folha usada como tempero; também: loiro.
+RÉGUA|Instrumento reto para medir e traçar linhas.
+SALMO|Canto ou poema religioso da Bíblia.
+BIOMA|Grande região com clima, fauna e flora próprios, como a caatinga.
+RAMAL|Linha secundária de telefone ou de trem.
+TONTO|Zonzo; também: bobo.
+CLORO|Produto químico usado para limpar piscinas e água.
+DURÃO|Pessoa que se faz de forte e severa.
+VAZÃO|Quantidade de líquido que passa por um ponto.
+DENSO|Compacto, espesso.
+PAVOR|Medo muito grande.
+BALSA|Embarcação que transporta pessoas e carros na travessia de rios.
+FÊNIX|Ave mitológica que renasce das próprias cinzas.
+ARCAR|Assumir a responsabilidade ou o custo.
+JAULA|Gaiola grande para animais.
+HORTO|Lugar onde se cultivam plantas.
+PAVÃO|Ave de cauda grande e colorida que se abre em leque.
+COUVE|Verdura de folhas verdes, servida na feijoada.
+CAPIM|Grama alta usada como pasto.
+TREVO|Planta de três folhas; o de quatro folhas dá sorte.
+ÂNSIA|Agonia; também: desejo intenso.
+PAPAL|Relativo ao papa.
+MÁGOA|Tristeza causada por uma ofensa.
+VAGÃO|Cada carro de um trem.
+OÁSIS|Lugar com água e plantas no meio do deserto.
+HASTE|Vara fina; também: caule.
+NASAL|Relativo ao nariz.
+BUSTO|Parte superior do corpo; também: escultura de cabeça e ombros.
+BUQUÊ|Ramo de flores.
+ALIAR|Unir-se a alguém por um objetivo.
+AVEIA|Cereal usado em mingaus e granolas.
+FEIXE|Molho de coisas amarradas; também: raio de luz.
+FETAL|Relativo ao feto.
+VULGO|Apelido; também: o povo em geral.
+ARDER|Queimar; também: provocar ardência.
+BANAL|Comum, sem importância.
+CURRY|Mistura de temperos de origem indiana.
+PEDAL|Peça acionada com o pé.
+ÁTOMO|Menor parte de um elemento químico.
+FARDA|Uniforme militar.
+LIMBO|Estado de esquecimento ou indefinição.
+TAPAR|Cobrir, fechar.
+BREJO|Terreno alagado.
+ÓRFÃO|Quem perdeu o pai ou a mãe.
+MAMAR|Sugar o leite do peito.
+NENÉM|Bebê.
+CISNE|Ave aquática branca de pescoço longo.
+GRILO|Inseto que canta à noite; também: preocupação.
+CESTO|Recipiente trançado.
+CAPUZ|Parte da roupa que cobre a cabeça.
+LICOR|Bebida alcoólica doce.
+NÉVOA|Neblina.
+ÁRDUO|Difícil, trabalhoso.
+JURAR|Prometer solenemente.
+PIXEL|Menor ponto de uma imagem digital.
+SABRE|Espada curva.
+MANSO|Calmo, dócil.
+SAUNA|Sala de vapor quente.
+CERNE|Parte central e mais dura do tronco; também: essência.
+GUETO|Bairro isolado onde vive um grupo segregado.
+ÓXIDO|Composto de oxigênio com outro elemento, como a ferrugem.
+LINHO|Tecido feito de uma planta de mesmo nome.
+LEBRE|Animal parecido com o coelho, de orelhas longas.
+CEDRO|Árvore de madeira nobre e perfumada.
+LATÃO|Metal amarelo; também: lata grande.
+ASSAR|Cozinhar no forno ou na brasa.
+LÁTEX|Seiva leitosa de algumas plantas, usada na borracha.
+MOITA|Arbusto baixo e cerrado.
+FÚTIL|Sem importância; superficial.
+MÚMIA|Corpo preservado, como os do Egito antigo.
+CHALÉ|Casa de campo com telhado inclinado.
+GAMBÁ|Animal que solta um cheiro forte para se defender.
+PRECE|Oração.
+BANIR|Expulsar, proibir.
+MAMÃO|Fruta tropical de polpa laranja.
+CAVAR|Abrir buraco na terra.
+ACESO|Que está ligado ou em chamas.
+FOCAL|Relativo ao foco; central.
+SEARA|Campo de cereais; também: área de atuação.
+VARAL|Fio onde se estende roupa para secar.
+POMAR|Plantação de árvores frutíferas.
+COÇAR|Esfregar a pele com as unhas.
+CORJA|Bando de gente ruim.
+LÍRIO|Flor branca e perfumada.
+PUDOR|Vergonha, recato.
+DOGMA|Verdade que não se questiona.
+AMENO|Agradável, suave.
+ZELAR|Cuidar com atenção.
+DITAR|Falar para alguém escrever; também: impor.
+MEIGO|Carinhoso, doce.
+URUBU|Ave preta que se alimenta de animais mortos.
+CANIL|Lugar onde se abrigam cães.
+AZEDO|De sabor ácido.
+BUCAL|Relativo à boca.
+TÊNUE|Fino, delicado, fraco.
+PÓLEN|Pó das flores que permite a reprodução das plantas.
+VESPA|Inseto parecido com a abelha, de ferrão doloroso.
+POÇÃO|Bebida mágica ou medicinal.
+SÓTÃO|Espaço entre o teto e o telhado.
+ÁRIDO|Muito seco.
+ILESO|Sem ferimentos.
+XEROX|Fotocópia.
+EDEMA|Inchaço causado por acúmulo de líquido.
+POSAR|Ficar parado para uma foto ou pintura.
+LAICO|Que não é religioso.
+FOBIA|Medo exagerado de algo.
+TIARA|Enfeite em arco para o cabelo.
+TRUTA|Peixe de água doce.
+LAPSO|Esquecimento ou erro momentâneo.
+PICAR|Cortar em pedaços pequenos; também: ferroar.
+ZÍPER|Fecho de roupa ou bolsa com dentes que se encaixam.
+ÂMBAR|Resina fóssil amarelada; também: a cor alaranjada.
+RETRÔ|Que imita o estilo do passado.
+SOCAR|Dar socos; também: amassar.
+BABAR|Deixar escorrer saliva; também: admirar muito.
+AQUÉM|Abaixo do esperado; do lado de cá.
+LABOR|Trabalho.
+ÁTRIO|Entrada de um prédio; também: cavidade do coração.
+SELAR|Fechar com selo; também: pôr sela no cavalo.
+TELÃO|Tela grande.
+MINAR|Brotar água; também: enfraquecer aos poucos.
+CÓLON|Parte do intestino grosso.
+PARVO|Tolo, bobo.
+HORDA|Bando numeroso e desordenado.
+LÍTIO|Metal leve usado em baterias.
+UNÇÃO|Ato de ungir com óleo sagrado.
+ROMBO|Buraco grande; também: grande prejuízo.
+FREAR|Fazer parar com o freio.
+MIRAR|Fazer pontaria; olhar.
+LOMBO|Costas de um animal; também: carne dessa parte.
+ÔMEGA|Última letra do alfabeto grego.
+REGAR|Molhar as plantas.
+FALIR|Quebrar financeiramente.
+GALÃO|Recipiente grande para líquidos; também: café com leite.
+ÓVULO|Célula reprodutora feminina.
+FACÃO|Faca grande.
+TRICÔ|Tecido feito à mão com duas agulhas.
+DÉBIL|Fraco.
+PAGÃO|Quem não segue as religiões cristãs.
+REVÉS|Contratempo; também: o lado contrário.
+MODEM|Aparelho que conecta à internet.
+SARAU|Reunião noturna com música e poesia.
+QUIÇÁ|Talvez.
+LÓTUS|Flor aquática sagrada no Oriente.
+VETAR|Proibir, barrar.
+VARÃO|Barra de metal; também: homem.
+HIATO|Intervalo; também: encontro de vogais em sílabas separadas.
+MAMBO|Ritmo e dança de origem cubana.
+FOICE|Ferramenta de lâmina curva para cortar mato.
+CARIZ|Aparência, aspecto.
+SARAR|Curar-se.
+CERVO|Veado.
+ACOLÁ|Lá longe.
+AREAL|Terreno coberto de areia.
+CACHÊ|Pagamento de um artista por apresentação.
+FUNIL|Utensílio em forma de cone para despejar líquidos.
+DUBLÊ|Quem substitui o ator em cenas perigosas.
+DÓCIL|Obediente, manso.
+VISOR|Tela pequena de um aparelho.
+FRADE|Religioso de uma ordem.
+DENDÊ|Óleo de palmeira usado no acarajé e na moqueca.
+ENJOO|Mal-estar com vontade de vomitar.
+BAIÃO|Ritmo nordestino; também: baião de dois, prato de arroz e feijão.
+PROLE|Filhos, descendência.
+CÍVEL|Relativo ao direito civil.
+ÁVIDO|Ansioso, desejoso.
+HIENA|Animal da savana conhecido pelo som que parece risada.
+OUSAR|Ter coragem para fazer algo.
+RÍMEL|Cosmético para os cílios.
+DOTAR|Dar uma qualidade ou recurso.
+GEMER|Fazer sons de dor ou esforço.
+FUROR|Fúria; também: grande sucesso.
+VAGAR|Andar sem rumo; também: ficar vago.
+AORTA|Maior artéria do corpo.
+AMIDO|Substância presente no milho, na batata e na mandioca.
+LOUSA|Quadro de escrever.
+LOÇÃO|Líquido para a pele ou o cabelo.
+ZERAR|Reduzir a zero.
+VOGAL|Letra A, E, I, O ou U.
+FEDOR|Cheiro muito ruim.
+BOINA|Chapéu redondo e achatado.
+PECAR|Cometer pecado.
+DORSO|Costas.
+TOTEM|Objeto ou figura que simboliza um grupo.
+MAGMA|Rocha derretida dentro da Terra.
+COZER|Cozinhar.
+CACTO|Planta com espinhos que vive em lugares secos.
+TENOR|Cantor de voz masculina aguda.
+PÁREO|Disputa; competição equilibrada.
+POTRO|Cavalo novo.
+LÚPUS|Doença em que o corpo ataca os próprios tecidos.
+TECER|Fazer tecido entrelaçando fios.
+CHOPE|Cerveja servida da torneira.
+MIOLO|Parte de dentro do pão; também: cérebro.
+CREPE|Panqueca fina.
+CETRO|Bastão que simboliza o poder de um rei.
+BANJO|Instrumento de cordas com corpo redondo.
+MODAL|Relativo ao modo; tipo de transporte.
+ÓSSEO|Relativo aos ossos.
+TRENÓ|Veículo que desliza na neve.
+REMAR|Mover um barco com remos.
+LIXAR|Alisar com lixa.
+DIQUE|Barreira contra a água.
+FLÚOR|Elemento usado nas pastas de dente.
+TRIPÉ|Suporte de três pés.
+ERETO|Em pé, reto.
+FÊMUR|Osso da coxa, o maior do corpo.
+VIRIL|Másculo.
+GABAR|Elogiar; gabar-se: contar vantagem.
+LARVA|Fase inicial de alguns insetos.
+AVELÃ|Fruto seco usado em cremes de chocolate.
+XISTO|Tipo de rocha.
+VORAZ|Que come muito; insaciável.
+SÓSIA|Pessoa muito parecida com outra.
+ALGOZ|Carrasco; quem maltrata.
+HARÉM|Parte da casa reservada às mulheres, em culturas antigas do Oriente.
+XAMPU|Produto para lavar o cabelo.
+NINAR|Embalar uma criança para dormir.
+OBESO|Que tem excesso de peso.
+CAULE|Parte da planta que sustenta folhas e flores.
+ORIXÁ|Divindade das religiões de matriz africana.
+MUSGO|Planta pequena e macia que cresce em lugares úmidos.
+BAQUE|Queda forte; também: choque emocional.
+SUÍNO|Relativo ao porco.
+ÂMAGO|A parte mais íntima; essência.
+CETIM|Tecido liso e brilhante.
+CISÃO|Divisão, separação.
+PÔNEI|Cavalo de raça pequena.
+ARDOR|Ardência; também: paixão.
+TALCO|Pó fino usado na pele.
+SAGAZ|Esperto, perspicaz.
+ÁLIBI|Prova de que alguém estava em outro lugar.
+ROJÃO|Fogo de artifício que estoura no ar.
+MOLAR|Dente de trás, usado para triturar.
+RAIAR|Começar a clarear, como o dia.
+ANZOL|Gancho usado para pescar.
+MIMAR|Tratar com muito carinho e regalias.
+ATEAR|Pôr fogo.
+REGER|Conduzir uma orquestra; também: governar.
+VAIAR|Fazer barulho para mostrar desaprovação.
+SONAR|Aparelho que localiza objetos debaixo d'água pelo som.
+FISCO|Órgão que cobra impostos.
+SANAR|Resolver, curar.
+LATIR|Soltar latidos, como o cachorro.
+SABIÁ|Pássaro brasileiro de canto bonito.
+LEPRA|Hanseníase, doença que afeta pele e nervos.
+BERRO|Grito forte.
+BEATO|Muito devoto.
+ROTOR|Parte que gira de uma máquina.
+PAVIO|Cordão que se acende na vela.
+PARIR|Dar à luz.
+BOLAR|Inventar, planejar.
+FEDER|Cheirar muito mal.
+GELAR|Ficar muito frio.
+PANÇA|Barriga grande.
+TOPAR|Aceitar; também: encontrar por acaso.
+VODCA|Bebida alcoólica destilada de origem russa.
+PAIOL|Depósito de mantimentos ou de pólvora.
+PUXÃO|Puxada forte.
+NEVAR|Cair neve.
+SADIO|Saudável.
+JARRO|Vaso para água ou flores.
+AXILA|Sovaco.
+COVIL|Esconderijo de animais ou bandidos.
+TRAPO|Pano velho e rasgado.
+SAFAR|Livrar de uma situação difícil.
+LOTAR|Encher completamente.
+LINCE|Felino de orelhas pontudas e visão aguçada.
+SANHA|Fúria, ira.
+CÁRIE|Doença que destrói os dentes.
+TAXAR|Cobrar taxa; também: rotular.
+RALAR|Passar no ralador; também: esfolar a pele.
+COICE|Pancada dada com a pata traseira.
+LERDO|Lento.
+LHAMA|Animal dos Andes parecido com o camelo, mas sem corcova.
+TENAZ|Persistente.
+RUELA|Rua estreita.
+CUPIM|Inseto que come madeira.
+DOMAR|Amansar um animal.
+ÓTICO|Relativo à visão ou à luz.
+BAGRE|Peixe de bigodes que vive no fundo de rios.
+MÍOPE|Quem enxerga mal de longe.
+CASPA|Escamas brancas que se soltam do couro cabeludo.
+GNOMO|Pequeno ser das lendas que vive na terra.
+TORSO|Tronco do corpo humano.
+RUMAR|Seguir em direção a um lugar.
+HÍFEN|Tracinho que une palavras, como em guarda-chuva.
+MOGNO|Árvore de madeira nobre avermelhada.
+TRECO|Coisa qualquer; troço.
+SELIM|Assento da bicicleta.
+NINFA|Divindade feminina da natureza nas lendas gregas.
+ALÇAR|Levantar, erguer.
+PIRÃO|Papa de farinha de mandioca com caldo.
+FUGAZ|Que passa muito rápido.
+TALÃO|Bloco de folhas destacáveis, como o de cheques.
+RÚGBI|Esporte com bola oval jogado com mãos e pés.
+PLATÔ|Planalto.
+BOCAL|Abertura de um recipiente; também: peça de instrumento de sopro.
+RAPEL|Descida por corda em paredões.
+PILÃO|Recipiente de madeira para socar grãos.
+BULBO|Parte arredondada da raiz de algumas plantas, como a cebola.
+CUSPE|Saliva.
+BEIJU|Tapioca dobrada, comum no Norte e no Nordeste.
+VISAR|Ter como objetivo; também: mirar.
+MATIZ|Tom de uma cor.
+ECOAR|Repetir-se como eco.
+RIMAR|Fazer rimas.
+BRABO|Bravo, zangado.
+CIANO|Azul esverdeado.
+PEQUI|Fruto do cerrado, de cheiro forte e caroço com espinhos.
+ALADO|Que tem asas.
+VIVAZ|Cheio de vida e energia.
+BEMOL|Sinal musical que abaixa a nota em meio tom.
+BOLOR|Mofo.
+LIANA|Cipó.
+ATROZ|Cruel, terrível.
+AUDAZ|Ousado, corajoso.
+VELAR|Vigiar; também: velório.
+FILÃO|Veio de minério; também: fonte de lucro.
+POLIR|Deixar brilhante esfregando.
+FEUDO|Terra de um senhor na Idade Média.
+CEGAR|Deixar cego.
+AFOXÉ|Cortejo musical de origem africana no carnaval da Bahia.
+UREIA|Substância eliminada na urina.
+GERME|Micróbio; também: origem de algo.
+BUCHO|Estômago de animal; também: barriga.
+MIOJO|Macarrão instantâneo.
+ÉBANO|Madeira escura e nobre.
+FUÇAR|Bisbilhotar, mexer em tudo.
+DÚBIO|Que pode ser entendido de dois jeitos.
+SAQUÊ|Bebida japonesa feita de arroz.
+CIDRA|Fruta cítrica grande, parecida com o limão.
+CAQUI|Fruta alaranjada e doce.
+PÓLIO|Poliomielite, doença prevenida por vacina.
+FURÃO|Pequeno mamífero alongado; também: quem falta a compromissos.
+VESGO|Que tem estrabismo.
+COESO|Unido, bem ligado.
+TÁTIL|Relativo ao tato.
+CHULÉ|Mau cheiro dos pés.
+ROÇAR|Encostar de leve; também: capinar.
+ÚMERO|Osso do braço.
+APURO|Situação difícil.
+ROUCO|Com a voz fraca e áspera.
+AIPIM|Mandioca, macaxeira.
+BOIAR|Flutuar; também: não entender nada, na gíria.
+AFIAR|Deixar cortante.
+BOMBO|Tambor grande de som grave.
+PELVE|Bacia, parte do corpo onde ficam os quadris.
+SENIL|Próprio da velhice.
+RAPAR|Raspar.
+HÚMUS|Terra fértil formada por restos de plantas.
+CORAR|Ficar vermelho de vergonha.
+REFIL|Carga para reabastecer um produto.
+AMEBA|Ser de uma só célula que muda de forma.
+BAOBÁ|Árvore africana de tronco muito grosso.
+FAUNO|Ser mitológico metade homem, metade bode.
+ARPÃO|Lança usada para pescar peixes grandes.
+SIFÃO|Cano curvo que impede o mau cheiro do esgoto.
+JEGUE|Jumento, muito comum no Nordeste.
+DERME|Camada da pele abaixo da superfície.
+PAPAR|Comer, na linguagem de criança.
+DÁLIA|Flor de muitas pétalas.
+JAMBO|Fruta vermelha de polpa branca.
+SISAL|Planta de fibra usada para fazer cordas.
+PODAR|Cortar galhos de plantas.
+TACAR|Jogar, arremessar.
+ÁCARO|Bicho microscópico que vive na poeira.
+VÁRIO|Diverso; vários: muitos.
+ABADÁ|Camiseta de bloco de carnaval.
+OTITE|Inflamação no ouvido.
+BÍLIS|Líquido do fígado que ajuda a digerir gorduras.
+SEIXO|Pedrinha lisa de rio.
+CAÇÃO|Pequeno tubarão usado na culinária.
+CRASE|Acento grave que marca a junção de a + a.
+UNTAR|Passar gordura.
+BUTIÁ|Fruto de uma palmeira do Sul do Brasil.
+DATAR|Pôr data; também: ser de certa época.
+ÁBACO|Instrumento de contas para fazer cálculos.
+CÍLIO|Pelo da borda das pálpebras.
+CARNÊ|Bloco de boletos para pagar em prestações.
+PEDRA|Material duro e mineral, como a rocha.
+PEIXE|Animal que vive na água e respira por guelras.
+FRUTA|Parte comestível e doce de algumas plantas.
+FEIRA|Mercado de rua com barracas.
+HORTA|Lugar onde se plantam verduras e legumes.
+LESTE|Ponto cardeal onde o sol nasce.
+PORTO|Lugar onde os navios atracam.
+PRATA|Metal precioso branco e brilhante.
+TESTE|Prova, experiência.
+SAÚDE|Bom estado do corpo e da mente.
+TROPA|Grupo de soldados; também: grupo de animais de carga.
+NINHO|Abrigo feito pelas aves para pôr os ovos.
+AJUDA|Auxílio.
+ADEGA|Lugar onde se guardam vinhos.
+AMORA|Fruta pequena e escura, doce e azedinha.
+BEIRA|Borda, margem.
+BISPO|Líder religioso de uma diocese; também: peça de xadrez.
+COSTA|Litoral; costas: parte de trás do tronco.
+DUCHA|Chuveiro forte.
+FENDA|Rachadura, abertura estreita.
+CHORO|Ato de chorar; também: gênero musical brasileiro.
+POSTO|Lugar de serviço, como o de gasolina; também: cargo.
+TALHO|Corte; também: açougue.
+PINGO|Gota pequena.
+QUINA|Canto, aresta; também: prêmio de loteria com cinco números.
+BOLSA|Sacola para levar objetos; também: auxílio em dinheiro para estudar.
+CAIXA|Recipiente para guardar coisas; também: quem recebe pagamentos.
+CARTA|Mensagem escrita enviada a alguém; também: peça do baralho.
+LIVRO|Conjunto de páginas encadernadas com um texto.
+FOLHA|Parte verde e achatada das plantas; também: folha de papel.
+GARFO|Talher com dentes para espetar a comida.
+PORTA|Abertura com tampa para entrar e sair de um lugar.
+ZEBRA|Animal africano listrado; também: resultado inesperado no futebol.
+COBRA|Réptil sem patas, de corpo comprido.
+VIOLA|Instrumento de cordas parecido com o violão, da música caipira.
+SAMBA|Ritmo e dança brasileiros.
+TANGO|Dança e música argentinas.
+VALSA|Dança de salão em compasso de três tempos.
+SALSA|Erva usada como tempero; também: ritmo latino.
+TERRA|O planeta onde vivemos; também: solo.
+VENTO|Ar em movimento.
+GRAMA|Planta rasteira dos jardins e campos; também: unidade de peso.
+PLUMA|Pena leve de ave.
+BOLHA|Bola de ar; também: inchaço com líquido na pele.
+PERNA|Membro do corpo que sustenta e permite andar.
+TESTA|Parte do rosto acima dos olhos.
+PALHA|Haste seca de cereais.
+BEIJO|Toque com os lábios.
+SORTE|Acontecimento favorável por acaso.
+SONHO|Imagens que surgem enquanto se dorme; também: desejo; também: doce frito recheado.
+PLANO|Projeto; também: superfície lisa.
+PISTA|Faixa por onde se corre ou se dirige; também: dica.
+PONTE|Construção que liga duas margens.
+TORRE|Construção alta e estreita; também: peça de xadrez.
+REINO|País governado por um rei.
+MAGIA|Truques que parecem impossíveis; feitiço.
+CREME|Pasta macia; também: nata do leite.
+TINTA|Líquido colorido para pintar ou escrever.
+LETRA|Sinal do alfabeto; também: texto de uma música.
+CANTO|Ato de cantar; também: esquina, ângulo.
+GRITO|Som alto da voz.
+PIADA|História curta para fazer rir.
+JARRA|Recipiente com bico para servir bebidas.
+SALTO|Pulo; também: parte de trás do sapato.
+ROUPA|Peça de vestir.
+CALÇA|Peça de roupa que cobre as pernas.
+CINTO|Tira que prende a calça na cintura.
+TORTA|Massa assada com recheio.
+MOLHO|Caldo para temperar a comida; também: conjunto de chaves.
+CERCA|Barreira que delimita um terreno.
+TELHA|Peça que forma o telhado.
+CHAMA|Fogo, labareda.
+CINZA|Pó que sobra depois de queimar; também: cor entre o branco e o preto.
+LENHA|Madeira para queimar.
+SERRA|Ferramenta dentada para cortar; também: cadeia de montanhas.
+PREGO|Haste de metal pontuda usada para fixar.
+TRENA|Fita métrica que se enrola.
+LINHA|Fio; também: traço; também: fileira.
+RENDA|Tecido delicado feito à mão, tradição do Ceará; também: rendimento.
+VIDRO|Material duro e transparente.
+TECLA|Botão de teclado ou piano.
+SENHA|Combinação secreta para acessar algo.
+PASTA|Pasta de papéis; também: massa cremosa.
+PROVA|Teste de avaliação; também: evidência.
+LEGAR|Deixar como herança.
+CASTO|Puro, inocente.
+MOSTO|Suco de uva antes de virar vinho.
+DÉRBI|Clássico entre dois times rivais da mesma cidade.

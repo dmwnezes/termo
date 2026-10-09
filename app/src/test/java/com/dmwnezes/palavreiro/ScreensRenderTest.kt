@@ -30,6 +30,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 
 /** Desenha as telas principais e salva imagens em app/build/frames para conferência. */
 @RunWith(RobolectricTestRunner::class)
@@ -106,7 +109,7 @@ class ScreensRenderTest {
         save("8-ajuda")
     }
 
-    private fun asset(n: String) = File("src/main/assets/$n").readText()
+    private fun asset(n: String) = File("../shared/$n").readText()
     private val day = java.time.LocalDate.of(2026, 10, 9)
 
     @Test
@@ -162,5 +165,42 @@ class ScreensRenderTest {
         val (p, f) = QuizData.synonyms(asset("sinonimos.txt"))
         rule.setContent { PalavreiroTheme { SynonymScreen(p, f, null, null, {}, seed = 4) } }
         save("15-sinonimos")
+    }
+
+    @Test
+    fun calendario() {
+        rule.mainClock.autoAdvance = false
+        val today = java.time.LocalDate.of(2026, 10, 9)
+        val act = (1..9).associate { today.withDayOfMonth(it).toString() to (it % 4 + 1) } - today.withDayOfMonth(4).toString()
+        val termo = (1..9).associate { today.withDayOfMonth(it).toString() to if (it == 6) "l" else "w" } - today.withDayOfMonth(4).toString()
+        rule.setContent {
+            PalavreiroTheme {
+                androidx.compose.foundation.layout.Column(
+                    androidx.compose.ui.Modifier.background(com.dmwnezes.palavreiro.ui.Night.surface).padding(18.dp)
+                ) { com.dmwnezes.palavreiro.ui.StreakCalendar(act, termo, today) }
+            }
+        }
+        save("16-calendario")
+    }
+
+    @Test
+    fun cartaoStories() {
+        val g = TermoGame(Mode.DUETO, words, store = null) { day }
+        for (w in listOf("CARRO", g.answers[0], "MUNDO", g.answers[1])) { w.forEach(g::type); g.submit(); g.finishReveal() }
+        val bmp = com.dmwnezes.palavreiro.ui.StoryCard.render(rule.activity, com.dmwnezes.palavreiro.ui.storyFor(g, Stats(played = 9, won = 8, streak = 5, maxStreak = 6)))
+        File(out, "17-stories.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 90, it) }
+    }
+
+    @Test
+    fun resultadoComSignificado() {
+        rule.mainClock.autoAdvance = false
+        val meanings = com.dmwnezes.palavreiro.game.QuizData.meanings(asset("significados.txt"))
+        val g = TermoGame(Mode.DIARIO, words, store = null) { day }
+        g.setHard(true)
+        g.hint()
+        for (i in 0 until 5) if (g.current[i] == null) { g.select(i); g.type(g.answer[i]) }
+        g.submit(); g.finishReveal()
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}, meanings) } }
+        save("18-resultado")
     }
 }

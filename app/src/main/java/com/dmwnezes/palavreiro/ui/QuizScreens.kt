@@ -61,6 +61,7 @@ fun DefineScreen(defs: List<Definition>, store: Store?, feedback: Feedback?, onB
             true -> {
                 feedback?.win()
                 store?.add("def_right")
+                store?.logActivity()
                 store?.max("def_best", game.streak); best = maxOf(best, game.streak)
                 toast.show(listOf("Isso!", "Acertou!", "Boa!", "Mandou bem!").random())
             }
@@ -184,6 +185,7 @@ fun SynonymScreen(
 
     LaunchedEffect(game.over) {
         if (game.over) {
+            store?.logActivity()
             store?.max("syn_best", game.chain)
             best = maxOf(best, game.chain)
         }

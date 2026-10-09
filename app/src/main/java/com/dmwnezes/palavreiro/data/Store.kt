@@ -14,7 +14,9 @@ enum class Mode(val key: String, val title: String, val boards: Int, val daily: 
     DIARIO("diario", "Termo", 1, daily = true, free = false),
     INFINITO("infinito", "Infinito", 1, daily = false, free = true),
     DUETO("dueto", "Dueto", 2, daily = true, free = true),
-    QUARTETO("quarteto", "Quarteto", 4, daily = true, free = true);
+    QUARTETO("quarteto", "Quarteto", 4, daily = true, free = true),
+    /** Palavra escolhida por um amigo, recebida por link. */
+    DESAFIO("desafio", "Desafio", 1, daily = false, free = false);
 
     val maxTries: Int get() = 5 + boards
 }
@@ -56,9 +58,18 @@ data class Stats(
 }
 
 /** Partida salva: as tentativas são reavaliadas ao carregar. */
-data class SavedGame(val key: String, val answers: List<String>, val words: List<String>, val over: Boolean, val won: Boolean) {
+data class SavedGame(
+    val key: String,
+    val answers: List<String>,
+    val words: List<String>,
+    val over: Boolean,
+    val won: Boolean,
+    val hints: List<Int> = emptyList(),
+    val hard: Boolean = false,
+) {
     fun toJson(): String = JSONObject()
         .put("key", key).put("answers", JSONArray(answers)).put("words", JSONArray(words)).put("over", over).put("won", won)
+        .put("hints", JSONArray(hints)).put("hard", hard)
         .toString()
 
     companion object {
@@ -69,7 +80,12 @@ data class SavedGame(val key: String, val answers: List<String>, val words: List
                 val arr = o.getJSONArray("words")
                 val ans = o.optJSONArray("answers")
                 val answers = if (ans != null) List(ans.length()) { ans.getString(it) } else listOf(o.getString("answer"))
-                SavedGame(o.getString("key"), answers, List(arr.length()) { arr.getString(it) }, o.optBoolean("over"), o.optBoolean("won"))
+                val h = o.optJSONArray("hints")
+                SavedGame(
+                    o.getString("key"), answers, List(arr.length()) { arr.getString(it) }, o.optBoolean("over"), o.optBoolean("won"),
+                    hints = if (h != null) List(h.length()) { h.getInt(it) } else emptyList(),
+                    hard = o.optBoolean("hard"),
+                )
             }.getOrNull()
         }
     }
@@ -102,6 +118,43 @@ class Store(context: Context) {
     var vibration: Boolean
         get() = prefs.getBoolean("vibration", true)
         set(v) = prefs.edit().putBoolean("vibration", v).apply()
+
+    /** Modo difícil: verdes ficam no lugar e amarelos precisam ser usados. */
+    var hard: Boolean
+        get() = prefs.getBoolean("hard", false)
+        set(v) = prefs.edit().putBoolean("hard", v).apply()
+
+    /** Lembrete diário (hora do dia, 0–23). */
+    var reminder: Boolean
+        get() = prefs.getBoolean("reminder", false)
+        set(v) = prefs.edit().putBoolean("reminder", v).apply()
+    var reminderHour: Int
+        get() = prefs.getInt("reminder_hour", 9)
+        set(v) = prefs.edit().putInt("reminder_hour", v).apply()
+
+    /** Quantos jogos foram concluídos em cada dia (para o calendário). */
+    fun activity(): Map<String, Int> = runCatching {
+        val o = JSONObject(prefs.getString("activity", "{}") ?: "{}")
+        o.keys().asSequence().associateWith { o.getInt(it) }
+    }.getOrDefault(emptyMap())
+
+    fun logActivity(day: String = java.time.LocalDate.now().toString()) {
+        val o = runCatching { JSONObject(prefs.getString("activity", "{}") ?: "{}") }.getOrDefault(JSONObject())
+        o.put(day, o.optInt(day) + 1)
+        prefs.edit().putString("activity", o.toString()).apply()
+    }
+
+    /** Resultado do Termo do dia em cada data: "w" (acertou) ou "l" (errou). */
+    fun termoResults(): Map<String, String> = runCatching {
+        val o = JSONObject(prefs.getString("termo_days", "{}") ?: "{}")
+        o.keys().asSequence().associateWith { o.getString(it) }
+    }.getOrDefault(emptyMap())
+
+    fun logTermo(day: String, won: Boolean) {
+        val o = runCatching { JSONObject(prefs.getString("termo_days", "{}") ?: "{}") }.getOrDefault(JSONObject())
+        o.put(day, if (won) "w" else "l")
+        prefs.edit().putString("termo_days", o.toString()).apply()
+    }
 
     var seenHelp: Boolean
         get() = prefs.getBoolean("seen_help", false)

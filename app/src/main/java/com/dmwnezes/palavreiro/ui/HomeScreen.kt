@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -68,6 +68,7 @@ fun HomeScreen(badges: Map<Dest, String?>, onOpen: (Dest) -> Unit, onProfile: ()
         GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
+        GameCardInfo(Dest.DESAFIAR, "Desafiar um amigo", "Escolha uma palavra e mande o link", null),
     )
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(
@@ -190,6 +191,12 @@ private fun CardIcon(dest: Dest) {
                 listOf(null, 'A', null, null).forEach { ch ->
                     Box(Modifier.size(11.dp).clip(RoundedCornerShape(3.dp)).background(if (ch != null) Night.present else Night.surfaceHigh))
                 }
+            }
+        }
+        Dest.DESAFIAR -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("✉", color = Night.present, fontSize = 22.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                repeat(5) { Box(Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(Night.accent)) }
             }
         }
         Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {

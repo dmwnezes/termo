@@ -21,6 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Lightbulb
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -63,6 +68,7 @@ fun GameScreen(
     onBack: () -> Unit,
     onPlayInfinite: () -> Unit,
     onHelp: () -> Unit,
+    meanings: Map<String, String> = emptyMap(),
 ) {
     val scope = rememberCoroutineScope()
     val toast = rememberToast()
@@ -121,10 +127,30 @@ fun GameScreen(
         append(game.mode.title)
         if (game.mode.daily && game.mode.free && !game.isDaily) append(" · livre")
     }
+    val ordinal = listOf("1ª", "2ª", "3ª", "4ª", "5ª")
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar(title = title, onBack = onBack, onHelp = onHelp)
+            TopBar(title = title, onBack = onBack, onHelp = onHelp, trailing = {
+                if (game.hard) {
+                    Text("DIFÍCIL", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Night.red,
+                        modifier = Modifier.clip(Shapes.pill).background(Night.red.copy(alpha = 0.15f)).padding(horizontal = 8.dp, vertical = 3.dp))
+                }
+                if (!game.over) {
+                    val left = game.maxHints - game.hints.size
+                    IconButton(onClick = {
+                        val pos = game.hint()
+                        if (pos == null) toast.show(if (left <= 0) "Sem dicas nesta partida" else "Nada para revelar")
+                        else { feedback?.reveal(pos, Mark.CORRECT); toast.show("Dica: a ${ordinal[pos]} letra é ${game.current[pos]}") }
+                    }) {
+                        Box(contentAlignment = Alignment.TopEnd) {
+                            Icon(Icons.Rounded.Lightbulb, "Dica", tint = if (left > 0) Night.present else Night.muted)
+                            Text("$left", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Night.text,
+                                modifier = Modifier.offset(x = 6.dp, y = (-4).dp))
+                        }
+                    }
+                }
+            })
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Boards(game)
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -149,6 +175,7 @@ fun GameScreen(
                 onClose = { showResult = false },
                 onNewWord = { showResult = false; game.newWord() },
                 onPlayInfinite = { showResult = false; onPlayInfinite() },
+                meanings = meanings,
             )
         }
     }
@@ -296,7 +323,13 @@ private fun RevealTile(g: Guess, index: Int, size: Dp, animate: Boolean) {
 
 /** Janela do fim da partida: resultado, estatísticas do modo e próximos passos. */
 @Composable
-private fun ResultSheet(game: TermoGame, onClose: () -> Unit, onNewWord: () -> Unit, onPlayInfinite: () -> Unit) {
+private fun ResultSheet(
+    game: TermoGame,
+    onClose: () -> Unit,
+    onNewWord: () -> Unit,
+    onPlayInfinite: () -> Unit,
+    meanings: Map<String, String>,
+) {
     val context = LocalContext.current
     val stats = remember(game.over, game.rows.size) { game.stats() }
     BottomSheet(onClose) {
@@ -305,6 +338,19 @@ private fun ResultSheet(game: TermoGame, onClose: () -> Unit, onNewWord: () -> U
             if (game.won) "Você acertou!" else "Não foi dessa vez",
             (if (plural) "As palavras eram " else "A palavra era ") + game.answerDisplay(),
         )
+        // O que significa cada palavra.
+        val defs = game.answers.mapNotNull { a -> meanings[a]?.let { game.answerDisplayOf(a) to it } }
+        if (defs.isNotEmpty()) {
+            Spacer(Modifier.height(14.dp))
+            Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surfaceHigh).padding(16.dp)) {
+                Text("O que significa", fontSize = 13.sp, color = Night.muted)
+                defs.forEach { (w, d) ->
+                    Spacer(Modifier.height(6.dp))
+                    Text(w, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Night.text)
+                    Text(d, fontSize = 14.sp, color = Night.text.copy(alpha = 0.9f))
+                }
+            }
+        }
         Spacer(Modifier.height(18.dp))
         StatsRow(stats)
         Spacer(Modifier.height(16.dp))
@@ -317,7 +363,8 @@ private fun ResultSheet(game: TermoGame, onClose: () -> Unit, onNewWord: () -> U
                         g.marks.joinToString("") { when (it) { Mark.CORRECT -> "🟩"; Mark.PRESENT -> "🟨"; Mark.ABSENT -> "⬛" } }
                     }
                 }
-                val score = if (game.won) "${game.rows.size}/${game.maxTries}" else "X/${game.maxTries}"
+                val score = (if (game.won) "${game.rows.size}/${game.maxTries}" else "X/${game.maxTries}") +
+                    (if (game.hard) "*" else "") + (if (game.hints.isNotEmpty()) " 💡${game.hints.size}" else "")
                 val text = "Palavreiro · ${game.mode.title} $score\n\n$grids"
                 context.startActivity(
                     Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartilhar")
@@ -329,6 +376,10 @@ private fun ResultSheet(game: TermoGame, onClose: () -> Unit, onNewWord: () -> U
                 else -> PillButton("Jogar Infinito", Night.correct, modifier = Modifier.weight(1f), onClick = onPlayInfinite)
             }
         }
+        Spacer(Modifier.height(10.dp))
+        PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {
+            StoryCard.share(context, storyFor(game, stats))
+        }
         if (game.mode.daily && game.isDaily) {
             Spacer(Modifier.height(12.dp))
             Text(
@@ -337,6 +388,20 @@ private fun ResultSheet(game: TermoGame, onClose: () -> Unit, onNewWord: () -> U
             )
         }
     }
+}
+
+/** Dados do cartão para Stories do Termo, Dueto e Quarteto. */
+fun storyFor(game: TermoGame, stats: com.dmwnezes.palavreiro.data.Stats): StoryData {
+    val grids = game.answers.indices.map { b -> game.boardGuesses(b).map { g -> g.marks.map { Night.mark(it) } } }
+    val headline = if (game.won) "Acertei em ${game.rows.size}/${game.maxTries}" else "Quase! X/${game.maxTries}"
+    val extras = listOfNotNull(if (game.hard) "modo difícil" else null, if (game.hints.isNotEmpty()) "${game.hints.size} dica(s)" else null)
+    return StoryData(
+        game = game.mode.title + if (game.isDaily && game.mode.daily) " do dia" else "",
+        headline = headline,
+        detail = extras.joinToString(" · ").ifEmpty { "Você consegue mais rápido?" },
+        grids = grids,
+        stats = listOf("${stats.streak}" to "Sequência", "${stats.winPct}%" to "Vitórias", "${stats.maxStreak}" to "Melhor"),
+    )
 }
 
 /** Ajuda com exemplos. */
@@ -355,6 +420,8 @@ fun HelpSheet(onClose: () -> Unit) {
             Text("Toque num quadrado da linha para escolher onde a próxima letra entra.", color = Night.muted, fontSize = 14.sp)
             Spacer(Modifier.height(6.dp))
             Text("No Dueto (7 tentativas) e no Quarteto (9) você descobre 2 ou 4 palavras ao mesmo tempo. Cada tecla mostra as cores de cada tabuleiro.", color = Night.muted, fontSize = 14.sp)
+            Spacer(Modifier.height(6.dp))
+            Text("💡 Toque na lâmpada para revelar uma letra (até 2 por partida). No modo difícil, ligado no Perfil, as letras verdes precisam ficar no lugar e as amarelas precisam ser usadas.", color = Night.muted, fontSize = 14.sp)
             Spacer(Modifier.height(18.dp))
             PillButton("Entendi", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = onClose)
         }

@@ -30,6 +30,8 @@ class TermoGame(
     val mode: Mode,
     private val words: Words,
     private val store: Store?,
+    /** Palavra do desafio recebido por link (só no modo Desafio). */
+    private val challenge: String? = null,
     private val today: () -> LocalDate = { LocalDate.now() },
 ) {
     val boards: Int get() = mode.boards
@@ -60,6 +62,14 @@ class TermoGame(
     private var key = ""
     var events: GameEvents = object : GameEvents {}
 
+    /** Posições reveladas por dica (no primeiro tabuleiro ainda aberto). */
+    val hints = mutableStateListOf<Int>()
+    val maxHints = 2
+
+    /** Modo difícil ligado nesta partida (vale para Termo e Infinito). */
+    var hard by mutableStateOf(false)
+        private set
+
     val busy: Boolean get() = revealingRow >= 0
     val currentRow: Int get() = rows.size
 
@@ -78,6 +88,13 @@ class TermoGame(
 
     private fun load() {
         val saved = store?.game(mode)
+        if (mode == Mode.DESAFIO) {
+            val word = Words.normalize(challenge ?: words.random())
+            isDaily = false
+            key = "desafio-$word"
+            restore(listOf(word), saved?.takeIf { it.key == key })
+            return
+        }
         if (mode.daily) {
             val dayKey = todayKey()
             val daily = words.dailySet(today(), boards, salt)
@@ -98,6 +115,9 @@ class TermoGame(
 
     private fun restore(list: List<String>, saved: SavedGame?) {
         answers.clear(); answers.addAll(list)
+        hints.clear()
+        saved?.hints?.let { hints.addAll(it) }
+        hard = if (saved != null && saved.words.isNotEmpty()) saved.hard else (boards == 1 && (store?.hard ?: false))
         rows.clear()
         saved?.words?.let { rows.addAll(it) }
         over = saved?.over ?: false
@@ -112,7 +132,7 @@ class TermoGame(
     }
 
     private fun save() {
-        store?.saveGame(mode, SavedGame(key, answers.toList(), rows.toList(), over, won))
+        store?.saveGame(mode, SavedGame(key, answers.toList(), rows.toList(), over, won, hints.toList(), hard))
     }
 
     /** O dia virou enquanto o app estava aberto? */
@@ -181,9 +201,53 @@ class TermoGame(
         if (current.any { it == null }) return invalid("Palavra incompleta")
         val word = current.joinToString("") { it.toString() }
         if (!words.isAccepted(word)) return invalid("Palavra não aceita")
+        if (hard) hardModeProblem(word)?.let { return invalid(it) }
         rows += word
         revealingRow = rows.size - 1
         clearRow()
+    }
+
+    /** Liga ou desliga o modo difícil; só antes da primeira tentativa. */
+    fun setHard(on: Boolean): Boolean {
+        if (rows.isNotEmpty() || boards != 1) return false
+        hard = on
+        return true
+    }
+
+    /**
+     * Modo difícil: cada letra verde precisa ficar no mesmo lugar
+     * e cada letra amarela precisa aparecer na nova tentativa.
+     */
+    fun hardModeProblem(word: String): String? {
+        val ordinal = listOf("1ª", "2ª", "3ª", "4ª", "5ª")
+        for (g in boardGuesses(0).take(revealedRows)) {
+            for (i in g.word.indices) if (g.marks[i] == Mark.CORRECT && word[i] != g.word[i]) {
+                return "A ${ordinal[i]} letra precisa ser ${g.word[i]}"
+            }
+            val needed = HashMap<Char, Int>()
+            for (i in g.word.indices) if (g.marks[i] != Mark.ABSENT) needed[g.word[i]] = (needed[g.word[i]] ?: 0) + 1
+            for ((c, n) in needed) if (word.count { it == c } < n) return "A palavra precisa ter $c"
+        }
+        return null
+    }
+
+    /**
+     * Dica: revela uma letra certa na linha atual, numa posição que ainda não está verde.
+     * Devolve a posição revelada, ou null se não houver mais dicas.
+     */
+    fun hint(): Int? {
+        if (over || busy || hints.size >= maxHints) return null
+        val b = answers.indices.firstOrNull { !isSolved(it) } ?: return null
+        val ans = answers[b]
+        val known = boardGuesses(b).flatMap { g -> g.word.indices.filter { g.marks[it] == Mark.CORRECT } }.toSet()
+        val options = ans.indices.filter { it !in known && it !in hints && current[it] != ans[it] }
+        if (options.isEmpty()) return null
+        val pos = options.random()
+        hints += pos
+        current[pos] = ans[pos]
+        cursor = nextEmpty(0).takeIf { it >= 0 } ?: cursor
+        save()
+        return pos
     }
 
     private fun invalid(msg: String) {
@@ -207,6 +271,8 @@ class TermoGame(
         over = true
         won = win
         record(win, rows.size)
+        store?.logActivity(todayKey())
+        if (isDaily && mode == Mode.DIARIO) store?.logTermo(todayKey(), win)
         if (isDaily && mode.daily) store?.setText("daily_done_${mode.key}", todayKey())
         if (win) events.onWin(rows.size) else events.onLose(answers.filter { !isSolved(answers.indexOf(it)) }.map(words::display))
     }
@@ -252,4 +318,5 @@ class TermoGame(
     }
 
     fun answerDisplay(): String = answers.joinToString(", ") { words.display(it) }
+    fun answerDisplayOf(a: String): String = words.display(a)
 }

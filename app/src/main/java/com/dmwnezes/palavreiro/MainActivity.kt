@@ -1,5 +1,6 @@
 package com.dmwnezes.palavreiro
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -23,7 +24,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dmwnezes.palavreiro.data.Mode
+import com.dmwnezes.palavreiro.game.Challenge
 import com.dmwnezes.palavreiro.game.Records
+import com.dmwnezes.palavreiro.system.Widget
+import com.dmwnezes.palavreiro.ui.ChallengeScreen
 import com.dmwnezes.palavreiro.game.TermoGame
 import com.dmwnezes.palavreiro.ui.ConnectionsScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
@@ -49,7 +53,30 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
         AppGraph.init(this)
+        if (savedInstanceState == null) Launch.read(intent)
         setContent { PalavreiroTheme { PalavreiroApp() } }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Launch.read(intent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Widget.refresh(this)
+    }
+}
+
+/** Para onde abrir: atalho do ícone, widget, notificação ou link de desafio. */
+object Launch {
+    var pending by mutableStateOf<String?>(null)
+    var challenge by mutableStateOf<String?>(null)
+
+    fun read(intent: Intent?) {
+        intent ?: return
+        intent.getStringExtra("dest")?.let { pending = it }
+        intent.data?.getQueryParameter("d")?.let { code -> Challenge.decode(code)?.let { challenge = it } }
     }
 }
 
@@ -57,6 +84,7 @@ private sealed interface Screen {
     data object Home : Screen
     data class Game(val mode: Mode) : Screen
     data class Other(val dest: Dest) : Screen
+    data class ChallengeGame(val word: String) : Screen
     data object Profile : Screen
 }
 
@@ -79,7 +107,27 @@ fun PalavreiroApp() {
 
     val store = AppGraph.store
     val games = remember { HashMap<Mode, TermoGame>() }
-    fun game(mode: Mode) = games.getOrPut(mode) { TermoGame(mode, AppGraph.words, store) }
+    fun game(mode: Mode) = games.getOrPut(mode) { TermoGame(mode, AppGraph.words, store) }.also { it.setHard(store.hard) }
+
+    fun open(d: Dest) {
+        screen = when (d) {
+            Dest.TERMO -> Screen.Game(Mode.DIARIO)
+            Dest.INFINITO -> Screen.Game(Mode.INFINITO)
+            Dest.DUETO -> Screen.Game(Mode.DUETO)
+            Dest.QUARTETO -> Screen.Game(Mode.QUARTETO)
+            else -> Screen.Other(d)
+        }
+    }
+
+    // Abre o destino pedido por atalho, widget, notificação ou link.
+    LaunchedEffect(Launch.pending, Launch.challenge, splash) {
+        if (splash) return@LaunchedEffect
+        Launch.challenge?.let { screen = Screen.ChallengeGame(it); Launch.challenge = null; return@LaunchedEffect }
+        Launch.pending?.let { p ->
+            Launch.pending = null
+            if (p == "HOME") screen = Screen.Home else runCatching { Dest.valueOf(p) }.getOrNull()?.let(::open)
+        }
+    }
 
     // Checagem automática de atualização ao abrir o app.
     LaunchedEffect(Unit) {
@@ -125,15 +173,7 @@ fun PalavreiroApp() {
                     }
                     HomeScreen(
                         badges = badges,
-                        onOpen = { d ->
-                            screen = when (d) {
-                                Dest.TERMO -> Screen.Game(Mode.DIARIO)
-                                Dest.INFINITO -> Screen.Game(Mode.INFINITO)
-                                Dest.DUETO -> Screen.Game(Mode.DUETO)
-                                Dest.QUARTETO -> Screen.Game(Mode.QUARTETO)
-                                else -> Screen.Other(d)
-                            }
-                        },
+                        onOpen = ::open,
                         onProfile = { screen = Screen.Profile },
                     )
                 }
@@ -145,8 +185,20 @@ fun PalavreiroApp() {
                         Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
+                        Dest.DESAFIAR -> ChallengeScreen(AppGraph.words, AppGraph.feedback, back)
                         else -> {}
                     }
+                }
+                is Screen.ChallengeGame -> {
+                    val g = remember(s.word) { TermoGame(Mode.DESAFIO, AppGraph.words, store, challenge = s.word).also { it.setHard(store.hard) } }
+                    GameScreen(
+                        game = g,
+                        feedback = AppGraph.feedback,
+                        onBack = { screen = Screen.Home; refresh++ },
+                        onPlayInfinite = { screen = Screen.Game(Mode.INFINITO) },
+                        onHelp = { showHelp = true },
+                        meanings = AppGraph.meanings,
+                    )
                 }
                 is Screen.Game -> GameScreen(
                     game = game(s.mode),
@@ -154,6 +206,7 @@ fun PalavreiroApp() {
                     onBack = { screen = Screen.Home; refresh++ },
                     onPlayInfinite = { screen = Screen.Game(Mode.INFINITO) },
                     onHelp = { showHelp = true },
+                    meanings = AppGraph.meanings,
                 )
                 Screen.Profile -> ProfileScreen(
                     store = store,

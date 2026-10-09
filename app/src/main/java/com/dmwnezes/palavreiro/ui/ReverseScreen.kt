@@ -56,6 +56,7 @@ fun ReverseScreen(words: Words, store: Store?, feedback: Feedback?, onBack: () -
         if (!game.over || game.contradiction || recorded) return@LaunchedEffect
         recorded = true
         store?.add("rev_played")
+        store?.logActivity()
         if (game.appWon) { store?.add("rev_appwins"); feedback?.win() } else { store?.add("rev_userwins"); feedback?.lose(); confetti++ }
     }
 

@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Palavreiro</string>
+    <string name="widget_desc">Sua sequência e os jogos do dia</string>
+    <string name="sc_termo">Termo</string>
+    <string name="sc_termo_long">Termo do dia</string>
+    <string name="sc_conexoes">Conexões</string>
+    <string name="sc_conexoes_long">Conexões do dia</string>
+    <string name="sc_infinito">Infinito</string>
+    <string name="sc_infinito_long">Termo infinito</string>
+    <string name="sc_caca">Caça-Palavras</string>
+    <string name="sc_caca_long">Caça-Palavras do dia</string>
 </resources>

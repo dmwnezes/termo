@@ -63,6 +63,7 @@ fun WordSearchScreen(
     date: LocalDate = LocalDate.now(),
 ) {
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val toast = rememberToast()
     val day = date.toString()
     val theme = themes[WordSearchData.dailyIndex(date, themes.size)]
@@ -96,6 +97,7 @@ fun WordSearchScreen(
             if (store != null && store.text("ws_done") != day) {
                 store.setText("ws_done", day)
                 store.add("ws_played")
+                store.logActivity(day)
                 store.min("ws_best", seconds)
             }
             scope.launch { delay(1600); showResult = true }
@@ -162,6 +164,20 @@ fun WordSearchScreen(
                 Spacer(Modifier.height(16.dp))
                 Text("Uma grade nova aparece amanhã.", fontSize = 13.sp, color = Night.muted)
                 Spacer(Modifier.height(12.dp))
+                PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {
+                    val colors = ws.placed.indices.map { colorFor(it) }
+                    StoryCard.share(
+                        context,
+                        StoryData(
+                            game = "Caça-Palavras do dia",
+                            headline = "Achei tudo em ${formatTime(seconds)}",
+                            detail = "Tema: ${theme.name}",
+                            grids = listOf(colors.chunked(4)),
+                            stats = listOf((store?.int("ws_best")?.takeIf { it > 0 }?.let(::formatTime) ?: "—") to "Melhor tempo", "${store?.int("ws_played") ?: 0}" to "Grades"),
+                        ),
+                    )
+                }
+                Spacer(Modifier.height(10.dp))
                 PillButton("Fechar", Night.correct, modifier = Modifier.fillMaxWidth()) { showResult = false }
             }
         }

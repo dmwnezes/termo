@@ -94,6 +94,7 @@ fun ConnectionsScreen(
         if (st.text("conn_done") == day) return
         st.setText("conn_done", day)
         st.add("conn_played")
+        st.logActivity(day)
         if (game.won) {
             st.add("conn_won")
             if (game.mistakes == 0) st.add("conn_perfect")
@@ -245,6 +246,20 @@ private fun ConnectionsResult(game: ConnectionsGame, store: Store?, onClose: () 
         PillButton("Compartilhar", Night.correct, modifier = Modifier.fillMaxWidth()) {
             val text = "Palavreiro · Conexões\n\n${game.shareGrid()}"
             context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartilhar"))
+        }
+        Spacer(Modifier.height(10.dp))
+        PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {
+            val rows = game.tries.map { t -> t.map { w -> Night.levels[game.puzzle.groups.first { w in it.words }.level] } }
+            StoryCard.share(
+                context,
+                StoryData(
+                    game = "Conexões do dia",
+                    headline = if (game.won) (if (game.mistakes == 0) "Perfeito!" else "Resolvi!") else "Quase lá!",
+                    detail = if (game.won) "${game.mistakes} ${if (game.mistakes == 1) "erro" else "erros"}" else "Faltou pouco",
+                    grids = listOf(rows),
+                    stats = listOf("${store?.int("conn_won") ?: 0}" to "Resolvidos", "${store?.int("conn_perfect") ?: 0}" to "Perfeitos"),
+                ),
+            )
         }
         Spacer(Modifier.height(10.dp))
         Text("Um desafio novo aparece amanhã.", fontSize = 13.sp, color = Night.muted)

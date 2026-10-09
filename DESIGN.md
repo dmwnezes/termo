@@ -31,7 +31,7 @@ Em 08/10/2026 o Daniel decidiu as escolhas principais e depois passou as demais 
 | Conquistas | 8: primeira palavra, de primeira, em duas, sequências de 3/7/30, 25 no Infinito, 100 no total |
 | Configurações | Sons e vibração podem ser desligados; Como jogar; Buscar atualização |
 | Ícone | Fundo roxo em degradê com 5 quadradinhos: verde, verde, amarelo, verde, verde |
-| Formato | App Android nativo (Kotlin + Compose), como o Sintonia |
+| Formato | App Android nativo (Kotlin + Compose), como o Sintonia; site com os mesmos jogos e visual |
 | Atualização | Dentro do app: verifica ao abrir e em Perfil > Buscar atualização; baixa o APK das Releases do GitHub e abre o instalador |
 
 ## App Android
@@ -59,4 +59,19 @@ Em 08/10/2026 o Daniel decidiu as escolhas principais e depois passou as demais 
 | Qual é a Palavra? | Definição escrita à mão, 3 chances, cada erro revela uma letra; `definicoes.txt` |
 | Sinônimos | 4 opções e 10 s por palavra, cadeia até errar; `sinonimos.txt` (linhas com `=` evitam alternativas ambíguas) |
 
-Para acrescentar conteúdo, basta editar os arquivos `.txt` em `app/src/main/assets/`.
+Para acrescentar conteúdo, basta editar os arquivos `.txt` em `shared/` (usados pelo app e pelo site).
+
+## Recursos extras (app e site)
+
+| Recurso | Onde |
+|---|---|
+| Modo difícil | Perfil > Configurações; verdes no lugar e amarelos obrigatórios (Termo e Infinito) |
+| Dicas 💡 | Lâmpada no topo do Termo/Dueto/Quarteto; até 2 por partida, aparecem no compartilhamento |
+| O que significa | Ao fim da partida, significado escrito para cada uma das 1000 palavras (`shared/significados.txt`) |
+| Calendário | Perfil; cor mais forte = mais jogos no dia; pontinho verde/vermelho = Termo do dia |
+| Cartão para Stories | Imagem 1080×1920 com o resultado, no fim do Termo, Dueto, Quarteto, Conexões e Caça-Palavras |
+| Desafio por link | "Desafiar um amigo": gera `dmwnezes.github.io/termo/?d=...`, que abre no site ou no app |
+| Widget (app) | Sequência e status dos 5 jogos do dia; toque abre o jogo |
+| Lembrete diário (app) | Perfil > Configurações; notificação no horário escolhido, só se o Termo do dia não foi jogado |
+| Atalhos do ícone (app) | Segurar o ícone: Termo, Conexões, Infinito, Caça-Palavras |
+

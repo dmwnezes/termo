@@ -23,7 +23,7 @@ import java.time.LocalDate
 
 class NewGamesTest {
     private val words = Words(File("../shared/words.js").readText())
-    private fun asset(n: String) = File("src/main/assets/$n").readText()
+    private fun asset(n: String) = File("../shared/$n").readText()
 
     @Test
     fun duetoEQuarteto() {

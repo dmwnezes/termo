@@ -17,6 +17,11 @@ object QuizData {
         .filter { it.isNotEmpty() && !it.startsWith("#") && '|' in it }
         .map { Definition(it.substringBefore('|').trim(), it.substringAfter('|').trim()) }
 
+    /** Significados: PALAVRA|texto, indexado pela palavra sem acento. */
+    fun meanings(text: String): Map<String, String> = text.lines()
+        .filter { '|' in it }
+        .associate { Words.normalize(it.substringBefore('|').trim()) to it.substringAfter('|').trim() }
+
     /** Pares e famílias de sentido (linhas com =). */
     fun synonyms(text: String): Pair<List<SynPair>, List<Set<String>>> {
         val pairs = ArrayList<SynPair>()

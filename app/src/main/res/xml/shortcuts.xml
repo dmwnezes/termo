@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Atalhos ao segurar o ícone do app -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="termo" android:enabled="true" android:icon="@drawable/sc_termo"
+        android:shortcutShortLabel="@string/sc_termo" android:shortcutLongLabel="@string/sc_termo_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.dmwnezes.palavreiro"
+            android:targetClass="com.dmwnezes.palavreiro.MainActivity">
+            <extra android:name="dest" android:value="TERMO" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="conexoes" android:enabled="true" android:icon="@drawable/sc_conexoes"
+        android:shortcutShortLabel="@string/sc_conexoes" android:shortcutLongLabel="@string/sc_conexoes_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.dmwnezes.palavreiro"
+            android:targetClass="com.dmwnezes.palavreiro.MainActivity">
+            <extra android:name="dest" android:value="CONEXOES" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="infinito" android:enabled="true" android:icon="@drawable/sc_infinito"
+        android:shortcutShortLabel="@string/sc_infinito" android:shortcutLongLabel="@string/sc_infinito_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.dmwnezes.palavreiro"
+            android:targetClass="com.dmwnezes.palavreiro.MainActivity">
+            <extra android:name="dest" android:value="INFINITO" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="caca" android:enabled="true" android:icon="@drawable/sc_caca"
+        android:shortcutShortLabel="@string/sc_caca" android:shortcutLongLabel="@string/sc_caca_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.dmwnezes.palavreiro"
+            android:targetClass="com.dmwnezes.palavreiro.MainActivity">
+            <extra android:name="dest" android:value="CACA" />
+        </intent>
+    </shortcut>
+</shortcuts>
