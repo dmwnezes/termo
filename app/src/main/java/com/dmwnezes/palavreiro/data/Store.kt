@@ -189,6 +189,11 @@ class Store(context: Context) {
     /** Todas as chaves salvas (para o código de sincronização). */
     internal val raw: SharedPreferences get() = prefs
 
+    /** Contagem até a próxima palavra na Now Bar / barra de status. */
+    var liveCountdown: Boolean
+        get() = prefs.getBoolean("live_countdown", false)
+        set(v) = prefs.edit().putBoolean("live_countdown", v).apply()
+
     var streakAlert: Boolean
         get() = prefs.getBoolean("streak_alert", true)
         set(v) = prefs.edit().putBoolean("streak_alert", v).apply()

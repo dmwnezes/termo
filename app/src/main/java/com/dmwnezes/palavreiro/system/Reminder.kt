@@ -109,6 +109,7 @@ class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Reminder.notifyIfNeeded(context, intent.getStringExtra("kind"))
         Widget.refresh(context)
+        NextWordLive.update(context)
     }
 }
 
@@ -118,6 +119,7 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
             Reminder.schedule(context)
             Widget.refresh(context)
+            NextWordLive.update(context)
         }
     }
 }

@@ -86,6 +86,34 @@ class StoreFeaturesTest {
     }
 
     @Test
+    fun contagemDaProximaPalavra() {
+        val store = freshStore()
+        val app = org.robolectric.RuntimeEnvironment.getApplication()
+        org.robolectric.Shadows.shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        val nm = app.getSystemService(android.app.NotificationManager::class.java)
+        val shadow = org.robolectric.Shadows.shadowOf(nm)
+        // Desligada ou sem o Termo do dia feito: nada aparece.
+        com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
+        assertEquals(0, shadow.allNotifications.size)
+        store.liveCountdown = true
+        com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
+        assertEquals(0, shadow.allNotifications.size)
+        // Termo do dia feito: aparece a contagem até a meia-noite, contínua e pedindo para virar "ao vivo".
+        store.setText("daily_done_diario", LocalDate.now().toString())
+        com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
+        val n = shadow.allNotifications.single()
+        assertTrue(n.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0)
+        assertTrue(n.extras.getBoolean("android.requestPromotedOngoing"))
+        assertEquals("Nova palavra à meia-noite", n.extras.getString(android.app.Notification.EXTRA_TITLE))
+        assertTrue(n.extras.getBoolean(android.app.Notification.EXTRA_SHOW_CHRONOMETER))
+        assertEquals(LocalDate.now().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(), n.`when`)
+        // Desligando, some.
+        store.liveCountdown = false
+        com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
+        assertEquals(0, shadow.allNotifications.size)
+    }
+
+    @Test
     fun sincronizacaoIdaEVolta() {
         val a = freshStore()
         a.saveStats(Mode.DIARIO, Stats(played = 9, won = 8, streak = 3, maxStreak = 5, lastWinDay = 280, firstTry = 1, dist = listOf(1, 2, 3, 2, 0, 0, 0, 0, 0)))

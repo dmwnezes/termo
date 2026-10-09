@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         Widget.refresh(this)
+        com.dmwnezes.palavreiro.system.NextWordLive.update(this)
     }
 }
 
@@ -166,6 +167,8 @@ fun PalavreiroApp() {
         ) { s ->
             when (s) {
                 Screen.Home -> {
+                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                    LaunchedEffect(refresh) { com.dmwnezes.palavreiro.system.NextWordLive.update(ctx, store) }
                     val badges = remember(refresh) {
                         val today = java.time.LocalDate.now().toString()
                         fun daily(m: Mode): String {

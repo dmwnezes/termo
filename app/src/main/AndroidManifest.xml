@@ -8,6 +8,8 @@
     <!-- Lembrete diário -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Contagem da próxima palavra como notificação ao vivo (Android 16 / Now Bar da Samsung) -->
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 
     <queries>
         <package android:name="com.instagram.android" />
@@ -20,6 +22,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Palavreiro">
+
+        <!-- Samsung One UI: permite Live Notifications / Now Bar -->
+        <meta-data android:name="com.samsung.android.support.ongoing_activity" android:value="true" />
 
         <activity
             android:name=".MainActivity"

@@ -272,6 +272,26 @@ private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () ->
             Text("Se você ainda não jogou o Termo, avisa às 21h que sua sequência vai acabar.", fontSize = 12.sp, color = Night.muted)
         }
     }
+    Section("Contagem da próxima palavra") {
+        var live by remember { mutableStateOf(store?.liveCountdown ?: false) }
+        fun turn(on: Boolean) {
+            live = on; store?.liveCountdown = on
+            store?.let { com.dmwnezes.palavreiro.system.NextWordLive.update(context, it) }
+        }
+        val askLive = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok -> turn(ok) }
+        ToggleRow("Mostrar na Now Bar", live) { on ->
+            if (on && Build.VERSION.SDK_INT >= 33 && !Reminder.canNotify(context)) askLive.launch(Manifest.permission.POST_NOTIFICATIONS)
+            else turn(on)
+        }
+        Text(
+            "Depois do Termo do dia, mostra quanto falta para a palavra nova. No Samsung aparece na Now Bar " +
+                "e na tela de bloqueio; nos outros celulares, na barra de status. Some sozinha à meia-noite.",
+            fontSize = 12.sp, color = Night.muted,
+        )
+        if (live && Build.VERSION.SDK_INT >= 36) {
+            ActionRow("Ajustes de notificações ao vivo", onClick = { com.dmwnezes.palavreiro.system.NextWordLive.openSettings(context) })
+        }
+    }
     Section("Sincronizar site e app") {
         Text("Leve seu progresso entre o app e o site com um código. Nada é apagado: os dados são somados.", fontSize = 13.sp, color = Night.muted)
         Spacer(Modifier.height(12.dp))
