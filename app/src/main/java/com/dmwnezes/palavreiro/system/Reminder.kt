@@ -57,7 +57,7 @@ object Reminder {
     /** Nomes dos desafios do dia que ainda faltam. */
     fun missing(status: DailyStatus): List<String> = listOfNotNull(
         "Termo".takeIf { !status.termo }, "Dueto".takeIf { !status.dueto }, "Quarteto".takeIf { !status.quarteto },
-        "Conexões".takeIf { !status.conexoes }, "Caça-Palavras".takeIf { !status.caca },
+        "Conexões".takeIf { !status.conexoes },
     )
 
     /** Texto do lembrete, ou null se não precisa avisar. */
@@ -70,7 +70,7 @@ object Reminder {
         val left = missing(status)
         if (left.isEmpty()) return null
         val list = if (left.size == 1) left[0] else left.dropLast(1).joinToString(", ") + " e " + left.last()
-        val title = if (left.size == 5) "Seus desafios do dia chegaram" else "Falta${if (left.size > 1) "m" else ""} ${left.size} desafio${if (left.size > 1) "s" else ""} hoje"
+        val title = if (left.size == status.total) "Seus desafios do dia chegaram" else "Falta${if (left.size > 1) "m" else ""} ${left.size} desafio${if (left.size > 1) "s" else ""} hoje"
         val text = if (!status.termo && status.streak > 0) "Não perca sua sequência de ${status.streak} ${if (status.streak == 1) "dia" else "dias"} 🔥 · Falta: $list"
         else "Falta: $list"
         return title to text

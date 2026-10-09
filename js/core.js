@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "13"; // versão dos arquivos de conteúdo
+  const V = "14"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -85,7 +85,7 @@
   P.logActivity = (day = P.dayKey()) => { const a = P.store.get("activity", {}); a[day] = (a[day] || 0) + 1; P.store.set("activity", a); };
   /** Resultado de um desafio do dia ou do arquivo: results["jogo|AAAA-MM-DD"] = "w" | "l". */
   P.setResult = (game, day, won) => { const r = P.store.get("results", {}); r[game + "|" + day] = won ? "w" : "l"; P.store.set("results", r); };
-  /** Histórico só dos desafios do dia: history[dia][campo] = n (termo, conn, caca). */
+  /** Histórico só dos desafios do dia: history[dia][campo] = n (termo, conn). */
   P.setHistory = (day, field, n) => { const h = P.store.get("history", {}); h[day] = Object.assign(h[day] || {}, { [field]: n }); P.store.set("history", h); };
   /** Partida do arquivo terminada. */
   P.archiveDone = (game, day, won) => { P.setResult(game, day, won); P.store.add("arch-played"); if (won) P.store.add("arch-won"); P.logActivity(); };
@@ -154,7 +154,7 @@
       <button class="icon-btn" data-back aria-label="Voltar">←</button>
       <h1>${title}</h1>${extra}${help ? `<button class="icon-btn" data-help aria-label="Como jogar">?</button>` : ""}</div>`;
 
-  // Seletor "Do dia | Infinito" (Conexões e Caça-Palavras).
+  // Seletor "Do dia | Infinito" (Termo, Dueto, Quarteto e Conexões).
   P.modeSwitch = (inf) => `<div class="mode-switch"><button data-mode="0" class="${inf ? "" : "on"}">Do dia</button><button data-mode="1" class="${inf ? "on" : ""}">Infinito</button></div>`;
   P.bindModeSwitch = (root, go) => root.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => { if (!b.classList.contains("on")) { P.fx.type(); go(b.dataset.mode === "1"); } }));
 

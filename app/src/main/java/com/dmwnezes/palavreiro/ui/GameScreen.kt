@@ -69,6 +69,9 @@ fun GameScreen(
     onPlayInfinite: () -> Unit,
     onHelp: () -> Unit,
     meanings: Map<String, String> = emptyMap(),
+    /** Aba atual do seletor "Do dia | Infinito" (null = sem seletor, ex.: Arquivo e desafio de amigo). */
+    infiniteTab: Boolean? = null,
+    onSwitchTab: (Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val toast = rememberToast()
@@ -124,9 +127,8 @@ fun GameScreen(
     }
 
     val title = buildString {
-        append(game.mode.title)
+        append(if (game.mode == Mode.INFINITO) "Termo" else game.mode.title)
         game.archive?.let { append(" · " + shortDay(it)) }
-            ?: run { if (game.mode.daily && game.mode.free && !game.isDaily) append(" · livre") }
     }
     val ordinal = listOf("1ª", "2ª", "3ª", "4ª", "5ª")
 
@@ -152,14 +154,20 @@ fun GameScreen(
                     }
                 }
             })
+            infiniteTab?.let { inf -> ModeSwitch(inf, Modifier.padding(horizontal = 16.dp)) { onSwitchTab(it) } }
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Boards(game)
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     ToastView(toast)
                     if (game.over && game.isArchive && toast.text == null && !showResult) {
                         PillButton("Voltar ao arquivo", Night.correct, onClick = onBack)
-                    } else if (game.over && game.mode.free && toast.text == null && !showResult) {
+                    } else if (game.over && !game.isDaily && game.mode.free && toast.text == null && !showResult) {
                         PillButton(if (game.boards == 1) "Nova palavra" else "Jogar de novo", Night.correct) { game.newWord() }
+                    } else if (game.over && game.isDaily && infiniteTab != null && toast.text == null && !showResult) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            PillButton("Ver resultado", Night.surfaceHigh, Night.text) { showResult = true }
+                            PillButton("Jogar Infinito", Night.correct, onClick = onPlayInfinite)
+                        }
                     }
                 }
             }
@@ -372,7 +380,7 @@ private fun ResultSheet(
                 }
                 val score = (if (game.won) "${game.rows.size}/${game.maxTries}" else "X/${game.maxTries}") +
                     (if (game.hard) "*" else "") + (if (game.hints.isNotEmpty()) " 💡${game.hints.size}" else "")
-                val text = "Palavreiro · ${game.mode.title} $score\n\n$grids"
+                val text = "Palavreiro · ${if (game.mode == Mode.INFINITO) "Termo Infinito" else game.mode.title + if (!game.isDaily && game.archive == null && game.mode.daily) " Infinito" else ""} $score\n\n$grids"
                 context.startActivity(
                     Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartilhar")
                 )
@@ -380,7 +388,7 @@ private fun ResultSheet(
             when {
                 game.isArchive -> PillButton("Arquivo ›", Night.correct, modifier = Modifier.weight(1f), onClick = onBack)
                 game.mode == Mode.INFINITO -> PillButton("Nova palavra", Night.correct, modifier = Modifier.weight(1f), onClick = onNewWord)
-                game.mode.free -> PillButton("Jogar de novo", Night.correct, modifier = Modifier.weight(1f), onClick = onNewWord)
+                game.mode.free && !game.isDaily -> PillButton("Jogar de novo", Night.correct, modifier = Modifier.weight(1f), onClick = onNewWord)
                 else -> PillButton("Jogar Infinito", Night.correct, modifier = Modifier.weight(1f), onClick = onPlayInfinite)
             }
         }
@@ -391,7 +399,7 @@ private fun ResultSheet(
         if (game.mode.daily && game.isDaily) {
             Spacer(Modifier.height(12.dp))
             Text(
-                if (game.mode.free) "Desafio do dia concluído. Novas partidas são livres." else "Uma palavra nova aparece amanhã.",
+                if (game.boards > 1) "Um desafio novo aparece amanhã. No Infinito você joga quantas quiser." else "Uma palavra nova aparece amanhã.",
                 fontSize = 13.sp, color = Night.muted,
             )
         }
@@ -404,7 +412,7 @@ fun storyFor(game: TermoGame, stats: com.dmwnezes.palavreiro.data.Stats): StoryD
     val headline = if (game.won) "Acertei em ${game.rows.size}/${game.maxTries}" else "Quase! X/${game.maxTries}"
     val extras = listOfNotNull(if (game.hard) "modo difícil" else null, if (game.hints.isNotEmpty()) "${game.hints.size} dica(s)" else null)
     return StoryData(
-        game = game.mode.title + (game.archive?.let { " · " + shortDay(it) } ?: if (game.isDaily && game.mode.daily) " do dia" else ""),
+        game = (if (game.mode == Mode.INFINITO) "Termo Infinito" else game.mode.title + if (!game.isDaily && game.archive == null && game.mode.daily) " Infinito" else "") + (game.archive?.let { " · " + shortDay(it) } ?: if (game.isDaily && game.mode.daily) " do dia" else ""),
         headline = headline,
         detail = extras.joinToString(" · ").ifEmpty { "Você consegue mais rápido?" },
         grids = grids,

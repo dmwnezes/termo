@@ -111,7 +111,7 @@ class SpellingGame(private val pairs: List<SpellPair>, private val rnd: Random =
     }
 }
 
-/** Gráfico de evolução: média semanal de um campo do histórico ("termo", "conn" ou "caca"). */
+/** Gráfico de evolução: média semanal de um campo do histórico ("termo" ou "conn"). */
 object Evolution {
     /** Últimas [count] semanas (segunda a domingo), da mais antiga para a atual. Valor null = sem dados. */
     fun weeks(history: JSONObject, field: String, today: LocalDate = LocalDate.now(), count: Int = 8): List<Pair<LocalDate, Double?>> {

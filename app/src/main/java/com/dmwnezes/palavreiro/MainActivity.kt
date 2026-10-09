@@ -34,7 +34,6 @@ import com.dmwnezes.palavreiro.ui.DefineScreen
 import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ReverseScreen
 import com.dmwnezes.palavreiro.ui.SynonymScreen
-import com.dmwnezes.palavreiro.ui.WordSearchScreen
 import com.dmwnezes.palavreiro.ui.ArchiveGame
 import com.dmwnezes.palavreiro.ui.ArchiveScreen
 import com.dmwnezes.palavreiro.ui.IntruderScreen
@@ -87,7 +86,8 @@ object Launch {
 
 private sealed interface Screen {
     data object Home : Screen
-    data class Game(val mode: Mode) : Screen
+    /** [free]: aba Infinito do Dueto/Quarteto (partidas livres salvas à parte). */
+    data class Game(val mode: Mode, val free: Boolean = false) : Screen
     data class Other(val dest: Dest) : Screen
     data class ChallengeGame(val word: String) : Screen
     data object Profile : Screen
@@ -107,8 +107,14 @@ fun PalavreiroApp() {
     var refresh by remember { mutableIntStateOf(0) }
 
     val store = AppGraph.store
-    val games = remember { HashMap<Mode, TermoGame>() }
-    fun game(mode: Mode) = games.getOrPut(mode) { TermoGame(mode, AppGraph.words, store) }.also { it.setHard(store.hard) }
+    val games = remember { HashMap<Pair<Mode, Boolean>, TermoGame>() }
+    fun game(mode: Mode, free: Boolean = false) =
+        games.getOrPut(mode to free) { TermoGame(mode, AppGraph.words, store, freePlay = free) }.also { it.setHard(store.hard) }
+    /** A outra aba do seletor "Do dia | Infinito" de cada jogo. */
+    fun tab(s: Screen.Game, infinite: Boolean): Screen.Game = when (s.mode) {
+        Mode.DIARIO, Mode.INFINITO -> Screen.Game(if (infinite) Mode.INFINITO else Mode.DIARIO)
+        else -> Screen.Game(s.mode, free = infinite)
+    }
 
     fun open(d: Dest) {
         screen = when (d) {
@@ -171,7 +177,6 @@ fun PalavreiroApp() {
                             Dest.DUETO to daily(Mode.DUETO),
                             Dest.QUARTETO to daily(Mode.QUARTETO),
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
-                            Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                         )
                     }
                     // Painel "Hoje" e confete uma vez por dia quando os 5 desafios estiverem feitos.
@@ -194,7 +199,6 @@ fun PalavreiroApp() {
                     val back: () -> Unit = { screen = Screen.Home; refresh++ }
                     when (s.dest) {
                         Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
-                        Dest.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back)
                         Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
@@ -202,6 +206,7 @@ fun PalavreiroApp() {
                         Dest.DESAFIAR -> ChallengeScreen(AppGraph.words, AppGraph.feedback, back)
                         Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
+                        Dest.MESTRE -> com.dmwnezes.palavreiro.ui.MestreScreen(AppGraph.mestre, store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }
@@ -216,14 +221,19 @@ fun PalavreiroApp() {
                         meanings = AppGraph.meanings,
                     )
                 }
-                is Screen.Game -> GameScreen(
-                    game = game(s.mode),
-                    feedback = AppGraph.feedback,
-                    onBack = { screen = Screen.Home; refresh++ },
-                    onPlayInfinite = { screen = Screen.Game(Mode.INFINITO) },
-                    onHelp = { showHelp = true },
-                    meanings = AppGraph.meanings,
-                )
+                is Screen.Game -> {
+                    val inf = s.mode == Mode.INFINITO || s.free
+                    GameScreen(
+                        game = game(s.mode, s.free).also { it.refreshIfNewDay() },
+                        feedback = AppGraph.feedback,
+                        onBack = { screen = Screen.Home; refresh++ },
+                        onPlayInfinite = { screen = tab(s, true) },
+                        onHelp = { showHelp = true },
+                        meanings = AppGraph.meanings,
+                        infiniteTab = inf,
+                        onSwitchTab = { screen = tab(s, it) },
+                    )
+                }
                 is Screen.Archive -> ArchiveScreen(
                     store = store,
                     onBack = { screen = Screen.Home; refresh++ },
@@ -234,7 +244,6 @@ fun PalavreiroApp() {
                     val back: () -> Unit = { screen = Screen.Archive(s.game); refresh++ }
                     when (s.game) {
                         ArchiveGame.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back, date = s.date, archive = true)
-                        ArchiveGame.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back, date = s.date, archive = true)
                         else -> {
                             val mode = when (s.game) { ArchiveGame.DUETO -> Mode.DUETO; ArchiveGame.QUARTETO -> Mode.QUARTETO; else -> Mode.DIARIO }
                             val g = remember(s) { TermoGame(mode, AppGraph.words, store, archive = s.date) }

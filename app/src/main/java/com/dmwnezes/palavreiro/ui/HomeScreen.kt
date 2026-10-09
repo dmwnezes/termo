@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, ANTONIMOS, DESAFIAR, INTRUSO, ORTOGRAFIA, ARQUIVO }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, REVERSO, DEFINICAO, SINONIMOS, ANTONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -65,15 +65,14 @@ fun HomeScreen(
 ) {
     val guess = listOf(
         GameCardInfo(Dest.TERMO, "Termo", "Uma palavra nova por dia", badges[Dest.TERMO]),
-        GameCardInfo(Dest.INFINITO, "Infinito", "Quantas palavras quiser", null),
         GameCardInfo(Dest.DUETO, "Dueto", "Duas palavras, 7 tentativas", badges[Dest.DUETO]),
         GameCardInfo(Dest.QUARTETO, "Quarteto", "Quatro palavras, 9 tentativas", badges[Dest.QUARTETO]),
     )
     val more = listOf(
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
-        GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
+        GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
         GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
@@ -127,7 +126,6 @@ private fun TodayPanel(status: com.dmwnezes.palavreiro.system.DailyStatus, onOpe
     val items = listOf(
         Triple(Dest.TERMO, "Termo", status.termo), Triple(Dest.DUETO, "Dueto", status.dueto),
         Triple(Dest.QUARTETO, "Quarteto", status.quarteto), Triple(Dest.CONEXOES, "Conexões", status.conexoes),
-        Triple(Dest.CACA, "Caça", status.caca),
     )
     val done = status.doneCount
     Column(
@@ -227,18 +225,6 @@ private fun CardIcon(dest: Dest) {
                 Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) { repeat(4) { Box(Modifier.size(10.dp).clip(RoundedCornerShape(3.dp)).background(c)) } }
             }
         }
-        Dest.CACA -> Box(Modifier.size(52.dp)) {
-            Canvas(Modifier.fillMaxSize()) {
-                drawLine(Night.present.copy(alpha = 0.7f), Offset(size.width * 0.15f, size.height * 0.2f), Offset(size.width * 0.85f, size.height * 0.8f), strokeWidth = size.width * 0.2f, cap = StrokeCap.Round)
-            }
-            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceEvenly) {
-                listOf("CAS", "OLE", "PAJ").forEach { line ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        line.forEach { Text("$it", color = Night.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) }
-                    }
-                }
-            }
-        }
         Dest.REVERSO -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text("?", color = Night.accent, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -273,6 +259,10 @@ private fun CardIcon(dest: Dest) {
             }
         }
         Dest.ARQUIVO -> Text("🗂️", fontSize = 26.sp)
+        Dest.MESTRE -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text("👑", fontSize = 20.sp)
+            Pill("TOQUE", Night.present)
+        }
         Dest.ANTONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Pill("ALTO", Night.surfaceHigh)
             Text("≠", color = Night.muted, fontSize = 12.sp)
@@ -290,7 +280,7 @@ private fun CardIcon(dest: Dest) {
 private fun Pill(text: String, bg: Color) {
     Text(
         text, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
-        color = if (bg == Night.correct || bg == Night.red) Color(0xFF1A1438) else Night.text,
+        color = if (bg == Night.correct || bg == Night.red || bg == Night.present) Color(0xFF1A1438) else Night.text,
         modifier = Modifier.clip(Shapes.pill).background(bg).padding(horizontal = 8.dp, vertical = 2.dp),
     )
 }

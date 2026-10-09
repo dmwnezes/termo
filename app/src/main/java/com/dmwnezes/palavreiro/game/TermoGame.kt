@@ -34,12 +34,18 @@ class TermoGame(
     private val challenge: String? = null,
     /** Data de um desafio antigo jogado pelo Arquivo (não mexe em estatísticas nem na sequência). */
     val archive: LocalDate? = null,
+    /** Partidas livres (aba Infinito) do Dueto/Quarteto, salvas à parte do desafio do dia. */
+    val freePlay: Boolean = false,
     private val today: () -> LocalDate = { LocalDate.now() },
 ) {
     val isArchive: Boolean get() = archive != null
     /** Nome do jogo nos resultados ("termo", "dueto", "quarteto"). */
     val resultName: String get() = when (mode) { Mode.DUETO -> "dueto"; Mode.QUARTETO -> "quarteto"; else -> "termo" }
-    private val slot: String get() = if (archive != null) "arquivo_${mode.key}" else mode.key
+    private val slot: String get() = when {
+        archive != null -> "arquivo_${mode.key}"
+        freePlay -> "livre_${mode.key}"
+        else -> mode.key
+    }
     val boards: Int get() = mode.boards
     val maxTries: Int get() = mode.maxTries
 
@@ -108,15 +114,21 @@ class TermoGame(
             restore(listOf(word), saved?.takeIf { it.key == key })
             return
         }
-        if (mode.daily) {
+        if (mode.daily && !freePlay) {
             val dayKey = todayKey()
             val daily = words.dailySet(today(), boards, salt)
-            when {
-                saved != null && saved.key == dayKey && saved.answers == daily -> { isDaily = true; key = dayKey; restore(daily, saved) }
-                // Partida livre em andamento, mas o desafio do dia de hoje ainda não foi jogado: volta para o do dia.
-                saved != null && saved.key.startsWith("livre") && saved.answers.size == boards && store?.text("daily_done_${mode.key}") == dayKey ->
-                    { isDaily = false; key = saved.key; restore(saved.answers, saved) }
-                else -> { isDaily = true; key = dayKey; restore(daily, null) }
+            isDaily = true
+            key = dayKey
+            if (saved != null && saved.key == dayKey && saved.answers == daily) restore(daily, saved)
+            else {
+                // Versões antigas guardavam partidas livres no lugar do desafio do dia: leva para a aba Infinito.
+                if (saved != null && saved.key.startsWith("livre") && store?.game("livre_${mode.key}") == null) store?.saveGame("livre_${mode.key}", saved)
+                restore(daily, null)
+                // O desafio de hoje já foi feito (mas o tabuleiro se perdeu): mostra como terminado.
+                if (store?.text("daily_done_${mode.key}") == dayKey) {
+                    over = true
+                    won = store.results()["$resultName|$dayKey"] == "w"
+                }
             }
         } else {
             val ok = saved?.takeIf { s -> s.answers.size == boards && s.answers.all { it in words.answers } }
@@ -329,7 +341,7 @@ class TermoGame(
 
     /** Começa uma partida livre com palavras sorteadas (Infinito, e Dueto/Quarteto depois do desafio do dia). */
     fun newWord() {
-        if (!mode.free || busy || archive != null) return
+        if (!mode.free || busy || archive != null || (mode.daily && !freePlay)) return
         isDaily = false
         key = "livre-${System.currentTimeMillis()}"
         val avoid = answers.toSet()

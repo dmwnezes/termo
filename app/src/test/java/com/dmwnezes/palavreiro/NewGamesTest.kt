@@ -10,8 +10,6 @@ import com.dmwnezes.palavreiro.game.ReverseGame
 import com.dmwnezes.palavreiro.game.Rules
 import com.dmwnezes.palavreiro.game.SynonymGame
 import com.dmwnezes.palavreiro.game.TermoGame
-import com.dmwnezes.palavreiro.game.WordSearch
-import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.game.Words
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -43,8 +41,10 @@ class NewGamesTest {
         val wrong = words.answers.first { it !in q.answers }
         repeat(9) { wrong.forEach(q::type); q.submit(); q.finishReveal() }
         assertTrue(q.over); assertFalse(q.won)
-        // Partida livre depois do desafio do dia.
-        q.newWord(); assertFalse(q.over); assertFalse(q.isDaily)
+        // O desafio do dia não vira partida livre; as livres ficam na aba Infinito.
+        q.newWord(); assertTrue(q.over); assertTrue(q.isDaily)
+        val free = TermoGame(Mode.QUARTETO, words, store = null, freePlay = true) { LocalDate.of(2026, 10, 9) }
+        assertFalse(free.isDaily); free.newWord(); assertFalse(free.over)
     }
 
     @Test
@@ -62,22 +62,6 @@ class NewGamesTest {
         // Três de um grupo + uma de outro = "falta só uma".
         (ps[0].groups[1].words.take(3) + ps[0].groups[2].words.first()).forEach(g::toggle)
         assertEquals(ConnectionsGame.Result.OneAway, g.submit())
-    }
-
-    @Test
-    fun cacaPalavrasMontaTodasAsGrades() {
-        val themes = WordSearchData.parse(asset("caca.txt"))
-        assertTrue(themes.size >= 30)
-        for ((i, t) in themes.withIndex()) {
-            val ws = WordSearch(t, seed = i * 7L)
-            assertEquals(t.name, t.words.size, ws.placed.size)
-            for (p in ws.placed) {
-                p.cells.forEachIndexed { k, (r, c) -> assertEquals(p.word[k], ws.grid[r][c]) }
-            }
-            val p = ws.placed.first()
-            val (r2, c2) = p.cells.last()
-            assertNotNull(ws.check(r2, c2, p.row, p.col)) // de trás para frente também vale
-        }
     }
 
     @Test
@@ -143,19 +127,6 @@ class NewGamesTest {
     }
 
     @Test
-    fun cacaInfinito() {
-        val pool = WordSearchData.parse(asset("caca.txt")) + WordSearchData.parse(asset("caca-extra.txt"))
-        val names = HashSet<String>()
-        for (seed in 0L until 300L) {
-            val w = WordSearchData.infinite(pool, seed)
-            assertEquals(8, w.placed.size)
-            names += w.theme.name
-            assertEquals(w.grid.map { String(it) }, WordSearchData.infinite(pool, seed).grid.map { String(it) })
-        }
-        assertTrue(names.size > 50)
-    }
-
-    @Test
     fun antonimos() {
         val (_, synFam) = QuizData.synonyms(asset("sinonimos.txt"))
         val (pairs, fam) = QuizData.antonyms(asset("antonimos.txt"), synFam)
@@ -172,5 +143,47 @@ class NewGamesTest {
             assertEquals(1, g.options.count { it in antOf })
             assertTrue(g.answer(q.synonym)); g.next()
         }
+    }
+
+    @Test
+    fun mestreMandou() {
+        val (syn, synFam) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, antFam) = QuizData.antonyms(asset("antonimos.txt"), synFam)
+        val data = com.dmwnezes.palavreiro.game.MestreData(
+            ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), syn, synFam, ant, antFam,
+        )
+        assertTrue(data.bank.size > 300)
+        val g = com.dmwnezes.palavreiro.game.MestreGame(data, kotlin.random.Random(9))
+        val seen = HashSet<com.dmwnezes.palavreiro.game.OrderType>()
+        val L = com.dmwnezes.palavreiro.game.MestreData::letters
+        repeat(400) {
+            val r = g.round
+            seen += r.type
+            assertEquals(4, r.options.size); assertEquals(4, r.options.map { L(it) }.toSet().size)
+            assertEquals(if (r.type == com.dmwnezes.palavreiro.game.OrderType.TODAS) 2 else 1, r.targets.size)
+            // Confere as ordens de letra de forma independente.
+            Regex("começa com ([A-Z])$|começam com ([A-Z])$").find(r.text)?.let { m ->
+                val c = (m.groupValues[1] + m.groupValues[2])[0]
+                assertEquals(r.targets, r.options.filter { L(it).first() == c }.toSet())
+            }
+            Regex("de (\\d+) letras").find(r.text)?.let { m ->
+                assertEquals(r.targets, r.options.filter { L(it).length == m.groupValues[1].toInt() }.toSet())
+            }
+            if (r.text.endsWith("com acento") || r.text.endsWith("com acento!"))
+                assertEquals(r.targets, r.options.filter { com.dmwnezes.palavreiro.game.MestreData.hasAccent(it) }.toSet())
+            // Joga do jeito certo para a rodada.
+            when (r.type) {
+                com.dmwnezes.palavreiro.game.OrderType.NORMAL -> g.tap(r.targets.first())
+                com.dmwnezes.palavreiro.game.OrderType.NAO_TOQUE -> g.tap(r.options.first { it !in r.targets })
+                com.dmwnezes.palavreiro.game.OrderType.TODAS -> { g.tap(r.targets.first()); assertEquals(null, g.result); g.tap(r.targets.last()) }
+                else -> g.timeUp()
+            }
+            assertEquals(true, g.result)
+            g.next()
+        }
+        assertEquals(400, g.score); assertEquals(5, seen.size)
+        // Erros: tocar numa pegadinha e deixar o tempo acabar numa ordem real.
+        while (!g.round.type.isTrick) { g.timeUp(); if (g.over) break; g.next() }
+        if (!g.over) { g.tap(g.round.options.first()); assertEquals(false, g.result) }
     }
 }

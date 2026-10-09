@@ -150,6 +150,7 @@
     if (l.startsWith("=")) fams.push(new Set(l.slice(1).split(",").map((s) => s.trim())));
     else if (pairs && l.includes("|")) pairs.push({ word: l.split("|")[0].trim(), syn: l.split("|")[1].trim() });
   });
+  P.parseChain = parseChain; // também usado pelo Mestre Mandou
   P.games.antonimos = (root) => P.games.sinonimos(root, "antonimos");
   P.games.sinonimos = async function (root, kindKey = "sinonimos") {
     const K = KINDS[kindKey], pairs = [], fams = [];

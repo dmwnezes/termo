@@ -51,5 +51,4 @@
     <TextView android:id="@+id/w_dueto" style="@style/WidgetRow" />
     <TextView android:id="@+id/w_quarteto" style="@style/WidgetRow" />
     <TextView android:id="@+id/w_conexoes" style="@style/WidgetRow" />
-    <TextView android:id="@+id/w_caca" style="@style/WidgetRow" />
 </LinearLayout>

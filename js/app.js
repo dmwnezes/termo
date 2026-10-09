@@ -13,17 +13,17 @@
     return s + "</div>";
   };
   const ICONS = {
-    termo: mini(12, 0), infinito: mini(12, 0),
+    termo: mini(12, 0),
     dueto: `<div style="display:flex;gap:4px">${mini(7, 0)}${mini(7, 2)}</div>`,
     quarteto: `<div style="display:grid;grid-template-columns:auto auto;gap:4px">${mini(7, 0)}${mini(7, 1)}${mini(7, 2)}${mini(7, 3)}</div>`,
     conexoes: `<div class="mini" style="grid-template-columns:repeat(4,10px);gap:3px">${["var(--present)", "var(--correct)", "var(--blue)", "var(--purple)"].map((c) => `<i style="width:10px;height:10px;background:${c}"></i>`.repeat(4)).join("")}</div>`,
-    caca: `<div style="font-weight:600;font-size:12px;line-height:1.5;letter-spacing:6px;position:relative">CAS<br>OLE<br>PAJ<span style="position:absolute;left:-2px;top:6px;width:58px;height:10px;border-radius:9px;background:rgba(230,193,79,.6);transform:rotate(38deg);transform-origin:left"></span></div>`,
     reverso: `<div style="text-align:center"><b style="color:var(--accent);font-size:18px">?</b><div class="mini" style="grid-template-columns:repeat(5,9px)">${["--correct", "--absent", "--present", "--absent", "--correct"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div></div>`,
     definicao: `<div style="display:grid;gap:5px;justify-items:center"><i style="display:block;width:46px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><i style="display:block;width:34px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><div class="mini" style="grid-template-columns:repeat(4,11px)">${["--surface-high", "--present", "--surface-high", "--surface-high"].map((c) => `<i style="width:11px;height:11px;background:var(${c})"></i>`).join("")}</div></div>`,
     antonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">ALTO</span>≠<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--red)">BAIXO</span></div>`,
     sinonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">BELO</span>=<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--correct)">LINDO</span></div>`,
     intruso: `<div class="mini" style="grid-template-columns:repeat(5,9px);gap:3px">${["--absent", "--absent", "--red", "--absent", "--absent"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div>`,
     ortografia: `<div style="display:flex;gap:5px;font-weight:800;font-size:15px"><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--correct);color:var(--dark-text)">✓</span><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--red);color:var(--dark-text)">✗</span></div>`,
+    mestre: `<div style="display:grid;gap:2px;justify-items:center"><span style="font-size:17px;line-height:1">👑</span><span class="pill-badge" style="font-size:9px;padding:3px 9px;background:var(--accent);color:var(--dark-text)">TOQUE</span></div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
 
@@ -33,15 +33,14 @@
     const dd = (k) => P.store.get("daily-done-" + k) === today;
     const guess = [
       ["termo", "Termo", "Uma palavra nova por dia", badge(dd("termo"))],
-      ["infinito", "Infinito", "Quantas palavras quiser", ""],
       ["dueto", "Dueto", "Duas palavras, 7 tentativas", badge(dd("dueto"))],
       ["quarteto", "Quarteto", "Quatro palavras, 9 tentativas", badge(dd("quarteto"))],
     ];
     const more = [
       ["conexoes", "Conexões", "Separe 16 palavras em 4 grupos", badge(P.store.get("conn-done") === today)],
-      ["caca", "Caça-Palavras", "Ache as palavras do tema do dia", badge(P.store.get("ws-done") === today)],
       ["intruso", "Intruso", "Ache a palavra que não pertence ao grupo", ""],
       ["ortografia", "Certo ou Errado", "A palavra está escrita certo?", ""],
+      ["mestre", "Mestre Mandou", "Obedeça só quando o mestre mandar", ""],
       ["reverso", "Reverso", "O site tenta adivinhar a sua palavra", ""],
       ["definicao", "Qual é a Palavra?", "Descubra a palavra pela definição", ""],
       ["sinonimos", "Sinônimos", "Corrente de sinônimos contra o tempo", ""],
@@ -70,11 +69,11 @@
     window.scrollTo(0, 0);
     const screens = {
       termo: () => P.games.termoScreen(app, "termo"),
-      infinito: () => P.games.termoScreen(app, "infinito"),
+      infinito: () => P.games.termoScreen(app, "infinito"), // aba Infinito do Termo
       dueto: () => P.games.termoScreen(app, "dueto"),
       quarteto: () => P.games.termoScreen(app, "quarteto"),
       conexoes: () => P.games.conexoes(app),
-      caca: () => P.games.caca(app),
+      mestre: () => P.games.mestre(app),
       reverso: () => P.games.reverso(app),
       definicao: () => P.games.definicao(app),
       sinonimos: () => P.games.sinonimos(app),

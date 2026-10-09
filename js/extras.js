@@ -9,7 +9,6 @@
     ["dueto", "Dueto", () => P.store.get("daily-done-dueto")],
     ["quarteto", "Quarteto", () => P.store.get("daily-done-quarteto")],
     ["conexoes", "Conexões", () => P.store.get("conn-done")],
-    ["caca", "Caça", () => P.store.get("ws-done")],
   ];
   P.todayStatus = () => { const t = P.dayKey(); return TODAY_GAMES.map(([k, name, f]) => ({ k, name, done: f() === t })); };
 
@@ -23,7 +22,7 @@
     </div>
     <button class="arch-link" data-go="arquivo"><span>🗂️ Arquivo de desafios</span><span aria-hidden="true">›</span></button>`;
   };
-  /** Confete e contador uma vez por dia quando os 5 desafios estão feitos. */
+  /** Confete e contador uma vez por dia quando os 4 desafios estão feitos. */
   P.checkAllDone = () => {
     const t = P.dayKey();
     if (P.todayStatus().every((x) => x.done) && P.store.get("alldone-day") !== t) {
@@ -35,7 +34,6 @@
   P.achievements = () => {
     const st = Object.fromEntries(["termo", "infinito", "dueto", "quarteto"].map((k) => [k, P.stats(k)]));
     const d = st.termo, inf = st.infinito, wins = d.won + inf.won, first = d.firstTry + inf.firstTry;
-    const fast = (b) => b >= 1 && b <= 119;
     return [
       ["🌱", "Primeira palavra", "Acerte sua primeira palavra", wins, 1],
       ["🎯", "De primeira", "Acerte na primeira tentativa", first, 1],
@@ -50,16 +48,15 @@
       ["🧩", "Conectado", "Resolva um Conexões", n("conn-won"), 1],
       ["💎", "Sem errar", "Resolva um Conexões sem erros", n("conn-perfect"), 1],
       ["♻️", "Conexão sem fim", "Resolva 10 Conexões no Infinito", n("conn-inf-won"), 10],
-      ["🔎", "Olho de águia", "Termine um Caça-Palavras em menos de 2 minutos", fast(n("ws-best")) || fast(n("ws-inf-best")) ? 1 : 0, 1],
-      ["🗺️", "Caçador incansável", "Termine 10 grades no Caça-Palavras Infinito", n("ws-inf-played"), 10],
       ["🤖", "Mais esperto que o site", "Vença o Reverso", n("rev-user"), 1],
       ["📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", n("def-best"), 10],
       ["⛓️", "Corrente forte", "Faça uma cadeia de 20 sinônimos", n("syn-best"), 20],
       ["🔄", "Do avesso", "Faça uma cadeia de 20 antônimos", n("ant-best"), 20],
       ["🕵️", "Detetive", "Faça 10 pontos no Intruso", n("intr-best"), 10],
       ["✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", n("ort-best"), 20],
+      ["👑", "Obediente", "Faça 15 pontos no Mestre Mandou", n("mestre-best"), 15],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
-      ["🌟", "Dia completo", "Faça os 5 desafios do dia", n("alldone-days"), 1],
+      ["🌟", "Dia completo", "Faça os 4 desafios do dia", n("alldone-days"), 1],
     ].map(([emoji, title, desc, v, goal]) => ({ emoji, title, desc, goal, progress: Math.min(v, goal), ok: v >= goal }));
   };
 
@@ -78,8 +75,8 @@
       weeks.push({ label: `${pad(start.getDate())}/${pad(start.getMonth() + 1)}`, v: vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null });
     }
     if (weeks.every((w) => w.v == null)) return `<p class="muted evo-empty">Jogue os desafios do dia para ver sua evolução.</p>`;
-    const top = kind === "termo" ? 7 : kind === "conn" ? 4 : Math.max(60, ...weeks.map((w) => w.v || 0));
-    const fmt = (v) => (kind === "caca" ? P.fmtTime(Math.round(v)) : v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+    const top = kind === "termo" ? 7 : 4;
+    const fmt = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     return `<div class="evo" role="img" aria-label="Média por semana nas últimas 8 semanas">${weeks.map((w) => `<div class="evo-col">
         <div class="evo-track">${w.v == null ? `<i class="evo-bar empty"></i>` : `<span class="evo-val">${fmt(w.v)}</span><i class="evo-bar" style="height:${Math.max(4, (w.v / top) * 100)}%"></i>`}</div>
         <small>${w.label}</small></div>`).join("")}</div>
@@ -87,10 +84,10 @@
   };
 
   // ---------- sincronizar site e app ----------
-  // Nome canônico (app) → chave do site.
+  // Nome canônico (app) → chave do site. As chaves ws_* (Caça-Palavras, removido) ficam só por compatibilidade.
   const COUNTERS = ["conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won", "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
     "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best", "intr_played", "intr_best", "intr_right",
-    "ort_played", "ort_best", "ort_right", "ant_best", "arch_played", "arch_won", "alldone_days"];
+    "ort_played", "ort_best", "ort_right", "mestre_played", "mestre_best", "mestre_right", "ant_best", "arch_played", "arch_won", "alldone_days"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));
   const MODES = ["termo", "infinito", "dueto", "quarteto"];
   const toB64 = (str) => { let bin = ""; new TextEncoder().encode(str).forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };

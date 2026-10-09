@@ -18,8 +18,6 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
     operator fun get(key: String): Int = values[key] ?: 0
     val connWon get() = this["conn_won"]
     val connPerfect get() = this["conn_perfect"]
-    val wsPlayed get() = this["ws_played"]
-    val wsBest get() = this["ws_best"]
     val revApp get() = this["rev_appwins"]
     val revUser get() = this["rev_userwins"]
     val defBest get() = this["def_best"]
@@ -32,7 +30,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won",
             "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
             "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best",
-            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best",
+            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best", "mestre_played", "mestre_best", "mestre_right",
             "arch_played", "arch_won", "alldone_days",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
@@ -46,7 +44,6 @@ object Achievements {
         val wins = daily.won + infinite.won
         val firstTry = daily.firstTry + infinite.firstTry
         val twoTries = daily.dist[1] + infinite.dist[1]
-        val fastWs = listOf(r["ws_best"], r["ws_inf_best"]).any { it in 1..119 }
         fun a(e: String, t: String, d: String, v: Int, goal: Int) = Achievement(e, t, d, minOf(v, goal), goal)
         return listOf(
             a("🌱", "Primeira palavra", "Acerte sua primeira palavra", wins, 1),
@@ -62,16 +59,15 @@ object Achievements {
             a("🧩", "Conectado", "Resolva um Conexões", r["conn_won"], 1),
             a("💎", "Sem errar", "Resolva um Conexões sem erros", r["conn_perfect"], 1),
             a("♻️", "Conexão sem fim", "Resolva 10 Conexões no Infinito", r["conn_inf_won"], 10),
-            a("🔎", "Olho de águia", "Termine um Caça-Palavras em menos de 2 minutos", if (fastWs) 1 else 0, 1),
-            a("🗺️", "Caçador incansável", "Termine 10 grades no Caça-Palavras Infinito", r["ws_inf_played"], 10),
             a("🤖", "Mais esperto que o app", "Vença o Reverso", r["rev_userwins"], 1),
             a("📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", r["def_best"], 10),
             a("⛓️", "Corrente forte", "Faça uma cadeia de 20 sinônimos", r["syn_best"], 20),
             a("🔄", "Do avesso", "Faça uma cadeia de 20 antônimos", r["ant_best"], 20),
             a("🕵️", "Detetive", "Faça 10 pontos no Intruso", r["intr_best"], 10),
             a("✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", r["ort_best"], 20),
+            a("👑", "Obediente", "Faça 15 pontos no Mestre Mandou", r["mestre_best"], 15),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
-            a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),
+            a("🌟", "Dia completo", "Faça os 4 desafios do dia", r["alldone_days"], 1),
         )
     }
 }

@@ -35,19 +35,17 @@ class Widget : AppWidgetProvider() {
             val s = DailyStatus.read(Store(context))
             val v = RemoteViews(context.packageName, R.layout.widget)
             v.setTextViewText(R.id.w_streak, if (s.streak > 0) "🔥 ${s.streak}" else "🔥 0")
-            v.setTextViewText(R.id.w_progress, "${s.doneCount} de 5 hoje")
+            v.setTextViewText(R.id.w_progress, "${s.doneCount} de ${s.total} hoje")
             fun mark(done: Boolean) = if (done) "✓" else "•"
             v.setTextViewText(R.id.w_termo, "${mark(s.termo)}  Termo")
             v.setTextViewText(R.id.w_dueto, "${mark(s.dueto)}  Dueto")
             v.setTextViewText(R.id.w_quarteto, "${mark(s.quarteto)}  Quarteto")
             v.setTextViewText(R.id.w_conexoes, "${mark(s.conexoes)}  Conexões")
-            v.setTextViewText(R.id.w_caca, "${mark(s.caca)}  Caça-Palavras")
             v.setOnClickPendingIntent(R.id.w_root, open(context, "HOME", 10))
             v.setOnClickPendingIntent(R.id.w_termo, open(context, "TERMO", 11))
             v.setOnClickPendingIntent(R.id.w_dueto, open(context, "DUETO", 12))
             v.setOnClickPendingIntent(R.id.w_quarteto, open(context, "QUARTETO", 13))
             v.setOnClickPendingIntent(R.id.w_conexoes, open(context, "CONEXOES", 14))
-            v.setOnClickPendingIntent(R.id.w_caca, open(context, "CACA", 15))
             return v
         }
     }

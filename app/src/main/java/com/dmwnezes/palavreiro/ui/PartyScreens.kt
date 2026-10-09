@@ -267,3 +267,150 @@ private fun BigChoice(text: String, color: Color, modifier: Modifier, enabled: B
         contentAlignment = Alignment.Center,
     ) { Text(text, color = Ink, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold) }
 }
+
+/** Mestre Mandou: obedeça só quando o mestre mandar. */
+@Composable
+fun MestreScreen(
+    data: com.dmwnezes.palavreiro.game.MestreData,
+    store: Store?,
+    feedback: Feedback?,
+    onBack: () -> Unit,
+    seed: Long = System.nanoTime(),
+    autoStart: Boolean = false,
+) {
+    var run by remember { mutableIntStateOf(0) }
+    val game = remember(run) { com.dmwnezes.palavreiro.game.MestreGame(data, Random(seed + run)) }
+    var best by remember { mutableIntStateOf(store?.int("mestre_best") ?: 0) }
+    var started by remember { mutableStateOf(autoStart) }
+    var showEnd by remember(run) { mutableStateOf(false) }
+    var showHelp by remember { mutableStateOf(false) }
+    val timer = remember(run) { androidx.compose.animation.core.Animatable(1f) }
+    val round = game.round
+    val result = game.result
+
+    // Barra de tempo de cada rodada; quando acaba, decide (pegadinha = acerto).
+    LaunchedEffect(round, started, run) {
+        if (!started || game.over) return@LaunchedEffect
+        timer.snapTo(1f)
+        timer.animateTo(0f, androidx.compose.animation.core.tween((game.seconds * 1000).toInt(), easing = androidx.compose.animation.core.LinearEasing))
+        game.timeUp()
+    }
+    // Depois do resultado: mostra por 1,1 s e passa (ou termina).
+    LaunchedEffect(result, round, run) {
+        val r = result ?: return@LaunchedEffect
+        if (r) { feedback?.reveal(2, com.dmwnezes.palavreiro.game.Mark.CORRECT); store?.add("mestre_right") } else feedback?.invalid()
+        delay(1100)
+        if (game.over) {
+            store?.add("mestre_played"); store?.max("mestre_best", game.score); store?.logActivity()
+            best = maxOf(best, game.score)
+            feedback?.lose()
+            showEnd = true
+        } else game.next()
+    }
+
+    Box(Modifier.fillMaxSize().background(Night.background)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            TopBar("Mestre Mandou", onBack, onHelp = { showHelp = true })
+            Column(Modifier.weight(1f).padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                ScoreLives(game.score, game.lives, maxOf(best, game.score))
+                Spacer(Modifier.height(18.dp))
+                if (!started) {
+                    Spacer(Modifier.height(10.dp))
+                    Text("👑", fontSize = 48.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text("Mestre Mandou", color = Night.text, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+                    Spacer(Modifier.height(10.dp))
+                    Text(MESTRE_HELP, color = Night.muted, fontSize = 15.sp, textAlign = TextAlign.Center, lineHeight = 21.sp)
+                    Spacer(Modifier.height(26.dp))
+                    PillButton("Começar", Night.correct, modifier = Modifier.fillMaxWidth()) { started = true }
+                } else {
+                    Box(Modifier.fillMaxWidth().height(10.dp).clip(Shapes.pill).background(Night.surface)) {
+                        Box(
+                            Modifier.fillMaxWidth(timer.value).height(10.dp).clip(Shapes.pill)
+                                .background(if (timer.value < 0.3f) Night.red else Night.accent)
+                        )
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    OrderCard(round.text)
+                    Spacer(Modifier.height(18.dp))
+                    round.options.chunked(2).forEach { line ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            line.forEach { w ->
+                                val tappedIt = w in game.tapped
+                                val isTarget = w in round.targets
+                                val color = when {
+                                    // Durante a rodada: no TODAS, os toques certos já ficam verdes.
+                                    result == null -> if (tappedIt) Night.correct else Night.surfaceHigh
+                                    tappedIt && result == false -> Night.red
+                                    tappedIt -> Night.correct
+                                    result == false && !round.type.isTrick && round.type != com.dmwnezes.palavreiro.game.OrderType.NAO_TOQUE && isTarget -> Night.correct
+                                    else -> Night.surface
+                                }
+                                val bg by animateColorAsState(color, label = "mestre")
+                                Box(
+                                    Modifier.weight(1f).height(84.dp).padding(vertical = 5.dp).clip(Shapes.card).background(bg)
+                                        .clickable(enabled = result == null) { game.tap(w) },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        w.uppercase(), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                                        fontSize = if (w.length > 9) 15.sp else 18.sp,
+                                        color = if (bg == Night.correct || bg == Night.red) Ink else Night.text,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    Box(Modifier.height(30.dp), contentAlignment = Alignment.Center) {
+                        if (result != null) {
+                            Text(
+                                game.message, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
+                                color = if (result) Night.correct else Night.red,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        if (showEnd) {
+            EndSheet(
+                "Você fez ${game.score} ${if (game.score == 1) "ponto" else "pontos"}", game.score, best, store?.int("mestre_right") ?: 0,
+                "Palavreiro · Mestre Mandou\nFiz ${game.score} ${if (game.score == 1) "ponto" else "pontos"} 👑",
+                onAgain = { run++; started = true },
+            ) { showEnd = false }
+        }
+        if (showHelp) {
+            BottomSheet({ showHelp = false }) {
+                SheetTitle("Como jogar Mestre Mandou")
+                Spacer(Modifier.height(12.dp))
+                Text(MESTRE_HELP, color = Night.text, fontSize = 15.sp)
+                Spacer(Modifier.height(18.dp))
+                PillButton("Entendi", Night.correct, modifier = Modifier.fillMaxWidth()) { showHelp = false }
+            }
+        }
+    }
+}
+
+private const val MESTRE_HELP = "Faça o que a ordem pede, mas só quando começar com \"O mestre mandou\". " +
+    "Se o mestre não mandou, não toque em nada e espere o tempo acabar. Cuidado com o NÃO e com o TODAS. Você tem 3 vidas."
+
+/** Cartão da ordem: "NÃO" e "TODAS" ganham destaque amarelo. */
+@Composable
+private fun OrderCard(text: String) {
+    val styled = androidx.compose.ui.text.buildAnnotatedString {
+        var i = 0
+        val marks = Regex("NÃO|TODAS").findAll(text).toList()
+        marks.forEach { m ->
+            append(text.substring(i, m.range.first))
+            pushStyle(androidx.compose.ui.text.SpanStyle(color = Night.present, fontWeight = FontWeight.ExtraBold))
+            append(m.value); pop()
+            i = m.range.last + 1
+        }
+        append(text.substring(i))
+    }
+    Text(
+        styled, color = Night.text, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, lineHeight = 28.sp,
+        modifier = Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(horizontal = 18.dp, vertical = 24.dp),
+    )
+}

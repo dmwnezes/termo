@@ -19,6 +19,9 @@
     return m;
   };
 
+  // Também usados pelo Mestre Mandou.
+  P.parseGroups = parseGroups; P.parseFamilies = parseFamilies; P.BAD_FAMILIES = BAD;
+
   P.games.intruso = async function (root) {
     const [groupsAll, fam] = await Promise.all([P.text("conexoes.txt").then(parseGroups), P.text("conexoes-familias.txt").then(parseFamilies)]);
     // Um grupo por nome, só os que têm famílias conhecidas e nenhuma família proibida.

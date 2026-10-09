@@ -8,6 +8,4 @@
     <string name="sc_conexoes_long">Conexões do dia</string>
     <string name="sc_infinito">Infinito</string>
     <string name="sc_infinito_long">Termo infinito</string>
-    <string name="sc_caca">Caça-Palavras</string>
-    <string name="sc_caca_long">Caça-Palavras do dia</string>
 </resources>

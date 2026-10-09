@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-  const GAMES = [["termo", "Termo"], ["dueto", "Dueto"], ["quarteto", "Quarteto"], ["conexoes", "Conexões"], ["caca", "Caça"]];
+  const GAMES = [["termo", "Termo"], ["dueto", "Dueto"], ["quarteto", "Quarteto"], ["conexoes", "Conexões"]];
   const ss = {
     get(k, f) { try { const v = sessionStorage.getItem("pv-arch-" + k); return v == null ? f : JSON.parse(v); } catch (_) { return f; } },
     set(k, v) { try { sessionStorage.setItem("pv-arch-" + k, JSON.stringify(v)); } catch (_) {} },
@@ -57,7 +57,6 @@
     if (!/^\d{4}-\d{2}-\d{2}$/.test(day || "") || day < "2026-01-01" || day > last || P.dayKey(P.parseDay(day)) !== day) return false;
     if (game === "termo" || game === "dueto" || game === "quarteto") P.games.termoScreen(root, game, null, day);
     else if (game === "conexoes") P.games.conexoes(root, false, day);
-    else if (game === "caca") P.games.caca(root, false, day);
     else return false;
     ss.set("tab", game);
     return true;

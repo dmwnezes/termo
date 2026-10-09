@@ -22,11 +22,4 @@
             <extra android:name="dest" android:value="INFINITO" />
         </intent>
     </shortcut>
-    <shortcut android:shortcutId="caca" android:enabled="true" android:icon="@drawable/sc_caca"
-        android:shortcutShortLabel="@string/sc_caca" android:shortcutLongLabel="@string/sc_caca_long">
-        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.dmwnezes.palavreiro"
-            android:targetClass="com.dmwnezes.palavreiro.MainActivity">
-            <extra android:name="dest" android:value="CACA" />
-        </intent>
-    </shortcut>
 </shortcuts>

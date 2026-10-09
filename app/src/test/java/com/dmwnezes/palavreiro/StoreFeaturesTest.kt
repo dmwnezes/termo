@@ -71,6 +71,21 @@ class StoreFeaturesTest {
     }
 
     @Test
+    fun abasDoDiaEInfinitoNaoSeMisturam() {
+        val store = freshStore()
+        val daily = TermoGame(Mode.DUETO, words, store) { today }
+        "CARRO".forEach(daily::type); daily.submit(); daily.finishReveal()
+        val free = TermoGame(Mode.DUETO, words, store, freePlay = true) { today }
+        assertFalse(free.isDaily); assertEquals(0, free.rows.size)
+        "MUNDO".forEach(free::type); free.submit(); free.finishReveal()
+        // Reabrindo: cada aba com o seu tabuleiro.
+        assertEquals(listOf("CARRO"), TermoGame(Mode.DUETO, words, store) { today }.rows.toList())
+        assertEquals(listOf("MUNDO"), TermoGame(Mode.DUETO, words, store, freePlay = true) { today }.rows.toList())
+        // A partida do dia não vira livre.
+        daily.newWord(); assertTrue(daily.isDaily)
+    }
+
+    @Test
     fun sincronizacaoIdaEVolta() {
         val a = freshStore()
         a.saveStats(Mode.DIARIO, Stats(played = 9, won = 8, streak = 3, maxStreak = 5, lastWinDay = 280, firstTry = 1, dist = listOf(1, 2, 3, 2, 0, 0, 0, 0, 0)))
@@ -150,9 +165,9 @@ class StoreFeaturesTest {
 
     @Test
     fun lembrete() {
-        val all = DailyStatus(true, true, true, true, true, 4)
+        val all = DailyStatus(true, true, true, true, 4)
         assertNull(Reminder.message(all, null)); assertNull(Reminder.message(all, Reminder.KIND_STREAK))
-        val some = DailyStatus(termo = false, dueto = true, quarteto = true, conexoes = false, caca = true, streak = 4)
+        val some = DailyStatus(termo = false, dueto = true, quarteto = true, conexoes = false, streak = 4)
         val (t, x) = Reminder.message(some, null)!!
         assertEquals("Faltam 2 desafios hoje", t); assertTrue(x.contains("Termo e Conexões") && x.contains("sequência de 4"))
         assertTrue(Reminder.message(some, Reminder.KIND_STREAK)!!.second.contains("4 dias"))

@@ -165,13 +165,13 @@ class Store(context: Context) {
     fun json(key: String): JSONObject = runCatching { JSONObject(text(key) ?: "{}") }.getOrDefault(JSONObject())
     fun setJson(key: String, o: JSONObject) = setText(key, o.toString())
 
-    /** Resultado de um desafio do dia ou do arquivo: jogo ∈ termo, dueto, quarteto, conexoes, caca. */
+    /** Resultado de um desafio do dia ou do arquivo: jogo ∈ termo, dueto, quarteto, conexoes. */
     fun setResult(game: String, day: String, won: Boolean) {
         val o = json("results"); o.put("$game|$day", if (won) "w" else "l"); setJson("results", o)
     }
     fun results(): Map<String, String> = json("results").let { o -> o.keys().asSequence().associateWith { o.getString(it) } }
 
-    /** Histórico dos desafios do dia, para o gráfico de evolução (termo, conn, caca). */
+    /** Histórico dos desafios do dia, para o gráfico de evolução (termo, conn). */
     fun setHistory(day: String, field: String, value: Int) {
         val o = json("history"); val d = o.optJSONObject(day) ?: JSONObject()
         d.put(field, value); o.put(day, d); setJson("history", o)

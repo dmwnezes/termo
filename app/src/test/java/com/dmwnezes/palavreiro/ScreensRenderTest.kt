@@ -15,13 +15,11 @@ import com.dmwnezes.palavreiro.ui.ProfileScreen
 import com.dmwnezes.palavreiro.ui.SplashCredits
 import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ConnectionsScreen
-import com.dmwnezes.palavreiro.ui.WordSearchScreen
 import com.dmwnezes.palavreiro.ui.ReverseScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
 import com.dmwnezes.palavreiro.ui.SynonymScreen
 import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.game.ConnectionsData
-import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
 import org.junit.Test
@@ -131,7 +129,7 @@ class ScreensRenderTest {
     @Test
     fun inicioHoje() {
         rule.mainClock.autoAdvance = false
-        val st = com.dmwnezes.palavreiro.system.DailyStatus(termo = true, dueto = true, quarteto = false, conexoes = true, caca = false, streak = 3)
+        val st = com.dmwnezes.palavreiro.system.DailyStatus(termo = true, dueto = true, quarteto = false, conexoes = true, streak = 3)
         rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), {}, {}, today = st) } }
         save("2b-inicio-hoje")
     }
@@ -148,6 +146,35 @@ class ScreensRenderTest {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.SpellingScreen(com.dmwnezes.palavreiro.game.SpellingData.parse(asset("ortografia.txt")), null, null, {}, seed = 5) } }
         save("20-ortografia")
+    }
+
+    @Test
+    fun mestre() {
+        rule.mainClock.autoAdvance = false
+        val (syn, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, af) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        val data = com.dmwnezes.palavreiro.game.MestreData(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), syn, sf, ant, af)
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MestreScreen(data, null, null, {}, seed = 21, autoStart = true) } }
+        save("24-mestre", 1200)
+    }
+
+    @Test
+    fun mestreInicio() {
+        rule.mainClock.autoAdvance = false
+        val (syn, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, af) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        val data = com.dmwnezes.palavreiro.game.MestreData(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), syn, sf, ant, af)
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MestreScreen(data, null, null, {}, seed = 21) } }
+        save("24b-mestre-inicio")
+    }
+
+    @Test
+    fun termoComAbas() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.DUETO, words, store = null, freePlay = true) { day }
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}, infiniteTab = true) } }
+        save("25-dueto-infinito")
     }
 
     @Test
@@ -216,20 +243,6 @@ class ScreensRenderTest {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { ConnectionsScreen(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), null, null, {}, day, startInfinite = true) } }
         save("11b-conexoes-infinito")
-    }
-
-    @Test
-    fun caca() {
-        rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day) } }
-        save("12-caca")
-    }
-
-    @Test
-    fun cacaInfinito() {
-        rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day, startInfinite = true) } }
-        save("12b-caca-infinito")
     }
 
     @Test
