@@ -32,8 +32,14 @@ class TermoGame(
     private val store: Store?,
     /** Palavra do desafio recebido por link (só no modo Desafio). */
     private val challenge: String? = null,
+    /** Data de um desafio antigo jogado pelo Arquivo (não mexe em estatísticas nem na sequência). */
+    val archive: LocalDate? = null,
     private val today: () -> LocalDate = { LocalDate.now() },
 ) {
+    val isArchive: Boolean get() = archive != null
+    /** Nome do jogo nos resultados ("termo", "dueto", "quarteto"). */
+    val resultName: String get() = when (mode) { Mode.DUETO -> "dueto"; Mode.QUARTETO -> "quarteto"; else -> "termo" }
+    private val slot: String get() = if (archive != null) "arquivo_${mode.key}" else mode.key
     val boards: Int get() = mode.boards
     val maxTries: Int get() = mode.maxTries
 
@@ -87,7 +93,14 @@ class TermoGame(
     private val salt: Int get() = when (mode) { Mode.DUETO -> 1; Mode.QUARTETO -> 2; else -> 0 }
 
     private fun load() {
-        val saved = store?.game(mode)
+        val saved = store?.game(slot)
+        if (archive != null) {
+            val list = words.dailySet(archive, boards, salt)
+            isDaily = false
+            key = archive.toString()
+            restore(list, saved?.takeIf { it.key == key && it.answers == list })
+            return
+        }
         if (mode == Mode.DESAFIO) {
             val word = Words.normalize(challenge ?: words.random())
             isDaily = false
@@ -132,7 +145,7 @@ class TermoGame(
     }
 
     private fun save() {
-        store?.saveGame(mode, SavedGame(key, answers.toList(), rows.toList(), over, won, hints.toList(), hard))
+        store?.saveGame(slot, SavedGame(key, answers.toList(), rows.toList(), over, won, hints.toList(), hard))
     }
 
     /** O dia virou enquanto o app estava aberto? */
@@ -270,6 +283,15 @@ class TermoGame(
     private fun end(win: Boolean) {
         over = true
         won = win
+        if (archive != null) {
+            store?.archiveDone(resultName, archive.toString(), win)
+            if (win) events.onWin(rows.size) else events.onLose(answers.filter { !isSolved(answers.indexOf(it)) }.map(words::display))
+            return
+        }
+        if (isDaily && mode.daily) {
+            store?.setResult(resultName, todayKey(), win)
+            if (mode == Mode.DIARIO) store?.setHistory(todayKey(), "termo", if (win) rows.size else 7)
+        }
         record(win, rows.size)
         store?.logActivity(todayKey())
         if (isDaily && mode == Mode.DIARIO) store?.logTermo(todayKey(), win)
@@ -307,7 +329,7 @@ class TermoGame(
 
     /** Começa uma partida livre com palavras sorteadas (Infinito, e Dueto/Quarteto depois do desafio do dia). */
     fun newWord() {
-        if (!mode.free || busy) return
+        if (!mode.free || busy || archive != null) return
         isDaily = false
         key = "livre-${System.currentTimeMillis()}"
         val avoid = answers.toSet()

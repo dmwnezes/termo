@@ -300,3 +300,6 @@ fun ModeSwitch(infinite: Boolean, modifier: Modifier = Modifier, onChange: (Bool
         }
     }
 }
+
+/** "12/03" a partir de uma data. */
+fun shortDay(d: java.time.LocalDate): String = "%02d/%02d".format(d.dayOfMonth, d.monthValue)

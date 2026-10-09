@@ -51,11 +51,13 @@
   };
   const newSeed = () => Math.floor(Math.random() * 2147483647);
 
-  P.games.caca = async function (root, inf = false) {
+  P.games.caca = async function (root, inf = false, arch = null) {
     const [themes, extra] = await Promise.all([P.text("caca.txt").then(parseThemes), P.text("caca-extra.txt").then(parseThemes)]);
     const pool = themes.concat(extra);
-    const day = P.dayKey(), i = P.dayIndex();
-    const st = P.store.get(inf ? "ws-inf-state" : "ws-state", null);
+    if (arch) inf = false;
+    const day = arch || P.dayKey(), i = P.dayIndex(arch ? P.parseDay(arch) : new Date());
+    const stateKey = arch ? "ws-arch-state" : inf ? "ws-inf-state" : "ws-state";
+    const st = P.store.get(stateKey, null);
     const seed = inf ? (st && st.seed != null ? st.seed : newSeed()) : null;
     let theme, g, placed;
     if (inf) ({ theme, g, placed } = infinite(pool, seed));
@@ -73,8 +75,8 @@
     };
     if (inf && done()) return next();
 
-    root.innerHTML = P.topbar("Caça-Palavras", { extra: `<b class="muted" data-time style="padding-right:10px">${fmt(seconds)}</b>` }) + P.modeSwitch(inf) +
-      `<div class="game"><div class="ws-theme"><small>${inf ? "Tema sorteado" : "Tema de hoje"}</small><h2>${P.esc(theme.name)}</h2></div>
+    root.innerHTML = P.topbar(arch ? `Caça · ${P.shortDay(arch)}` : "Caça-Palavras", { extra: `<b class="muted" data-time style="padding-right:10px">${fmt(seconds)}</b>` }) + (arch ? "" : P.modeSwitch(inf)) +
+      `<div class="game"><div class="ws-theme"><small>${inf ? "Tema sorteado" : arch ? "Tema do dia " + P.shortDay(arch) : "Tema de hoje"}</small><h2>${P.esc(theme.name)}</h2></div>
       <div class="ws-wrap"><canvas></canvas><div class="ws-grid" style="grid-template-columns:repeat(${N},1fr)"></div></div>
       <div class="chips" data-chips></div><p class="center muted" data-count></p><div class="center" data-after style="padding-bottom:16px"></div></div>`;
     const wrap = P.$(".ws-wrap", root), canvas = P.$("canvas", wrap), gridEl = P.$(".ws-grid", wrap);
@@ -86,7 +88,7 @@
       if (done()) return;
       seconds++; P.$("[data-time]", root).textContent = fmt(seconds); save();
     }, 1000);
-    function save() { if (document.body.contains(wrap)) P.store.set(inf ? "ws-inf-state" : "ws-state", inf ? { seed, found, seconds } : { day, found, seconds }); }
+    function save() { if (document.body.contains(wrap)) P.store.set(stateKey, inf ? { seed, found, seconds } : { day, found, seconds }); }
     P.bindModeSwitch(root, (v) => { clearInterval(timer); P.games.caca(root, v); });
 
     function paint() {
@@ -101,7 +103,8 @@
       P.$("[data-count]", root).textContent = `${found.length} de ${placed.length} palavras`;
       const after = P.$("[data-after]", root);
       if (done() && !after.innerHTML) {
-        const b = P.h(`<button class="pill${inf ? " ghost" : ""}">Ver resultado</button>`); b.onclick = result; after.appendChild(b);
+        const b = P.h(`<button class="pill${inf || arch ? " ghost" : ""}">Ver resultado</button>`); b.onclick = result; after.appendChild(b);
+        if (arch) { const n = P.h(`<button class="pill" style="margin-left:8px">Voltar ao arquivo</button>`); n.onclick = () => P.go("arquivo"); after.appendChild(n); }
         if (inf) { const n = P.h(`<button class="pill" style="margin-left:8px">Próxima grade</button>`); n.onclick = next; after.appendChild(n); }
       }
     }
@@ -130,7 +133,11 @@
         if (done()) {
           P.fx.win(); P.confetti();
           if (inf) { P.store.add("ws-inf-played"); P.store.min("ws-inf-best", seconds); P.logActivity(); }
-          else if (P.store.get("ws-done") !== day) { P.store.set("ws-done", day); P.store.add("ws-played"); P.store.min("ws-best", seconds); P.logActivity(); }
+          else if (arch) P.archiveDone("caca", arch, true);
+          else if (P.store.get("ws-done") !== day) {
+            P.store.set("ws-done", day); P.store.add("ws-played"); P.store.min("ws-best", seconds); P.logActivity();
+            P.setResult("caca", day, true); P.setHistory(day, "caca", seconds);
+          }
           setTimeout(result, 1600);
         }
       }
@@ -141,19 +148,20 @@
     function result() {
       const best = P.store.get(inf ? "ws-inf-best" : "ws-best", 0), played = P.store.get(inf ? "ws-inf-played" : "ws-played", 0);
       const ui = P.sheet(`<h2>Você achou todas!</h2><p class="subtitle">Tema: ${P.esc(theme.name)}</p>
-        ${P.statsHTML([[fmt(seconds), "Tempo"], [best ? fmt(best) : "—", "Melhor tempo"], [played, "Grades"]], "three")}
+        ${arch ? P.statsHTML([[fmt(seconds), "Tempo"]], "one") : P.statsHTML([[fmt(seconds), "Tempo"], [best ? fmt(best) : "—", "Melhor tempo"], [played, "Grades"]], "three")}
         <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>Stories</button></div>
-        ${inf ? `<button class="pill" data-next style="width:100%;margin-top:10px">Próxima grade</button>` : `<p class="note">Uma grade nova aparece amanhã.</p>`}`);
+        ${arch ? `<button class="pill" data-arch style="width:100%;margin-top:10px">Voltar ao arquivo</button>` : inf ? `<button class="pill" data-next style="width:100%;margin-top:10px">Próxima grade</button>` : `<p class="note">Uma grade nova aparece amanhã.</p>`}`);
       if (inf) P.$("[data-next]", ui.el).onclick = next;
+      if (arch) P.$("[data-arch]", ui.el).onclick = () => P.go("arquivo");
       P.$("[data-share]", ui.el).onclick = () => P.share(`Palavreiro · Caça-Palavras\nTema: ${theme.name}\nAchei as ${placed.length} palavras em ${fmt(seconds)} 🔎`);
       P.$("[data-story]", ui.el).onclick = () => P.story({
-        game: inf ? "Caça-Palavras Infinito" : "Caça-Palavras do dia", headline: `Achei tudo em ${fmt(seconds)}`, detail: `Tema: ${theme.name}`,
+        game: inf ? "Caça-Palavras Infinito" : arch ? "Caça-Palavras · " + P.shortDay(arch) : "Caça-Palavras do dia", headline: `Achei tudo em ${fmt(seconds)}`, detail: `Tema: ${theme.name}`,
         grids: [placed.map((_, k) => COLORS[k % COLORS.length]).reduce((a, c, k) => { (a[Math.floor(k / 4)] = a[Math.floor(k / 4)] || []).push(c); return a; }, [])],
         stats: [[best ? fmt(best) : "—", "Melhor tempo"], [String(played), "Grades"]],
       });
     }
     window.addEventListener("resize", () => document.body.contains(wrap) && paint());
     paint();
-    if (done()) setTimeout(result, 400);
+    if (done() && !arch) setTimeout(result, 400);
   };
 })();

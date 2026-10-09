@@ -36,10 +36,12 @@
   };
   const newSeed = () => Math.floor(Math.random() * 2147483647);
 
-  P.games.conexoes = async function (root, inf = false) {
+  P.games.conexoes = async function (root, inf = false, arch = null) {
     const [puzzles, fam] = await Promise.all([P.text("conexoes.txt").then(parse), P.text("conexoes-familias.txt").then(families)]);
-    const day = P.dayKey(), i = P.dayIndex();
-    const saved = P.store.get(inf ? "conn-inf-state" : "conn-state", null);
+    if (arch) inf = false;
+    const day = arch || P.dayKey(), i = P.dayIndex(arch ? P.parseDay(arch) : new Date());
+    const stateKey = arch ? "conn-arch-state" : inf ? "conn-inf-state" : "conn-state";
+    const saved = P.store.get(stateKey, null);
     const seed = inf ? (saved && saved.seed != null ? saved.seed : newSeed()) : null;
     const groups = inf ? remix(puzzles, fam, seed) : puzzles[((i * 13 + 7) % puzzles.length + puzzles.length) % puzzles.length];
     const rnd = P.rng(inf ? seed : i * 97 + 5);
@@ -63,15 +65,17 @@
     // Um desafio infinito já terminado não volta: abre logo um novo.
     const next = () => { P.store.set("conn-inf-state", { seed: newSeed(), tries: [] }); document.querySelectorAll(".overlay").forEach((o) => o.remove()); P.games.conexoes(root, true); };
     if (inf && over) return next();
-    const persist = () => P.store.set(inf ? "conn-inf-state" : "conn-state", inf ? { seed, tries } : { day, tries });
+    const persist = () => P.store.set(stateKey, inf ? { seed, tries } : { day, tries });
     const finish = () => {
       if (inf) { P.store.add("conn-inf-played"); P.logActivity(); if (won) P.store.add("conn-inf-won"); return; }
+      if (arch) return P.archiveDone("conexoes", arch, won);
       if (P.store.get("conn-done") === day) return;
       P.store.set("conn-done", day); P.store.add("conn-played"); P.logActivity();
+      P.setResult("conexoes", day, won); P.setHistory(day, "conn", won ? mistakes : 4);
       if (won) { P.store.add("conn-won"); if (mistakes === 0) P.store.add("conn-perfect"); }
     };
 
-    root.innerHTML = P.topbar("Conexões", { help: true }) + P.modeSwitch(inf) + `<div class="game conn"><p class="hint">${inf ? "Grupos sorteados, sem limite de jogos" : "Crie 4 grupos de 4 palavras"}</p>
+    root.innerHTML = P.topbar(arch ? `Conexões · ${P.shortDay(arch)}` : "Conexões", { help: true }) + (arch ? "" : P.modeSwitch(inf)) + `<div class="game conn"><p class="hint">${arch ? "Desafio do arquivo" : inf ? "Grupos sorteados, sem limite de jogos" : "Crie 4 grupos de 4 palavras"}</p>
       <div data-solved></div><div class="conn-grid" data-grid></div><div class="dots" data-dots></div>
       <div class="row-btns" data-btns style="margin-top:auto;padding-bottom:16px"></div></div>`;
     const fs = (w) => (w.includes(" ") ? 11 : w.length >= 13 ? 8.5 : w.length >= 11 ? 9.5 : w.length >= 9 ? 10.5 : w.length >= 7 ? 12 : 14);
@@ -105,6 +109,10 @@
         btns.innerHTML = `<button class="pill ghost" data-res>Resultado</button><button class="pill" data-next>Próximo</button>`;
         P.$("[data-res]", btns).onclick = result;
         P.$("[data-next]", btns).onclick = next;
+      } else if (arch) {
+        btns.innerHTML = `<button class="pill ghost" data-res>Resultado</button><button class="pill" data-back-arch>Voltar ao arquivo</button>`;
+        P.$("[data-res]", btns).onclick = result;
+        P.$("[data-back-arch]", btns).onclick = () => P.go("arquivo");
       } else {
         btns.innerHTML = `<button class="pill" data-res>Ver resultado</button>`;
         P.$("[data-res]", btns).onclick = result;
@@ -114,16 +122,17 @@
       const em = ["🟨", "🟩", "🟦", "🟪"];
       const share = tries.map((t) => t.map((w) => em[groups.find((g) => g.words.includes(w)).level]).join("")).join("\n");
       const ui = P.sheet(`<h2>${won ? (mistakes === 0 ? "Perfeito!" : "Você conseguiu!") : "Não foi dessa vez"}</h2>
-        <p class="subtitle">${won ? `Erros: ${mistakes}` : inf ? "As respostas estão na tela" : "Volte amanhã para um desafio novo"}</p>
+        <p class="subtitle">${won ? `Erros: ${mistakes}` : inf || arch ? "As respostas estão na tela" : "Volte amanhã para um desafio novo"}</p>
         <p class="center" style="font-size:22px;line-height:1.2;white-space:pre">${share}</p>
-        ${inf ? P.statsHTML([[P.store.get("conn-inf-played", 0), "Jogos"], [P.store.get("conn-inf-won", 0), "Vitórias"]])
+        ${arch ? "" : inf ? P.statsHTML([[P.store.get("conn-inf-played", 0), "Jogos"], [P.store.get("conn-inf-won", 0), "Vitórias"]])
               : P.statsHTML([[P.store.get("conn-played", 0), "Jogos"], [P.store.get("conn-won", 0), "Vitórias"], [P.store.get("conn-perfect", 0), "Perfeitos"]], "three")}
         <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>Stories</button></div>
-        ${inf ? `<button class="pill" data-next style="width:100%;margin-top:10px">Próximo desafio</button>` : `<p class="note">Um desafio novo aparece amanhã.</p>`}`);
+        ${arch ? `<button class="pill" data-arch style="width:100%;margin-top:10px">Voltar ao arquivo</button>` : inf ? `<button class="pill" data-next style="width:100%;margin-top:10px">Próximo desafio</button>` : `<p class="note">Um desafio novo aparece amanhã.</p>`}`);
       if (inf) P.$("[data-next]", ui.el).onclick = next;
-      P.$("[data-share]", ui.el).onclick = () => P.share(`Palavreiro · Conexões${inf ? " Infinito" : ""}\n\n${share}`);
+      if (arch) P.$("[data-arch]", ui.el).onclick = () => P.go("arquivo");
+      P.$("[data-share]", ui.el).onclick = () => P.share(`Palavreiro · Conexões${inf ? " Infinito" : arch ? " · " + P.shortDay(arch) : ""}\n\n${share}`);
       P.$("[data-story]", ui.el).onclick = () => P.story({
-        game: inf ? "Conexões Infinito" : "Conexões do dia", headline: won ? (mistakes === 0 ? "Perfeito!" : "Resolvi!") : "Quase lá!",
+        game: inf ? "Conexões Infinito" : arch ? "Conexões · " + P.shortDay(arch) : "Conexões do dia", headline: won ? (mistakes === 0 ? "Perfeito!" : "Resolvi!") : "Quase lá!",
         detail: won ? `${mistakes} ${mistakes === 1 ? "erro" : "erros"}` : "Faltou pouco", grids: [grid()],
         stats: inf ? [[String(P.store.get("conn-inf-won", 0)), "Resolvidos"], [String(P.store.get("conn-inf-played", 0)), "Jogos"]]
           : [[String(P.store.get("conn-won", 0)), "Resolvidos"], [String(P.store.get("conn-perfect", 0)), "Perfeitos"]],
@@ -136,6 +145,6 @@
       <p>No modo Infinito, cada desafio junta grupos sorteados e você joga quantos quiser.</p>`);
     P.bindModeSwitch(root, (v) => P.games.conexoes(root, v));
     draw();
-    if (over && !inf) setTimeout(result, 400);
+    if (over && !inf && !arch) setTimeout(result, 400);
   };
 })();

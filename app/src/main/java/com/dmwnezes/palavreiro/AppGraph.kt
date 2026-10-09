@@ -43,6 +43,9 @@ object AppGraph {
     /** Famílias de assunto dos grupos do Conexões (para o modo infinito). */
     lateinit var connFamilies: Map<String, Set<String>>
         private set
+    /** Pares de grafia certa/errada do Certo ou Errado. */
+    lateinit var spelling: List<com.dmwnezes.palavreiro.game.SpellPair>
+        private set
     /** Temas do Caça-Palavras Infinito: os do dia + os extras. */
     lateinit var themesInfinite: List<SearchTheme>
         private set
@@ -63,6 +66,7 @@ object AppGraph {
         themes = WordSearchData.parse(asset("caca.txt"))
         connFamilies = ConnectionsData.families(asset("conexoes-familias.txt"))
         themesInfinite = themes + WordSearchData.parse(asset("caca-extra.txt"))
+        spelling = com.dmwnezes.palavreiro.game.SpellingData.parse(asset("ortografia.txt"))
         definitions = QuizData.definitions(asset("definicoes.txt"))
         QuizData.synonyms(asset("sinonimos.txt")).let { (p, f) -> synonyms = p; families = f }
         meanings = QuizData.meanings(asset("significados.txt"))

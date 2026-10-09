@@ -102,8 +102,68 @@ class ScreensRenderTest {
         rule.mainClock.autoAdvance = false
         val d = Stats(played = 12, won = 10, streak = 4, maxStreak = 7, firstTry = 1, dist = listOf(1, 2, 4, 2, 1, 0))
         val i = Stats(played = 30, won = 26, streak = 9, maxStreak = 11, dist = listOf(0, 3, 9, 8, 4, 2))
-        rule.setContent { PalavreiroTheme { ProfileScreen(null, mapOf(Mode.DIARIO to d, Mode.INFINITO to i), Records(connWon = 3, wsBest = 95, synBest = 12), {}, {}, {}) } }
+        rule.setContent { PalavreiroTheme { ProfileScreen(null, mapOf(Mode.DIARIO to d, Mode.INFINITO to i), Records(mapOf("conn_won" to 3, "ws_best" to 95, "syn_best" to 12, "intr_best" to 4)), {}, {}, {}) } }
         save("7-perfil")
+    }
+
+    private fun profileTab(tab: Int, name: String) {
+        rule.mainClock.autoAdvance = false
+        val d = Stats(played = 12, won = 10, streak = 4, maxStreak = 7, firstTry = 1, dist = listOf(1, 2, 4, 2, 1, 0, 0, 0, 0))
+        val i = Stats(played = 30, won = 26, streak = 9, maxStreak = 11, dist = listOf(0, 3, 9, 8, 4, 2, 0, 0, 0))
+        rule.setContent { PalavreiroTheme { ProfileScreen(null, mapOf(Mode.DIARIO to d, Mode.INFINITO to i), Records(mapOf("conn_won" to 3, "ws_inf_played" to 4, "intr_best" to 6)), {}, {}, {}, startTab = tab) } }
+        save(name)
+    }
+
+    @Test fun perfilConquistas() = profileTab(1, "7b-perfil-conquistas")
+    @Test fun perfilAjustes() = profileTab(2, "7c-perfil-ajustes")
+
+    @Test
+    fun evolucao() {
+        rule.mainClock.autoAdvance = false
+        val h = org.json.JSONObject()
+        var dd = day.minusDays(50)
+        var k = 0
+        while (!dd.isAfter(day)) { if (k % 3 != 0) h.put(dd.toString(), org.json.JSONObject().put("termo", 3 + (k % 4)).put("caca", 80 + k)); dd = dd.plusDays(1); k++ }
+        rule.setContent { PalavreiroTheme { androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(com.dmwnezes.palavreiro.ui.Night.surface).padding(18.dp)) { com.dmwnezes.palavreiro.ui.EvolutionChart(h, day) } } }
+        save("7d-evolucao")
+    }
+
+    @Test
+    fun inicioHoje() {
+        rule.mainClock.autoAdvance = false
+        val st = com.dmwnezes.palavreiro.system.DailyStatus(termo = true, dueto = true, quarteto = false, conexoes = true, caca = false, streak = 3)
+        rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), {}, {}, today = st) } }
+        save("2b-inicio-hoje")
+    }
+
+    @Test
+    fun intruso() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.IntruderScreen(ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), null, null, {}, seed = 3) } }
+        save("19-intruso")
+    }
+
+    @Test
+    fun ortografia() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.SpellingScreen(com.dmwnezes.palavreiro.game.SpellingData.parse(asset("ortografia.txt")), null, null, {}, seed = 5) } }
+        save("20-ortografia")
+    }
+
+    @Test
+    fun arquivo() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.ArchiveScreen(null, {}, { _, _ -> }, today = day) } }
+        save("21-arquivo")
+    }
+
+    @Test
+    fun arquivoTermo() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.DIARIO, words, store = null, archive = java.time.LocalDate.of(2026, 3, 12)) { day }
+        for (w in listOf("CARRO", g.answers[0])) { w.forEach(g::type); g.submit(); g.finishReveal() }
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}) } }
+        save("22-arquivo-termo", 4000)
     }
 
     @Test

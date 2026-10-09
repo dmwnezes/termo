@@ -69,15 +69,17 @@ fun ConnectionsScreen(
     onBack: () -> Unit,
     date: LocalDate = LocalDate.now(),
     startInfinite: Boolean = false,
+    /** Desafio antigo aberto pelo Arquivo (data = [date]). */
+    archive: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val toast = rememberToast()
     val day = date.toString()
-    var infinite by remember { mutableStateOf(startInfinite) }
+    var infinite by remember { mutableStateOf(startInfinite && !archive) }
     var infSeed by remember {
         mutableLongStateOf(store?.text("conn_inf_state")?.substringBefore('|')?.toLongOrNull() ?: Random.nextLong())
     }
-    val stateKey = if (infinite) "conn_inf_state" else "conn_state"
+    val stateKey = if (infinite) "conn_inf_state" else if (archive) "conn_arch_state" else "conn_state"
     val tag = if (infinite) infSeed.toString() else day
     val game = remember(infinite, infSeed, day) {
         val puzzle = if (infinite) ConnectionsData.remix(puzzles, families, infSeed) else puzzles[ConnectionsData.dailyIndex(date, puzzles.size)]
@@ -104,6 +106,7 @@ fun ConnectionsScreen(
 
     fun finish() {
         val st = store ?: return
+        if (archive) { st.archiveDone("conexoes", day, game.won); return }
         if (infinite) {
             st.add("conn_inf_played")
             st.logActivity(day)
@@ -112,6 +115,8 @@ fun ConnectionsScreen(
         }
         if (st.text("conn_done") == day) return
         st.setText("conn_done", day)
+        st.setResult("conexoes", day, game.won)
+        st.setHistory(day, "conn", if (game.won) game.mistakes else 4)
         st.add("conn_played")
         st.logActivity(day)
         if (game.won) {
@@ -128,8 +133,8 @@ fun ConnectionsScreen(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Conexões", onBack, onHelp = { showHelp = true })
-            ModeSwitch(infinite, Modifier.padding(horizontal = 16.dp)) { infinite = it }
+            TopBar(if (archive) "Conexões · ${shortDay(date)}" else "Conexões", onBack, onHelp = { showHelp = true })
+            if (!archive) ModeSwitch(infinite, Modifier.padding(horizontal = 16.dp)) { infinite = it }
             Spacer(Modifier.height(12.dp))
             Column(
                 Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp),
@@ -200,12 +205,20 @@ fun ConnectionsScreen(
                     PillButton("Resultado", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { showResult = true }
                     PillButton("Próximo", Night.correct, modifier = Modifier.weight(1f)) { next() }
                 }
+            } else if (archive) {
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    PillButton("Resultado", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { showResult = true }
+                    PillButton("Voltar ao arquivo", Night.correct, modifier = Modifier.weight(1f), onClick = onBack)
+                }
             } else {
                 PillButton("Ver resultado", Night.correct, modifier = Modifier.fillMaxWidth().padding(16.dp)) { showResult = true }
             }
         }
         if (confetti > 0) Confetti(confetti) { confetti = 0 }
-        if (showResult && game.over) ConnectionsResult(game, store, infinite, onNext = { showResult = false; next() }) { showResult = false }
+        if (showResult && game.over) ConnectionsResult(game, store, infinite, archive, onNext = { showResult = false; next() }, onArchive = onBack) { showResult = false }
         if (showHelp) {
             BottomSheet({ showHelp = false; store?.setInt("conn_help", 1) }) {
                 SheetTitle("Como jogar Conexões")
@@ -257,12 +270,12 @@ private fun SolvedGroup(g: ConnGroup) {
 }
 
 @Composable
-private fun ConnectionsResult(game: ConnectionsGame, store: Store?, infinite: Boolean, onNext: () -> Unit, onClose: () -> Unit) {
+private fun ConnectionsResult(game: ConnectionsGame, store: Store?, infinite: Boolean, archive: Boolean, onNext: () -> Unit, onArchive: () -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     BottomSheet(onClose) {
         SheetTitle(
             if (game.won) (if (game.mistakes == 0) "Perfeito!" else "Você conseguiu!") else "Não foi dessa vez",
-            if (game.won) "Erros: ${game.mistakes}" else if (infinite) "As respostas estão na tela" else "Volte amanhã para um desafio novo",
+            if (game.won) "Erros: ${game.mistakes}" else if (infinite || archive) "As respostas estão na tela" else "Volte amanhã para um desafio novo",
         )
         Spacer(Modifier.height(16.dp))
         Text(game.shareGrid(), fontSize = 22.sp, textAlign = TextAlign.Center, lineHeight = 26.sp)
@@ -298,7 +311,8 @@ private fun ConnectionsResult(game: ConnectionsGame, store: Store?, infinite: Bo
             )
         }
         Spacer(Modifier.height(10.dp))
-        if (infinite) PillButton("Próximo desafio", Night.present, modifier = Modifier.fillMaxWidth(), onClick = onNext)
+        if (archive) PillButton("Voltar ao arquivo", Night.present, modifier = Modifier.fillMaxWidth(), onClick = onArchive)
+        else if (infinite) PillButton("Próximo desafio", Night.present, modifier = Modifier.fillMaxWidth(), onClick = onNext)
         else Text("Um desafio novo aparece amanhã.", fontSize = 13.sp, color = Night.muted)
     }
 }

@@ -72,6 +72,7 @@
       }
       if (over && !contradiction && !recorded) {
         recorded = true; P.logActivity();
+        P.store.add("rev-played");
         if (appWon) { P.store.add("rev-app"); P.fx.win(); } else { P.store.add("rev-user"); P.fx.lose(); P.confetti(); }
       }
       draw();

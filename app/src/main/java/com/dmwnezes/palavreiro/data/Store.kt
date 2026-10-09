@@ -97,8 +97,11 @@ class Store(context: Context) {
     fun stats(mode: Mode): Stats = Stats.fromJson(prefs.getString("stats_${mode.key}", null))
     fun saveStats(mode: Mode, s: Stats) = prefs.edit().putString("stats_${mode.key}", s.toJson()).apply()
 
-    fun game(mode: Mode): SavedGame? = SavedGame.fromJson(prefs.getString("game_${mode.key}", null))
-    fun saveGame(mode: Mode, g: SavedGame) = prefs.edit().putString("game_${mode.key}", g.toJson()).apply()
+    fun game(mode: Mode): SavedGame? = game(mode.key)
+    fun saveGame(mode: Mode, g: SavedGame) = saveGame(mode.key, g)
+    /** Partida salva num espaço próprio (ex.: "arquivo_diario" para o Arquivo). */
+    fun game(slot: String): SavedGame? = SavedGame.fromJson(prefs.getString("game_$slot", null))
+    fun saveGame(slot: String, g: SavedGame) = prefs.edit().putString("game_$slot", g.toJson()).apply()
 
     /** Números simples dos outros jogos (recordes, contadores). */
     fun int(key: String): Int = prefs.getInt("n_$key", 0)
@@ -138,6 +141,8 @@ class Store(context: Context) {
         o.keys().asSequence().associateWith { o.getInt(it) }
     }.getOrDefault(emptyMap())
 
+    fun setActivity(map: Map<String, Int>) = prefs.edit().putString("activity", JSONObject(map).toString()).apply()
+
     fun logActivity(day: String = java.time.LocalDate.now().toString()) {
         val o = runCatching { JSONObject(prefs.getString("activity", "{}") ?: "{}") }.getOrDefault(JSONObject())
         o.put(day, o.optInt(day) + 1)
@@ -155,6 +160,38 @@ class Store(context: Context) {
         o.put(day, if (won) "w" else "l")
         prefs.edit().putString("termo_days", o.toString()).apply()
     }
+
+    /** JSON guardado como texto (resultados, histórico). */
+    fun json(key: String): JSONObject = runCatching { JSONObject(text(key) ?: "{}") }.getOrDefault(JSONObject())
+    fun setJson(key: String, o: JSONObject) = setText(key, o.toString())
+
+    /** Resultado de um desafio do dia ou do arquivo: jogo ∈ termo, dueto, quarteto, conexoes, caca. */
+    fun setResult(game: String, day: String, won: Boolean) {
+        val o = json("results"); o.put("$game|$day", if (won) "w" else "l"); setJson("results", o)
+    }
+    fun results(): Map<String, String> = json("results").let { o -> o.keys().asSequence().associateWith { o.getString(it) } }
+
+    /** Histórico dos desafios do dia, para o gráfico de evolução (termo, conn, caca). */
+    fun setHistory(day: String, field: String, value: Int) {
+        val o = json("history"); val d = o.optJSONObject(day) ?: JSONObject()
+        d.put(field, value); o.put(day, d); setJson("history", o)
+    }
+    fun history(): JSONObject = json("history")
+
+    /** Desafio do arquivo terminado: marca o dia, conta e registra atividade (hoje). */
+    fun archiveDone(game: String, day: String, won: Boolean) {
+        setResult(game, day, won)
+        add("arch_played")
+        if (won) add("arch_won")
+        logActivity()
+    }
+
+    /** Todas as chaves salvas (para o código de sincronização). */
+    internal val raw: SharedPreferences get() = prefs
+
+    var streakAlert: Boolean
+        get() = prefs.getBoolean("streak_alert", true)
+        set(v) = prefs.edit().putBoolean("streak_alert", v).apply()
 
     var seenHelp: Boolean
         get() = prefs.getBoolean("seen_help", false)

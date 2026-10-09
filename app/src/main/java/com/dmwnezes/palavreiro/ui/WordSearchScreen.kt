@@ -65,16 +65,18 @@ fun WordSearchScreen(
     onBack: () -> Unit,
     date: LocalDate = LocalDate.now(),
     startInfinite: Boolean = false,
+    /** Grade antiga aberta pelo Arquivo (data = [date]). */
+    archive: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
     val toast = rememberToast()
     val day = date.toString()
-    var infinite by remember { mutableStateOf(startInfinite) }
+    var infinite by remember { mutableStateOf(startInfinite && !archive) }
     var infSeed by remember {
         mutableLongStateOf(store?.text("ws_inf_state")?.substringBefore('|')?.toLongOrNull() ?: Random.nextLong())
     }
-    val stateKey = if (infinite) "ws_inf_state" else "ws_state"
+    val stateKey = if (infinite) "ws_inf_state" else if (archive) "ws_arch_state" else "ws_state"
     val tag = if (infinite) infSeed.toString() else day
     val ws = remember(infinite, infSeed, day) {
         val built = if (infinite) WordSearchData.infinite(infiniteThemes, infSeed)
@@ -90,6 +92,7 @@ fun WordSearchScreen(
     var seconds by remember(ws) {
         mutableIntStateOf(
             if (infinite) store?.text("ws_inf_time")?.takeIf { it.substringBefore('|') == tag }?.substringAfter('|')?.toIntOrNull() ?: 0
+            else if (archive) store?.text("ws_arch_time")?.takeIf { it.substringBefore('|') == day }?.substringAfter('|')?.toIntOrNull() ?: 0
             else if (store?.text("ws_day") == day) store.int("ws_elapsed") else 0
         )
     }
@@ -110,6 +113,7 @@ fun WordSearchScreen(
             delay(1000)
             seconds++
             if (infinite) store?.setText("ws_inf_time", "$tag|$seconds")
+            else if (archive) store?.setText("ws_arch_time", "$day|$seconds")
             else { store?.setText("ws_day", day); store?.setInt("ws_elapsed", seconds) }
         }
     }
@@ -119,12 +123,16 @@ fun WordSearchScreen(
         if (ws.done) {
             feedback?.win()
             confetti++
-            if (store != null && infinite) {
+            if (store != null && archive) {
+                store.archiveDone("caca", day, true)
+            } else if (store != null && infinite) {
                 store.add("ws_inf_played")
                 store.logActivity(day)
                 store.min("ws_inf_best", seconds)
             } else if (store != null && store.text("ws_done") != day) {
                 store.setText("ws_done", day)
+                store.setResult("caca", day, true)
+                store.setHistory(day, "caca", seconds)
                 store.add("ws_played")
                 store.logActivity(day)
                 store.min("ws_best", seconds)
@@ -137,17 +145,19 @@ fun WordSearchScreen(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Caça-Palavras", onBack, trailing = {
+            TopBar(if (archive) "Caça · ${shortDay(date)}" else "Caça-Palavras", onBack, trailing = {
                 Text(formatTime(seconds), color = Night.muted, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(end = 12.dp))
             })
-            ModeSwitch(infinite, Modifier.padding(horizontal = 14.dp)) { infinite = it }
-            Spacer(Modifier.height(10.dp))
+            if (!archive) {
+                ModeSwitch(infinite, Modifier.padding(horizontal = 14.dp)) { infinite = it }
+                Spacer(Modifier.height(10.dp))
+            }
             Column(
                 // Sem rolagem: o arrasto na grade não pode virar rolagem da tela.
                 Modifier.weight(1f).padding(horizontal = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(if (infinite) "Tema sorteado" else "Tema de hoje", color = Night.muted, fontSize = 13.sp)
+                Text(if (infinite) "Tema sorteado" else if (archive) "Tema do dia ${shortDay(date)}" else "Tema de hoje", color = Night.muted, fontSize = 13.sp)
                 Text(theme.name, color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
                 Spacer(Modifier.height(12.dp))
                 SearchGrid(ws) { p ->
@@ -180,8 +190,9 @@ fun WordSearchScreen(
                 if (ws.done) {
                     Spacer(Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        PillButton("Ver resultado", if (infinite) Night.surfaceHigh else Night.correct, if (infinite) Night.text else Color(0xFF14102C)) { showResult = true }
+                        PillButton("Ver resultado", if (infinite || archive) Night.surfaceHigh else Night.correct, if (infinite || archive) Night.text else Color(0xFF14102C)) { showResult = true }
                         if (infinite) PillButton("Próxima grade", Night.correct) { next() }
+                        if (archive) PillButton("Voltar ao arquivo", Night.correct, onClick = onBack)
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -198,7 +209,8 @@ fun WordSearchScreen(
                     StatItem("${store?.int(playedKey) ?: 0}", "Grades")
                 }
                 Spacer(Modifier.height(16.dp))
-                if (infinite) PillButton("Próxima grade", Night.present, modifier = Modifier.fillMaxWidth()) { showResult = false; next() }
+                if (archive) PillButton("Voltar ao arquivo", Night.present, modifier = Modifier.fillMaxWidth(), onClick = onBack)
+                else if (infinite) PillButton("Próxima grade", Night.present, modifier = Modifier.fillMaxWidth()) { showResult = false; next() }
                 else Text("Uma grade nova aparece amanhã.", fontSize = 13.sp, color = Night.muted)
                 Spacer(Modifier.height(12.dp))
                 PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {

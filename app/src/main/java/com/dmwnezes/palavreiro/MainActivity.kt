@@ -35,6 +35,11 @@ import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ReverseScreen
 import com.dmwnezes.palavreiro.ui.SynonymScreen
 import com.dmwnezes.palavreiro.ui.WordSearchScreen
+import com.dmwnezes.palavreiro.ui.ArchiveGame
+import com.dmwnezes.palavreiro.ui.ArchiveScreen
+import com.dmwnezes.palavreiro.ui.IntruderScreen
+import com.dmwnezes.palavreiro.ui.SpellingScreen
+import com.dmwnezes.palavreiro.system.DailyStatus
 import com.dmwnezes.palavreiro.ui.GameScreen
 import com.dmwnezes.palavreiro.ui.HelpSheet
 import com.dmwnezes.palavreiro.ui.HomeScreen
@@ -86,15 +91,11 @@ private sealed interface Screen {
     data class Other(val dest: Dest) : Screen
     data class ChallengeGame(val word: String) : Screen
     data object Profile : Screen
+    data class Archive(val game: ArchiveGame = ArchiveGame.TERMO) : Screen
+    data class ArchivePlay(val game: ArchiveGame, val date: java.time.LocalDate) : Screen
 }
 
-private fun records(store: com.dmwnezes.palavreiro.data.Store) = Records(
-    connWon = store.int("conn_won"), connPerfect = store.int("conn_perfect"),
-    wsPlayed = store.int("ws_played"), wsBest = store.int("ws_best"),
-    revApp = store.int("rev_appwins"), revUser = store.int("rev_userwins"),
-    defBest = store.int("def_best"), defRight = store.int("def_right"),
-    synBest = store.int("syn_best"),
-)
+private fun records(store: com.dmwnezes.palavreiro.data.Store) = Records(Records.KEYS.associateWith { store.int(it) })
 
 @Composable
 fun PalavreiroApp() {
@@ -115,6 +116,7 @@ fun PalavreiroApp() {
             Dest.INFINITO -> Screen.Game(Mode.INFINITO)
             Dest.DUETO -> Screen.Game(Mode.DUETO)
             Dest.QUARTETO -> Screen.Game(Mode.QUARTETO)
+            Dest.ARQUIVO -> Screen.Archive()
             else -> Screen.Other(d)
         }
     }
@@ -146,7 +148,8 @@ fun PalavreiroApp() {
     }
 
     BackHandler(enabled = screen != Screen.Home || showHelp) {
-        if (showHelp) showHelp = false else { screen = Screen.Home; refresh++ }
+        if (showHelp) showHelp = false
+        else { val cur = screen; screen = if (cur is Screen.ArchivePlay) Screen.Archive(cur.game) else Screen.Home; refresh++ }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -171,10 +174,20 @@ fun PalavreiroApp() {
                             Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                         )
                     }
+                    // Painel "Hoje" e confete uma vez por dia quando os 5 desafios estiverem feitos.
+                    val status = remember(refresh) { DailyStatus.read(store) }
+                    val celebrate = remember(refresh) {
+                        val today = java.time.LocalDate.now().toString()
+                        (status.doneCount == 5 && store.text("alldone_day") != today).also {
+                            if (it) { store.setText("alldone_day", today); store.add("alldone_days") }
+                        }
+                    }
                     HomeScreen(
                         badges = badges,
                         onOpen = ::open,
                         onProfile = { screen = Screen.Profile },
+                        today = status,
+                        celebrate = celebrate,
                     )
                 }
                 is Screen.Other -> {
@@ -186,6 +199,8 @@ fun PalavreiroApp() {
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         Dest.DESAFIAR -> ChallengeScreen(AppGraph.words, AppGraph.feedback, back)
+                        Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
+                        Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }
@@ -208,6 +223,31 @@ fun PalavreiroApp() {
                     onHelp = { showHelp = true },
                     meanings = AppGraph.meanings,
                 )
+                is Screen.Archive -> ArchiveScreen(
+                    store = store,
+                    onBack = { screen = Screen.Home; refresh++ },
+                    onPlay = { g, d -> screen = Screen.ArchivePlay(g, d) },
+                    initialGame = s.game,
+                )
+                is Screen.ArchivePlay -> {
+                    val back: () -> Unit = { screen = Screen.Archive(s.game); refresh++ }
+                    when (s.game) {
+                        ArchiveGame.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back, date = s.date, archive = true)
+                        ArchiveGame.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back, date = s.date, archive = true)
+                        else -> {
+                            val mode = when (s.game) { ArchiveGame.DUETO -> Mode.DUETO; ArchiveGame.QUARTETO -> Mode.QUARTETO; else -> Mode.DIARIO }
+                            val g = remember(s) { TermoGame(mode, AppGraph.words, store, archive = s.date) }
+                            GameScreen(
+                                game = g,
+                                feedback = AppGraph.feedback,
+                                onBack = back,
+                                onPlayInfinite = { screen = Screen.Game(Mode.INFINITO) },
+                                onHelp = { showHelp = true },
+                                meanings = AppGraph.meanings,
+                            )
+                        }
+                    }
+                }
                 Screen.Profile -> ProfileScreen(
                     store = store,
                     stats = remember(refresh) { Mode.entries.associateWith { store.stats(it) } },
@@ -215,6 +255,7 @@ fun PalavreiroApp() {
                     onBack = { screen = Screen.Home; refresh++ },
                     onCheckUpdates = { showUpdate = true },
                     onHelp = { showHelp = true },
+                    onSynced = { refresh++ },
                 )
             }
         }

@@ -12,16 +12,22 @@
   const ORD = ["1ª", "2ª", "3ª", "4ª", "5ª"];
 
   /** Estado de uma partida. */
-  function createGame(modeKey, challenge) {
+  function createGame(modeKey, challenge, archDay) {
     const mode = MODES[modeKey];
-    const g = { modeKey, mode, boards: mode.boards, maxTries: 5 + mode.boards, rows: [], current: [null, null, null, null, null], cursor: 0, over: false, won: false, hints: [], hard: false, isDaily: mode.daily, key: "" };
+    const g = { modeKey, mode, boards: mode.boards, maxTries: 5 + mode.boards, rows: [], current: [null, null, null, null, null], cursor: 0, over: false, won: false, hints: [], hard: false, isDaily: mode.daily, key: "", slot: "game-" + modeKey, arch: archDay || null };
     const today = P.dayKey();
-    const saved = P.store.get("game-" + modeKey, null);
+    if (archDay) g.slot = "game-arquivo-" + modeKey;
+    const saved = P.store.get(g.slot, null);
     const restore = (answers, s) => {
       g.answers = answers; g.rows = s ? s.rows : []; g.over = s ? s.over : false; g.won = s ? s.won : false;
       g.hints = s && s.hints ? s.hints : []; g.hard = s && s.rows.length ? !!s.hard : (g.boards === 1 && P.settings().hard);
     };
-    if (modeKey === "desafio") {
+    if (archDay) {
+      // Arquivo: mesmas palavras do dia escolhido, em slot próprio, sem mexer em estatísticas.
+      g.key = archDay; g.isDaily = false;
+      const answers = P.dailySet(P.parseDay(archDay), g.boards, mode.salt || 0);
+      restore(answers, saved && saved.key === archDay && JSON.stringify(saved.answers) === JSON.stringify(answers) ? saved : null);
+    } else if (modeKey === "desafio") {
       g.key = "desafio-" + challenge; g.isDaily = false;
       restore([challenge], saved && saved.key === g.key ? saved : null);
     } else if (mode.daily) {
@@ -37,7 +43,7 @@
     return g;
   }
 
-  const save = (g) => P.store.set("game-" + g.modeKey, { key: g.key, answers: g.answers, rows: g.rows, over: g.over, won: g.won, hints: g.hints, hard: g.hard });
+  const save = (g) => P.store.set(g.slot, { key: g.key, answers: g.answers, rows: g.rows, over: g.over, won: g.won, hints: g.hints, hard: g.hard });
   const solvedAt = (g, b, upTo = g.rows.length) => { const i = g.rows.indexOf(g.answers[b]); return i >= 0 && i < upTo ? i : -1; };
   const boardRows = (g, b) => { const at = solvedAt(g, b); return at >= 0 ? g.rows.slice(0, at + 1) : g.rows.slice(); };
 
@@ -53,6 +59,11 @@
   }
 
   function record(g) {
+    if (g.arch) return P.archiveDone(g.modeKey, g.arch, g.won);
+    if (g.isDaily && g.mode.daily) {
+      P.setResult(g.modeKey, P.dayKey(), g.won);
+      if (g.modeKey === "termo") P.setHistory(P.dayKey(), "termo", g.won ? g.rows.length : 7);
+    }
     const s = P.stats(g.modeKey), today = P.dayIndex(), tries = g.rows.length;
     s.played++;
     if (g.won) {
@@ -69,13 +80,13 @@
   }
 
   /** Desenha a tela do jogo. */
-  P.games.termoScreen = function (root, modeKey, challenge) {
-    let g = createGame(modeKey, challenge);
+  P.games.termoScreen = function (root, modeKey, challenge, archDay) {
+    let g = createGame(modeKey, challenge, archDay);
     let busy = false;
     let meanings = {};
     P.meanings().then((m) => (meanings = m));
 
-    const title = () => g.mode.title + (g.mode.daily && g.mode.free && !g.isDaily ? " · livre" : "");
+    const title = () => g.arch ? `${g.mode.title} · ${P.shortDay(g.arch)}` : g.mode.title + (g.mode.daily && g.mode.free && !g.isDaily ? " · livre" : "");
     root.innerHTML = P.topbar(`<span data-title>${title()}</span>`, {
       help: true,
       extra: `<span class="badge hidden" data-hard>DIFÍCIL</span><button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
@@ -135,7 +146,11 @@
       }
       kb.paint();
       after.innerHTML = "";
-      if (g.over && g.mode.free) {
+      if (g.over && g.arch) {
+        const r = P.h(`<button class="pill ghost">Ver resultado</button>`); r.onclick = () => result();
+        const b = P.h(`<button class="pill" style="margin-left:8px">Voltar ao arquivo</button>`); b.onclick = () => P.go("arquivo");
+        after.append(r, b);
+      } else if (g.over && g.mode.free) {
         const b = P.h(`<button class="pill">${g.boards === 1 ? "Nova palavra" : "Jogar de novo"}</button>`);
         b.onclick = () => newWord(); after.appendChild(b);
       } else if (g.over) {
@@ -222,22 +237,22 @@
       const ui = P.sheet(`<h2>${g.won ? "Você acertou!" : "Não foi dessa vez"}</h2>
         <p class="subtitle">${plural ? "As palavras eram" : "A palavra era"} ${g.answers.map(P.words.display).join(", ")}</p>
         ${defs.length ? `<div class="meaning"><small>O que significa</small>${defs.join("")}</div>` : ""}
-        ${g.modeKey === "desafio" ? "" : P.statsHTML([[s.played, "Jogos"], [Math.round((s.won / Math.max(1, s.played)) * 100) + "%", "Vitórias"], [s.streak, "Sequência"], [s.maxStreak, "Melhor"]]) + P.distHTML(s.dist, g.won ? g.rows.length : -1, g.maxTries)}
-        <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill" data-next>${g.mode.free ? (g.boards === 1 ? "Nova palavra" : "Jogar de novo") : "Jogar Infinito"}</button></div>
+        ${g.modeKey === "desafio" || g.arch ? "" : P.statsHTML([[s.played, "Jogos"], [Math.round((s.won / Math.max(1, s.played)) * 100) + "%", "Vitórias"], [s.streak, "Sequência"], [s.maxStreak, "Melhor"]]) + P.distHTML(s.dist, g.won ? g.rows.length : -1, g.maxTries)}
+        <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill" data-next>${g.arch ? "Voltar ao arquivo" : g.mode.free ? (g.boards === 1 ? "Nova palavra" : "Jogar de novo") : "Jogar Infinito"}</button></div>
         <button class="pill accent wide" style="margin-top:10px" data-story>Cartão para Stories</button>
-        <p class="note">${g.mode.daily && g.isDaily ? (g.mode.free ? "Desafio do dia concluído. Novas partidas são livres." : "Uma palavra nova aparece amanhã.") : ""}</p>`);
+        <p class="note">${g.arch ? `Desafio de ${P.shortDay(g.arch)} do arquivo.` : g.mode.daily && g.isDaily ? (g.mode.free ? "Desafio do dia concluído. Novas partidas são livres." : "Uma palavra nova aparece amanhã.") : ""}</p>`);
       P.$("[data-share]", ui.el).onclick = () => {
         const score = (g.won ? `${g.rows.length}/${g.maxTries}` : `X/${g.maxTries}`) + (g.hard ? "*" : "") + (g.hints.length ? ` 💡${g.hints.length}` : "");
         const em = { c: "🟩", p: "🟨", a: "⬛" };
-        P.share(`Palavreiro · ${g.mode.title} ${score}\n\n${grids().map((b) => b.map((r) => r.map((m) => em[m]).join("")).join("\n")).join("\n\n")}\n\n${location.origin}${location.pathname}`);
+        P.share(`Palavreiro · ${g.arch ? title() : g.mode.title} ${score}\n\n${grids().map((b) => b.map((r) => r.map((m) => em[m]).join("")).join("\n")).join("\n\n")}\n\n${location.origin}${location.pathname}`);
       };
-      P.$("[data-next]", ui.el).onclick = () => { ui.close(); if (g.mode.free) newWord(); else P.go("infinito"); };
+      P.$("[data-next]", ui.el).onclick = () => { ui.close(); if (g.arch) P.go("arquivo"); else if (g.mode.free) newWord(); else P.go("infinito"); };
       P.$("[data-story]", ui.el).onclick = () => P.story({
-        game: g.mode.title + (g.isDaily && g.mode.daily ? " do dia" : ""),
+        game: g.arch ? title() : g.mode.title + (g.isDaily && g.mode.daily ? " do dia" : ""),
         headline: g.won ? `Acertei em ${g.rows.length}/${g.maxTries}` : `Quase! X/${g.maxTries}`,
         detail: [g.hard ? "modo difícil" : "", g.hints.length ? `${g.hints.length} dica(s)` : ""].filter(Boolean).join(" · ") || "Você consegue mais rápido?",
         grids: grids(),
-        stats: g.modeKey === "desafio" ? [] : [[String(s.streak), "Sequência"], [Math.round((s.won / Math.max(1, s.played)) * 100) + "%", "Vitórias"], [String(s.maxStreak), "Melhor"]],
+        stats: g.modeKey === "desafio" || g.arch ? [] : [[String(s.streak), "Sequência"], [Math.round((s.won / Math.max(1, s.played)) * 100) + "%", "Vitórias"], [String(s.maxStreak), "Melhor"]],
       });
     }
 

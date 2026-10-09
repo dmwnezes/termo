@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "11"; // versão dos arquivos de conteúdo
+  const V = "12"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -83,6 +83,15 @@
   P.defaultStats = () => ({ played: 0, won: 0, streak: 0, maxStreak: 0, lastWinDay: -999999, firstTry: 0, dist: [0, 0, 0, 0, 0, 0, 0, 0, 0] });
   P.stats = (mode) => Object.assign(P.defaultStats(), P.store.get("stats-" + mode, {}));
   P.logActivity = (day = P.dayKey()) => { const a = P.store.get("activity", {}); a[day] = (a[day] || 0) + 1; P.store.set("activity", a); };
+  /** Resultado de um desafio do dia ou do arquivo: results["jogo|AAAA-MM-DD"] = "w" | "l". */
+  P.setResult = (game, day, won) => { const r = P.store.get("results", {}); r[game + "|" + day] = won ? "w" : "l"; P.store.set("results", r); };
+  /** Histórico só dos desafios do dia: history[dia][campo] = n (termo, conn, caca). */
+  P.setHistory = (day, field, n) => { const h = P.store.get("history", {}); h[day] = Object.assign(h[day] || {}, { [field]: n }); P.store.set("history", h); };
+  /** Partida do arquivo terminada. */
+  P.archiveDone = (game, day, won) => { P.setResult(game, day, won); P.store.add("arch-played"); if (won) P.store.add("arch-won"); P.logActivity(); };
+  /** "2026-03-12" → Date local; "12/03". */
+  P.parseDay = (k) => { const [y, m, d] = String(k).split("-").map(Number); return new Date(y, m - 1, d); };
+  P.shortDay = (k) => k.slice(8, 10) + "/" + k.slice(5, 7);
 
   // ---------- conteúdo (arquivos .txt compartilhados com o app) ----------
   const cache = {};

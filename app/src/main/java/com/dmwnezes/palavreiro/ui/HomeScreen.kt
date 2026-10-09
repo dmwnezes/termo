@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR, INTRUSO, ORTOGRAFIA, ARQUIVO }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -54,8 +54,15 @@ private data class GameCardInfo(
  * Tela inicial: um cartão por jogo, perfil no canto superior direito e créditos no rodapé.
  * [badges] traz o selo de cada jogo diário ("Novo", "Feito hoje ✓").
  */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun HomeScreen(badges: Map<Dest, String?>, onOpen: (Dest) -> Unit, onProfile: () -> Unit) {
+fun HomeScreen(
+    badges: Map<Dest, String?>,
+    onOpen: (Dest) -> Unit,
+    onProfile: () -> Unit,
+    today: com.dmwnezes.palavreiro.system.DailyStatus? = null,
+    celebrate: Boolean = false,
+) {
     val guess = listOf(
         GameCardInfo(Dest.TERMO, "Termo", "Uma palavra nova por dia", badges[Dest.TERMO]),
         GameCardInfo(Dest.INFINITO, "Infinito", "Quantas palavras quiser", null),
@@ -65,6 +72,8 @@ fun HomeScreen(badges: Map<Dest, String?>, onOpen: (Dest) -> Unit, onProfile: ()
     val more = listOf(
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
+        GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
+        GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
@@ -96,6 +105,7 @@ fun HomeScreen(badges: Map<Dest, String?>, onOpen: (Dest) -> Unit, onProfile: ()
                 Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                today?.let { TodayPanel(it, onOpen) }
                 SectionLabel("Adivinhe a palavra")
                 guess.forEach { c -> GameCard(c) { onOpen(c.dest) } }
                 Spacer(Modifier.height(4.dp))
@@ -105,6 +115,56 @@ fun HomeScreen(badges: Map<Dest, String?>, onOpen: (Dest) -> Unit, onProfile: ()
             }
             CreatorCredit(Modifier.align(Alignment.CenterHorizontally).padding(vertical = 14.dp))
         }
+        if (celebrate) Confetti(1) {}
+    }
+}
+
+/** Painel "Hoje": quantos desafios do dia já foram feitos, com atalho para cada um e para o Arquivo. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun TodayPanel(status: com.dmwnezes.palavreiro.system.DailyStatus, onOpen: (Dest) -> Unit) {
+    val items = listOf(
+        Triple(Dest.TERMO, "Termo", status.termo), Triple(Dest.DUETO, "Dueto", status.dueto),
+        Triple(Dest.QUARTETO, "Quarteto", status.quarteto), Triple(Dest.CONEXOES, "Conexões", status.conexoes),
+        Triple(Dest.CACA, "Caça", status.caca),
+    )
+    val done = status.doneCount
+    Column(
+        Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface)
+            .border(1.dp, Night.outline.copy(alpha = 0.45f), Shapes.card).padding(16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Hoje", fontSize = 21.sp, fontWeight = FontWeight.SemiBold, color = Night.text, modifier = Modifier.weight(1f))
+            Text("$done de ${items.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (done == items.size) Night.correct else Night.muted)
+        }
+        Spacer(Modifier.height(10.dp))
+        Box(Modifier.fillMaxWidth().height(8.dp).clip(Shapes.pill).background(Night.bgBottom)) {
+            Box(Modifier.fillMaxWidth(done / items.size.toFloat()).height(8.dp).clip(Shapes.pill).background(Night.correct))
+        }
+        Spacer(Modifier.height(12.dp))
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            items.forEach { (dest, label, ok) ->
+                Text(
+                    if (ok) "✓ $label" else label,
+                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                    color = if (ok) Color(0xFF1A1438) else Night.text,
+                    modifier = Modifier.clip(Shapes.pill).background(if (ok) Night.correct else Night.surfaceHigh)
+                        .clickable { onOpen(dest) }.padding(horizontal = 12.dp, vertical = 7.dp),
+                )
+            }
+        }
+        if (done == items.size) {
+            Spacer(Modifier.height(10.dp))
+            Text("Tudo feito hoje! 🎉", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Night.correct)
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "🗂️  Arquivo de desafios  ›", fontSize = 15.sp, color = Night.accent, fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.clip(Shapes.pill).clickable { onOpen(Dest.ARQUIVO) }.padding(vertical = 8.dp),
+        )
     }
 }
 
@@ -199,6 +259,19 @@ private fun CardIcon(dest: Dest) {
                 repeat(5) { Box(Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(Night.accent)) }
             }
         }
+        Dest.INTRUSO -> Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            listOf(Night.surfaceHigh, Night.surfaceHigh, Night.red, Night.surfaceHigh, Night.surfaceHigh).forEach {
+                Box(Modifier.size(9.dp).clip(RoundedCornerShape(3.dp)).background(it))
+            }
+        }
+        Dest.ORTOGRAFIA -> Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+            listOf("✓" to Night.correct, "✗" to Night.red).forEach { (t, c) ->
+                Box(Modifier.size(22.dp).clip(RoundedCornerShape(7.dp)).background(c), contentAlignment = Alignment.Center) {
+                    Text(t, color = Color(0xFF1A1438), fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
+                }
+            }
+        }
+        Dest.ARQUIVO -> Text("🗂️", fontSize = 26.sp)
         Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Pill("BELO", Night.surfaceHigh)
             Text("=", color = Night.muted, fontSize = 12.sp)

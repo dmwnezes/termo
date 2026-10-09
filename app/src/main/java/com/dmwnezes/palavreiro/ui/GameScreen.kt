@@ -125,7 +125,8 @@ fun GameScreen(
 
     val title = buildString {
         append(game.mode.title)
-        if (game.mode.daily && game.mode.free && !game.isDaily) append(" · livre")
+        game.archive?.let { append(" · " + shortDay(it)) }
+            ?: run { if (game.mode.daily && game.mode.free && !game.isDaily) append(" · livre") }
     }
     val ordinal = listOf("1ª", "2ª", "3ª", "4ª", "5ª")
 
@@ -155,7 +156,9 @@ fun GameScreen(
                 Boards(game)
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     ToastView(toast)
-                    if (game.over && game.mode.free && toast.text == null && !showResult) {
+                    if (game.over && game.isArchive && toast.text == null && !showResult) {
+                        PillButton("Voltar ao arquivo", Night.correct, onClick = onBack)
+                    } else if (game.over && game.mode.free && toast.text == null && !showResult) {
                         PillButton(if (game.boards == 1) "Nova palavra" else "Jogar de novo", Night.correct) { game.newWord() }
                     }
                 }
@@ -176,6 +179,7 @@ fun GameScreen(
                 onNewWord = { showResult = false; game.newWord() },
                 onPlayInfinite = { showResult = false; onPlayInfinite() },
                 meanings = meanings,
+                onBack = onBack,
             )
         }
     }
@@ -329,6 +333,7 @@ private fun ResultSheet(
     onNewWord: () -> Unit,
     onPlayInfinite: () -> Unit,
     meanings: Map<String, String>,
+    onBack: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val stats = remember(game.over, game.rows.size) { game.stats() }
@@ -351,10 +356,12 @@ private fun ResultSheet(
                 }
             }
         }
-        Spacer(Modifier.height(18.dp))
-        StatsRow(stats)
-        Spacer(Modifier.height(16.dp))
-        Distribution(stats.dist, highlight = if (game.won) game.rows.size else -1, rows = game.maxTries)
+        if (!game.isArchive) {
+            Spacer(Modifier.height(18.dp))
+            StatsRow(stats)
+            Spacer(Modifier.height(16.dp))
+            Distribution(stats.dist, highlight = if (game.won) game.rows.size else -1, rows = game.maxTries)
+        }
         Spacer(Modifier.height(20.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             PillButton("Compartilhar", Night.surfaceHigh, Night.text, Modifier.weight(1f)) {
@@ -371,6 +378,7 @@ private fun ResultSheet(
                 )
             }
             when {
+                game.isArchive -> PillButton("Arquivo ›", Night.correct, modifier = Modifier.weight(1f), onClick = onBack)
                 game.mode == Mode.INFINITO -> PillButton("Nova palavra", Night.correct, modifier = Modifier.weight(1f), onClick = onNewWord)
                 game.mode.free -> PillButton("Jogar de novo", Night.correct, modifier = Modifier.weight(1f), onClick = onNewWord)
                 else -> PillButton("Jogar Infinito", Night.correct, modifier = Modifier.weight(1f), onClick = onPlayInfinite)
@@ -396,7 +404,7 @@ fun storyFor(game: TermoGame, stats: com.dmwnezes.palavreiro.data.Stats): StoryD
     val headline = if (game.won) "Acertei em ${game.rows.size}/${game.maxTries}" else "Quase! X/${game.maxTries}"
     val extras = listOfNotNull(if (game.hard) "modo difícil" else null, if (game.hints.isNotEmpty()) "${game.hints.size} dica(s)" else null)
     return StoryData(
-        game = game.mode.title + if (game.isDaily && game.mode.daily) " do dia" else "",
+        game = game.mode.title + (game.archive?.let { " · " + shortDay(it) } ?: if (game.isDaily && game.mode.daily) " do dia" else ""),
         headline = headline,
         detail = extras.joinToString(" · ").ifEmpty { "Você consegue mais rápido?" },
         grids = grids,
