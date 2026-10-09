@@ -43,19 +43,23 @@ import com.dmwnezes.palavreiro.data.Mode
 import com.dmwnezes.palavreiro.data.Stats
 import com.dmwnezes.palavreiro.data.Store
 import com.dmwnezes.palavreiro.game.Achievements
+import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.update.Updater
 
 /** Perfil: estatísticas, conquistas e configurações, num só lugar. */
 @Composable
 fun ProfileScreen(
     store: Store?,
-    daily: Stats,
-    infinite: Stats,
+    stats: Map<Mode, Stats>,
+    records: Records,
     onBack: () -> Unit,
     onCheckUpdates: () -> Unit,
     onHelp: () -> Unit,
 ) {
     var tab by remember { mutableStateOf(0) }
+    val daily = stats[Mode.DIARIO] ?: Stats()
+    val infinite = stats[Mode.INFINITO] ?: Stats()
+    val modes = Mode.entries
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -71,23 +75,30 @@ fun ProfileScreen(
                     }
                     Spacer(Modifier.width(14.dp))
                     Column {
-                        Text("${daily.won + infinite.won} palavras acertadas", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
-                        Text("Sequência no Diário: ${daily.streak}", fontSize = 14.sp, color = Night.muted)
+                        Text("${stats.values.sumOf { it.won }} partidas vencidas", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
+                        Text("Sequência no Termo: ${daily.streak}", fontSize = 14.sp, color = Night.muted)
                     }
                 }
                 Spacer(Modifier.height(22.dp))
                 Section("Estatísticas") {
-                    Segmented(listOf(Mode.DIARIO.title, Mode.INFINITO.title), tab) { tab = it }
+                    Segmented(modes.map { it.title }, tab) { tab = it }
                     Spacer(Modifier.height(16.dp))
-                    val s = if (tab == 0) daily else infinite
+                    val s = stats[modes[tab]] ?: Stats()
                     StatsRow(s)
                     Spacer(Modifier.height(16.dp))
                     Text("Distribuição de tentativas", fontSize = 13.sp, color = Night.muted)
                     Spacer(Modifier.height(8.dp))
-                    Distribution(s.dist, highlight = -1)
+                    Distribution(s.dist, highlight = -1, rows = modes[tab].maxTries)
+                }
+                Section("Recordes") {
+                    RecordRow("Conexões", "${records.connWon} resolvidos · ${records.connPerfect} sem erro")
+                    RecordRow("Caça-Palavras", "${records.wsPlayed} grades · melhor ${if (records.wsBest > 0) formatTime(records.wsBest) else "—"}")
+                    RecordRow("Reverso", "app ${records.revApp} × ${records.revUser} você")
+                    RecordRow("Qual é a Palavra?", "recorde ${records.defBest} seguidas · ${records.defRight} acertos")
+                    RecordRow("Sinônimos", "maior cadeia: ${records.synBest}")
                 }
                 Section("Conquistas") {
-                    val list = Achievements.all(daily, infinite)
+                    val list = Achievements.all(daily, infinite, stats[Mode.DUETO] ?: Stats(), stats[Mode.QUARTETO] ?: Stats(), records)
                     Text("${list.count { it.unlocked }} de ${list.size}", fontSize = 13.sp, color = Night.muted)
                     Spacer(Modifier.height(10.dp))
                     list.chunked(2).forEach { pair ->
@@ -132,6 +143,14 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
+private fun RecordRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, fontSize = 15.sp, color = Night.text, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+        Text(value, fontSize = 13.sp, color = Night.muted, textAlign = TextAlign.End)
+    }
+}
+
+@Composable
 private fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
     Row(Modifier.fillMaxWidth().clip(Shapes.pill).background(Night.bgBottom).padding(4.dp)) {
         options.forEachIndexed { i, label ->
@@ -139,6 +158,8 @@ private fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> U
                 label,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
+                fontSize = if (options.size > 2) 13.sp else 15.sp,
+                maxLines = 1,
                 color = if (i == selected) Night.text else Night.muted,
                 modifier = Modifier.weight(1f).clip(Shapes.pill)
                     .background(if (i == selected) Night.surfaceHigh else Night.bgBottom)

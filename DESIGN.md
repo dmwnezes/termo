@@ -45,6 +45,18 @@ Em 08/10/2026 o Daniel decidiu as escolhas principais e depois passou as demais 
 - Modos Diário e Infinito; Dueto e Quarteto ainda "em breve".
 - Créditos na abertura e na janela "Como jogar".
 
-## Próximos passos
+## Jogos (app Android)
 
-- Modos Dueto e Quarteto.
+| Jogo | Como funciona |
+|---|---|
+| Termo | Uma palavra por dia, 6 tentativas |
+| Infinito | Palavras sorteadas sem limite |
+| Dueto | 2 palavras ao mesmo tempo, 7 tentativas; desafio do dia e depois partidas livres |
+| Quarteto | 4 palavras ao mesmo tempo, 9 tentativas; teclas divididas em 4 cores |
+| Conexões | 16 palavras em 4 grupos (amarelo, verde, azul, roxo), 4 erros; 30 desafios em `app/src/main/assets/conexoes.txt` |
+| Caça-Palavras | Grade 10×10 do tema do dia, arrastar o dedo para marcar, cronômetro; 30 temas em `caca.txt` |
+| Reverso | O app tenta adivinhar a palavra que a pessoa pensou; ela marca as cores |
+| Qual é a Palavra? | Definição escrita à mão, 3 chances, cada erro revela uma letra; `definicoes.txt` |
+| Sinônimos | 4 opções e 10 s por palavra, cadeia até errar; `sinonimos.txt` (linhas com `=` evitam alternativas ambíguas) |
+
+Para acrescentar conteúdo, basta editar os arquivos `.txt` em `app/src/main/assets/`.

@@ -13,6 +13,16 @@ import com.dmwnezes.palavreiro.ui.HomeScreen
 import com.dmwnezes.palavreiro.ui.PalavreiroTheme
 import com.dmwnezes.palavreiro.ui.ProfileScreen
 import com.dmwnezes.palavreiro.ui.SplashCredits
+import com.dmwnezes.palavreiro.ui.Dest
+import com.dmwnezes.palavreiro.ui.ConnectionsScreen
+import com.dmwnezes.palavreiro.ui.WordSearchScreen
+import com.dmwnezes.palavreiro.ui.ReverseScreen
+import com.dmwnezes.palavreiro.ui.DefineScreen
+import com.dmwnezes.palavreiro.ui.SynonymScreen
+import com.dmwnezes.palavreiro.game.Records
+import com.dmwnezes.palavreiro.game.ConnectionsData
+import com.dmwnezes.palavreiro.game.WordSearchData
+import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +60,7 @@ class ScreensRenderTest {
     @Test
     fun inicio() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { HomeScreen(dailyDone = false, dailyWon = false, onPlay = {}, onProfile = {}) } }
+        rule.setContent { PalavreiroTheme { HomeScreen(mapOf(Dest.TERMO to "Novo", Dest.DUETO to "Feito hoje ✓", Dest.CONEXOES to "Novo"), {}, {}) } }
         save("2-inicio")
     }
 
@@ -85,14 +95,72 @@ class ScreensRenderTest {
         rule.mainClock.autoAdvance = false
         val d = Stats(played = 12, won = 10, streak = 4, maxStreak = 7, firstTry = 1, dist = listOf(1, 2, 4, 2, 1, 0))
         val i = Stats(played = 30, won = 26, streak = 9, maxStreak = 11, dist = listOf(0, 3, 9, 8, 4, 2))
-        rule.setContent { PalavreiroTheme { ProfileScreen(null, d, i, {}, {}, {}) } }
+        rule.setContent { PalavreiroTheme { ProfileScreen(null, mapOf(Mode.DIARIO to d, Mode.INFINITO to i), Records(connWon = 3, wsBest = 95, synBest = 12), {}, {}, {}) } }
         save("7-perfil")
     }
 
     @Test
     fun ajuda() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { HomeScreen(true, true, {}, {}); HelpSheet {} } }
+        rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), {}, {}); HelpSheet {} } }
         save("8-ajuda")
+    }
+
+    private fun asset(n: String) = File("src/main/assets/$n").readText()
+    private val day = java.time.LocalDate.of(2026, 10, 9)
+
+    @Test
+    fun dueto() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.DUETO, words, store = null) { day }
+        for (w in listOf("CARRO", g.answers[0], "MUNDO")) { w.forEach(g::type); g.submit(); g.finishReveal() }
+        g.type('P'); g.type('E')
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}) } }
+        save("9-dueto")
+    }
+
+    @Test
+    fun quarteto() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.QUARTETO, words, store = null) { day }
+        for (w in listOf("CARRO", "MUNDO", g.answers[2], "PEDRA")) { w.forEach(g::type); g.submit(); g.finishReveal() }
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}) } }
+        save("10-quarteto")
+    }
+
+    @Test
+    fun conexoes() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { ConnectionsScreen(ConnectionsData.parse(asset("conexoes.txt")), null, null, {}, day) } }
+        save("11-conexoes")
+    }
+
+    @Test
+    fun caca() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), null, null, {}, day) } }
+        save("12-caca")
+    }
+
+    @Test
+    fun reverso() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { ReverseScreen(words, null, null, {}) } }
+        save("13-reverso")
+    }
+
+    @Test
+    fun definicao() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { DefineScreen(QuizData.definitions(asset("definicoes.txt")), null, null, {}, seed = 4) } }
+        save("14-definicao")
+    }
+
+    @Test
+    fun sinonimos() {
+        rule.mainClock.autoAdvance = false
+        val (p, f) = QuizData.synonyms(asset("sinonimos.txt"))
+        rule.setContent { PalavreiroTheme { SynonymScreen(p, f, null, null, {}, seed = 4) } }
+        save("15-sinonimos")
     }
 }

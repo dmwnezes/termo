@@ -23,7 +23,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.dmwnezes.palavreiro.data.Mode
+import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.game.TermoGame
+import com.dmwnezes.palavreiro.ui.ConnectionsScreen
+import com.dmwnezes.palavreiro.ui.DefineScreen
+import com.dmwnezes.palavreiro.ui.Dest
+import com.dmwnezes.palavreiro.ui.ReverseScreen
+import com.dmwnezes.palavreiro.ui.SynonymScreen
+import com.dmwnezes.palavreiro.ui.WordSearchScreen
 import com.dmwnezes.palavreiro.ui.GameScreen
 import com.dmwnezes.palavreiro.ui.HelpSheet
 import com.dmwnezes.palavreiro.ui.HomeScreen
@@ -49,8 +56,17 @@ class MainActivity : ComponentActivity() {
 private sealed interface Screen {
     data object Home : Screen
     data class Game(val mode: Mode) : Screen
+    data class Other(val dest: Dest) : Screen
     data object Profile : Screen
 }
+
+private fun records(store: com.dmwnezes.palavreiro.data.Store) = Records(
+    connWon = store.int("conn_won"), connPerfect = store.int("conn_perfect"),
+    wsPlayed = store.int("ws_played"), wsBest = store.int("ws_best"),
+    revApp = store.int("rev_appwins"), revUser = store.int("rev_userwins"),
+    defBest = store.int("def_best"), defRight = store.int("def_right"),
+    synBest = store.int("syn_best"),
+)
 
 @Composable
 fun PalavreiroApp() {
@@ -93,13 +109,44 @@ fun PalavreiroApp() {
         ) { s ->
             when (s) {
                 Screen.Home -> {
-                    val daily = remember(refresh) { game(Mode.DIARIO).also { it.refreshIfNewDay() } }
+                    val badges = remember(refresh) {
+                        val today = java.time.LocalDate.now().toString()
+                        fun daily(m: Mode): String {
+                            val g = game(m).also { it.refreshIfNewDay() }
+                            return if (store.text("daily_done_${m.key}") == today || (g.isDaily && g.over)) "Feito hoje ✓" else "Novo"
+                        }
+                        mapOf(
+                            Dest.TERMO to daily(Mode.DIARIO),
+                            Dest.DUETO to daily(Mode.DUETO),
+                            Dest.QUARTETO to daily(Mode.QUARTETO),
+                            Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
+                        )
+                    }
                     HomeScreen(
-                        dailyDone = daily.over,
-                        dailyWon = daily.won,
-                        onPlay = { screen = Screen.Game(it) },
+                        badges = badges,
+                        onOpen = { d ->
+                            screen = when (d) {
+                                Dest.TERMO -> Screen.Game(Mode.DIARIO)
+                                Dest.INFINITO -> Screen.Game(Mode.INFINITO)
+                                Dest.DUETO -> Screen.Game(Mode.DUETO)
+                                Dest.QUARTETO -> Screen.Game(Mode.QUARTETO)
+                                else -> Screen.Other(d)
+                            }
+                        },
                         onProfile = { screen = Screen.Profile },
                     )
+                }
+                is Screen.Other -> {
+                    val back: () -> Unit = { screen = Screen.Home; refresh++ }
+                    when (s.dest) {
+                        Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, store, AppGraph.feedback, back)
+                        Dest.CACA -> WordSearchScreen(AppGraph.themes, store, AppGraph.feedback, back)
+                        Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
+                        Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
+                        Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
+                        else -> {}
+                    }
                 }
                 is Screen.Game -> GameScreen(
                     game = game(s.mode),
@@ -110,8 +157,8 @@ fun PalavreiroApp() {
                 )
                 Screen.Profile -> ProfileScreen(
                     store = store,
-                    daily = remember(refresh) { store.stats(Mode.DIARIO) },
-                    infinite = remember(refresh) { store.stats(Mode.INFINITO) },
+                    stats = remember(refresh) { Mode.entries.associateWith { store.stats(it) } },
+                    records = remember(refresh) { records(store) },
                     onBack = { screen = Screen.Home; refresh++ },
                     onCheckUpdates = { showUpdate = true },
                     onHelp = { showHelp = true },

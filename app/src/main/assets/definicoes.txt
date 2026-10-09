@@ -1,0 +1,123 @@
+# Qual é a Palavra?  PALAVRA|definição (definições escritas para o Palavreiro)
+SAUDADE|Sentimento de falta de alguém, de um lugar ou de um tempo que ficou para trás.
+JANGADA|Embarcação simples de madeira, com vela, usada por pescadores do litoral nordestino.
+CUSCUZ|Prato feito de flocos de milho cozidos no vapor, comum no café da manhã do Nordeste.
+TAPIOCA|Massa feita da goma da mandioca, assada na frigideira e recheada.
+RELÓGIO|Objeto que mostra as horas.
+GUARDA-CHUVA|Objeto que se abre sobre a cabeça para proteger da chuva.
+ESPELHO|Superfície que reflete a imagem de quem está na frente dela.
+BIBLIOTECA|Lugar onde ficam guardados muitos livros para leitura e empréstimo.
+FAROL|Torre à beira-mar com uma luz forte que orienta os navios à noite.
+ARCO-ÍRIS|Faixa colorida que aparece no céu quando o sol ilumina gotas de chuva.
+TESOURA|Instrumento de duas lâminas usado para cortar papel, tecido ou cabelo.
+TRAVESSEIRO|Almofada onde se apoia a cabeça para dormir.
+GELADEIRA|Eletrodoméstico que mantém os alimentos frios.
+VASSOURA|Utensílio com cabo e cerdas usado para varrer o chão.
+CARTEIRO|Profissional que entrega cartas e encomendas.
+PADEIRO|Quem faz e vende pães.
+BOMBEIRO|Profissional que apaga incêndios e faz resgates.
+DICIONÁRIO|Livro que reúne as palavras de uma língua com seus significados.
+CALENDÁRIO|Tabela que organiza os dias, as semanas e os meses do ano.
+TERMÔMETRO|Instrumento que mede a temperatura.
+BÚSSOLA|Instrumento com uma agulha que aponta sempre para o norte.
+MOCHILA|Bolsa carregada nas costas, presa pelos ombros.
+ESCADA|Sequência de degraus para subir ou descer.
+JANELA|Abertura na parede que deixa entrar luz e ar.
+TELHADO|Cobertura que fica no alto da casa e protege da chuva.
+CHINELO|Calçado aberto e leve, de usar em casa ou na praia.
+PIPA|Brinquedo de papel e varetas que voa preso a uma linha.
+PIÃO|Brinquedo que gira sobre uma ponta depois de lançado com uma cordinha.
+SANFONA|Instrumento de fole e teclas, símbolo do forró.
+ZABUMBA|Tambor grande tocado com uma baqueta de um lado e uma vareta do outro, no forró.
+CORDEL|Literatura popular em versos, vendida em folhetos pendurados em barbantes.
+REPENTE|Desafio em versos improvisados, cantados por dois violeiros.
+SERTÃO|Região do interior, seca e afastada do litoral.
+CAATINGA|Vegetação do semiárido, com plantas que perdem as folhas na seca.
+MANDACARU|Cacto alto do sertão que dá flores brancas e frutos vermelhos.
+RAPADURA|Doce duro feito do caldo da cana-de-açúcar fervido e endurecido.
+CAJUÍNA|Bebida feita do suco do caju clarificado, típica do Piauí e do Ceará.
+FOGUEIRA|Monte de lenha acesa, tradição das festas de São João.
+QUADRILHA|Dança em grupo das festas juninas, com marcações de um puxador.
+ARQUIPÉLAGO|Grupo de ilhas próximas umas das outras.
+PENÍNSULA|Porção de terra cercada de água por quase todos os lados.
+VULCÃO|Montanha por onde sai lava, cinzas e gases do interior da Terra.
+CACHOEIRA|Queda de água de um rio.
+DESERTO|Região muito seca, com pouca chuva e pouca vegetação.
+FLORESTA|Grande área coberta de árvores.
+MANGUE|Ecossistema de lama e água salobra, berçário de caranguejos.
+DUNA|Monte de areia formado pelo vento.
+ECLIPSE|Quando um astro esconde outro, como a Lua cobrindo o Sol.
+COMETA|Astro de gelo e poeira que forma uma cauda brilhante ao se aproximar do Sol.
+GALÁXIA|Enorme conjunto de estrelas, poeira e gás, como a Via Láctea.
+ÓRBITA|Caminho que um astro faz ao redor de outro.
+SEMENTE|Parte da planta que, plantada, dá origem a uma nova planta.
+RAIZ|Parte da planta que fica embaixo da terra e absorve água.
+POLVO|Animal marinho de oito braços com ventosas.
+TARTARUGA|Réptil com casco duro que pode viver na terra ou no mar.
+CAMALEÃO|Lagarto que muda de cor para se disfarçar.
+MORCEGO|Único mamífero que voa de verdade; dorme de cabeça para baixo.
+FORMIGUEIRO|Ninho onde vive uma colônia de formigas.
+COLMEIA|Casa das abelhas, onde elas fazem o mel.
+GIRASSOL|Flor grande e amarela que acompanha a posição do sol.
+ORQUÍDEA|Flor delicada, muito usada como planta de enfeite em vasos.
+ALFACE|Verdura de folhas verdes usada em saladas.
+PIPOCA|Grão de milho que estoura no calor.
+BRIGADEIRO|Docinho de chocolate e leite condensado, enrolado no granulado.
+PUDIM|Sobremesa cremosa feita no forno com calda de caramelo.
+SORVETE|Doce gelado e cremoso, servido em casquinha ou pote.
+SANDUÍCHE|Duas fatias de pão com recheio no meio.
+FEIJOADA|Prato de feijão-preto com carnes de porco, servido com arroz e couve.
+CHURRASCO|Carne assada na brasa, normalmente em espetos ou na grelha.
+TEMPERO|O que se coloca na comida para dar mais sabor.
+COZINHEIRO|Quem prepara as refeições.
+PROFESSOR|Quem ensina numa escola ou universidade.
+ADVOGADO|Profissional que defende pessoas na Justiça.
+JARDINEIRO|Quem cuida de plantas e jardins.
+MOTORISTA|Quem dirige um veículo.
+PILOTO|Quem comanda um avião ou um carro de corrida.
+ASTRONAUTA|Pessoa treinada para viajar ao espaço.
+DETETIVE|Quem investiga mistérios e crimes em busca de pistas.
+PALHAÇO|Artista de circo que faz rir, com nariz vermelho e roupa colorida.
+MÁGICO|Artista que faz truques que parecem impossíveis.
+ORQUESTRA|Grupo grande de músicos tocando juntos, guiados por um maestro.
+MAESTRO|Quem rege uma orquestra.
+POEMA|Texto escrito em versos.
+ROMANCE|Livro com uma história longa de ficção.
+ALFABETO|Conjunto das letras de uma língua, em ordem.
+VÍRGULA|Sinal que marca uma pequena pausa na frase.
+SEGREDO|Algo que se mantém escondido dos outros.
+MEMÓRIA|Capacidade de guardar e lembrar informações.
+CORAGEM|Força para enfrentar o medo e o perigo.
+PACIÊNCIA|Capacidade de esperar com calma.
+PREGUIÇA|Falta de vontade de fazer as coisas; também é um bicho lento que vive nas árvores.
+CIÚME|Medo de perder alguém querido para outra pessoa.
+ABRAÇO|Gesto de envolver alguém com os braços.
+SORRISO|Expressão do rosto de quem está feliz.
+SONHO|Imagens e histórias que passam pela cabeça enquanto se dorme.
+ANIVERSÁRIO|Dia em que se completa mais um ano de vida.
+FERIADO|Dia em que não se trabalha por causa de uma data especial.
+CARNAVAL|Festa popular de rua, com fantasias, blocos e música.
+PRESENTE|Algo que se dá a alguém como lembrança ou carinho; também é o tempo de agora.
+CONVITE|Pedido para que alguém vá a um evento.
+VIAGEM|Ida de um lugar a outro, geralmente distante.
+PASSAPORTE|Documento usado para viajar a outros países.
+MALA|Bolsa grande para levar roupas numa viagem.
+AEROPORTO|Lugar onde os aviões pousam e decolam.
+SEMÁFORO|Aparelho de luzes que controla o trânsito.
+BICICLETA|Veículo de duas rodas movido por pedais.
+ELEVADOR|Cabine que sobe e desce entre os andares de um prédio.
+CHAVEIRO|Argola onde se guardam as chaves; também quem faz cópias de chaves.
+LANTERNA|Aparelho portátil que acende uma luz.
+TOMADA|Ponto na parede onde se liga um aparelho elétrico.
+CONTROLE|Aparelho com botões para comandar a TV de longe.
+CELULAR|Telefone que se leva no bolso.
+SENHA|Combinação secreta para entrar ou desbloquear algo.
+MAPA|Desenho que representa um lugar visto de cima.
+BANDEIRA|Pano com cores e símbolos que representa um país.
+TROFÉU|Taça ou estátua dada a quem vence uma competição.
+APITO|Objeto pequeno que faz um som agudo ao soprar; usado pelo juiz.
+GOLEIRO|Jogador que defende o gol.
+TORCIDA|Grupo de pessoas que apoiam um time.
+XADREZ|Jogo de tabuleiro com rei, rainha, torres, bispos, cavalos e peões.
+QUEBRA-CABEÇA|Jogo de encaixar peças para montar uma imagem.
+ESCONDE-ESCONDE|Brincadeira em que um conta e os outros se escondem.

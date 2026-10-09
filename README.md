@@ -1,6 +1,6 @@
 # Palavreiro
 
-Jogo de palavras em português, estilo Termo, com versão web e app Android.
+Jogos de palavras em português: Termo, Infinito, Dueto, Quarteto, Conexões, Caça-Palavras, Reverso, Qual é a Palavra? e Sinônimos. O site tem o Termo; o app Android tem todos.
 
 - **Site:** https://dmwnezes.github.io/termo/
 - **App Android:** baixe o `Palavreiro.apk` mais recente em Releases. O app avisa sozinho quando há versão nova.

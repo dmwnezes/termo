@@ -5,10 +5,18 @@ import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** Modos de jogo. Dueto e Quarteto entram aqui quando ficarem prontos. */
-enum class Mode(val key: String, val title: String) {
-    DIARIO("diario", "Diário"),
-    INFINITO("infinito", "Infinito"),
+/**
+ * Modos do jogo de adivinhar palavras.
+ * [boards]: quantas palavras ao mesmo tempo; tentativas = 5 + boards (6, 7 ou 9).
+ * [daily]: tem desafio do dia; [free]: permite jogar partidas livres (palavras sorteadas).
+ */
+enum class Mode(val key: String, val title: String, val boards: Int, val daily: Boolean, val free: Boolean) {
+    DIARIO("diario", "Termo", 1, daily = true, free = false),
+    INFINITO("infinito", "Infinito", 1, daily = false, free = true),
+    DUETO("dueto", "Dueto", 2, daily = true, free = true),
+    QUARTETO("quarteto", "Quarteto", 4, daily = true, free = true);
+
+    val maxTries: Int get() = 5 + boards
 }
 
 data class Stats(
@@ -18,7 +26,7 @@ data class Stats(
     val maxStreak: Int = 0,
     val lastWinDay: Long = Long.MIN_VALUE,
     val firstTry: Int = 0,
-    val dist: List<Int> = List(6) { 0 },
+    val dist: List<Int> = List(9) { 0 },
 ) {
     val winPct: Int get() = if (played == 0) 0 else Math.round(won * 100f / played)
 
@@ -40,7 +48,7 @@ data class Stats(
                     maxStreak = o.optInt("maxStreak"),
                     lastWinDay = o.optLong("lastWinDay", Long.MIN_VALUE),
                     firstTry = o.optInt("firstTry"),
-                    dist = List(6) { i -> d?.optInt(i) ?: 0 },
+                    dist = List(9) { i -> d?.optInt(i) ?: 0 },
                 )
             }.getOrDefault(Stats())
         }
@@ -48,9 +56,9 @@ data class Stats(
 }
 
 /** Partida salva: as tentativas são reavaliadas ao carregar. */
-data class SavedGame(val key: String, val answer: String, val words: List<String>, val over: Boolean, val won: Boolean) {
+data class SavedGame(val key: String, val answers: List<String>, val words: List<String>, val over: Boolean, val won: Boolean) {
     fun toJson(): String = JSONObject()
-        .put("key", key).put("answer", answer).put("words", JSONArray(words)).put("over", over).put("won", won)
+        .put("key", key).put("answers", JSONArray(answers)).put("words", JSONArray(words)).put("over", over).put("won", won)
         .toString()
 
     companion object {
@@ -59,10 +67,9 @@ data class SavedGame(val key: String, val answer: String, val words: List<String
             return runCatching {
                 val o = JSONObject(s)
                 val arr = o.getJSONArray("words")
-                SavedGame(
-                    o.getString("key"), o.getString("answer"),
-                    List(arr.length()) { arr.getString(it) }, o.optBoolean("over"), o.optBoolean("won"),
-                )
+                val ans = o.optJSONArray("answers")
+                val answers = if (ans != null) List(ans.length()) { ans.getString(it) } else listOf(o.getString("answer"))
+                SavedGame(o.getString("key"), answers, List(arr.length()) { arr.getString(it) }, o.optBoolean("over"), o.optBoolean("won"))
             }.getOrNull()
         }
     }
@@ -76,6 +83,17 @@ class Store(context: Context) {
 
     fun game(mode: Mode): SavedGame? = SavedGame.fromJson(prefs.getString("game_${mode.key}", null))
     fun saveGame(mode: Mode, g: SavedGame) = prefs.edit().putString("game_${mode.key}", g.toJson()).apply()
+
+    /** Números simples dos outros jogos (recordes, contadores). */
+    fun int(key: String): Int = prefs.getInt("n_$key", 0)
+    fun setInt(key: String, v: Int) = prefs.edit().putInt("n_$key", v).apply()
+    fun add(key: String, delta: Int = 1) = setInt(key, int(key) + delta)
+    fun max(key: String, v: Int) { if (v > int(key)) setInt(key, v) }
+    /** Menor valor positivo (ex.: melhor tempo). */
+    fun min(key: String, v: Int) { val cur = int(key); if (cur == 0 || v < cur) setInt(key, v) }
+
+    fun text(key: String): String? = prefs.getString("t_$key", null)
+    fun setText(key: String, v: String?) = prefs.edit().putString("t_$key", v).apply()
 
     var sound: Boolean
         get() = prefs.getBoolean("sound", true)

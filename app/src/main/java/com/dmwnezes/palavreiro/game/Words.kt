@@ -40,6 +40,9 @@ class Words(source: String) {
 
     fun isAccepted(word: String): Boolean = word in accepted
 
+    /** Todas as palavras aceitas (respostas + tentativas extras). */
+    val all: Set<String> get() = accepted
+
     fun display(word: String): String = accented[word] ?: word
 
     /** Mesmo cálculo da versão web: dias desde 01/01/2026, com embaralhamento fixo. */
@@ -48,6 +51,30 @@ class Words(source: String) {
         val n = answers.size
         val idx = (((i * 7919L + 104729L) % n) + n) % n
         return answers[idx.toInt()]
+    }
+
+    /**
+     * Palavras do dia para modos com vários tabuleiros (Dueto, Quarteto).
+     * [salt] separa os modos; as palavras nunca se repetem entre si.
+     */
+    fun dailySet(date: LocalDate, count: Int, salt: Int): List<String> {
+        if (count == 1 && salt == 0) return listOf(daily(date))
+        val n = answers.size
+        val i = dayIndex(date)
+        val out = LinkedHashSet<String>()
+        var k = 0
+        while (out.size < count) {
+            val idx = ((i * 7919L + 104729L + salt * 3331L + k * 577L) % n + n) % n
+            out += answers[idx.toInt()]
+            k++
+        }
+        return out.toList()
+    }
+
+    fun randomSet(count: Int, rnd: Random = Random.Default): List<String> {
+        val out = LinkedHashSet<String>()
+        while (out.size < count) out += answers[rnd.nextInt(answers.size)]
+        return out.toList()
     }
 
     fun random(avoid: String? = null, rnd: Random = Random.Default): String {

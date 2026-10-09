@@ -1,0 +1,153 @@
+# Conexões: um desafio por bloco, separado por linha em branco.
+# Cada linha: Nome do grupo: PALAVRA, PALAVRA, PALAVRA, PALAVRA
+# Ordem dos grupos = dificuldade (1º mais fácil, 4º mais difícil).
+
+Frutas: CAJU, GOIABA, ACEROLA, PITANGA
+Cores: ROXO, BEGE, VINHO, CINZA
+Instrumentos do forró: SANFONA, ZABUMBA, TRIÂNGULO, PANDEIRO
+Pé de ___: MOLEQUE, CABRA, PATO, GALINHA
+
+Planetas: MARTE, VÊNUS, SATURNO, NETUNO
+Bichos do sertão: CALANGO, PREÁ, TATU, CARCARÁ
+Comidas nordestinas: CUSCUZ, TAPIOCA, BUCHADA, PAÇOCA
+Quebra-___: CABEÇA, MAR, MOLAS, NOZES
+
+Ritmos brasileiros: FORRÓ, XOTE, FREVO, MARACATU
+Peças de xadrez: REI, RAINHA, TORRE, BISPO
+Partes do corpo: COTOVELO, JOELHO, CANELA, NUCA
+Guarda-___: CHUVA, ROUPA, COSTAS, SOL
+
+Esportes: VÔLEI, JUDÔ, TÊNIS, REMO
+Móveis: SOFÁ, ARMÁRIO, ESTANTE, CÔMODA
+Signos: ÁRIES, LEÃO, GÊMEOS, PEIXES
+Bate-___: PAPO, BOCA, VOLTA, ESTACA
+
+Profissões: PEDREIRO, CARTEIRO, BOMBEIRO, PADEIRO
+Cômodos da casa: SALA, COZINHA, QUARTO, VARANDA
+Notas musicais: DÓ, RÉ, MI, FÁ
+Sem-___: TERRA, TETO, VERGONHA, GRAÇA
+
+Aves: SABIÁ, CANÁRIO, PERIQUITO, CORUJA
+Insetos: FORMIGA, BESOURO, GRILO, CIGARRA
+Peixes: TILÁPIA, SARDINHA, ATUM, PESCADA
+Porta-___: AVIÕES, RETRATO, MALAS, VOZ
+
+Transportes: ÔNIBUS, METRÔ, BALSA, CARROÇA
+Calçados: CHINELO, SANDÁLIA, BOTA, TAMANCO
+Utensílios de cozinha: CONCHA, ESCUMADEIRA, PANELA, FRIGIDEIRA
+Palíndromos: ARARA, RADAR, OVO, REVIVER
+
+Bebidas: CAFÉ, SUCO, CHÁ, REFRIGERANTE
+Material escolar: LÁPIS, CADERNO, BORRACHA, RÉGUA
+Flores: ROSA, MARGARIDA, ORQUÍDEA, GIRASSOL
+Capitais do Nordeste: NATAL, RECIFE, MACEIÓ, ARACAJU
+
+Ferramentas: MARTELO, ALICATE, SERROTE, CHAVE
+Árvores: IPÊ, JATOBÁ, CARNAÚBA, MANGUEIRA
+Meses de número ímpar: JANEIRO, MARÇO, MAIO, JULHO
+Cores do arco-íris: VERMELHO, LARANJA, ANIL, VIOLETA
+
+Roupas: CALÇA, SAIA, BLUSA, BERMUDA
+Coisas de praia: AREIA, ONDA, PRANCHA, BOIA
+Animais marinhos: POLVO, LULA, TUBARÃO, GOLFINHO
+Mal-___: ESTAR, HUMORADO, ENTENDIDO, AGRADECIDO
+
+Naipes: ESPADAS, COPAS, OUROS, PAUS
+Moedas: REAL, DÓLAR, EURO, IENE
+Doces de festa: BRIGADEIRO, BEIJINHO, CAJUZINHO, QUINDIM
+Olho de ___: GATO, PEIXE, BOI, ÁGUIA
+
+Esportes com bola: FUTEBOL, BASQUETE, HANDEBOL, GOLFE
+Partes do carro: VOLANTE, PNEU, CAPÔ, FAROL
+Instrumentos de sopro: FLAUTA, TROMPETE, SAXOFONE, CLARINETE
+Cara de ___: PAU, ANJO, TACHO, PAISAGEM
+
+Animais da fazenda: VACA, PORCO, CABRITO, GALO
+Legumes: CENOURA, BETERRABA, CHUCHU, ABOBRINHA
+Temperos: ORÉGANO, COMINHO, COLORAU, PIMENTA
+Pão de ___: QUEIJO, FORMA, LÓ, AÇÚCAR
+
+Estações do ano: VERÃO, INVERNO, OUTONO, PRIMAVERA
+Fenômenos do tempo: CHUVA, TROVÃO, RELÂMPAGO, GAROA
+Pontos cardeais: NORTE, SUL, LESTE, OESTE
+Para-___: QUEDAS, BRISA, CHOQUE, RAIOS
+
+Animais da savana: LEÃO, ZEBRA, GIRAFA, HIENA
+Formas geométricas: CÍRCULO, QUADRADO, TRIÂNGULO, LOSANGO
+Partes do computador: TECLADO, MOUSE, MONITOR, GABINETE
+Arroz de ___: LEITE, FESTA, CARRETEIRO, FORNO
+
+Cereais: MILHO, TRIGO, AVEIA, CEVADA
+Laticínios: QUEIJO, IOGURTE, MANTEIGA, REQUEIJÃO
+Partes da árvore: RAIZ, TRONCO, GALHO, FOLHA
+Fim de ___: SEMANA, ANO, TARDE, LINHA
+
+Deuses gregos: ZEUS, HERA, ATENA, POSEIDON
+Continentes: ÁFRICA, ÁSIA, EUROPA, OCEANIA
+Rios brasileiros: AMAZONAS, TOCANTINS, PARANÁ, JAGUARIBE
+Mão de ___: OBRA, VACA, TINTA, FERRO
+
+Profissões da saúde: MÉDICO, DENTISTA, ENFERMEIRO, FISIOTERAPEUTA
+Animais de estimação: CACHORRO, GATO, HAMSTER, CALOPSITA
+Jogos de cartas: TRUCO, BURACO, CANASTRA, PÔQUER
+Bom ___: DIA, SENSO, GOSTO, HUMOR
+
+Partes da casa: TELHADO, PAREDE, PORTA, JANELA
+Coisas de banheiro: TOALHA, SABONETE, ESCOVA, ESPELHO
+Animais que botam ovos: TARTARUGA, JACARÉ, AVESTRUZ, ORNITORRINCO
+Água ___: VIVA, BENTA, SANITÁRIA, OXIGENADA
+
+Danças: SAMBA, VALSA, TANGO, SALSA
+Unidades de medida: METRO, LITRO, GRAMA, SEGUNDO
+Brinquedos: PIÃO, PIPA, BONECA, IOIÔ
+Cabeça de ___: VENTO, BAGRE, ALHO, CHAVE
+
+Metais: OURO, PRATA, FERRO, COBRE
+Pedras preciosas: DIAMANTE, RUBI, ESMERALDA, SAFIRA
+Partes do olho: ÍRIS, PUPILA, CÓRNEA, RETINA
+Linha de ___: FRENTE, CHEGADA, PRODUÇÃO, PESCA
+
+Répteis: LAGARTO, COBRA, JABUTI, IGUANA
+Frutas cítricas: LIMÃO, LARANJA, TANGERINA, LIMA
+Material de construção: CIMENTO, TIJOLO, AREIA, TELHA
+Ponto de ___: ÔNIBUS, VISTA, EXCLAMAÇÃO, ENCONTRO
+
+Esportes aquáticos: NATAÇÃO, SURFE, CANOAGEM, MERGULHO
+Datas comemorativas: NATAL, PÁSCOA, CARNAVAL, RÉVEILLON
+Corpos celestes: COMETA, ESTRELA, LUA, ASTEROIDE
+Tira-___: GOSTO, TEIMA, MANCHAS, DÚVIDAS
+
+Trabalhos manuais: BORDADO, CROCHÊ, RENDA, TRICÔ
+Aves de rapina: GAVIÃO, FALCÃO, ÁGUIA, CORUJA
+Sobremesas: PUDIM, MOUSSE, PAVÊ, SORVETE
+Bem-___: VINDO, ESTAR, AMADO, FEITO
+
+Partes do pé: CALCANHAR, DEDÃO, SOLA, TORNOZELO
+Café da manhã: PÃO, MANTEIGA, CUSCUZ, OVO
+Ferramentas de jardim: PÁ, ENXADA, RASTELO, REGADOR
+Ponta-___: PÉ, CABEÇA, ESQUERDA, DIREITA
+
+Insetos que voam: ABELHA, MOSCA, MOSQUITO, BORBOLETA
+Lugares da cidade: PRAÇA, FEIRA, PADARIA, FARMÁCIA
+Partes do livro: CAPA, PÁGINA, CAPÍTULO, ÍNDICE
+Sangue ___: FRIO, BOM, AZUL, QUENTE
+
+Comidas de São João: CANJICA, PAMONHA, MUNGUZÁ, QUENTÃO
+Partes da bicicleta: GUIDÃO, PEDAL, CORRENTE, SELIM
+Expressões cearenses: OXENTE, ARRETADO, MASSA, PAI D'ÉGUA
+Banho de ___: SOL, MAR, LOJA, CHUVA
+
+Animais herbívoros: CAVALO, COELHO, BOI, CAMELO
+Profissões da escola: PROFESSOR, DIRETOR, COORDENADOR, PORTEIRO
+Mudam de sentido com acento: AVO, PAIS, SABIA, SECRETARIA
+Fogo ___: PALHA, ARTIFÍCIO, CHÃO, CRUZADO
+
+Peças de bateria: BUMBO, PRATO, CAIXA, SURDO
+Matérias da escola: MATEMÁTICA, HISTÓRIA, GEOGRAFIA, QUÍMICA
+Bichinhos do jardim: LESMA, MINHOCA, CARACOL, JOANINHA
+Dor de ___: CABEÇA, COTOVELO, BARRIGA, DENTE
+
+Frutos do mar: CARANGUEJO, LAGOSTA, SIRI, OSTRA
+Instrumentos de percussão: ATABAQUE, AGOGÔ, TAMBORIM, CUÍCA
+Coisas do futebol: GOL, PÊNALTI, ESCANTEIO, IMPEDIMENTO
+Ficar de ___: MOLHO, OLHO, BICO, CASTIGO

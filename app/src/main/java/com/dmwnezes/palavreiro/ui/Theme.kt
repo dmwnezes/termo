@@ -29,6 +29,12 @@ object Night {
     val accent = Color(0xFF9B8CFF)
     val correct = Color(0xFF5FB873)
     val present = Color(0xFFE6C14F)
+    val blue = Color(0xFF6FA8E8)
+    val purple = Color(0xFFB48CF0)
+    val red = Color(0xFFE5737A)
+
+    /** Cores dos 4 grupos do Conexões, do mais fácil ao mais difícil. */
+    val levels = listOf(present, correct, blue, purple)
 
     val background: Brush get() = Brush.verticalGradient(listOf(bgTop, bgBottom))
 
