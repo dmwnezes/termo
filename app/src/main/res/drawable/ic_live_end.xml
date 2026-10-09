@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fim da barra do dia na Now Bar: um quadradinho verde da marca com uma estrela (a palavra nova). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#5FB873"
+        android:pathData="M7,2h10a5,5 0,0 1,5 5v10a5,5 0,0 1,-5 5h-10a5,5 0,0 1,-5 -5v-10a5,5 0,0 1,5 -5z" />
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M12,6.2l1.65,3.55 3.85,0.45 -2.85,2.65 0.75,3.85 -3.4,-1.95 -3.4,1.95 0.75,-3.85 -2.85,-2.65 3.85,-0.45z" />
+</vector>

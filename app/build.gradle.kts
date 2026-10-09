@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.dmwnezes.palavreiro"
-    compileSdk = 35
+    // 36 (Android 16) para a barra do dia na Now Bar; o app continua mirando o 35.
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.dmwnezes.palavreiro"

@@ -103,14 +103,24 @@ class StoreFeaturesTest {
         com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
         val n = shadow.allNotifications.single()
         assertTrue(n.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0)
+        assertEquals("Próxima palavra", n.extras.getString(android.app.Notification.EXTRA_TITLE))
         assertTrue(n.extras.getBoolean("android.requestPromotedOngoing"))
-        assertEquals("Nova palavra à meia-noite", n.extras.getString(android.app.Notification.EXTRA_TITLE))
+        assertEquals(com.dmwnezes.palavreiro.system.NextWordLive.DAY_MINUTES, n.extras.getInt(android.app.Notification.EXTRA_PROGRESS_MAX))
         assertTrue(n.extras.getBoolean(android.app.Notification.EXTRA_SHOW_CHRONOMETER))
         assertEquals(LocalDate.now().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(), n.`when`)
         // Desligando, some.
         store.liveCountdown = false
         com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
         assertEquals(0, shadow.allNotifications.size)
+    }
+
+    @Test
+    fun barraDoDia() {
+        val m = com.dmwnezes.palavreiro.system.NextWordLive
+        assertEquals(0, m.minutesElapsed(java.time.LocalDateTime.of(2026, 10, 9, 0, 0)))
+        assertEquals(18 * 60 + 35, m.minutesElapsed(java.time.LocalDateTime.of(2026, 10, 9, 18, 35)))
+        assertEquals(5, m.SEGMENT_COLORS.size)
+        assertEquals(0, m.DAY_MINUTES % m.SEGMENT_COLORS.size)
     }
 
     @Test

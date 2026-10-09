@@ -284,7 +284,7 @@ private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () ->
             else turn(on)
         }
         Text(
-            "Depois do Termo do dia, mostra quanto falta para a palavra nova. No Samsung aparece na Now Bar " +
+            "Depois do Termo do dia, mostra a barra do dia com quanto falta para a palavra nova. No Samsung aparece na Now Bar " +
                 "e na tela de bloqueio; nos outros celulares, na barra de status. Some sozinha à meia-noite.",
             fontSize = 12.sp, color = Night.muted,
         )
