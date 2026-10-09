@@ -230,7 +230,7 @@ private fun KeyButton(
     val single = marks.size <= 1
     val only = marks.firstOrNull()
     Box(
-        modifier.height(56.dp).clip(Shapes.key).background(if (single && only != null) Night.mark(only) else Night.key).clickable(onClick = onClick),
+        modifier.height(56.dp).clip(Shapes.key).background(if (single) Night.keyMark(only) else Night.key).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         // Dueto: metades; Quarteto: quatro cantos, cada um com a cor de um tabuleiro.
@@ -241,7 +241,7 @@ private fun KeyButton(
                     Row(Modifier.weight(1f).fillMaxWidth()) {
                         line.forEach { b ->
                             val m = marks.getOrNull(b)
-                            Box(Modifier.weight(1f).fillMaxSize().background(if (m != null) Night.mark(m) else Night.key))
+                            Box(Modifier.weight(1f).fillMaxSize().background(Night.keyMark(m)))
                         }
                     }
                 }
@@ -255,7 +255,7 @@ private fun KeyButton(
                 label,
                 fontSize = if (small) (if (label.length > 5) 11.sp else 13.sp) else 18.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = if (dark) Night.onMark(only) else Night.text,
+                color = if (dark) Night.onMark(only) else if (single && only == Mark.ABSENT) Night.muted.copy(alpha = 0.5f) else Night.text,
                 maxLines = 1,
                 softWrap = false,
             )

@@ -6,7 +6,8 @@
   --surface-high: #2F275C;
   --outline: #4A4180;
   --absent: #3A3363;
-  --key: #4C437F;
+  --key: #5A4F96;
+  --key-absent: #17132F;
   --text: #F4F1FF;
   --muted: #A9A2D0;
   --accent: #9B8CFF;
@@ -175,7 +176,7 @@ button { font-family: inherit; color: inherit; }
 .key span { position: relative; }
 .key.c { background: var(--correct); }
 .key.p { background: var(--present); color: var(--dark-text); }
-.key.a { background: var(--absent); }
+.key.a { background: var(--key-absent); color: rgba(169,162,208,.45); }
 .spacer-half { flex: .5; }
 
 /* ---------- janelas ---------- */

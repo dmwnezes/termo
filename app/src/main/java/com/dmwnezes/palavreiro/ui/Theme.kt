@@ -23,7 +23,10 @@ object Night {
     val surfaceHigh = Color(0xFF2F275C)
     val outline = Color(0xFF4A4180)
     val absent = Color(0xFF3A3363)
-    val key = Color(0xFF4C437F)
+    val key = Color(0xFF5A4F96)
+    /** Tecla de letra que não está na palavra: quase a cor do fundo, bem distinta das não testadas. */
+    val keyAbsent = Color(0xFF17132F)
+    fun keyMark(m: Mark?): Color = when (m) { null -> key; Mark.ABSENT -> keyAbsent; else -> mark(m) }
     val text = Color(0xFFF4F1FF)
     val muted = Color(0xFFA9A2D0)
     val accent = Color(0xFF9B8CFF)

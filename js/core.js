@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "9"; // versão dos arquivos de conteúdo
+  const V = "10"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -181,7 +181,7 @@
     };
     document.addEventListener("keydown", onKey);
     root.appendChild(kb);
-    const colors = { c: "var(--correct)", p: "var(--present)", a: "var(--absent)" };
+    const colors = { c: "var(--correct)", p: "var(--present)", a: "var(--key-absent)" };
     return {
       paint() {
         if (!marksFor) return;
