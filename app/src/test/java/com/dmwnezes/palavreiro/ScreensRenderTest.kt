@@ -57,7 +57,11 @@ class ScreensRenderTest {
     fun abertura() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { SplashCredits {} } }
-        save("1-abertura", 900)
+        save("1a-bandeira", 500)
+        save("1b-tremulando", 400)
+        save("1c-transformando", 600)
+        save("1d-quase", 300)
+        save("1-abertura", 1000)
     }
 
     @Test

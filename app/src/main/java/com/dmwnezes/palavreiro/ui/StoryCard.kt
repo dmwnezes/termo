@@ -54,7 +54,7 @@ object StoryCard {
         val sq = 46f; val gap = 12f
         val markW = 5 * sq + 4 * gap
         var x = (W - markW) / 2f
-        val markColors = listOf(Night.correct, Night.correct, Night.present, Night.correct, Night.correct)
+        val markColors = Night.brand
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
         markColors.forEach { col -> p.color = col.toArgb(); c.drawRoundRect(RectF(x, 170f, x + sq, 170f + sq), 13f, 13f, p); x += sq + gap }
         text(c, "Palavreiro", W / 2f, 330f, 92f, bold, Night.text)

@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "8"; // versão dos arquivos de conteúdo
+  const V = "9"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -243,7 +243,7 @@
       g.fillText(s, W / 2, y); g.letterSpacing = "0px";
     };
     let x = (W - (5 * 46 + 4 * 12)) / 2;
-    ["#5FB873", "#5FB873", "#E6C14F", "#5FB873", "#5FB873"].forEach((col) => { rr(x, 170, 46, 46, 13, col); x += 58; });
+    ["#5FB873", "#E6C14F", "#4A72CF", "#E6C14F", "#5FB873"].forEach((col) => { rr(x, 170, 46, 46, 13, col); x += 58; });
     txt("Palavreiro", 330, 92, 800, "#F4F1FF");
     txt(game.toUpperCase(), 420, 40, 600, "#A9A2D0", "7px");
     txt(headline, 560, 76, 800, "#F4F1FF");

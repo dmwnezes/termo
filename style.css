@@ -15,6 +15,7 @@
   --blue: #6FA8E8;
   --purple: #B48CF0;
   --red: #E5737A;
+  --flag-blue: #4A72CF;
   --dark-text: #1A1438;
   --r-tile: 14px;
   --r-key: 12px;
@@ -70,7 +71,9 @@ button { font-family: inherit; color: inherit; }
 
 .mark { display: flex; gap: 6px; }
 .mark span { width: 26px; height: 26px; border-radius: 8px; background: var(--correct); }
-.mark span:nth-child(3) { background: var(--present); }
+.mark span:nth-child(2), .mark span:nth-child(4) { background: var(--present); }
+.mark span:nth-child(3) { background: var(--flag-blue); }
+#flag { display: block; width: 100%; max-width: 420px; height: 180px; }
 .mark.small { gap: 3px; }
 .mark.small span { width: 10px; height: 10px; border-radius: 3px; }
 .mark.bounce span { animation: hop 1.6s infinite ease-in-out; }

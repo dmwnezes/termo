@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cinco quadradinhos arredondados: a palavra de 5 letras do Palavreiro -->
+<!-- Cinco quadradinhos nas cores da bandeira: verde, amarelo, azul, amarelo, verde -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
     <path android:fillColor="#FF5FB873" android:pathData="M27.00,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
-    <path android:fillColor="#FF5FB873" android:pathData="M39.40,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
-    <path android:fillColor="#FFE6C14F" android:pathData="M51.80,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
-    <path android:fillColor="#FF5FB873" android:pathData="M64.20,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
+    <path android:fillColor="#FFE6C14F" android:pathData="M39.40,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
+    <path android:fillColor="#FF4A72CF" android:pathData="M51.80,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
+    <path android:fillColor="#FFE6C14F" android:pathData="M64.20,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
     <path android:fillColor="#FF5FB873" android:pathData="M76.60,48.80h4.40a3.0,3.0 0,0 1,3.0,3.0v4.40a3.0,3.0 0,0 1,-3.0,3.0h-4.40a3.0,3.0 0,0 1,-3.0,-3.0v-4.40a3.0,3.0 0,0 1,3.0,-3.0z" />
 </vector>

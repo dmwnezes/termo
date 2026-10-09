@@ -90,9 +90,47 @@
   window.addEventListener("hashchange", route);
   route();
 
-  // Abertura com créditos: some sozinha em ~2,8 s ou ao tocar fora do link.
+  // Abertura: a bandeira do Brasil em quadradinhos tremula e vira a marca (mesma animação do app).
   const sp = P.$("#splash");
+  (function flag() {
+    const cv = P.$("#flag", sp); if (!cv) return;
+    const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const g = cv.getContext("2d"); g.scale(dpr, dpr);
+    const G = "#5FB873", Y = "#E6C14F", B = "#4A72CF";
+    const diamond = new Set(["0,3", "1,2", "1,3", "1,4", "2,1", "2,2", "2,4", "2,5", "3,2", "3,3", "3,4", "4,3"]);
+    const keepers = ["2,0", "2,2", "2,3", "2,4", "2,6"];
+    const color = (r, c) => (r === 2 && c === 3 ? B : diamond.has(r + "," + c) ? Y : G);
+    const ease = (x) => { const t = Math.min(1, Math.max(0, x)); return t * t * (3 - 2 * t); };
+    const s = 30, gap = 7, fs = s * 0.82, fg = fs * 0.2, cx = W / 2, cy = H / 2;
+    const flagW = 7 * fs + 6 * fg, flagH = 5 * fs + 4 * fg, rowW = 5 * s + 4 * gap;
+    const rr = (x, y, z, col, a = 1) => { g.globalAlpha = a; g.fillStyle = col; g.beginPath(); g.roundRect(x, y, z, z, z * 0.3); g.fill(); };
+    const t0 = performance.now();
+    const title = P.$("#splash-title"), credit = P.$("#splash-credit");
+    const frame = (now) => {
+      if (!document.body.contains(cv)) return;
+      const t = (now - t0) / 1000, m = ease(t - 1), wave = 1 - m;
+      g.clearRect(0, 0, W, H);
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) {
+        const k = keepers.indexOf(r + "," + c);
+        const fx = cx - flagW / 2 + c * (fs + fg), fy = cy - flagH / 2 + r * (fs + fg) + Math.sin(t * 5 - c * 0.7) * fs * 0.2 * wave;
+        if (k >= 0) {
+          const hop = m >= 1 ? Math.max(0, Math.sin(((t - 2) / 1.6 - k * 0.12) * 2 * Math.PI)) * s * 0.35 : 0;
+          const tx = cx - rowW / 2 + k * (s + gap), ty = cy - s / 2 - hop, z = fs + (s - fs) * m;
+          rr(fx + (tx - fx) * m, fy + (ty - fy) * m, z, color(r, c));
+        } else if (m < 1) {
+          const z = fs * (1 - m);
+          rr(fx + (cx - fx) * m * 0.35 + (fs - z) / 2, fy + (cy - fy) * m * 0.35 + (fs - z) / 2, z, color(r, c), 1 - m);
+        }
+      }
+      g.globalAlpha = 1;
+      const a = Math.min(1, Math.max(0, (t - 1.7) / 0.5));
+      title.style.opacity = a; title.style.transform = `translateY(${(1 - a) * 20}px)`; credit.style.opacity = a;
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  })();
   const close = () => { sp.classList.add("hide"); setTimeout(() => sp.remove(), 400); if (!P.store.get("seen-help") && !location.hash.includes("desafio")) { P.store.set("seen-help", true); P.games.help(); } };
-  const t = setTimeout(close, 2800);
+  const t = setTimeout(close, 3600);
   sp.addEventListener("click", (e) => { if (!e.target.closest(".credit")) { clearTimeout(t); close(); } });
 })();

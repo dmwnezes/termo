@@ -32,6 +32,11 @@ object Night {
     val blue = Color(0xFF6FA8E8)
     val purple = Color(0xFFB48CF0)
     val red = Color(0xFFE5737A)
+    /** Azul da bandeira, usado só na marca. */
+    val flagBlue = Color(0xFF4A72CF)
+
+    /** A marca: cinco quadradinhos nas cores da bandeira do Brasil. */
+    val brand = listOf(correct, present, flagBlue, present, correct)
 
     /** Cores dos 4 grupos do Conexões, do mais fácil ao mais difícil. */
     val levels = listOf(present, correct, blue, purple)
