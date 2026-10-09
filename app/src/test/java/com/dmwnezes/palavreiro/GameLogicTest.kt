@@ -17,7 +17,7 @@ class GameLogicTest {
 
     @Test
     fun listaTemMilRespostasDeCincoLetras() {
-        assertEquals(1000, words.answers.size)
+        assertEquals(1227, words.answers.size) // 1000 originais + 227 novas (ANSWERS2)
         assertTrue(words.answers.all { it.length == 5 && it.all { c -> c in 'A'..'Z' } })
     }
 
@@ -35,6 +35,18 @@ class GameLogicTest {
         for (line in expected) {
             val (date, word) = line.split(' ')
             assertEquals(date, word, words.daily(LocalDate.parse(date)))
+        }
+    }
+
+    @Test
+    fun duetoEQuartetoDoDiaIguaisAoSite() {
+        // Calculado pelo site (core.js) com a mesma lista, antes e depois da entrada das palavras novas.
+        val lines = File("src/test/resources/daily-sets.txt").readLines().filter { it.isNotBlank() }
+        for (line in lines) {
+            val (date, duo, quad) = line.split(' ')
+            val d = LocalDate.parse(date)
+            assertEquals(date, duo, words.dailySet(d, 2, 1).joinToString(","))
+            assertEquals(date, quad, words.dailySet(d, 4, 2).joinToString(","))
         }
     }
 

@@ -17,22 +17,31 @@ class Words(source: String) {
     /** Forma com acento de cada resposta, para exibir. */
     private val accented: Map<String, String>
 
+    /** Quantas respostas entram no sorteio do dia antes de [newFrom] (as novas só depois). */
+    private val baseCount: Int
+    private val newFrom: Long
+
     /** Tudo o que é aceito como tentativa. */
     private val accepted: Set<String>
 
     init {
         val answerRaw = readList(source, "ANSWERS")
         val validRaw = readList(source, "VALID")
+        val newRaw = readList(source, "ANSWERS2")
+        newFrom = Regex("""const\s+ANSWERS2_FROM\s*=\s*(\d+)""").find(source)?.groupValues?.get(1)?.toLong() ?: 0L
 
         val order = ArrayList<String>()
         val acc = HashMap<String, String>()
-        for (w in answerRaw) {
+        fun addAnswer(w: String) {
             val n = normalize(w)
             if (n.length == WORD_LENGTH && n.all { it in 'A'..'Z' } && n !in acc) {
                 acc[n] = w.uppercase()
                 order += n
             }
         }
+        answerRaw.forEach(::addAnswer)
+        baseCount = order.size
+        newRaw.forEach(::addAnswer)
         answers = order
         accented = acc
         accepted = HashSet<String>(order).apply { validRaw.forEach { add(normalize(it)) } }
@@ -48,7 +57,7 @@ class Words(source: String) {
     /** Mesmo cálculo da versão web: dias desde 01/01/2026, com embaralhamento fixo. */
     fun daily(date: LocalDate = LocalDate.now()): String {
         val i = dayIndex(date)
-        val n = answers.size
+        val n = poolSize(i)
         val idx = (((i * 7919L + 104729L) % n) + n) % n
         return answers[idx.toInt()]
     }
@@ -59,8 +68,8 @@ class Words(source: String) {
      */
     fun dailySet(date: LocalDate, count: Int, salt: Int): List<String> {
         if (count == 1 && salt == 0) return listOf(daily(date))
-        val n = answers.size
         val i = dayIndex(date)
+        val n = poolSize(i)
         val out = LinkedHashSet<String>()
         var k = 0
         while (out.size < count) {
@@ -70,6 +79,9 @@ class Words(source: String) {
         }
         return out.toList()
     }
+
+    /** Mesmo cálculo da versão web: as palavras novas só entram no sorteio a partir de [newFrom]. */
+    private fun poolSize(dayIndex: Long): Int = if (dayIndex >= newFrom) answers.size else baseCount
 
     fun randomSet(count: Int, rnd: Random = Random.Default): List<String> {
         val out = LinkedHashSet<String>()

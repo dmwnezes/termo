@@ -998,3 +998,230 @@ LEGAR|Deixar como herança.
 CASTO|Puro, inocente.
 MOSTO|Suco de uva antes de virar vinho.
 DÉRBI|Clássico entre dois times rivais da mesma cidade.
+COISA|Qualquer objeto, assunto ou fato que não se quer ou não se sabe nomear.
+PARTE|Pedaço ou porção de um todo.
+GRUPO|Conjunto de pessoas ou coisas reunidas.
+VOLTA|Retorno ao lugar de onde se saiu; também: giro, passeio curto.
+CONTA|Cálculo; também: valor a pagar ou registro em banco.
+FILHO|Pessoa em relação ao pai e à mãe.
+TARDE|Período do dia entre o meio-dia e a noite; também: depois da hora.
+CERTO|Que está correto; também: seguro, garantido.
+FEITO|Ação marcante, façanha; também: pronto, terminado.
+FALTA|Ausência de algo; também: infração num jogo.
+CAUSA|Aquilo que faz algo acontecer; também: ideal que se defende.
+AMIGO|Pessoa com quem se tem amizade e confiança.
+PONTO|Sinal pequeno e redondo; também: local ou unidade de pontuação.
+LISTA|Relação de nomes ou itens escritos um abaixo do outro.
+APOIO|Ajuda, suporte; também: aquilo em que algo se apoia.
+IDEIA|Pensamento, plano ou noção que surge na mente.
+JUNTO|Unido, ao lado; também: em companhia.
+CARRO|Veículo de rodas, especialmente o automóvel.
+VISTA|Sentido da visão; também: paisagem que se vê de um lugar.
+BAIXO|De pouca altura; também: instrumento musical de som grave.
+ACIMA|Em posição mais alta; também: mais do que.
+BUSCA|Ato de procurar algo ou alguém.
+PASSO|Movimento de pôr um pé à frente do outro ao andar.
+RESTO|O que sobra de um todo.
+MENTE|Parte de nós que pensa, sente e lembra.
+MARCA|Sinal deixado em algo; também: nome de um produto.
+PRESO|Que está na prisão; também: amarrado, fixo.
+VERÃO|Estação mais quente do ano.
+CULPA|Responsabilidade por um erro ou dano.
+RISCO|Possibilidade de perigo; também: traço feito com lápis.
+USADO|Que já foi utilizado; que não é novo.
+ROSTO|A parte da frente da cabeça; o mesmo que cara.
+SAÍDA|Lugar por onde se sai; também: solução para um problema.
+LINDO|Muito bonito.
+PRETO|Da cor mais escura, como o carvão.
+TROCA|Ato de dar uma coisa e receber outra.
+CARGO|Função ou posto ocupado por alguém.
+DANÇA|Movimentos do corpo feitos ao ritmo da música.
+TORNO|Máquina que gira peças para moldá-las; em "em torno": ao redor.
+PADRE|Sacerdote da Igreja Católica.
+CALMA|Tranquilidade, ausência de agitação.
+QUEDA|Ato de cair.
+CUSTO|Valor que se paga por algo.
+FAIXA|Tira comprida e estreita; também: pista da rua.
+RAIVA|Sentimento forte de irritação; também: doença transmitida por mordida.
+POSSE|Fato de ter algo como seu; também: cerimônia de início num cargo.
+TOQUE|Ato de tocar; também: som de campainha ou celular.
+FERRO|Metal duro e resistente; também: aparelho de passar roupa.
+HONRA|Dignidade, reputação de quem age com retidão.
+VINHO|Bebida feita da fermentação da uva.
+JUSTO|Que age com justiça; também: apertado.
+UNIDO|Que está junto, ligado; que vive em harmonia.
+BLOCO|Pedaço sólido e grande; também: grupo de carnaval.
+CARGA|Aquilo que é transportado; também: energia de uma bateria.
+PASSE|Ato de passar a bola a um colega; também: bilhete de transporte.
+PONTA|Extremidade fina de algo.
+BARRA|Peça comprida e rígida; também: sinal gráfico (/).
+BOMBA|Artefato que explode; também: aparelho que puxa líquidos.
+LANÇA|Arma de haste longa com ponta afiada.
+DROGA|Substância que altera o organismo; também: coisa ruim.
+TURMA|Grupo de alunos ou de amigos.
+REGRA|Norma que diz como algo deve ser feito.
+PEITO|Parte da frente do tronco, entre o pescoço e a barriga.
+PRIMO|Filho do tio ou da tia.
+VAZIO|Que não tem nada dentro.
+EXTRA|Que vem a mais, além do normal.
+FALHA|Erro, defeito; também: rachadura.
+RITMO|Repetição regular de sons ou movimentos.
+ÁRABE|Dos povos ou da língua da Arábia e do Oriente Médio.
+LANCE|Jogada; também: oferta num leilão.
+BORDO|Lado do navio; "a bordo": dentro de um veículo.
+MORRO|Elevação de terra menor que uma montanha.
+BOLSO|Pequeno saco costurado na roupa para guardar objetos.
+ATIVO|Que age, que está em atividade.
+COBRE|Metal avermelhado, bom condutor de eletricidade.
+PARTO|Momento em que a mãe dá à luz.
+SALVO|Livre de perigo; também: exceto.
+FICHA|Cartão com informações; também: peça usada em jogos.
+PORTE|Tamanho, estatura; também: autorização para levar algo.
+LARGO|Que tem grande largura; também: pequena praça.
+BANDO|Grupo de pessoas ou de animais.
+AMADO|Que é objeto de amor.
+MULTA|Pena em dinheiro por desrespeitar uma regra.
+PESCA|Ato de pegar peixes.
+ABUSO|Uso exagerado ou errado de algo.
+GREGO|Da Grécia, seu povo ou sua língua.
+CORDA|Fios trançados usados para amarrar; também: fio de instrumento.
+GRANA|Dinheiro (popular).
+PAUTA|Lista de assuntos de uma reunião; também: linhas da partitura.
+BARBA|Pelos que crescem no rosto, no queixo e nas bochechas.
+USINA|Instalação industrial, como a que produz energia ou açúcar.
+PRAGA|Animal ou planta que causa estragos; também: maldição.
+TRAMA|Enredo de uma história; também: entrelaçado de fios.
+PAUSA|Interrupção breve.
+BACIA|Recipiente largo e raso; também: ossos do quadril.
+CURVA|Linha ou trecho que muda de direção.
+TRONO|Assento de um rei ou rainha.
+SIGLA|Palavra formada pelas iniciais de outras, como ONU.
+SOLTO|Livre, que não está preso.
+PACTO|Acordo firmado entre partes.
+BESTA|Animal de carga; também: pessoa tola.
+CERCO|Ato de cercar um lugar ou alguém.
+ENVIO|Ato de mandar algo para alguém.
+FOLGA|Dia de descanso; também: espaço sobrando.
+PALMA|A parte interna da mão; também: folha de palmeira.
+TERÇO|Cada uma das três partes iguais de um todo; também: rosário.
+GRIPE|Doença causada por vírus, com febre e tosse.
+SALDO|Valor que resta numa conta.
+TURCO|Da Turquia, seu povo ou sua língua.
+CALMO|Tranquilo, sem agitação.
+TRIGO|Cereal usado para fazer farinha e pão.
+SOBRA|O que resta, o que fica a mais.
+GOLFO|Grande entrada do mar na terra.
+NOIVO|Quem vai se casar.
+POSTE|Coluna que sustenta fios e lâmpadas na rua.
+FLORA|Conjunto das plantas de uma região.
+PERSA|Da antiga Pérsia; também: raça de gato de pelo longo.
+TROCO|Dinheiro devolvido quando se paga a mais.
+CHUTE|Pancada com o pé; também: palpite sem certeza.
+TOURO|Macho da vaca, forte e com chifres.
+TAMPA|Peça que fecha a abertura de um recipiente.
+FAUNA|Conjunto dos animais de uma região.
+RUÍDO|Som, geralmente barulho desagradável.
+RONDA|Percurso de vigilância.
+VASTO|Muito grande, amplo.
+FIBRA|Filamento fino; também: firmeza de caráter.
+FIRMA|Empresa; também: assinatura.
+SUSTO|Medo repentino causado por algo inesperado.
+BORDA|Margem, beirada de algo.
+GOLFE|Esporte em que se leva uma bola a buracos com tacos.
+VERSO|Linha de um poema; também: lado de trás de uma folha.
+PULSO|Parte do braço junto à mão; também: batida do sangue.
+CESTA|Recipiente trançado para carregar coisas.
+PILHA|Monte de coisas umas sobre as outras; também: bateria pequena.
+SURTO|Aparecimento repentino de uma doença ou de uma crise.
+BANCA|Mesa ou barraca de venda; também: grupo de avaliadores.
+BOATE|Casa noturna para dançar.
+VERBA|Quantia de dinheiro destinada a um fim.
+ZUMBI|Morto-vivo das histórias de terror.
+CASCA|Cobertura externa de frutas, ovos e árvores.
+LENTE|Vidro curvo que aumenta ou corrige a imagem.
+BARRO|Terra misturada com água; lama.
+FÊMEA|Animal do sexo feminino.
+LEITO|Cama; também: fundo por onde corre um rio.
+URINA|Líquido eliminado pelos rins.
+TRAJE|Roupa, vestimenta.
+FARTO|Cheio, satisfeito; também: cansado de algo.
+MALHA|Tecido de fios entrelaçados; também: rede.
+TOCHA|Bastão com fogo na ponta para iluminar.
+GARRA|Unha forte e curva de alguns animais; também: determinação.
+SONDA|Instrumento para explorar ou medir algo.
+SUECO|Da Suécia, seu povo ou sua língua.
+TERNO|Conjunto de paletó e calça; também: carinhoso.
+MOSCA|Inseto pequeno de duas asas.
+PANDA|Urso preto e branco da China que come bambu.
+TRAÇO|Linha ou risco; também: característica.
+BOATO|Notícia sem confirmação que se espalha.
+BELGA|Da Bélgica ou de seu povo.
+LIBRA|Moeda do Reino Unido; também: signo.
+PROSA|Texto escrito sem versos; também: conversa.
+TOSSE|Expulsão forçada de ar pelos pulmões.
+VIGIA|Pessoa que vigia um lugar.
+FRETE|Valor pago pelo transporte de algo.
+SOPRO|Ar expelido pela boca.
+TENDA|Barraca de lona; também: pequena loja.
+SURDO|Que não ouve; também: tambor de som grave.
+ÓTICA|Loja de óculos; também: ponto de vista.
+PORÃO|Parte de uma casa ou navio abaixo do piso.
+SOGRO|Pai do marido ou da esposa.
+TRAVE|Cada uma das barras do gol; também: viga.
+CASCO|Unha grossa de cavalos e bois; também: fundo do barco.
+FARRA|Festa animada, bagunça.
+DOBRA|Parte que se dobra; prega.
+PARDO|De cor entre o branco e o preto, acastanhado.
+RAPTO|Ato de levar alguém à força.
+BARCA|Embarcação larga para transportar pessoas e cargas.
+CISCO|Partícula pequena de sujeira, como a que cai no olho.
+MACIO|Suave ao toque, fofo.
+FARDO|Carga pesada; também: pacote amarrado.
+TINTO|Diz-se do vinho de cor escura.
+FRITO|Preparado em óleo quente.
+AROMA|Cheiro agradável.
+GAITA|Instrumento de sopro com palhetas.
+ZINCO|Metal usado em telhas e para proteger o ferro.
+APEGO|Ligação afetiva forte com alguém ou algo.
+SEITA|Grupo religioso separado de uma religião maior.
+BREGA|De gosto popular e exagerado; também: estilo musical.
+GESSO|Pó branco que endurece com água.
+BINGO|Jogo de sorteio de números em cartelas.
+OLIVA|Azeitona; também: cor verde-escura.
+ABATE|Ato de matar animais para consumo; também: desconto.
+FURTO|Roubo feito sem violência.
+CIFRA|Número, quantia; também: notação de acordes musicais.
+PIQUE|Brincadeira de pega-pega; também: disposição, energia.
+BRUXO|Quem pratica bruxaria, feiticeiro.
+FOSSA|Buraco para dejetos; também: tristeza profunda.
+RECUO|Ato de voltar para trás.
+TUMBA|Sepultura.
+SAFRA|Colheita de um ano.
+CASTA|Grupo social fechado; também: raça, linhagem.
+NICHO|Cavidade na parede; também: parte específica de um mercado.
+MANTA|Coberta de tecido grosso.
+GÊMEO|Cada um dos irmãos nascidos do mesmo parto.
+TROTE|Andar do cavalo; também: brincadeira com calouros.
+TOMBO|Queda.
+GÍRIA|Palavra ou expressão informal de um grupo.
+MILHA|Medida de distância de cerca de 1,6 km.
+CINTA|Faixa que aperta a cintura.
+ARARA|Ave grande e colorida, parente do papagaio.
+JANTA|Jantar, a refeição da noite (popular).
+BANHA|Gordura de porco.
+BROCA|Ponta da furadeira; também: inseto que fura madeira.
+IRADO|Furioso; também (gíria): muito legal.
+SUADO|Coberto de suor.
+PASTO|Terreno com capim para o gado.
+MECHA|Porção de cabelos; também: pavio.
+SURFE|Esporte de deslizar nas ondas sobre uma prancha.
+RELVA|Grama baixa e fina.
+VIÚVO|Quem perdeu o cônjuge por morte.
+LEIGO|Que não é especialista em um assunto.
+DARDO|Pequena flecha lançada com a mão.
+PULGA|Inseto pequeno que pica e salta.
+HARPA|Instrumento de cordas tocado com os dedos.
+GAROA|Chuva fina e leve.
+TOSCO|Malfeito, grosseiro.
+CALVO|Que não tem cabelo, careca.
+TRUCO|Jogo de cartas muito popular no Brasil.

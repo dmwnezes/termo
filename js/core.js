@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "14"; // versão dos arquivos de conteúdo
+  const V = "17"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -15,23 +15,29 @@
   P.words = (() => {
     const acc = {};
     const list = [];
-    ANSWERS.forEach((w) => {
+    const add = (w) => {
       const n = P.norm(w);
       if (n.length === 5 && /^[A-Z]+$/.test(n) && !acc[n]) { acc[n] = w.toUpperCase(); list.push(n); }
-    });
+    };
+    ANSWERS.forEach(add);
+    const base = list.length; // palavras do sorteio antes de ANSWERS2_FROM
+    (typeof ANSWERS2 !== "undefined" ? ANSWERS2 : []).forEach(add);
     const accepted = new Set([...list, ...VALID.map(P.norm)]);
-    return { answers: list, display: (w) => acc[w] || w, ok: (w) => accepted.has(w), all: accepted };
+    const from = typeof ANSWERS2_FROM !== "undefined" ? ANSWERS2_FROM : 0;
+    return { answers: list, base, from, display: (w) => acc[w] || w, ok: (w) => accepted.has(w), all: accepted };
   })();
 
   // ---------- datas ----------
   P.dayIndex = (d = new Date()) => Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 0, 1)) / 86400000);
   P.dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const mod = (a, n) => ((a % n) + n) % n;
-  P.daily = (d = new Date()) => P.words.answers[mod(P.dayIndex(d) * 7919 + 104729, P.words.answers.length)];
+  /** Quantas palavras entram no sorteio do dia nessa data (as novas só a partir de ANSWERS2_FROM). */
+  const poolSize = (i) => (i >= P.words.from ? P.words.answers.length : P.words.base);
+  P.daily = (d = new Date()) => { const i = P.dayIndex(d); return P.words.answers[mod(i * 7919 + 104729, poolSize(i))]; };
   /** Palavras do dia para Dueto (salt 1) e Quarteto (salt 2). */
   P.dailySet = (d, count, salt) => {
     if (count === 1 && salt === 0) return [P.daily(d)];
-    const n = P.words.answers.length, i = P.dayIndex(d), out = [];
+    const i = P.dayIndex(d), n = poolSize(i), out = [];
     for (let k = 0; out.length < count; k++) {
       const w = P.words.answers[mod(i * 7919 + 104729 + salt * 3331 + k * 577, n)];
       if (!out.includes(w)) out.push(w);
@@ -201,9 +207,11 @@
         kb.querySelectorAll(".key[data-k]").forEach((b) => {
           const k = b.dataset.k; if (k.length !== 1) return;
           const m = marksFor(k);
-          b.className = "key"; b.querySelector(".seg")?.remove();
+          b.className = "key"; b.querySelector(".kseg")?.remove();
           if (m.length <= 1 || m.every((x) => !x)) { if (m.length === 1 && m[0]) b.classList.add(m[0]); return; }
-          const seg = P.h(`<div class="seg" style="grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr"></div>`);
+          // Mesma cor em todos os tabuleiros: pinta a tecla inteira (ex.: letra que não está em nenhuma palavra).
+          if (m.every((x) => x && x === m[0])) { b.classList.add(m[0]); return; }
+          const seg = P.h(`<div class="kseg" style="grid-template-columns:repeat(2,1fr);grid-auto-rows:1fr"></div>`);
           m.forEach((x) => seg.appendChild(P.h(`<i style="background:${x ? colors[x] : "var(--key)"}"></i>`)));
           b.prepend(seg);
         });

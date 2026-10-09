@@ -171,8 +171,9 @@ button { font-family: inherit; color: inherit; }
   font-weight: 600; font-size: 1.1rem; cursor: pointer; position: relative; overflow: hidden; padding: 0;
 }
 .key.wide { max-width: 76px; flex: 1.6; font-size: .75rem; }
-.key .seg { position: absolute; display: grid; inset: 0; }
-.key .seg i { display: block; }
+/* Tecla dividida (Dueto/Quarteto): uma cor por tabuleiro, ocupando a tecla inteira. */
+.key .kseg { position: absolute; display: grid; inset: 0; }
+.key .kseg i { display: block; }
 .key span { position: relative; }
 .key.c { background: var(--correct); }
 .key.p { background: var(--present); color: var(--dark-text); }

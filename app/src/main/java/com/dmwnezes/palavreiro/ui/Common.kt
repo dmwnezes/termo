@@ -227,7 +227,8 @@ private fun KeyButton(
     icon: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val single = marks.size <= 1
+    // Mesma cor em todos os tabuleiros (ex.: letra que não está em nenhuma palavra): pinta a tecla inteira.
+    val single = marks.size <= 1 || marks.all { it != null && it == marks[0] }
     val only = marks.firstOrNull()
     Box(
         modifier.height(56.dp).clip(Shapes.key).background(if (single) Night.keyMark(only) else Night.key).clickable(onClick = onClick),
