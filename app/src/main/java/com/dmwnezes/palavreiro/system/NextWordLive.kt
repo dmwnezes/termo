@@ -24,14 +24,15 @@ import java.time.temporal.ChronoUnit
 
 /**
  * "Barra do dia": contagem até a próxima palavra como notificação ao vivo (Live Update do Android 16).
- * No Samsung com One UI 8 aparece na Now Bar. Visual limpo: título "Próxima palavra", o tempo que falta
- * e uma barra que vai enchendo até a meia-noite, pintada com as cores da marca, com uma estrela no fim.
+ * No Samsung com One UI 8 aparece na Now Bar. Visual limpo: título "Nova palavra em 4h 56min" (tempo no próprio
+ * título, alinhado) e uma barra que vai enchendo até a meia-noite, pintada com as cores da marca, com uma estrela no fim.
  * Aparece depois do Termo do dia e some sozinha à meia-noite.
  */
 object NextWordLive {
     private const val CHANNEL = "proxima_palavra"
     private const val ID = 3
-    private const val TITLE = "Próxima palavra"
+    /** A barra é atualizada a cada ~5 minutos enquanto está na tela (o tempo do título acompanha). */
+    private const val TICK_MS = 5 * 60 * 1000L
     /** Minutos do dia: a barra vai de 0 (meia-noite de ontem) a 1440 (meia-noite de hoje). */
     const val DAY_MINUTES = 24 * 60
 
@@ -40,6 +41,30 @@ object NextWordLive {
 
     private const val EXTRA_REQUEST_PROMOTED_ONGOING = "android.requestPromotedOngoing"
     private const val ACTION_PROMOTED_SETTINGS = "android.settings.MANAGE_APP_PROMOTED_NOTIFICATIONS"
+
+    /**
+     * Título com o tempo que falta, no mesmo texto (alinhado): "Nova palavra em 4h 56min".
+     * O relógio automático do sistema ficava colado e desalinhado ao lado do título na Now Bar.
+     */
+    fun title(msLeft: Long): String = "Nova palavra em ${remaining(msLeft)}"
+
+    /** "4h 56min", "4h", "38 min" ou "1 min" (arredonda para cima, nunca mostra 0). */
+    fun remaining(msLeft: Long): String {
+        val total = ((msLeft + 59_999) / 60_000).coerceAtLeast(1)
+        val h = total / 60; val m = total % 60
+        return when {
+            h == 0L -> "$m min"
+            m == 0L -> "${h}h"
+            else -> "${h}h ${m}min"
+        }
+    }
+
+    /** Texto curto do chip da barra de status: "4h56", "38min". */
+    fun chip(msLeft: Long): String {
+        val total = ((msLeft + 59_999) / 60_000).coerceAtLeast(1)
+        val h = total / 60; val m = total % 60
+        return if (h == 0L) "${m}min" else "${h}h%02d".format(m)
+    }
 
     /** Minutos já passados hoje (posição da barra). */
     fun minutesElapsed(now: LocalDateTime = LocalDateTime.now()): Int =
@@ -74,7 +99,7 @@ object NextWordLive {
         val n = (if (Build.VERSION.SDK_INT >= 36) runCatching { live(context, midnight, left, elapsed, open) }.getOrNull() else null)
             ?: classic(context, midnight, left, elapsed, open)
         runCatching { nm.notify(ID, n) }
-        // A barra anda sozinha: atualiza a cada ~15 minutos enquanto estiver na tela.
+        // A barra e o tempo do título andam sozinhos: atualiza a cada ~5 minutos enquanto estiver na tela.
         scheduleTicks(context, true)
     }
 
@@ -90,15 +115,14 @@ object NextWordLive {
             .setProgressEndIcon(Icon.createWithResource(context, R.drawable.ic_live_end))
         return Notification.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(TITLE)
+            .setContentTitle(title(left))
             .setStyle(style)
             .setCategory(Notification.CATEGORY_STATUS)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setWhen(midnight)
-            .setShowWhen(true)
-            .setUsesChronometer(true)
-            .setChronometerCountDown(true)
+            .setShowWhen(false)
+            .setShortCriticalText(chip(left))
             .setTimeoutAfter(left)
             .setContentIntent(open)
             // Pedido de Live Update (Notification.EXTRA_REQUEST_PROMOTED_ONGOING).
@@ -110,22 +134,20 @@ object NextWordLive {
     private fun classic(context: Context, midnight: Long, left: Long, elapsed: Int, open: PendingIntent): Notification =
         NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(TITLE)
+            .setContentTitle(title(left))
             .setProgress(DAY_MINUTES, elapsed, false)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .setWhen(midnight)
-            .setShowWhen(true)
-            .setUsesChronometer(true)
-            .setChronometerCountDown(true)
+            .setShowWhen(false)
             .setTimeoutAfter(left)
             .setContentIntent(open)
             .addExtras(android.os.Bundle().apply { putBoolean(EXTRA_REQUEST_PROMOTED_ONGOING, true) })
             .build()
 
-    /** Liga ou desliga a atualização da barra a cada ~15 minutos (sem acordar o celular). */
+    /** Liga ou desliga a atualização da barra a cada ~5 minutos (sem acordar o celular). */
     private fun scheduleTicks(context: Context, on: Boolean) {
         val alarm = context.getSystemService(AlarmManager::class.java) ?: return
         val pi = PendingIntent.getBroadcast(
@@ -133,10 +155,8 @@ object NextWordLive {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         alarm.cancel(pi)
-        if (on) alarm.setInexactRepeating(
-            AlarmManager.RTC, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-            AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi,
-        )
+        // RTC (não acorda o celular): atualiza quando a tela está ligada, que é quando a Now Bar aparece.
+        if (on) alarm.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + TICK_MS, TICK_MS, pi)
     }
 
     /** Android 16+: abre o ajuste "notificações ao vivo" do Palavreiro (ou as notificações do app). */

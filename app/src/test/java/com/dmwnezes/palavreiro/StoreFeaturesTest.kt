@@ -103,11 +103,10 @@ class StoreFeaturesTest {
         com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
         val n = shadow.allNotifications.single()
         assertTrue(n.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0)
-        assertEquals("Próxima palavra", n.extras.getString(android.app.Notification.EXTRA_TITLE))
+        assertTrue(n.extras.getString(android.app.Notification.EXTRA_TITLE)!!.startsWith("Nova palavra em "))
         assertTrue(n.extras.getBoolean("android.requestPromotedOngoing"))
         assertEquals(com.dmwnezes.palavreiro.system.NextWordLive.DAY_MINUTES, n.extras.getInt(android.app.Notification.EXTRA_PROGRESS_MAX))
-        assertTrue(n.extras.getBoolean(android.app.Notification.EXTRA_SHOW_CHRONOMETER))
-        assertEquals(LocalDate.now().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(), n.`when`)
+        assertFalse(n.extras.getBoolean(android.app.Notification.EXTRA_SHOW_CHRONOMETER))
         // Desligando, some.
         store.liveCountdown = false
         com.dmwnezes.palavreiro.system.NextWordLive.update(app, store)
@@ -120,6 +119,12 @@ class StoreFeaturesTest {
         assertEquals(0, m.minutesElapsed(java.time.LocalDateTime.of(2026, 10, 9, 0, 0)))
         assertEquals(18 * 60 + 35, m.minutesElapsed(java.time.LocalDateTime.of(2026, 10, 9, 18, 35)))
         assertEquals(5, m.SEGMENT_COLORS.size)
+        assertEquals("4h 56min", m.remaining((4 * 60 + 55) * 60_000L + 30_000))
+        assertEquals("5h", m.remaining(5 * 3_600_000L))
+        assertEquals("38 min", m.remaining(38 * 60_000L))
+        assertEquals("1 min", m.remaining(5_000))
+        assertEquals("Nova palavra em 2h 5min", m.title((2 * 60 + 5) * 60_000L))
+        assertEquals("4h56", m.chip((4 * 60 + 56) * 60_000L)); assertEquals("38min", m.chip(38 * 60_000L))
         assertEquals(0, m.DAY_MINUTES % m.SEGMENT_COLORS.size)
     }
 
