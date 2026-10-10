@@ -82,4 +82,41 @@ class MultiFlowTest {
         Thread.sleep(4000); rule.waitForIdle()
         rule.waitUntil(15_000) { rule.onAllNodes(hasText("jogando · 1/9")).fetchSemanticsNodes().isNotEmpty() }
     }
+
+    /** Melhor de 3: o anfitrião (de mentira) vence duas rodadas e o troféu vai para ele. */
+    @Test
+    fun serieComTrofeu() {
+        assumeTrue(System.getenv("PV_LIVE") == "1")
+        val ntfy = Ntfy(OkHttpClient())
+        val room = Multi.newRoom('t')
+        runBlocking { ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("host0001", "Daniel", true))) }
+        Thread.sleep(1500)
+        val host = Thread {
+            runBlocking {
+                kotlinx.coroutines.withTimeout(60_000) {
+                    ntfy.events(room.topic).collect { e ->
+                        if (e is Ntfy.Event.Message) {
+                            val m = Multi.decode(e.text)
+                            if (m is Multi.Msg.Hello && !m.host) {
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.Start(System.currentTimeMillis(), m.id)))
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.End("host0001", true, 3, 30000)))
+                                kotlinx.coroutines.delay(4000)
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.Again(Multi.newSeed(), System.currentTimeMillis())))
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.End("host0001", true, 2, 20000)))
+                                throw kotlinx.coroutines.CancellationException("ok")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}, joinCode = room.code) } }
+        rule.waitUntil(20_000) { rule.onAllNodes(hasText("Daniel te chamou", substring = true)).fetchSemanticsNodes().isNotEmpty() }
+        host.start()
+        rule.onNodeWithText("Seu nome").performTextInput("Convidado")
+        rule.onNodeWithText("Entrar").performClick()
+        rule.waitUntil(30_000) { rule.onAllNodes(hasText("0 × 1")).fetchSemanticsNodes().isNotEmpty() }
+        rule.waitUntil(30_000) { rule.onAllNodes(hasText("Daniel levou a série")).fetchSemanticsNodes().isNotEmpty() }
+        rule.onAllNodes(hasText("Melhor de 3 · 0 × 2")).fetchSemanticsNodes().let { assert(it.isNotEmpty()) }
+    }
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -110,10 +111,14 @@ fun MultiScreen(
     var showEnd by remember { mutableStateOf(false) }
     var replayTrigger by remember { mutableIntStateOf(0) }
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    // Melhor de 3: placar da série e a última rodada já contada nele.
+    var series by remember { mutableStateOf(Multi.Series()) }
+    var scoredRound by remember { mutableIntStateOf(-1) }
 
     fun send(m: Msg) { val r = room ?: return; scope.launch { ntfy.publish(r.topic, Multi.encode(m)) } }
 
-    fun beginRound(at: Long) {
+    fun beginRound(at: Long, newSeries: Boolean) {
+        if (newSeries) series = Multi.Series()
         val t = System.currentTimeMillis()
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
         oppRows.clear(); ends.clear(); showEnd = false
@@ -132,13 +137,18 @@ fun MultiScreen(
                 }
             }
             is Msg.Start -> when {
-                isHost && m.guest == oppId -> beginRound(m.at)
-                !isHost && m.guest == myId -> beginRound(m.at)
+                isHost && m.guest == oppId -> beginRound(m.at, true)
+                !isHost && m.guest == myId -> beginRound(m.at, true)
                 !isHost -> { startedOthers = true; if (phase == Phase.WAIT_START || phase == Phase.JOIN) phase = Phase.FULL }
             }
             is Msg.Row -> if (m.id == oppId && phase == Phase.PLAYING && m.row == oppRows.size) oppRows.add(m.marks)
-            is Msg.End -> if (phase == Phase.PLAYING && (m.id == myId || m.id == oppId) && ends.none { it.id == m.id }) ends.add(m)
-            is Msg.Again -> if (phase == Phase.PLAYING) { room = room?.withSeed(m.seed); oppLeft = false; beginRound(m.at) }
+            is Msg.End -> if (phase == Phase.PLAYING && (m.id == myId || m.id == oppId) && ends.none { it.id == m.id }) {
+                ends.add(m)
+                val o = Multi.outcome(ends, myId, oppId, oppLeft)
+                if (o != null && scoredRound != round) { scoredRound = round; series = series.plus(o) }
+            }
+            // Série acabada + revanche de um app antigo (sem "s") também zera o placar.
+            is Msg.Again -> if (phase == Phase.PLAYING) { room = room?.withSeed(m.seed); oppLeft = false; beginRound(m.at, m.newSeries || series.over) }
             is Msg.Bye -> if (m.id == oppId) oppLeft = true
         }
     }
@@ -167,7 +177,7 @@ fun MultiScreen(
     Box(Modifier.fillMaxSize().background(Night.background)) {
         when (phase) {
             Phase.CREATE -> Lobby("Jogar com amigo", onBack) {
-                Text("Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras.", color = Night.muted, fontSize = 15.sp)
+                Text("Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(16.dp))
@@ -235,7 +245,17 @@ fun MultiScreen(
                         context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Palavreiro", r.link))
                     }
                 }
-                Spacer(Modifier.height(28.dp))
+                Spacer(Modifier.height(20.dp))
+                // QR da sala: o amigo do lado entra só apontando a câmera.
+                Column(
+                    Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    QrCode(r.link, Modifier.size(196.dp))
+                    Spacer(Modifier.height(10.dp))
+                    Text("Amigo do lado? Ele aponta a câmera aqui e entra.", color = Night.muted, fontSize = 14.sp, textAlign = TextAlign.Center)
+                }
+                Spacer(Modifier.height(24.dp))
                 WaitingDots(if (oppName != null) "${oppName} entrou!" else "Esperando seu amigo entrar")
                 if (!online) { Spacer(Modifier.height(10.dp)); Text("Reconectando…", color = Night.muted, fontSize = 13.sp) }
             }
@@ -246,7 +266,7 @@ fun MultiScreen(
                     color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold,
                 )
                 Spacer(Modifier.height(8.dp))
-                Text("Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras.", color = Night.muted, fontSize = 15.sp)
+                Text("Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(20.dp))
@@ -308,6 +328,7 @@ fun MultiScreen(
                         meanings = meanings,
                         multiplayer = true,
                         titleOverride = "Você × ${oppName ?: "amigo"}",
+                        titleTrailing = { SeriesPill(series) },
                         header = {
                             OpponentStrip(
                                 name = oppName ?: "Amigo", boards = boards, maxTries = mode.maxTries, rows = oppRows,
@@ -328,8 +349,8 @@ fun MultiScreen(
                     EndSheet(
                         outcome = outcome, oppName = oppName ?: "Amigo", game = game,
                         mine = ends.firstOrNull { it.id == myId }, theirs = ends.firstOrNull { it.id == oppId },
-                        isHost = isHost, meanings = meanings,
-                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis())) },
+                        isHost = isHost, meanings = meanings, series = series,
+                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis(), newSeries = series.over)) },
                         onReplay = { showEnd = false; replayTrigger++ },
                         onLeave = onBack,
                         onClose = { showEnd = false },
@@ -431,16 +452,33 @@ internal fun OpponentStrip(name: String, boards: Int, maxTries: Int, rows: List<
 }
 
 @Composable
-private fun EndSheet(
+internal fun EndSheet(
     outcome: String, oppName: String, game: TermoGame, mine: Msg.End?, theirs: Msg.End?, isHost: Boolean,
-    meanings: Map<String, String>, onAgain: () -> Unit, onReplay: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
+    meanings: Map<String, String>, series: Multi.Series, onAgain: () -> Unit, onReplay: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
-        SheetTitle(
-            when (outcome) { "me" -> "Você venceu! 🏆"; "opp" -> "$oppName venceu"; else -> "Empate" },
-            (if (game.boards > 1) "As palavras eram " else "A palavra era ") + game.answerDisplay(),
-        )
+        val words = (if (game.boards > 1) "As palavras eram " else "A palavra era ") + game.answerDisplay()
+        val champ = series.winner
+        if (champ != null) {
+            // Fim da série: troféu para quem levou.
+            Trophy(if (champ == "me") "Você levou a série!" else "$oppName levou a série", "Melhor de 3 · ${series.score}", champ == "me")
+            Spacer(Modifier.height(10.dp))
+            Text(
+                when (outcome) { "me" -> "Você venceu a última rodada. "; "opp" -> "$oppName venceu a última rodada. "; else -> "" } + words,
+                color = Night.muted, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            SheetTitle(
+                when (outcome) { "me" -> "Você venceu a rodada!"; "opp" -> "$oppName venceu a rodada"; else -> "Empate" },
+                words,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Série: Você ${series.score} $oppName · melhor de 3",
+                color = Night.accent, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+            )
+        }
         Spacer(Modifier.height(16.dp))
         fun line(e: Msg.End?) = when {
             e == null -> "ainda jogando"
@@ -451,14 +489,20 @@ private fun EndSheet(
         ResultLine(oppName, line(theirs), outcome == "opp")
         Spacer(Modifier.height(18.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (isHost) PillButton("Revanche", Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
+            if (isHost) PillButton(if (champ != null) "Nova série" else "Próxima rodada", Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
             else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
             PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.6f), onClick = onLeave)
         }
         Spacer(Modifier.height(10.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             PillButton("Compartilhar", Night.accent, modifier = Modifier.weight(1f)) {
-                val res = when (outcome) { "me" -> "Venci em ${mine?.tries ?: game.rows.size} tentativas ⚔️"; "opp" -> "Perdi ⚔️"; else -> "Empate ⚔️" }
+                val res = when {
+                    champ == "me" -> "Levei a série por ${series.score} 🏆"
+                    champ == "opp" -> "Perdi a série por ${series.opp} × ${series.me} ⚔️"
+                    outcome == "me" -> "Venci em ${mine?.tries ?: game.rows.size} tentativas ⚔️ (série ${series.score})"
+                    outcome == "opp" -> "Perdi ⚔️ (série ${series.score})"
+                    else -> "Empate ⚔️ (série ${series.score})"
+                }
                 context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, "Palavreiro · Partida com $oppName\n$res"), "Compartilhar"))
             }
             PillButton("▶ Replay", Night.surfaceHigh, Night.text, Modifier.weight(0.8f), onClick = onReplay)
@@ -479,3 +523,30 @@ private fun ResultLine(who: String, text: String, winner: Boolean) {
 }
 
 private fun formatMs(ms: Long): String { val s = (ms / 1000).coerceAtLeast(0); return "%d:%02d".format(s / 60, s % 60) }
+
+/** Placar da série ao lado do título: "1 × 0", dourado quando alguém leva. */
+@Composable
+internal fun SeriesPill(series: Multi.Series) {
+    val gold = Color(0xFFF5C84C)
+    Column(
+        Modifier.padding(end = 10.dp).clip(Shapes.pill).background(if (series.over) gold.copy(alpha = 0.2f) else Night.surfaceHigh)
+            .padding(horizontal = 12.dp, vertical = 3.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text((if (series.over) "🏆 " else "") + series.score, color = if (series.over) gold else Night.text, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+        Text("melhor de 3", color = Night.muted, fontSize = 9.sp, lineHeight = 10.sp)
+    }
+}
+
+/** Troféu do fim da série, com um leve balanço. */
+@Composable
+private fun Trophy(title: String, subtitle: String, mine: Boolean) {
+    val t = rememberInfiniteTransition(label = "trofeu")
+    val s by t.animateFloat(0.94f, 1.06f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "s")
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("🏆", fontSize = 64.sp, modifier = Modifier.graphicsLayer { scaleX = s; scaleY = s; alpha = if (mine) 1f else 0.75f })
+        Spacer(Modifier.height(6.dp))
+        Text(title, color = Night.text, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+        Text(subtitle, color = Color(0xFFF5C84C), fontSize = 17.sp, fontWeight = FontWeight.Bold)
+    }
+}

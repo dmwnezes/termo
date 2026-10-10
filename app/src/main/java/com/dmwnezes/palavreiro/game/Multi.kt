@@ -76,7 +76,8 @@ object Multi {
         data class Start(val at: Long, val guest: String) : Msg
         data class Row(val id: String, val row: Int, val marks: String) : Msg
         data class End(val id: String, val won: Boolean, val tries: Int, val ms: Long) : Msg
-        data class Again(val seed: Long, val at: Long) : Msg
+        /** [newSeries] = começa uma série nova (placar volta a 0 × 0). */
+        data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false) : Msg
         data class Bye(val id: String) : Msg
     }
 
@@ -85,7 +86,7 @@ object Multi {
         is Msg.Start -> JSONObject().put("t", "start").put("at", m.at).put("g", m.guest)
         is Msg.Row -> JSONObject().put("t", "row").put("id", m.id).put("r", m.row).put("m", m.marks)
         is Msg.End -> JSONObject().put("t", "end").put("id", m.id).put("won", m.won).put("tries", m.tries).put("ms", m.ms)
-        is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at)
+        is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at).apply { if (m.newSeries) put("s", 1) }
         is Msg.Bye -> JSONObject().put("t", "bye").put("id", m.id)
     }.toString()
 
@@ -96,7 +97,7 @@ object Multi {
             "start" -> Msg.Start(o.getLong("at"), o.optString("g"))
             "row" -> Msg.Row(o.getString("id"), o.getInt("r"), o.getString("m"))
             "end" -> Msg.End(o.getString("id"), o.getBoolean("won"), o.optInt("tries"), o.optLong("ms"))
-            "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"))
+            "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1)
             "bye" -> Msg.Bye(o.getString("id"))
             else -> null
         }
@@ -118,5 +119,18 @@ object Multi {
             mine && oppLeft -> "draw"           // eu errei e o outro saiu sem terminar
             else -> null
         }
+    }
+
+    // ---------- melhor de 3 ----------
+    /** Vitórias para levar a série (melhor de 3; empates não contam). */
+    const val SERIES_WINS = 2
+
+    /** Placar da série: soma o resultado de cada rodada; quem chegar a 2 leva o troféu. */
+    data class Series(val me: Int = 0, val opp: Int = 0) {
+        val over: Boolean get() = me >= SERIES_WINS || opp >= SERIES_WINS
+        /** "me", "opp" ou null enquanto a série continua. */
+        val winner: String? get() = when { me >= SERIES_WINS -> "me"; opp >= SERIES_WINS -> "opp"; else -> null }
+        val score: String get() = "$me × $opp"
+        fun plus(outcome: String?): Series = if (over) this else when (outcome) { "me" -> copy(me = me + 1); "opp" -> copy(opp = opp + 1); else -> this }
     }
 }

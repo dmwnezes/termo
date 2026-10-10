@@ -75,6 +75,8 @@ fun GameScreen(
     /** Partida com amigo: sem dicas e sem a folha de resultado própria (a tela da partida mostra a dela). */
     multiplayer: Boolean = false,
     titleOverride: String? = null,
+    /** Algo ao lado do título (placar da série na partida com amigo). */
+    titleTrailing: (@Composable () -> Unit)? = null,
     /** Conteúdo acima do tabuleiro (faixa do adversário na partida com amigo). */
     header: (@Composable () -> Unit)? = null,
     /** false bloqueia o teclado (contagem 3-2-1 ou partida decidida). */
@@ -170,7 +172,8 @@ fun GameScreen(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar(title = title, onBack = onBack, onHelp = onHelp, trailing = {
+            TopBar(title = title, onBack = onBack, onHelp = if (multiplayer) null else onHelp, trailing = {
+                titleTrailing?.invoke()
                 if (game.hard) {
                     Text("DIFÍCIL", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Night.red,
                         modifier = Modifier.clip(Shapes.pill).background(Night.red.copy(alpha = 0.15f)).padding(horizontal = 8.dp, vertical = 3.dp))

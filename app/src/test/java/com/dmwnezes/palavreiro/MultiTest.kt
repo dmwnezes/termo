@@ -70,6 +70,34 @@ class MultiTest {
     }
 
     @Test
+    fun melhorDeTres() {
+        var s = Multi.Series()
+        s = s.plus("me"); assertEquals("1 × 0", s.score); assertFalse(s.over)
+        s = s.plus("draw"); assertEquals("1 × 0", s.score)
+        s = s.plus("opp"); assertEquals("1 × 1", s.score); assertNull(s.winner)
+        s = s.plus("me"); assertTrue(s.over); assertEquals("me", s.winner); assertEquals("2 × 1", s.score)
+        assertEquals("2 × 1", s.plus("opp").score) // depois de acabar, não conta mais
+        // "again" com série nova leva "s":1; sem ele continua a série. Apps antigos ignoram o campo.
+        val novo = Multi.encode(Msg.Again(99, 5, newSeries = true))
+        assertTrue(novo.contains("\"s\":1"))
+        assertEquals(Msg.Again(99, 5, true), Multi.decode(novo))
+        assertEquals(Msg.Again(99, 5, false), Multi.decode("""{"t":"again","seed":"2r","at":5}"""))
+    }
+
+    @Test
+    fun qrDoLink() {
+        val link = Multi.newRoom('d').link
+        val m = com.dmwnezes.palavreiro.ui.qrMatrix(link)
+        // Lê de volta com o leitor do ZXing (com margem branca, como na tela).
+        val q = 4; val border = 4 * q; val w = m.width * q + 2 * border
+        val px = IntArray(w * w) { -1 }
+        for (y in 0 until m.height) for (x in 0 until m.width) if (m[x, y])
+            for (dy in 0 until q) for (dx in 0 until q) px[(border + y * q + dy) * w + border + x * q + dx] = 0xFF000000.toInt()
+        val bmp = com.google.zxing.BinaryBitmap(com.google.zxing.common.HybridBinarizer(com.google.zxing.RGBLuminanceSource(w, w, px)))
+        assertEquals(link, com.google.zxing.qrcode.QRCodeReader().decode(bmp).text)
+    }
+
+    @Test
     fun marcasSemLetras() {
         val ans = Multi.words(words.answers, 42, 2)
         val g = TermoGame(Mode.DUETO, words, store = null, fixed = ans)

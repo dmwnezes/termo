@@ -22,6 +22,8 @@ import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.game.ConnectionsData
 import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performClick
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -207,6 +209,49 @@ class ScreensRenderTest {
             }
         }
         save("28-amigo-partida")
+    }
+
+    @Test
+    fun amigoSalaComQr() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
+        rule.onNode(androidx.compose.ui.test.hasText("Seu nome")).performTextInput("Daniel")
+        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performClick()
+        save("31-amigo-sala-qr")
+    }
+
+    @Test
+    fun amigoSerie() {
+        rule.mainClock.autoAdvance = false
+        val ans = com.dmwnezes.palavreiro.game.Multi.words(words.answers, 77, 1)
+        val g = TermoGame(Mode.DIARIO, words, store = null, fixed = ans)
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        ans[0].forEach(g::type); g.submit(); g.finishReveal()
+        val series = com.dmwnezes.palavreiro.game.Multi.Series(1, 0)
+        rule.setContent {
+            PalavreiroTheme {
+                GameScreen(g, null, {}, {}, {}, multiplayer = true, titleOverride = "Você × Ana",
+                    titleTrailing = { com.dmwnezes.palavreiro.ui.SeriesPill(series) })
+            }
+        }
+        save("32-amigo-serie-placar")
+    }
+
+    @Test
+    fun amigoTrofeu() {
+        rule.mainClock.autoAdvance = false
+        val ans = com.dmwnezes.palavreiro.game.Multi.words(words.answers, 77, 1)
+        val g = TermoGame(Mode.DIARIO, words, store = null, fixed = ans)
+        ans[0].forEach(g::type); g.submit(); g.finishReveal()
+        rule.setContent {
+            PalavreiroTheme {
+                com.dmwnezes.palavreiro.ui.EndSheet(
+                    "me", "Ana", g, com.dmwnezes.palavreiro.game.Multi.Msg.End("a", true, 1, 41000), com.dmwnezes.palavreiro.game.Multi.Msg.End("b", false, 6, 90000), true, emptyMap(),
+                    com.dmwnezes.palavreiro.game.Multi.Series(2, 1), {}, {}, {}, {},
+                )
+            }
+        }
+        save("33-amigo-trofeu")
     }
 
     @Test

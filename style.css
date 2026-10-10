@@ -488,3 +488,19 @@ button { font-family: inherit; color: inherit; }
 .mp-or::before, .mp-or::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--outline, #4A4180) 60%, transparent); }
 .mp-err { color: var(--red); font-size: .85rem; margin: 6px 0 0; }
 .mp-err.hidden { display: none; }
+
+/* Melhor de 3 e QR da sala */
+.mp-score { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; padding: 4px 12px; border-radius: 999px; background: var(--surface-high, rgba(255,255,255,.08)); margin-right: 4px; flex: none; }
+.mp-score b { font-size: 1.05rem; font-weight: 800; white-space: nowrap; }
+.mp-score small { font-size: .58rem; color: var(--muted); white-space: nowrap; }
+.mp-score.over { background: rgba(245,200,76,.2); }
+.mp-score.over b { color: #F5C84C; }
+.mp-series { text-align: center; color: var(--accent); font-weight: 600; margin: 6px 0 0; }
+.mp-series.gold { color: #F5C84C; font-weight: 700; font-size: 1.05rem; margin: 2px 0 6px; }
+.mp-trophy { font-size: 4rem; text-align: center; line-height: 1.1; animation: mp-trophy .7s ease-in-out infinite alternate; }
+.mp-trophy.theirs { opacity: .75; }
+@keyframes mp-trophy { from { transform: scale(.94) rotate(-4deg); } to { transform: scale(1.06) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .mp-trophy { animation: none; } }
+.mp-qr { margin: 16px 0 4px; padding: 16px; border-radius: 22px; background: var(--bg-bottom); text-align: center; }
+.mp-qr svg { width: min(200px, 60vw); height: auto; border-radius: 12px; display: block; margin: 0 auto; }
+.mp-qr p { margin: 10px 0 0; color: var(--muted); font-size: .9rem; }

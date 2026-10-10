@@ -120,7 +120,7 @@
     const title = () => mp ? mp.title : g.arch ? `${g.mode.title} · ${P.shortDay(g.arch)}` : MODES[base].title;
     root.innerHTML = P.topbar(`<span data-title>${title()}</span>`, {
       help: true,
-      extra: `<span class="badge hidden" data-hard>DIFÍCIL</span><button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
+      extra: (mp && mp.extra ? mp.extra : "") + `<span class="badge hidden" data-hard>DIFÍCIL</span><button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
     }) + (hasSwitch ? P.modeSwitch(g.free) : "") + `<div class="game">${mp ? `<div class="opp" data-opp></div>` : ""}<div class="boards"><div class="boards-grid"></div></div><div class="center" data-after></div></div>`;
     if (hasSwitch) P.bindModeSwitch(root, showTab);
     const grid = P.$(".boards-grid", root);

@@ -40,6 +40,7 @@
     P.fx.muted = false;
   }
   P.mp.leave = leave;
+  P.mp.current = () => S;
   window.addEventListener("pagehide", () => leave(true));
 
   // ---------- transporte ----------
@@ -114,7 +115,8 @@
     leave(false);
     S = { room, m, seed, mode: MODES[m], topic: "palavreiro-mp-" + room, me: { id: randStr(8), name, host }, root,
       hostHello: null, guestHello: null, started: false, startSent: false, joined: false, full: false, oppLeft: false,
-      seen: new Set(), lastId: null, es: null, closed: false, queue: Promise.resolve(), round: null, view: null };
+      seen: new Set(), lastId: null, es: null, closed: false, queue: Promise.resolve(), round: null, view: null,
+      series: { me: 0, opp: 0 } };
     return S;
   }
   const opp = (s) => (s.me.host ? s.guestHello : s.hostHello);
@@ -135,12 +137,15 @@
     } else if (m.t === "start") {
       s.started = true;
       if (!s.me.host && (!s.joined || m.g !== s.me.id)) { if (s.joined) markFull(s); else if (s.view === "join") joinText(s); return; }
+      s.series = { me: 0, opp: 0 };
       beginRound(s, +m.at || Date.now(), live);
     } else if (m.t === "again") {
       if (!s.round) return;
       const seed = parseInt(String(m.seed || ""), 36);
       if (!(seed >= 0 && seed <= 2147483646)) return;
       s.seed = seed;
+      // "s":1 = série nova (o placar volta a 0 × 0). Série já decidida também recomeça.
+      if (m.s === 1 || seriesOver(s)) s.series = { me: 0, opp: 0 };
       beginRound(s, +m.at || Date.now(), live);
     } else if (m.t === "row") {
       const r = s.round, o = opp(s);
@@ -194,7 +199,7 @@
     body.innerHTML = `<div class="mp-card">
         ${duoIcon}
         <h2>Partida ao vivo</h2>
-        <p class="muted mp-lead">Vocês recebem as mesmas palavras. Quem acertar primeiro ganha.</p>
+        <p class="muted mp-lead">Vocês recebem as mesmas palavras. Quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆</p>
         ${nameField()}
         <div class="mp-field"><span>Modo</span><div class="seg mp-modes">${Object.entries(MODES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? "on" : ""}">${v.name}</button>`).join("")}</div></div>
         <button class="pill wide" data-create>Criar partida</button>
@@ -248,6 +253,7 @@
         <h2>Mande o link para seu amigo</h2>
         <div class="mp-link" data-link>${P.esc(link)}</div>
         <div class="row-btns"><button class="pill" data-share>Compartilhar</button><button class="pill ghost" data-copy>Copiar link</button></div>
+        ${qrBlock(link)}
         <div class="mp-wait" data-wait><div class="mark small bounce"><span></span><span></span><span></span><span></span><span></span></div><p>Esperando seu amigo entrar…</p></div>
       </div>`;
     P.$("[data-share]", body).onclick = () => P.share(`Bora jogar ${s.mode.name} comigo no Palavreiro? Quem acertar primeiro ganha: ${link}`);
@@ -256,6 +262,16 @@
       catch (_) { const r = document.createRange(); r.selectNodeContents(P.$("[data-link]", body)); getSelection().removeAllRanges(); getSelection().addRange(r); P.toast("Selecione e copie o link"); }
     };
   }
+  /** QR da sala: o amigo do lado entra só apontando a câmera. */
+  function qrSvg(text) {
+    if (typeof qrcode !== "function") return "";
+    const q = qrcode(0, "M"); q.addData(text); q.make();
+    const n = q.getModuleCount(); let d = "";
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) d += `M${x} ${y}h1v1h-1z`;
+    return `<svg viewBox="-3 -3 ${n + 6} ${n + 6}" shape-rendering="crispEdges" role="img" aria-label="QR code do link da partida"><rect x="-3" y="-3" width="${n + 6}" height="${n + 6}" fill="#fff"/><path d="${d}" fill="#14102C"/></svg>`;
+  }
+  const qrBlock = (link) => { const svg = qrSvg(link); return svg ? `<div class="mp-qr" data-qr>${svg}<p>Amigo do lado? Ele aponta a câmera aqui e entra.</p></div>` : ""; };
+
   function waitingJoined(s) {
     const w = s.view === "wait" && P.$("[data-wait]", s.root);
     if (w) { w.classList.add("joined"); w.innerHTML = `<div class="mp-big">🎉</div><p><b>${P.esc(s.guestHello.name)}</b> entrou!</p>`; P.fx.win(); }
@@ -273,7 +289,7 @@
     body.innerHTML = `<div class="mp-card">
         ${duoIcon}
         <h2 data-invite>Você foi chamado para um ${s.mode.name}</h2>
-        <p class="muted mp-lead">Partida ao vivo: quem acertar primeiro ganha.</p>
+        <p class="muted mp-lead">Partida ao vivo: quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆</p>
         ${nameField()}
         <button class="pill wide" data-join>Entrar</button>
       </div>`;
@@ -320,6 +336,7 @@
       mp: {
         mode: s.mode.key, answers: r.answers,
         title: `Você × ${o ? o.name : "Amigo"}`,
+        extra: `<span class="mp-score" data-score></span>`,
         locked: () => Date.now() < r.startAt || !!r.result,
         mount: (el) => { r.strip = el; drawStrip(s); },
         onRow: (row, marks) => { if (S === s && s.round === r) publish({ t: "row", id: s.me.id, r: row, m: marks }); },
@@ -333,7 +350,20 @@
         showResult: () => resultSheet(s, r),
       },
     });
+    drawScore(s);
     countdown(s, r);
+  }
+
+  // ---------- melhor de 3 ----------
+  const WINS = 2;
+  const seriesOver = (s) => s.series.me >= WINS || s.series.opp >= WINS;
+  const seriesWinner = (s) => (s.series.me >= WINS ? "me" : s.series.opp >= WINS ? "opp" : null);
+  const score = (s) => `${s.series.me} × ${s.series.opp}`;
+  /** Placar da série no topo, ao lado do título. */
+  function drawScore(s) {
+    const el = s.root && P.$("[data-score]", s.root); if (!el) return;
+    el.classList.toggle("over", seriesOver(s));
+    el.innerHTML = `<b>${seriesOver(s) ? "🏆 " : ""}${score(s)}</b><small>melhor de 3</small>`;
   }
 
   function countdown(s, r) {
@@ -403,6 +433,8 @@
     }
     if (!res) return;
     r.result = res;
+    if (!seriesOver(s)) { if (res === "me") s.series.me++; else if (res === "opp") s.series.opp++; }
+    drawScore(s);
     P.store.add("mp-played"); if (res === "me") P.store.add("mp-won");
     P.logActivity();
     const g = r.api && r.api.game;
@@ -417,19 +449,28 @@
     document.querySelectorAll(".overlay").forEach((x) => x.remove());
     const o = opp(s), oname = o ? o.name : "Amigo";
     const mine = r.ends.find((e) => e.id === s.me.id), theirs = o && r.ends.find((e) => e.id === o.id);
-    const head = r.result === "me" ? "Você venceu! 🏆" : r.result === "opp" ? `${P.esc(oname)} venceu` : "Empate";
+    const champ = seriesWinner(s);
+    const words = `${r.answers.length > 1 ? "As palavras eram" : "A palavra era"} ${r.answers.map(P.words.display).join(", ")}`;
+    const head = champ
+      ? `<div class="mp-trophy${champ === "me" ? "" : " theirs"}" aria-hidden="true">🏆</div><h2>${champ === "me" ? "Você levou a série!" : `${P.esc(oname)} levou a série`}</h2>
+         <p class="mp-series gold">Melhor de 3 · ${score(s)}</p>
+         <p class="subtitle">${r.result === "me" ? "Você venceu a última rodada. " : r.result === "opp" ? `${P.esc(oname)} venceu a última rodada. ` : ""}${words}</p>`
+      : `<h2>${r.result === "me" ? "Você venceu a rodada!" : r.result === "opp" ? `${P.esc(oname)} venceu a rodada` : "Empate"}</h2>
+         <p class="subtitle">${words}</p>
+         <p class="mp-series">Série: Você ${score(s)} ${P.esc(oname)} · melhor de 3</p>`;
     const line = (who, e, left) => {
       const res = e ? (e.won ? triesTxt(e.tries) : "errou") : left ? "saiu" : "não terminou";
       return `<div class="mp-res${e && e.won ? " ok" : ""}"><b>${who}</b><span>${res}</span><small>${e ? clockFmt(e.ms) : "–"}</small></div>`;
     };
-    const ui = P.sheet(`<h2>${head}</h2>
-      <p class="subtitle">${r.answers.length > 1 ? "As palavras eram" : "A palavra era"} ${r.answers.map(P.words.display).join(", ")}</p>
+    const ui = P.sheet(`${head}
       <div class="mp-results">${line("Você", mine, false)}${line(P.esc(oname), theirs, s.oppLeft)}</div>
       <div class="row-btns wrap"><button class="pill ghost" data-share>Compartilhar</button><button class="pill ghost" data-replay>▶ Replay</button></div>
-      <div class="row-btns" style="margin-top:10px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>Revanche</button><button class="pill ghost" data-exit>Sair</button></div>
+      <div class="row-btns" style="margin-top:10px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>${champ ? "Nova série" : "Próxima rodada"}</button><button class="pill ghost" data-exit>Sair</button></div>
       ${s.me.host ? (s.oppLeft ? `<p class="note">${P.esc(oname)} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
     P.$("[data-share]", ui.el).onclick = () => {
-      const t = r.result === "me" ? `Venci em ${triesTxt(mine ? mine.tries : 0)} ⚔️` : r.result === "opp" ? "Perdi ⚔️" : "Empate ⚔️";
+      const t = champ === "me" ? `Levei a série por ${score(s)} 🏆`
+        : champ === "opp" ? `Perdi a série por ${s.series.opp} × ${s.series.me} ⚔️`
+        : (r.result === "me" ? `Venci em ${triesTxt(mine ? mine.tries : 0)} ⚔️` : r.result === "opp" ? "Perdi ⚔️" : "Empate ⚔️") + ` (série ${score(s)})`;
       P.share(`Palavreiro · Partida com ${oname}\n${t}`);
     };
     P.$("[data-replay]", ui.el).onclick = () => { ui.close(); r.api && r.api.replay(); };
@@ -437,7 +478,9 @@
     P.$("[data-again]", ui.el).onclick = () => {
       if (!s.me.host || s.oppLeft) return;
       P.$("[data-again]", ui.el).disabled = true;
-      publish({ t: "again", seed: newSeed().toString(36), at: Date.now() });
+      const msg = { t: "again", seed: newSeed().toString(36), at: Date.now() };
+      if (champ) msg.s = 1;
+      publish(msg);
     };
   }
 })();
