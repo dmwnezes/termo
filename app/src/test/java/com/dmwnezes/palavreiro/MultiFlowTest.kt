@@ -1,0 +1,85 @@
+package com.dmwnezes.palavreiro
+
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.semantics.SemanticsProperties
+import com.dmwnezes.palavreiro.game.Multi
+import com.dmwnezes.palavreiro.game.Words
+import com.dmwnezes.palavreiro.system.Ntfy
+import com.dmwnezes.palavreiro.ui.MultiScreen
+import com.dmwnezes.palavreiro.ui.PalavreiroTheme
+import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
+import org.junit.Assume.assumeTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
+import java.io.File
+
+/** Fluxo completo de "Jogar com amigo" pela rede de verdade (rode com PV_LIVE=1). */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [34])
+@LooperMode(LooperMode.Mode.PAUSED)
+class MultiFlowTest {
+    @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+    private val words = Words(File("../shared/words.js").readText())
+
+    @Test
+    fun anfitriaoCriaEAmigoEntra() {
+        assumeTrue(System.getenv("PV_LIVE") == "1")
+        val ntfy = Ntfy(OkHttpClient())
+        rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
+        rule.onNodeWithText("Seu nome").performTextInput("Teste")
+        rule.onNodeWithText("Criar partida").performClick()
+        rule.waitUntil(15_000) { rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().isNotEmpty() }
+        val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
+            .config[SemanticsProperties.Text].joinToString("") { it.text }
+        val room = Multi.fromPasted(link)!!
+        runBlocking { ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("guest001", "Amigo", false))) }
+        rule.waitUntil(30_000) { rule.onAllNodes(hasText("Você × Amigo")).fetchSemanticsNodes().isNotEmpty() }
+        // Partida começou: espera a contagem e joga uma tentativa.
+        Thread.sleep(3500); rule.waitForIdle()
+        rule.waitUntil(10_000) { rule.onAllNodes(hasText("ENTER")).fetchSemanticsNodes().isNotEmpty() }
+    }
+
+    @Test
+    fun amigoEntraPeloLink() {
+        assumeTrue(System.getenv("PV_LIVE") == "1")
+        val ntfy = Ntfy(OkHttpClient())
+        val room = Multi.newRoom('q')
+        runBlocking { ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("host0001", "Daniel", true))) }
+        Thread.sleep(1500)
+        // "Anfitrião" de mentira: quando o convidado mandar hello, manda o start.
+        val host = Thread {
+            runBlocking {
+                kotlinx.coroutines.withTimeout(40_000) {
+                    ntfy.events(room.topic).collect { e ->
+                        if (e is Ntfy.Event.Message) {
+                            val m = Multi.decode(e.text)
+                            if (m is Multi.Msg.Hello && !m.host) {
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.Start(System.currentTimeMillis(), m.id)))
+                                ntfy.publish(room.topic, Multi.encode(Multi.Msg.Row("host0001", 0, "capap|aaaaa|ccccc|pppaa")))
+                                throw kotlinx.coroutines.CancellationException("ok")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}, joinCode = room.code) } }
+        rule.waitUntil(20_000) { rule.onAllNodes(hasText("Daniel te chamou", substring = true)).fetchSemanticsNodes().isNotEmpty() }
+        host.start()
+        rule.onNodeWithText("Seu nome").performTextInput("Convidado")
+        rule.onNodeWithText("Entrar").performClick()
+        rule.waitUntil(30_000) { rule.onAllNodes(hasText("Você × Daniel")).fetchSemanticsNodes().isNotEmpty() }
+        Thread.sleep(4000); rule.waitForIdle()
+        rule.waitUntil(15_000) { rule.onAllNodes(hasText("jogando · 1/9")).fetchSemanticsNodes().isNotEmpty() }
+    }
+}

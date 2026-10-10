@@ -23,6 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import com.dmwnezes.palavreiro.data.Mode
 import com.dmwnezes.palavreiro.game.Challenge
 import com.dmwnezes.palavreiro.game.Records
@@ -56,6 +59,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
         )
         super.onCreate(savedInstanceState)
+        com.dmwnezes.palavreiro.system.CrashLog.install(this)
         AppGraph.init(this)
         if (savedInstanceState == null) Launch.read(intent)
         setContent { PalavreiroTheme { PalavreiroApp() } }
@@ -289,6 +293,21 @@ fun PalavreiroApp() {
             }
         }
         if (showHelp) HelpSheet { showHelp = false }
+        // O app fechou por um erro da última vez: mostra o motivo para copiar e mandar.
+        val ctx = androidx.compose.ui.platform.LocalContext.current
+        var crash by remember { mutableStateOf(com.dmwnezes.palavreiro.system.CrashLog.take(ctx)) }
+        crash?.let { text ->
+            com.dmwnezes.palavreiro.ui.BottomSheet({ crash = null }) {
+                com.dmwnezes.palavreiro.ui.SheetTitle("O app fechou por um erro", "Desculpe! Copie os detalhes e mande para @dmwnezes para ele corrigir.")
+                androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
+                com.dmwnezes.palavreiro.ui.PillButton("Copiar detalhes", com.dmwnezes.palavreiro.ui.Night.accent, modifier = Modifier.fillMaxWidth()) {
+                    ctx.getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText("Erro do Palavreiro", text))
+                    crash = null
+                }
+                androidx.compose.foundation.layout.Spacer(Modifier.height(10.dp))
+                com.dmwnezes.palavreiro.ui.PillButton("Fechar", com.dmwnezes.palavreiro.ui.Night.surfaceHigh, com.dmwnezes.palavreiro.ui.Night.text, Modifier.fillMaxWidth()) { crash = null }
+            }
+        }
         if (showUpdate) UpdateDialog(onDismiss = { showUpdate = false })
         foundUpdate?.let { r ->
             UpdateDialog(initial = r, onSkip = { store.skippedUpdate = it.tag }, onDismiss = { foundUpdate = null })

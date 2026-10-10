@@ -262,8 +262,11 @@ private fun Boards(game: TermoGame, replay: ReplayView? = null) {
         val gridRows = if (game.boards == 4) 2 else 1
         val tries = game.maxTries
         val byWidth = (maxWidth - boardGap * (cols - 1) - gap * 4 * cols) / (5 * cols)
-        val byHeight = (maxHeight - 50.dp - boardGap * (gridRows - 1) - gap * (tries - 1) * gridRows) / (tries * gridRows)
-        val tile = minOf(byWidth, byHeight, 68.dp)
+        // Espaço para o botão/aviso de baixo; some quando a tela está apertada (ex.: faixa do adversário no Quarteto).
+        val reserve = if (maxHeight > 420.dp) 50.dp else 8.dp
+        val byHeight = (maxHeight - reserve - boardGap * (gridRows - 1) - gap * (tries - 1) * gridRows) / (tries * gridRows)
+        // Nunca negativo: com pouca altura o tamanho calculado podia ficar < 0 e o app fechava.
+        val tile = minOf(byWidth, byHeight, 68.dp).coerceAtLeast(12.dp)
         Column(verticalArrangement = Arrangement.spacedBy(boardGap), horizontalAlignment = Alignment.CenterHorizontally) {
             for (gr in 0 until gridRows) {
                 Row(horizontalArrangement = Arrangement.spacedBy(boardGap)) {
@@ -370,7 +373,7 @@ private fun InputTile(letter: Char?, selected: Boolean, size: Dp, onClick: () ->
         Text(letter?.toString().orEmpty(), fontSize = (size.value * 0.48f).sp, fontWeight = FontWeight.SemiBold, color = Night.text)
         if (selected) {
             Box(
-                Modifier.align(Alignment.BottomCenter).padding(bottom = size * 0.1f)
+                Modifier.align(Alignment.BottomCenter).padding(bottom = (size * 0.1f).coerceAtLeast(0.dp))
                     .width(size * 0.36f).height(if (size > 40.dp) 3.dp else 2.dp).clip(Shapes.pill).background(Night.accent)
             )
         }
