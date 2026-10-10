@@ -12,9 +12,21 @@ object Multi {
     const val SITE = "https://dmwnezes.github.io/termo/"
     const val TOPIC_PREFIX = "palavreiro-mp-"
 
-    /** Modos da partida: letra do link → modo do jogo. */
+    /** Modos da partida no estilo Termo: letra do link → modo do jogo. */
     val MODES = linkedMapOf('t' to Mode.DIARIO, 'd' to Mode.DUETO, 'q' to Mode.QUARTETO)
-    fun modeName(code: Char): String = when (code) { 'd' -> "Dueto"; 'q' -> "Quarteto"; else -> "Termo" }
+    const val BOMB = 'b'
+    const val ANAGRAM = 'a'
+    /** Todas as letras de modo aceitas no link, na ordem das pílulas da tela de criar. */
+    val CODES = listOf('t', 'd', 'q', BOMB, ANAGRAM)
+    fun modeName(code: Char): String = when (code) {
+        'd' -> "Dueto"; 'q' -> "Quarteto"; BOMB -> "Bomba-Relógio"; ANAGRAM -> "Anagrama"; else -> "Termo"
+    }
+    /** Nome curto da pílula na tela de criar. */
+    fun chipName(code: Char): String = if (code == BOMB) "Bomba" else modeName(code)
+    /** "um Termo", "uma Bomba-Relógio", "um Anagrama". */
+    fun withArticle(code: Char): String = (if (code == BOMB) "uma " else "um ") + modeName(code)
+    /** Modos que seguem o fluxo do Termo (Termo, Dueto, Quarteto); Bomba e Anagrama têm jogo próprio. */
+    fun isTermo(code: Char): Boolean = code in MODES
     fun boards(code: Char): Int = MODES[code]?.boards ?: 1
 
     /** Dados do link ?mp=ROOM-MODO-SEED. */
@@ -29,7 +41,7 @@ object Multi {
         val p = code?.trim()?.split('-') ?: return null
         if (p.size != 3) return null
         val room = p[0]; val mode = p[1].singleOrNull(); val seed = p[2].toLongOrNull(36)
-        if (!room.matches(Regex("[a-z0-9]{6,32}")) || mode == null || mode !in MODES || seed == null || seed !in 0..2147483646L) return null
+        if (!room.matches(Regex("[a-z0-9]{6,32}")) || mode == null || mode !in CODES || seed == null || seed !in 0..2147483646L) return null
         return Room(room, mode, seed)
     }
 
@@ -37,7 +49,7 @@ object Multi {
     fun fromPasted(text: String?): Room? {
         val t = text?.trim().orEmpty()
         Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
-        Regex("\\b([a-z0-9]{12}-[tdq]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        Regex("\\b([a-z0-9]{12}-[tdqba]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
         return null
     }
 
@@ -79,6 +91,14 @@ object Multi {
         /** [newSeries] = começa uma série nova (placar volta a 0 × 0). */
         data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false) : Msg
         data class Bye(val id: String) : Msg
+        /** Bomba-Relógio: palavra jogada; [n] = índice da jogada na rodada, [ms] = relógio da rodada de quem mandou. */
+        data class Word(val id: String, val word: String, val n: Int, val ms: Long) : Msg
+        /** Bomba-Relógio: a bomba explodiu com [id]. */
+        data class Boom(val id: String) : Msg
+        /** Anagrama: [id] acertou a rodada [round]. */
+        data class Solve(val id: String, val round: Int, val ms: Long) : Msg
+        /** Anagrama: ninguém acertou a rodada [round] a tempo. */
+        data class Skip(val round: Int) : Msg
     }
 
     fun encode(m: Msg): String = when (m) {
@@ -88,6 +108,10 @@ object Multi {
         is Msg.End -> JSONObject().put("t", "end").put("id", m.id).put("won", m.won).put("tries", m.tries).put("ms", m.ms)
         is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at).apply { if (m.newSeries) put("s", 1) }
         is Msg.Bye -> JSONObject().put("t", "bye").put("id", m.id)
+        is Msg.Word -> JSONObject().put("t", "word").put("id", m.id).put("w", m.word).put("n", m.n).put("ms", m.ms)
+        is Msg.Boom -> JSONObject().put("t", "boom").put("id", m.id)
+        is Msg.Solve -> JSONObject().put("t", "solve").put("id", m.id).put("r", m.round).put("ms", m.ms)
+        is Msg.Skip -> JSONObject().put("t", "skip").put("r", m.round)
     }.toString()
 
     fun decode(text: String): Msg? = runCatching {
@@ -99,6 +123,10 @@ object Multi {
             "end" -> Msg.End(o.getString("id"), o.getBoolean("won"), o.optInt("tries"), o.optLong("ms"))
             "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1)
             "bye" -> Msg.Bye(o.getString("id"))
+            "word" -> Msg.Word(o.getString("id"), o.getString("w"), o.getInt("n"), o.optLong("ms"))
+            "boom" -> Msg.Boom(o.getString("id"))
+            "solve" -> Msg.Solve(o.getString("id"), o.getInt("r"), o.optLong("ms"))
+            "skip" -> Msg.Skip(o.getInt("r"))
             else -> null
         }
     }.getOrNull()

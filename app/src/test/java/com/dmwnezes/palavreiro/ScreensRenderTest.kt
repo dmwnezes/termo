@@ -413,4 +413,79 @@ class ScreensRenderTest {
         rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}, meanings) } }
         save("18-resultado")
     }
+
+    // ---------- Bomba-Relógio e Anagrama (partida com amigo) ----------
+    private val T = 1_800_000_000_000L
+    private fun tm(at: Long, m: com.dmwnezes.palavreiro.game.Multi.Msg) = com.dmwnezes.palavreiro.game.Timed(at, m)
+
+    @Test
+    fun amigoModos() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
+        rule.onNode(androidx.compose.ui.test.hasText("Bomba")).performClick()
+        save("36-amigo-modos")
+    }
+
+    private fun bomb(msgs: List<com.dmwnezes.palavreiro.game.Timed>, name: String, advance: Long = 1500) {
+        rule.mainClock.autoAdvance = false
+        // SEED 123456789 é ímpar: o convidado ("op") começa.
+        rule.setContent {
+            PalavreiroTheme {
+                com.dmwnezes.palavreiro.ui.BombPlay(
+                    words, null, 123456789, 1, "me", "op", "Ana", true, msgs, T - 20_000,
+                    com.dmwnezes.palavreiro.game.Multi.Series(1, 0), true, false, {}, {}, {}, {}, clock = { T },
+                )
+            }
+        }
+        save(name, advance)
+    }
+
+    private val bombWords = listOf("CARRO", "PORTA", "MUNDO", "LIVRO", "TERMO", "FESTA", "PRATO").mapIndexed { i, w ->
+        tm(T - 18_000 + i * 2000, com.dmwnezes.palavreiro.game.Multi.Msg.Word(if (i % 2 == 0) "op" else "me", w, i, 2000L + i * 2000))
+    }
+
+    @Test fun bomba() = bomb(bombWords, "37-bomba")
+
+    @Test fun bombaExplodiu() = bomb(bombWords.take(6) + tm(T, com.dmwnezes.palavreiro.game.Multi.Msg.Boom("op")), "38-bomba-explodiu", 2500)
+
+    @Test fun bombaExplodiuComVoce() = bomb(bombWords.take(5) + tm(T - 100, com.dmwnezes.palavreiro.game.Multi.Msg.Boom("me")), "38b-bomba-explodiu-voce", 400)
+
+    private fun anagram(msgs: List<com.dmwnezes.palavreiro.game.Timed>, name: String, advance: Long = 1500) {
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            PalavreiroTheme {
+                com.dmwnezes.palavreiro.ui.AnagramPlay(
+                    words, null, 123456789, 1, "me", "op", "Ana", true, msgs, T - 60_000, true, false, {}, {}, {}, {}, clock = { T },
+                )
+            }
+        }
+        save(name, advance)
+    }
+
+    @Test
+    fun anagrama() = anagram(
+        listOf(
+            tm(T - 40_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("op", 0, 9000)),
+            tm(T - 20_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("me", 1, 12000)),
+            tm(T - 15_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("me", 2, 2000)),
+        ),
+        "39-anagrama",
+    )
+
+    @Test
+    fun anagramaAcertou() = anagram(
+        listOf(
+            tm(T - 40_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("op", 0, 9000)),
+            tm(T - 1_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("op", 1, 12000)),
+        ),
+        "39b-anagrama-amigo-acertou", 300,
+    )
+
+    @Test
+    fun anagramaFim() = anagram(
+        (0 until 10).map { r ->
+            tm(T - 30_000 + r * 1000, if (r == 4) com.dmwnezes.palavreiro.game.Multi.Msg.Skip(r) else com.dmwnezes.palavreiro.game.Multi.Msg.Solve(if (r % 3 == 0) "op" else "me", r, 5000))
+        },
+        "40-anagrama-fim", 3000,
+    )
 }

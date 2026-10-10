@@ -1,13 +1,23 @@
 // Jogar com amigo (site): partida ao vivo pelo ntfy.sh, compatível com o app Android.
-// Link: ?mp=SALA-MODO-SEED · tópico "palavreiro-mp-" + SALA · mensagens JSON (hello, start, row, end, again, bye).
+// Link: ?mp=SALA-MODO-SEED · tópico "palavreiro-mp-" + SALA · mensagens JSON (hello, start, row, end, again, bye;
+// Bomba-Relógio: word, boom; Anagrama: solve, skip).
 (function () {
   "use strict";
-  const NTFY = "https://ntfy.sh/";
+  // Testes: localStorage "pv-ntfy" (ex.: "http://127.0.0.1:8799/") troca o servidor do ntfy.sh.
+  const NTFY = (() => { try { const v = localStorage.getItem("pv-ntfy"); if (v && /^https?:\/\//.test(v)) return v.endsWith("/") ? v : v + "/"; } catch (_) {} return "https://ntfy.sh/"; })();
   const MODES = {
-    t: { key: "termo", name: "Termo", boards: 1 },
-    d: { key: "dueto", name: "Dueto", boards: 2 },
-    q: { key: "quarteto", name: "Quarteto", boards: 4 },
+    t: { key: "termo", name: "Termo", pill: "Termo", art: "um", boards: 1 },
+    d: { key: "dueto", name: "Dueto", pill: "Dueto", art: "um", boards: 2 },
+    q: { key: "quarteto", name: "Quarteto", pill: "Quarteto", art: "um", boards: 4 },
+    b: { key: "bomba", name: "Bomba-Relógio", pill: "Bomba", art: "uma", boards: 0 },
+    a: { key: "anagrama", name: "Anagrama", pill: "Anagrama", art: "um", boards: 0 },
   };
+  /** Texto de cada modo na tela de criar/entrar. */
+  const LEAD = {
+    b: "Vocês se revezam mandando palavras de 5 letras. A bomba explode num momento secreto: perde quem estiver com ela. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆",
+    a: "10 rodadas com as mesmas letras embaralhadas. Quem achar a palavra primeiro leva o ponto.",
+  };
+  const leadOf = (m, host) => LEAD[m] || (host ? "Vocês recebem as mesmas palavras. Quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆" : "Partida ao vivo: quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆");
   const ABC = "abcdefghijklmnopqrstuvwxyz0123456789";
   const randStr = (n) => { const b = new Uint32Array(n); crypto.getRandomValues(b); return Array.from(b, (x) => ABC[x % 36]).join(""); };
   const newSeed = () => { const b = new Uint32Array(1); crypto.getRandomValues(b); return b[0] % 2147483647; };
@@ -19,7 +29,7 @@
     link: (room, m, seed) => location.origin + location.pathname.replace(/index\.html$/, "") + `?mp=${room}-${m}-${seed.toString(36)}`,
     /** "sala-modo-seed" → {room, m, seed} ou null. */
     parse(code) {
-      const x = /^([a-z0-9]{12})-([tdq])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
+      const x = /^([a-z0-9]{12})-([tdqba])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
       if (!x) return null;
       const seed = parseInt(x[3], 36);
       return seed >= 0 && seed <= 2147483646 ? { room: x[1], m: x[2], seed } : null;
@@ -55,7 +65,7 @@
     if (!keep) forget();
     const s = S; S = null;
     s.closed = true;
-    clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer); clearInterval(s.ttlTimer);
+    clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer); clearInterval(s.ttlTimer); stopGame(s);
     if (s.es) s.es.close();
     if (sendBye && s.joined) { try { fetch(NTFY + s.topic, { method: "POST", body: JSON.stringify({ t: "bye", id: s.me.id }), keepalive: true }).catch(() => {}); } catch (_) {} }
     P.$("#mp-net")?.remove();
@@ -204,23 +214,29 @@
       // "s":1 = série nova (o placar volta a 0 × 0). Série já decidida também recomeça.
       if (m.s === 1 || seriesOver(s)) s.series = { me: 0, opp: 0 };
       beginRound(s, +m.at || Date.now(), live);
+    } else if (m.t === "word" || m.t === "boom") {
+      if (s.round && s.round.kind === "b") (m.t === "word" ? bombWord : bombBoom)(s, m);
+    } else if (m.t === "solve" || m.t === "skip") {
+      if (s.round && s.round.kind === "a") anaMsg(s, m);
     } else if (m.t === "row") {
       const r = s.round, o = opp(s);
-      if (!r || !o || m.id !== o.id || typeof m.m !== "string") return;
+      if (!r || r.kind || !o || m.id !== o.id || typeof m.m !== "string") return;
       const idx = +m.r;
       if (!(idx >= 0 && idx < 9) || r.opp.rows[idx]) return;
       r.opp.rows[idx] = m.m.split("|"); r.opp.fresh = idx;
       drawStrip(s);
     } else if (m.t === "end") {
       const r = s.round, o = opp(s);
-      if (!r || r.ends.some((e) => e.id === m.id) || (m.id !== s.me.id && (!o || m.id !== o.id))) return;
+      if (!r || r.kind || r.ends.some((e) => e.id === m.id) || (m.id !== s.me.id && (!o || m.id !== o.id))) return;
       r.ends.push({ id: m.id, won: m.won === true, tries: +m.tries || 0, ms: +m.ms || 0 });
       decide(s); drawStrip(s);
     } else if (m.t === "bye") {
       const o = opp(s);
       if (!o || m.id !== o.id) return;
       s.oppLeft = true;
-      if (s.round) { decide(s); drawStrip(s); }
+      if (s.round && s.round.kind === "b") bombDraw(s, s.round);
+      else if (s.round && s.round.kind === "a") anaDraw(s, s.round);
+      else if (s.round) { decide(s); drawStrip(s); }
       else if (s.view === "joinwait") P.toast(`${o.name} saiu da partida`, 2500);
     }
   }
@@ -257,9 +273,9 @@
     body.innerHTML = `<div class="mp-card">
         ${duoIcon}
         <h2>Partida ao vivo</h2>
-        <p class="muted mp-lead">Vocês recebem as mesmas palavras. Quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆</p>
+        <p class="muted mp-lead" data-lead>${leadOf(m, true)}</p>
         ${nameField()}
-        <div class="mp-field"><span>Modo</span><div class="seg mp-modes">${Object.entries(MODES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? "on" : ""}">${v.name}</button>`).join("")}</div></div>
+        <div class="mp-field"><span>Modo</span><div class="seg mp-modes">${Object.entries(MODES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? "on" : ""}">${v.pill}</button>`).join("")}</div></div>
         <button class="pill wide" data-create>Criar partida</button>
         <div class="mp-or"><span>ou entre numa partida</span></div>
         <label class="mp-field"><span>Link da partida</span>
@@ -267,13 +283,13 @@
         <p class="mp-err hidden" data-paste-err>Esse link não é de uma partida do Palavreiro.</p>
         <div class="row-btns"><button class="pill ghost" data-paste-btn>Colar</button><button class="pill accent" data-enter>Entrar na partida</button></div>
       </div>`;
-    body.querySelectorAll("[data-m]").forEach((b) => (b.onclick = () => { m = b.dataset.m; P.store.set("mp-mode", m); P.fx.type(); body.querySelectorAll("[data-m]").forEach((x) => x.classList.toggle("on", x === b)); }));
+    body.querySelectorAll("[data-m]").forEach((b) => (b.onclick = () => { m = b.dataset.m; P.store.set("mp-mode", m); P.fx.type(); body.querySelectorAll("[data-m]").forEach((x) => x.classList.toggle("on", x === b)); P.$("[data-lead]", body).textContent = leadOf(m, true); }));
     P.$("[data-name]", body).addEventListener("keydown", (e) => { if (e.key === "Enter") P.$("[data-create]", body).click(); });
     // Entrar numa partida colando o link (inteiro, só o código, ou no meio de uma mensagem).
     const fromPasted = (t) => {
       t = String(t || "").trim();
       const a = /[?&]mp=([A-Za-z0-9-]+)/.exec(t); if (a) return P.mp.parse(a[1]) ? a[1].toLowerCase() : null;
-      const b = /\b([a-z0-9]{12}-[tdq]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
+      const b = /\b([a-z0-9]{12}-[tdqba]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
     };
     const err = P.$("[data-paste-err]", body), input = P.$("[data-paste]", body);
     const enter = (t) => {
@@ -370,8 +386,8 @@
     const body = shell(root, "Jogar com amigo");
     body.innerHTML = `<div class="mp-card">
         ${duoIcon}
-        <h2 data-invite>Você foi chamado para um ${s.mode.name}</h2>
-        <p class="muted mp-lead">Partida ao vivo: quem acertar primeiro ganha. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆</p>
+        <h2 data-invite>Você foi chamado para ${s.mode.art} ${s.mode.name}</h2>
+        <p class="muted mp-lead">${leadOf(s.m, false)}</p>
         ${nameField()}
         <button class="pill wide" data-join>Entrar</button>
       </div>`;
@@ -405,7 +421,7 @@
     if (s.view !== "join") return;
     if (s.guestHello || s.started) return markFull(s);
     const h = P.$("[data-invite]", s.root);
-    if (h) h.innerHTML = s.hostHello ? `<b>${P.esc(s.hostHello.name)}</b> te chamou para um ${s.mode.name}` : `Você foi chamado para um ${s.mode.name}`;
+    if (h) h.innerHTML = s.hostHello ? `<b>${P.esc(s.hostHello.name)}</b> te chamou para ${s.mode.art} ${s.mode.name}` : `Você foi chamado para ${s.mode.art} ${s.mode.name}`;
   }
   function joinWait(s) {
     s.view = "joinwait";
@@ -424,6 +440,9 @@
     let delay = at + 3000 - now;
     if (live && Math.abs(now - at) > 2500) delay = 3000;
     delay = Math.max(0, Math.min(3000, delay));
+    stopGame(s);
+    if (s.m === "b") return bombRound(s, now + delay);
+    if (s.m === "a") return anaRound(s, now + delay);
     const o = opp(s);
     s.round = { seed: s.seed, startAt: now + delay, opp: { rows: [], fresh: -1 }, ends: [], result: null, sentEnd: false, answers: P.mpWords(s.seed, s.mode.boards) };
     s.view = "game";
@@ -577,6 +596,413 @@
       const msg = { t: "again", seed: newSeed().toString(36), at: Date.now() };
       if (champ) msg.s = 1;
       publish(msg);
+    };
+  }
+
+  // ================= Bomba-Relógio e Anagrama (mesma sala, mesmas mensagens do app) =================
+  function stopGame(s) {
+    clearInterval(s.gameTimer); clearTimeout(s.boomTimer);
+    if (s.raf) cancelAnimationFrame(s.raf);
+    s.gameTimer = s.boomTimer = s.raf = null;
+  }
+  /** Ids do anfitrião (h) e do convidado (g) na sala. */
+  const ids = (s) => ({
+    h: s.me.host ? s.me.id : s.hostHello && s.hostHello.id,
+    g: s.me.host ? s.guestHello && s.guestHello.id : s.me.id,
+  });
+  const oppName = (s) => { const o = opp(s); return o ? o.name : "Amigo"; };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const tiles5 = (letters, cls = "") => [0, 1, 2, 3, 4].map((i) => `<div class="tile input${cls}">${letters[i] || ""}</div>`).join("");
+  /** Só para testes (P.mp.debug ou window.PV_DEBUG = {fuseMs, roundMs}); sem isso valem os tempos da regra. */
+  const debug = () => { const d = P.mp.debug || window.PV_DEBUG; return d && typeof d === "object" ? d : {}; };
+  /** Tela base dos dois jogos: topo "Você × NOME" + placar, área do jogo e teclado do Termo. */
+  function gameShell(s, cls, inner, keys) {
+    s.root.innerHTML = P.topbar(`<span>Você × ${P.esc(oppName(s))}</span>`, { extra: `<span class="mp-score" data-score></span>` })
+      + `<div class="game mpg ${cls}">${inner}</div>`;
+    const game = P.$(".game", s.root);
+    const kb = P.keyboard(game, keys);
+    kb.el = P.$(".keyboard", game);
+    return kb;
+  }
+  function shakeEl(el, msg) {
+    P.fx.invalid(); P.toast(msg);
+    if (el) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
+  }
+
+  // ---------- A. Bomba-Relógio ----------
+  /** Pavio secreto (ms), igual nos dois lados: entre 25 s e 60 s. */
+  const bombFuse = (seed) => 25000 + (((seed % 35001) * 7919) % 35001);
+  /** SEED par → anfitrião começa; ímpar → convidado. */
+  const bombHostStarts = (seed) => seed % 2 === 0;
+  P.mp.bombFuse = bombFuse;
+  P.mp.bombHostStarts = bombHostStarts;
+
+  function bombRound(s, startAt) {
+    const { h, g } = ids(s);
+    const r = (s.round = { kind: "b", seed: s.seed, startAt, F: debug().fuseMs || bombFuse(s.seed), host: h, guest: g,
+      turn: bombHostStarts(s.seed) ? h : g, words: [], used: new Set(), pending: null, input: [], boom: null, result: null,
+      exploded: false, boomSent: false });
+    s.view = "game";
+    r.kb = gameShell(s, "bomb", `
+        <div class="bomb-stage"><div class="bomb-ico" data-bomb aria-hidden="true">💣</div><p class="bomb-turn" data-turn></p></div>
+        <div class="bomb-words"><p class="bomb-count" data-count></p><div class="bomb-list" data-list></div></div>
+        <div class="mpg-input" data-input></div>
+        <div class="center" data-after></div>`, {
+      onLetter: (c) => { if (bombCanType(s, r) && r.input.length < 5) { r.input.push(c); P.fx.type(); bombInput(s, r); } },
+      onDelete: () => { if (bombCanType(s, r) && r.input.length) { r.input.pop(); bombInput(s, r); } },
+      onEnter: () => bombSubmit(s, r),
+    });
+    r.api = { redraw: () => bombDraw(s, r) };
+    drawScore(s);
+    bombDraw(s, r);
+    countdown(s, r);
+    s.gameTimer = setInterval(() => bombTick(s, r), 100);
+    bombPulse(s, r);
+  }
+  const other = (r, id) => (id === r.host ? r.guest : r.host);
+  /** Quem está com a bomba agora (a minha palavra ainda no caminho já passou a vez). */
+  const holder = (r) => (r.pending ? other(r, r.turn) : r.turn);
+  const bombCanType = (s, r) => S === s && s.round === r && !r.result && !r.exploded && !r.pending && Date.now() >= r.startAt && r.turn === s.me.id;
+
+  function bombSubmit(s, r) {
+    if (!bombCanType(s, r)) return;
+    const row = P.$("[data-input]", s.root);
+    if (r.input.length < 5) return shakeEl(row, "Palavra incompleta");
+    const w = r.input.join("");
+    if (!P.words.ok(w)) return shakeEl(row, "Palavra não aceita");
+    if (r.used.has(w)) return shakeEl(row, "Essa palavra já foi");
+    const ms = Date.now() - r.startAt;
+    if (ms >= r.F) return;
+    r.pending = { w, n: r.words.length };
+    r.input = [];
+    publish({ t: "word", id: s.me.id, w, n: r.words.length, ms });
+    P.tone([[740, 40], [988, 60]], 0.08);
+    bombDraw(s, r);
+  }
+
+  function bombWord(s, m) {
+    const r = s.round;
+    if (!r || r.boom || r.result) return;
+    const w = P.norm(String(m.w || ""));
+    const ok = m.id === r.turn && Number(m.n) === r.words.length && /^[A-Z]{5}$/.test(w) && !r.used.has(w) && Number(m.ms) < r.F;
+    if (!ok) {
+      // A minha palavra foi recusada pela ordem do tópico: devolve a vez na tela.
+      if (m.id === s.me.id && r.pending && r.pending.w === w) { r.pending = null; bombDraw(s, r); }
+      return;
+    }
+    r.used.add(w);
+    r.words.push({ w, id: m.id, fresh: true });
+    if (m.id === s.me.id) r.pending = null;
+    r.turn = other(r, m.id);
+    if (r.turn === s.me.id) {
+      if (r.exploded) { if (!r.boomSent) sendBoom(s, r, s.me.id); }
+      else { P.vibrate(30); P.tone([[880, 50]], 0.07); }
+    }
+    bombDraw(s, r);
+  }
+  function sendBoom(s, r, id) {
+    if (r.boomSent || r.boom) return;
+    r.boomSent = true;
+    publish({ t: "boom", id });
+  }
+  function bombTick(s, r) {
+    if (S !== s || s.round !== r) return stopGame(s);
+    if (r.exploded || r.result || Date.now() - r.startAt < r.F) return;
+    r.exploded = true; r.input = [];
+    if (holder(r) === s.me.id) sendBoom(s, r, s.me.id);
+    else {
+      clearTimeout(s.boomTimer);
+      s.boomTimer = setTimeout(() => {
+        if (S !== s || s.round !== r || r.boom || r.boomSent) return;
+        sendBoom(s, r, holder(r) === s.me.id ? s.me.id : other(r, s.me.id));
+      }, 4000);
+    }
+    bombDraw(s, r);
+  }
+  function bombBoom(s, m) {
+    const r = s.round;
+    if (!r || r.boom || r.result || (m.id !== r.host && m.id !== r.guest)) return;
+    r.boom = m.id; r.exploded = true; r.pending = null; r.input = [];
+    clearTimeout(s.boomTimer);
+    r.result = m.id === s.me.id ? "opp" : "me";
+    if (!seriesOver(s)) { if (r.result === "me") s.series.me++; else s.series.opp++; }
+    drawScore(s);
+    P.store.add("mp-played"); if (r.result === "me") P.store.add("mp-won");
+    P.logActivity();
+    P.tone([[180, 90], [120, 140], [80, 380]], 0.16);
+    P.vibrate(600);
+    if (r.result === "me") setTimeout(() => { if (S === s && s.round === r) P.fx.win(); }, 700);
+    bombDraw(s, r);
+    clearTimeout(s.sheetTimer);
+    s.sheetTimer = setTimeout(() => { if (S === s && s.round === r && !document.querySelector(".overlay")) bombSheet(s, r); }, 1700);
+  }
+
+  function bombInput(s, r) {
+    const el = P.$("[data-input]", s.root); if (!el) return;
+    const on = bombCanType(s, r);
+    el.classList.toggle("off", !on);
+    el.innerHTML = tiles5(r.input);
+    const tiles = el.querySelectorAll(".tile");
+    if (on && r.input.length < 5) tiles[r.input.length].classList.add("sel");
+  }
+  function bombDraw(s, r) {
+    if (S !== s || s.round !== r || !P.$(".bomb", s.root)) return;
+    const me = s.me.id, oname = P.esc(oppName(s));
+    const bomb = P.$("[data-bomb]", s.root), turn = P.$("[data-turn]", s.root);
+    const started = Date.now() >= r.startAt;
+    if (r.boom) {
+      bomb.textContent = "💥"; bomb.classList.add("boom");
+      turn.className = "bomb-turn end";
+      turn.innerHTML = r.boom === me ? "A bomba explodiu com você!" : `A bomba explodiu com ${oname}!`;
+    } else if (r.exploded) {
+      bomb.textContent = "💥"; bomb.classList.add("boom");
+      turn.className = "bomb-turn"; turn.textContent = "…";
+    } else {
+      const mine = holder(r) === me;
+      turn.className = "bomb-turn" + (started && mine ? " mine" : "");
+      turn.innerHTML = !started ? "" : mine ? "Sua vez!" : `Vez de ${oname}…`;
+    }
+    const list = r.words.map((x) => ({ w: x.w, mine: x.id === me, fresh: x.fresh }));
+    if (r.pending) list.push({ w: r.pending.w, mine: true, pend: true });
+    P.$("[data-count]", s.root).textContent = list.length ? plural(list.length, "palavra", "palavras") : "";
+    P.$("[data-list]", s.root).innerHTML = list.slice().reverse()
+      .map((x) => `<span class="bw${x.mine ? " me" : ""}${x.pend ? " pend" : ""}${x.fresh ? " in" : ""}">${P.esc(P.words.display(x.w))}</span>`).join("");
+    r.words.forEach((x) => (x.fresh = false));
+    bombInput(s, r);
+    r.kb.el.classList.toggle("off", !bombCanType(s, r));
+    const after = P.$("[data-after]", s.root);
+    after.innerHTML = "";
+    if (r.result) { const b = P.h(`<button class="pill ghost">Ver resultado</button>`); b.onclick = () => bombSheet(s, r); after.appendChild(b); }
+  }
+  /** Pulso da bomba: ~1,2 s no começo até ~0,25 s no pavio, com tique-taque baixinho. */
+  function bombPulse(s, r) {
+    let phase = 0, last = performance.now();
+    const frame = (now) => {
+      if (S !== s || s.round !== r) return;
+      const el = P.$("[data-bomb]", s.root);
+      if (!el || r.exploded) { if (el) el.style.transform = ""; return; }
+      const dt = (now - last) / 1000; last = now;
+      const t = Date.now() - r.startAt;
+      if (t >= 0) {
+        const period = 1.2 - 0.95 * Math.min(1, t / r.F);
+        const prev = phase; phase += dt / period;
+        if (Math.floor(phase) !== Math.floor(prev)) P.tone([[Math.floor(phase) % 2 ? 1250 : 950, 18]], 0.035);
+      }
+      const k = Math.pow(Math.max(0, Math.sin(phase * Math.PI)), 6);
+      el.style.transform = `scale(${1 + 0.12 * k}) rotate(${(k * 4).toFixed(2)}deg)`;
+      s.raf = requestAnimationFrame(frame);
+    };
+    s.raf = requestAnimationFrame(frame);
+  }
+
+  function seriesHead(s, r, detail) {
+    const oname = P.esc(oppName(s)), champ = seriesWinner(s);
+    return champ
+      ? `<div class="mp-trophy${champ === "me" ? "" : " theirs"}" aria-hidden="true">🏆</div><h2>${champ === "me" ? "Você levou a série!" : `${oname} levou a série`}</h2>
+         <p class="mp-series gold">Melhor de 3 · ${score(s)}</p>
+         <p class="subtitle">${r.result === "me" ? "Você venceu a última rodada. " : r.result === "opp" ? `${oname} venceu a última rodada. ` : ""}${detail}</p>`
+      : `<h2>${r.result === "me" ? "Você venceu a rodada!" : r.result === "opp" ? `${oname} venceu a rodada` : "Empate"}</h2>
+         <p class="subtitle">${detail}</p>
+         <p class="mp-series">Série: Você ${score(s)} ${oname} · melhor de 3</p>`;
+  }
+  function bombSheet(s, r) {
+    if (!r.result) return;
+    document.querySelectorAll(".overlay").forEach((x) => x.remove());
+    const oname = oppName(s), champ = seriesWinner(s);
+    const ui = P.sheet(`<div class="bomb-sheet-ico" aria-hidden="true">💥</div>${seriesHead(s, r, `${plural(r.words.length, "palavra", "palavras")} na rodada`)}
+      <div class="row-btns" style="margin-top:14px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>${champ ? "Nova série" : "Próxima rodada"}</button><button class="pill ghost" data-exit>Sair</button></div>
+      <div class="row-btns" style="margin-top:10px"><button class="pill ghost" data-share>Compartilhar</button></div>
+      ${s.me.host ? (s.oppLeft ? `<p class="note">${P.esc(oname)} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
+    P.$("[data-share]", ui.el).onclick = () => {
+      const t = champ === "me" ? `Levei a série por ${score(s)}`
+        : champ === "opp" ? `Perdi a série por ${s.series.opp} × ${s.series.me}`
+        : `${r.result === "me" ? "Venci a rodada" : "Perdi a rodada"} (série ${score(s)})`;
+      P.share(`Palavreiro · Bomba-Relógio com ${oname}\n${t} 💣`);
+    };
+    P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
+    P.$("[data-again]", ui.el).onclick = () => {
+      if (!s.me.host || s.oppLeft) return;
+      P.$("[data-again]", ui.el).disabled = true;
+      const msg = { t: "again", seed: newSeed().toString(36), at: Date.now() };
+      if (champ) msg.s = 1;
+      publish(msg);
+    };
+  }
+
+  // ---------- B. Anagrama ----------
+  const ANA_N = 10, ANA_GAP = 2500;
+  /** Embaralhamento da palavra k (0..9), igual nos dois lados. */
+  function anaShuffle(word, k, seed) {
+    const a = [...word];
+    let x = ((seed + k * 7919) % 2147483646) + 1;
+    for (let i = 4; i >= 1; i--) { x = (x * 48271) % 2147483647; const j = x % (i + 1); const t = a[i]; a[i] = a[j]; a[j] = t; }
+    let out = a.join("");
+    for (let n = 0; n < 4 && out === word; n++) out = out.slice(1) + out[0];
+    return out;
+  }
+  P.mp.anaShuffle = anaShuffle;
+  P.mp.anaWords = (seed) => P.mpWords(seed, ANA_N);
+  const sorted = (w) => [...w].sort().join("");
+
+  function anaRound(s, startAt) {
+    const words = P.mpWords(s.seed, ANA_N);
+    const { h, g } = ids(s);
+    const r = (s.round = { kind: "a", seed: s.seed, startAt, host: h, guest: g, words, shuf: words.map((w, k) => anaShuffle(w, k, s.seed)),
+      roundMs: debug().roundMs || 45000, start: [startAt], res: [], done: 0, pts: { me: 0, opp: 0 }, input: [], order: null, orderFor: -1,
+      sent: {}, result: null, shown: -1 });
+    s.view = "game";
+    r.kb = gameShell(s, "ana", `
+        <div class="ana-opp" data-opp></div>
+        <div class="ana-stage">
+          <div class="ana-letters" data-letters></div>
+          <button class="ana-mix" data-mix>🔀 Embaralhar</button>
+          <p class="ana-msg" data-msg></p>
+        </div>
+        <div class="timer ana-timer"><i data-bar></i></div>
+        <div class="mpg-input" data-input></div>
+        <div class="center" data-after></div>`, {
+      onLetter: (c) => { if (anaCanType(s, r) && r.input.length < 5) { r.input.push(c); P.fx.type(); anaInput(s, r); } },
+      onDelete: () => { if (anaCanType(s, r) && r.input.length) { r.input.pop(); anaInput(s, r); } },
+      onEnter: () => anaSubmit(s, r),
+    });
+    P.$("[data-mix]", s.root).onclick = () => {
+      const k = anaActive(r); if (k < 0 || !r.order) return;
+      let n; do { n = P.shuffle(r.order); } while (n.join("") === r.order.join("") && new Set(r.order).size > 1);
+      r.order = n; P.fx.type(); anaLetters(s, r, true);
+    };
+    r.api = { redraw: () => anaDraw(s, r) };
+    anaDraw(s, r);
+    countdown(s, r);
+    s.gameTimer = setInterval(() => anaTick(s, r), 100);
+  }
+  /** Rodada em jogo agora (-1 = contagem, intervalo entre rodadas ou fim). */
+  const anaActive = (r) => (!r.result && r.done < ANA_N && Date.now() >= r.start[r.done] ? r.done : -1);
+  const anaCanType = (s, r) => S === s && s.round === r && anaActive(r) >= 0 && !r.sent[r.done];
+
+  function anaSubmit(s, r) {
+    if (!anaCanType(s, r)) return;
+    const k = r.done, ans = r.words[k], row = P.$("[data-input]", s.root);
+    if (r.input.length < 5) return shakeEl(row, "Palavra incompleta");
+    const w = r.input.join("");
+    if (sorted(w) !== sorted(ans) || !(P.words.ok(w) || w === ans)) { r.input = []; anaInput(s, r); return shakeEl(row, "Não é essa"); }
+    r.sent[k] = true;
+    publish({ t: "solve", id: s.me.id, r: k, ms: Date.now() - r.start[k] });
+    anaDraw(s, r);
+  }
+  function anaMsg(s, m) {
+    const r = s.round;
+    if (!r || r.result || Number(m.r) !== r.done || r.done >= ANA_N) return;
+    if (m.t === "solve" && m.id !== r.host && m.id !== r.guest) return;
+    const k = r.done, by = m.t === "solve" ? m.id : null;
+    r.res[k] = by;
+    if (by === s.me.id) r.pts.me++; else if (by) r.pts.opp++;
+    r.done = k + 1;
+    r.start[k + 1] = Date.now() + ANA_GAP;
+    r.input = [];
+    if (by === s.me.id) P.fx.win(); else if (by) { P.tone([[392, 120], [330, 160]]); P.vibrate(60); } else P.tone([[330, 160]]);
+    if (r.done >= ANA_N) {
+      r.result = r.pts.me > r.pts.opp ? "me" : r.pts.me < r.pts.opp ? "opp" : "draw";
+      P.store.add("mp-played"); if (r.result === "me") P.store.add("mp-won");
+      P.logActivity();
+      clearTimeout(s.sheetTimer);
+      s.sheetTimer = setTimeout(() => {
+        if (S !== s || s.round !== r) return;
+        if (r.result === "me") P.confetti();
+        anaDraw(s, r);
+        if (!document.querySelector(".overlay")) anaSheet(s, r);
+      }, ANA_GAP);
+    }
+    anaDraw(s, r);
+  }
+  function anaTick(s, r) {
+    if (S !== s || s.round !== r) return stopGame(s);
+    const k = anaActive(r);
+    if (k >= 0) {
+      const el = Date.now() - r.start[k];
+      // Tempo esgotado: o anfitrião manda o "skip" (o convidado só se o anfitrião saiu ou passaram 5 s a mais).
+      if (el > r.roundMs && !r.sent["skip" + k] && (s.me.host || s.oppLeft || el > r.roundMs + 5000)) {
+        r.sent["skip" + k] = true;
+        publish({ t: "skip", r: k });
+      }
+      const bar = P.$("[data-bar]", s.root);
+      if (bar) bar.style.width = `${Math.max(0, 100 - (el / r.roundMs) * 100)}%`;
+    }
+    // Mudou de fase (contagem → rodada, rodada → intervalo, intervalo → próxima): redesenha.
+    const phase = `${r.done}|${k}`;
+    if (phase !== r.phase) { r.phase = phase; anaDraw(s, r); }
+  }
+
+  function anaLetters(s, r, pop) {
+    const el = P.$("[data-letters]", s.root); if (!el) return;
+    const k = anaActive(r);
+    let letters;
+    if (k >= 0) {
+      if (r.orderFor !== k) { r.orderFor = k; r.order = [...r.shuf[k]]; }
+      letters = r.order;
+    } else if (r.done > 0 && (r.done >= ANA_N || Date.now() < r.start[r.done])) letters = [...P.words.display(r.words[r.done - 1])];
+    else letters = ["?", "?", "?", "?", "?"];
+    el.classList.toggle("reveal", k < 0 && r.done > 0);
+    el.innerHTML = letters.map((c, i) => `<div class="ana-l l${i}${pop ? " pop" : ""}">${P.esc(c)}</div>`).join("");
+  }
+  function anaInput(s, r) {
+    const el = P.$("[data-input]", s.root); if (!el) return;
+    const on = anaCanType(s, r);
+    el.classList.toggle("off", !on);
+    el.innerHTML = tiles5(r.input);
+    if (on && r.input.length < 5) el.querySelectorAll(".tile")[r.input.length].classList.add("sel");
+  }
+  function anaDraw(s, r) {
+    if (S !== s || s.round !== r || !P.$(".ana", s.root)) return;
+    const oname = P.esc(oppName(s)), k = anaActive(r), shownRound = k >= 0 ? k : Math.max(0, Math.min(ANA_N, r.done) - (r.done > 0 ? 1 : 0));
+    const sc = P.$("[data-score]", s.root);
+    if (sc) { sc.classList.toggle("over", !!r.result); sc.innerHTML = `<b>${r.result === "me" ? "🏆 " : ""}${r.pts.me} × ${r.pts.opp}</b><small>rodada ${shownRound + 1}/${ANA_N}</small>`; }
+    anaLetters(s, r, k >= 0 && r.shown !== k);
+    if (k >= 0) r.shown = k;
+    const last = r.done - 1, inGap = k < 0 && r.done > 0;
+    const msg = P.$("[data-msg]", s.root);
+    if (inGap) {
+      const by = r.res[last], word = P.esc(P.words.display(r.words[last]));
+      msg.className = "ana-msg " + (by === s.me.id ? "win" : by ? "lose" : "none");
+      msg.innerHTML = by === s.me.id ? `Você acertou! <b>${word}</b>` : by ? `${oname} acertou: <b>${word}</b>` : `Ninguém acertou: <b>${word}</b>`;
+    } else if (k >= 0 && r.sent[k]) { msg.className = "ana-msg"; msg.textContent = "Conferindo…"; }
+    else { msg.className = "ana-msg"; msg.textContent = ""; }
+    P.$("[data-mix]", s.root).disabled = k < 0;
+    const o = P.$("[data-opp]", s.root);
+    const oppGot = inGap && r.res[last] && r.res[last] !== s.me.id && Date.now() < r.start[r.done];
+    o.className = "ana-opp" + (oppGot ? " got" : "") + (s.oppLeft ? " gone" : "");
+    o.innerHTML = s.oppLeft ? `<b>${oname}</b> saiu` : oppGot ? `<b>${oname}</b> acertou!` : `<b>${oname}</b>: ${plural(r.pts.opp, "ponto", "pontos")}`;
+    const bar = P.$("[data-bar]", s.root);
+    if (k < 0) bar.style.width = r.done > 0 ? "0%" : "100%";
+    anaInput(s, r);
+    r.kb.el.classList.toggle("off", !anaCanType(s, r));
+    const after = P.$("[data-after]", s.root);
+    after.innerHTML = "";
+    if (r.result && Date.now() >= r.start[ANA_N]) { const b = P.h(`<button class="pill ghost">Ver resultado</button>`); b.onclick = () => anaSheet(s, r); after.appendChild(b); }
+  }
+  function anaSheet(s, r) {
+    if (!r.result) return;
+    document.querySelectorAll(".overlay").forEach((x) => x.remove());
+    const oname = oppName(s), en = P.esc(oname), sc = `${r.pts.me} × ${r.pts.opp}`;
+    const rows = r.words.map((w, i) => {
+      const by = r.res[i];
+      return `<div class="ana-row${by === s.me.id ? " me" : by ? " opp" : ""}"><b>${P.esc(P.words.display(w))}</b><span>${by === s.me.id ? "✓ você" : by ? en : "—"}</span></div>`;
+    }).join("");
+    const ui = P.sheet(`<div class="bomb-sheet-ico" aria-hidden="true">🔤</div>
+      <h2>${r.result === "me" ? "Você venceu! 🏆" : r.result === "opp" ? `${en} venceu` : "Empate"}</h2>
+      <p class="mp-series gold ana-final">${sc}</p>
+      <div class="ana-rows">${rows}</div>
+      <div class="row-btns" style="margin-top:14px">${s.me.host ? `<button class="pill" data-again ${s.oppLeft ? "disabled" : ""}>Revanche</button>` : ""}<button class="pill ghost" data-exit>Sair</button><button class="pill ghost" data-share>Compartilhar</button></div>
+      ${s.me.host ? (s.oppLeft ? `<p class="note">${en} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
+    P.$("[data-share]", ui.el).onclick = () => {
+      const t = r.result === "me" ? `Venci por ${sc}` : r.result === "opp" ? `Perdi por ${sc}` : `Empate ${sc}`;
+      P.share(`Palavreiro · Anagrama com ${oname}\n${t} 🔤`);
+    };
+    P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
+    const again = P.$("[data-again]", ui.el);
+    if (again) again.onclick = () => {
+      if (!s.me.host || s.oppLeft) return;
+      again.disabled = true;
+      publish({ t: "again", seed: newSeed().toString(36), at: Date.now() });
     };
   }
 })();

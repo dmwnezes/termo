@@ -519,3 +519,60 @@ button { font-family: inherit; color: inherit; }
 .sa-trap { margin: 4px 0 0; text-align: center; color: var(--present); font-weight: 600; }
 .sa-ico { display: grid; gap: 5px; justify-items: center; font-size: 8px; font-weight: 800; letter-spacing: -.01em; }
 .sa-ico span { display: block; padding: 3px 5px; border-radius: 99px; white-space: nowrap; color: var(--dark-text); line-height: 1.1; }
+
+/* Modos da partida com amigo: as pílulas quebram linha (Termo | Dueto | Quarteto / Bomba | Anagrama) */
+.mp-modes { flex-wrap: wrap; border-radius: 24px; row-gap: 4px; }
+.mp-modes button { flex: 1 1 30%; }
+
+/* Bomba-Relógio e Anagrama */
+.mpg { gap: 10px; }
+.mpg .keyboard { margin-top: auto; transition: opacity .2s; }
+.mpg .keyboard.off { opacity: .35; pointer-events: none; }
+.mpg-input { display: flex; justify-content: center; gap: 6px; transition: opacity .2s; }
+.mpg-input .tile { --tile: 46px; cursor: default; }
+.mpg-input.off { opacity: .4; }
+.mpg-input.shake, .ana-letters.shake { animation: shake .3s; }
+
+.bomb-stage { display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+.bomb-ico { font-size: 104px; line-height: 1.1; will-change: transform; filter: drop-shadow(0 10px 22px rgba(0,0,0,.35)); user-select: none; }
+.bomb-ico.boom { font-size: 128px; animation: boom .55s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes boom { from { transform: scale(.3); opacity: .2; } to { transform: none; opacity: 1; } }
+.bomb-turn { margin: 4px 0 0; min-height: 1.5em; font-size: 1.25rem; font-weight: 800; color: var(--muted); opacity: .7; text-align: center; }
+.bomb-turn.mine { color: var(--correct); opacity: 1; }
+.bomb-turn.end { color: var(--present); opacity: 1; font-size: 1.35rem; }
+.bomb-words { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; }
+.bomb-count { margin: 0; font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); min-height: 1.2em; }
+.bomb-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-height: 92px; overflow-y: auto; padding: 2px; }
+.bw { padding: 5px 12px; border-radius: 99px; font-weight: 800; font-size: .9rem; letter-spacing: .04em; background: var(--accent); color: var(--dark-text); }
+.bw.me { background: var(--correct); }
+.bw.pend { opacity: .55; }
+.bw.in { animation: obIn .35s ease both; }
+.bomb-sheet-ico { font-size: 3.4rem; text-align: center; line-height: 1.1; }
+
+.ana-opp { align-self: center; padding: 6px 14px; border-radius: 99px; background: var(--surface); color: var(--muted); font-size: .9rem; font-weight: 600; }
+.ana-opp b { color: var(--text); }
+.ana-opp.got { color: var(--accent); animation: blink .5s ease-in-out infinite alternate; }
+.ana-opp.gone { color: var(--red); }
+@keyframes blink { from { opacity: 1; } to { opacity: .35; } }
+.ana-stage { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 4px; }
+.ana-letters { display: flex; gap: 8px; justify-content: center; }
+.ana-l { width: min(60px, 16vw); height: min(60px, 16vw); border-radius: 16px; display: grid; place-items: center; font-size: min(2rem, 8.5vw); font-weight: 800; color: var(--dark-text); background: var(--correct); box-shadow: 0 6px 0 rgba(0,0,0,.18); }
+.ana-l.l1, .ana-l.l3 { background: var(--present); }
+.ana-l.l2 { background: var(--flag-blue); color: var(--text); }
+.ana-l.pop { animation: pop .25s ease both; }
+.ana-l.pop.l1 { animation-delay: .04s; } .ana-l.pop.l2 { animation-delay: .08s; } .ana-l.pop.l3 { animation-delay: .12s; } .ana-l.pop.l4 { animation-delay: .16s; }
+.ana-letters.reveal .ana-l { opacity: .9; }
+.ana-mix { border: none; background: var(--surface-high); color: var(--text); font: 600 .85rem Outfit, sans-serif; padding: 7px 14px; border-radius: 99px; cursor: pointer; }
+.ana-mix:disabled { opacity: .35; cursor: default; }
+.ana-msg { margin: 0; min-height: 1.5em; font-size: 1.1rem; font-weight: 700; text-align: center; color: var(--muted); }
+.ana-msg.win { color: var(--correct); }
+.ana-msg.lose { color: var(--accent); }
+.ana-msg b { letter-spacing: .04em; }
+.ana-timer { margin: 2px 8px; }
+.ana-final { font-size: 1.8rem !important; font-variant-numeric: tabular-nums; }
+.ana-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0 4px; }
+.ana-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; background: var(--surface-high); border-radius: 14px; padding: 8px 12px; font-size: .9rem; }
+.ana-row span { color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ana-row.me span { color: var(--correct); }
+.ana-row.opp span { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .ana-opp.got, .bw.in, .ana-l.pop, .bomb-ico.boom { animation: none; } }

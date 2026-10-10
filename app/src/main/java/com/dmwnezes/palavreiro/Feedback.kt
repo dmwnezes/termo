@@ -62,6 +62,18 @@ class Feedback(context: Context, private val store: Store) {
         vibrate(longArrayOf(0, 180))
     }
 
+    /** Bomba-Relógio: passou a ser a sua vez (um toque curto). */
+    fun turn() {
+        tone(listOf(880.0 to 40), volume = 0.10)
+        vibrate(longArrayOf(0, 30))
+    }
+
+    /** Bomba-Relógio: a bomba explodiu (vibração longa). */
+    fun boom() {
+        tone(listOf(110.0 to 260, 82.4 to 420), volume = 0.2)
+        vibrate(longArrayOf(0, 650))
+    }
+
     private fun vibrate(pattern: LongArray) {
         if (!store.vibration) return
         runCatching { vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1)) }

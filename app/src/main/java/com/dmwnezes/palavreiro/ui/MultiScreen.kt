@@ -112,7 +112,7 @@ fun MultiScreen(
     var keptAt by remember { mutableLongStateOf(resume?.at ?: 0L) }
     var expired by remember { mutableStateOf(false) }
     var left by remember { mutableStateOf(false) }
-    var modeCode by remember { mutableStateOf(store?.text("mp_mode")?.firstOrNull()?.takeIf { it in Multi.MODES } ?: 'd') }
+    var modeCode by remember { mutableStateOf(store?.text("mp_mode")?.firstOrNull()?.takeIf { it in Multi.CODES } ?: 'd') }
     var oppId by remember { mutableStateOf<String?>(null) }
     var oppName by remember { mutableStateOf<String?>(null) }
     var joined by remember { mutableStateOf(resume?.host == false) }
@@ -123,6 +123,8 @@ fun MultiScreen(
     var localStart by remember { mutableLongStateOf(0L) }
     val oppRows = remember { mutableStateListOf<String>() }
     val ends = remember { mutableStateListOf<Msg.End>() }
+    // Bomba-Relógio e Anagrama: mensagens da rodada atual (zeradas a cada start/again), com a hora de chegada.
+    val roundMsgs = remember { mutableStateListOf<com.dmwnezes.palavreiro.game.Timed>() }
     var oppLeft by remember { mutableStateOf(false) }
     var recordedRound by remember { mutableIntStateOf(-1) }
     var showEnd by remember { mutableStateOf(false) }
@@ -156,7 +158,7 @@ fun MultiScreen(
         if (newSeries) series = Multi.Series()
         val t = System.currentTimeMillis()
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
-        oppRows.clear(); ends.clear(); showEnd = false
+        oppRows.clear(); ends.clear(); roundMsgs.clear(); showEnd = false
         round++
         phase = Phase.PLAYING
     }
@@ -190,6 +192,11 @@ fun MultiScreen(
             // Série acabada + revanche de um app antigo (sem "s") também zera o placar.
             is Msg.Again -> if (phase == Phase.PLAYING) { room = room?.withSeed(m.seed); oppLeft = false; beginRound(m.at, m.newSeries || series.over) }
             is Msg.Bye -> if (m.id == oppId) oppLeft = true
+            is Msg.Word, is Msg.Boom, is Msg.Solve -> if (phase == Phase.PLAYING) {
+                val id = when (m) { is Msg.Word -> m.id; is Msg.Boom -> m.id; is Msg.Solve -> m.id; else -> null }
+                if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            }
+            is Msg.Skip -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
         }
     }
 
@@ -229,14 +236,14 @@ fun MultiScreen(
     Box(Modifier.fillMaxSize().background(Night.background)) {
         when (phase) {
             Phase.CREATE -> Lobby("Jogar com amigo", ::leave) {
-                Text("Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆", color = Night.muted, fontSize = 15.sp)
+                Text(modeRules(modeCode, create = true), color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(16.dp))
                 Text("Modo", color = Night.muted, fontSize = 13.sp)
                 Spacer(Modifier.height(6.dp))
-                val codes = Multi.MODES.keys.toList()
-                ChipTabs(codes.map(Multi::modeName), codes.indexOf(modeCode)) { modeCode = codes[it] }
+                val codes = Multi.CODES
+                ChipTabs(codes.map(Multi::chipName), codes.indexOf(modeCode)) { modeCode = codes[it] }
                 Spacer(Modifier.height(22.dp))
                 PillButton("Criar partida", Night.correct, modifier = Modifier.fillMaxWidth(), enabled = Multi.validName(name)) {
                     val n = name.trim(); store?.setText("mp_name", n); store?.setText("mp_mode", modeCode.toString())
@@ -332,11 +339,11 @@ fun MultiScreen(
             Phase.JOIN -> Lobby("Jogar com amigo", ::leave) {
                 val r = room!!
                 Text(
-                    if (oppName != null) "$oppName te chamou para um ${Multi.modeName(r.mode)}" else "Você foi chamado para um ${Multi.modeName(r.mode)}",
+                    if (oppName != null) "$oppName te chamou para ${Multi.withArticle(r.mode)}" else "Você foi chamado para ${Multi.withArticle(r.mode)}",
                     color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold,
                 )
                 Spacer(Modifier.height(8.dp))
-                Text("Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆", color = Night.muted, fontSize = 15.sp)
+                Text(modeRules(r.mode, create = false), color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(20.dp))
@@ -373,7 +380,32 @@ fun MultiScreen(
                 Spacer(Modifier.height(20.dp))
                 PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
             }
-            Phase.PLAYING -> {
+            Phase.PLAYING -> if (!Multi.isTermo(room!!.mode)) {
+                val r = room!!
+                val counting = now < localStart
+                // Resultado (uma vez por rodada/partida): placar da série (Bomba) e contadores.
+                val decided: (String) -> Unit = { o ->
+                    if (r.mode == Multi.BOMB && scoredRound != round) { scoredRound = round; series = series.plus(o) }
+                    if (recordedRound != round) {
+                        recordedRound = round
+                        store?.add("mp_played"); if (o == "me") store?.add("mp_won"); store?.logActivity()
+                    }
+                }
+                Box(Modifier.fillMaxSize()) {
+                    if (r.mode == Multi.BOMB) BombPlay(
+                        words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, series, online, oppLeft,
+                        send = ::send, onDecided = decided,
+                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis(), newSeries = series.over)) },
+                        onLeave = ::leave,
+                    ) else AnagramPlay(
+                        words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, online, oppLeft,
+                        send = ::send, onDecided = decided,
+                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis())) },
+                        onLeave = ::leave,
+                    )
+                    if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
+                }
+            } else {
                 val r = room!!
                 val boards = Multi.boards(r.mode)
                 val mode = Multi.MODES.getValue(r.mode)
@@ -438,6 +470,14 @@ fun MultiScreen(
     }
 }
 
+/** Explicação curta do modo nas telas de criar e de entrar. */
+private fun modeRules(code: Char, create: Boolean): String = when (code) {
+    Multi.BOMB -> "Vocês se revezam mandando palavras de 5 letras, sem repetir. A bomba explode num momento secreto: perde quem estiver com ela. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
+    Multi.ANAGRAM -> "10 rodadas com as mesmas 5 letras embaralhadas para os dois: quem achar a palavra primeiro leva o ponto. Vence quem fizer mais pontos 🏆"
+    else -> if (create) "Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
+    else "Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
+}
+
 private fun oppStatus(rows: Int, max: Int, end: Msg.End?, left: Boolean): String = when {
     end != null && end.won -> "acertou em ${end.tries}!"
     end != null -> "errou"
@@ -482,7 +522,7 @@ private fun WaitingDots(text: String) {
 }
 
 @Composable
-private fun Countdown(n: Int) {
+internal fun Countdown(n: Int) {
     Box(
         Modifier.fillMaxSize().background(Night.bgBottom.copy(alpha = 0.72f))
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
@@ -588,7 +628,7 @@ internal fun EndSheet(
 }
 
 @Composable
-private fun ResultLine(who: String, text: String, winner: Boolean) {
+internal fun ResultLine(who: String, text: String, winner: Boolean) {
     Row(
         Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(Shapes.card).background(if (winner) Night.correct.copy(alpha = 0.22f) else Night.surfaceHigh)
             .padding(horizontal = 14.dp, vertical = 12.dp),
@@ -617,7 +657,7 @@ internal fun SeriesPill(series: Multi.Series) {
 
 /** Troféu do fim da série, com um leve balanço. */
 @Composable
-private fun Trophy(title: String, subtitle: String, mine: Boolean) {
+internal fun Trophy(title: String, subtitle: String, mine: Boolean) {
     val t = rememberInfiniteTransition(label = "trofeu")
     val s by t.animateFloat(0.94f, 1.06f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "s")
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
