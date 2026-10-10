@@ -46,6 +46,12 @@ class MultiTest {
         // Formato exato que o site manda.
         assertEquals(Msg.Hello("q1w2e3r4", "Ana", false), Multi.decode("""{"t":"hello","id":"q1w2e3r4","n":"Ana","host":false}"""))
         assertEquals(Msg.Again(Multi.parse("abc123xyz789-d-21i3v9")!!.seed, 5), Multi.decode("""{"t":"again","seed":"21i3v9","at":5}"""))
+        // Colar o link: inteiro, só o código, ou no meio de uma mensagem.
+        assertEquals(r, Multi.fromPasted(r.link))
+        assertEquals(r, Multi.fromPasted(r.code))
+        assertEquals(r, Multi.fromPasted("Bora jogar Dueto no Palavreiro? ${r.link} vem!"))
+        assertEquals(r, Multi.fromPasted("https://dmwnezes.github.io/termo/index.html?mp=ABC123XYZ789-D-21I3V9&x=1"))
+        assertNull(Multi.fromPasted("https://dmwnezes.github.io/termo/")); assertNull(Multi.fromPasted("")); assertNull(Multi.fromPasted(null))
         assertNull(Multi.decode("oi")); assertNull(Multi.decode("""{"t":"outro"}"""))
         assertTrue(Multi.validName("Ana")); assertFalse(Multi.validName("A")); assertFalse(Multi.validName("x".repeat(17)))
     }

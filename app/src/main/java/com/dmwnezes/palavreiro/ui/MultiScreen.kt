@@ -184,6 +184,41 @@ fun MultiScreen(
                 if (name.isNotEmpty() && !Multi.validName(name)) {
                     Spacer(Modifier.height(8.dp)); Text("O nome precisa ter de 2 a 16 letras.", color = Night.red, fontSize = 13.sp)
                 }
+                // Entrar numa partida que alguém criou: cola o link (ou o código) e entra na sala.
+                Spacer(Modifier.height(28.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.weight(1f).height(1.dp).background(Night.outline.copy(alpha = 0.5f)))
+                    Text("  ou entre numa partida  ", color = Night.muted, fontSize = 13.sp)
+                    Box(Modifier.weight(1f).height(1.dp).background(Night.outline.copy(alpha = 0.5f)))
+                }
+                Spacer(Modifier.height(14.dp))
+                var pasted by remember { mutableStateOf("") }
+                var bad by remember { mutableStateOf(false) }
+                fun enter(text: String) {
+                    val r = Multi.fromPasted(text)
+                    if (r == null) { bad = true; return }
+                    bad = false; room = r; isHost = false; oppName = null; phase = Phase.JOIN
+                }
+                OutlinedTextField(
+                    value = pasted, onValueChange = { pasted = it; bad = false }, singleLine = true,
+                    label = { Text("Link da partida") }, placeholder = { Text("Cole aqui o link que seu amigo mandou") },
+                    modifier = Modifier.fillMaxWidth(), isError = bad,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Night.text, unfocusedTextColor = Night.text, focusedBorderColor = Night.accent,
+                        unfocusedBorderColor = Night.outline, cursorColor = Night.accent, focusedLabelColor = Night.accent, unfocusedLabelColor = Night.muted,
+                        errorBorderColor = Night.red, errorLabelColor = Night.red, errorTextColor = Night.text, errorCursorColor = Night.red,
+                    ),
+                )
+                if (bad) { Spacer(Modifier.height(6.dp)); Text("Esse link não é de uma partida do Palavreiro.", color = Night.red, fontSize = 13.sp) }
+                Spacer(Modifier.height(12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    PillButton("Colar", Night.surfaceHigh, Night.text, Modifier.weight(1f)) {
+                        val clip = context.getSystemService(ClipboardManager::class.java)?.primaryClip?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
+                        pasted = clip
+                        if (Multi.fromPasted(clip) != null) enter(clip) else bad = clip.isNotBlank()
+                    }
+                    PillButton("Entrar na partida", Night.accent, modifier = Modifier.weight(1.4f), enabled = pasted.isNotBlank()) { enter(pasted) }
+                }
             }
             Phase.WAITING -> Lobby("Jogar com amigo", onBack) {
                 val r = room!!

@@ -198,9 +198,36 @@
         ${nameField()}
         <div class="mp-field"><span>Modo</span><div class="seg mp-modes">${Object.entries(MODES).map(([k, v]) => `<button data-m="${k}" class="${k === m ? "on" : ""}">${v.name}</button>`).join("")}</div></div>
         <button class="pill wide" data-create>Criar partida</button>
+        <div class="mp-or"><span>ou entre numa partida</span></div>
+        <label class="mp-field"><span>Link da partida</span>
+          <input class="mp-input" data-paste placeholder="Cole aqui o link que seu amigo mandou" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+        <p class="mp-err hidden" data-paste-err>Esse link não é de uma partida do Palavreiro.</p>
+        <div class="row-btns"><button class="pill ghost" data-paste-btn>Colar</button><button class="pill accent" data-enter>Entrar na partida</button></div>
       </div>`;
     body.querySelectorAll("[data-m]").forEach((b) => (b.onclick = () => { m = b.dataset.m; P.store.set("mp-mode", m); P.fx.type(); body.querySelectorAll("[data-m]").forEach((x) => x.classList.toggle("on", x === b)); }));
     P.$("[data-name]", body).addEventListener("keydown", (e) => { if (e.key === "Enter") P.$("[data-create]", body).click(); });
+    // Entrar numa partida colando o link (inteiro, só o código, ou no meio de uma mensagem).
+    const fromPasted = (t) => {
+      t = String(t || "").trim();
+      const a = /[?&]mp=([A-Za-z0-9-]+)/.exec(t); if (a) return P.mp.parse(a[1]) ? a[1].toLowerCase() : null;
+      const b = /\b([a-z0-9]{12}-[tdq]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
+    };
+    const err = P.$("[data-paste-err]", body), input = P.$("[data-paste]", body);
+    const enter = (t) => {
+      const code = fromPasted(t);
+      err.classList.toggle("hidden", !!code || !String(t || "").trim());
+      if (!code) return;
+      try { sessionStorage.setItem("pv-mp-join", code); } catch (_) {}
+      P.go("amigo/entrar");
+    };
+    input.addEventListener("input", () => err.classList.add("hidden"));
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") enter(input.value); });
+    P.$("[data-enter]", body).onclick = () => enter(input.value);
+    P.$("[data-paste-btn]", body).onclick = async () => {
+      try { const t = await navigator.clipboard.readText(); input.value = t; enter(t); }
+      catch (_) { input.focus(); P.toast("Cole o link no campo"); }
+    };
+    P.mp.fromPasted = fromPasted;
     P.$("[data-create]", body).onclick = () => {
       const name = readName(root); if (!name) return;
       const s = session({ room: randStr(12), m, seed: newSeed(), host: true, name, root });

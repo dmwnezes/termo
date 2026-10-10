@@ -33,6 +33,14 @@ object Multi {
         return Room(room, mode, seed)
     }
 
+    /** Aceita o link inteiro (…?mp=CODIGO…), só o código, ou um texto com o link no meio (mensagem do WhatsApp). */
+    fun fromPasted(text: String?): Room? {
+        val t = text?.trim().orEmpty()
+        Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
+        Regex("\\b([a-z0-9]{12}-[tdq]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        return null
+    }
+
     private const val ALPHA = "abcdefghijklmnopqrstuvwxyz0123456789"
     fun randomId(n: Int, rnd: Random = Random.Default) = buildString { repeat(n) { append(ALPHA[rnd.nextInt(ALPHA.length)]) } }
     fun newSeed(rnd: Random = Random.Default): Long = rnd.nextLong(0, 2147483647L)
