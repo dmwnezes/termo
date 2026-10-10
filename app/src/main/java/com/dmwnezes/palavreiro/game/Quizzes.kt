@@ -201,3 +201,96 @@ class SynonymGame(
         buildOptions()
     }
 }
+
+/** Tipo de pergunta do Sinônimo ou Antônimo. */
+enum class SaKind { SINONIMO, ANTONIMO }
+
+/** Pergunta: a palavra, a resposta certa e se há pegadinha (o par do outro tipo entre as opções). */
+data class SaQuestion(val kind: SaKind, val word: String, val answer: String, val trick: String?)
+
+/**
+ * Sinônimo ou Antônimo: cada pergunta pede um sinônimo ou um antônimo (nunca 3 iguais seguidos).
+ * Pegadinha: quando a palavra também tem par do outro tipo, às vezes ele aparece entre as opções.
+ */
+class SynAntGame(
+    private val syn: List<SynPair>,
+    private val synFamilies: List<Set<String>>,
+    private val ant: List<SynPair>,
+    private val antFamilies: List<Set<String>>,
+    seed: Long = System.nanoTime(),
+    val secondsPerQuestion: Int = 10,
+) {
+    private val rnd = Random(seed)
+    private val synOf = syn.groupBy({ it.word }, { it.synonym })
+    private val antOf = ant.groupBy({ it.word }, { it.synonym })
+    /** Palavras que existem nos dois arquivos (as que podem ter pegadinha). */
+    private val synBoth = syn.filter { it.word in antOf }
+    private val antBoth = ant.filter { it.word in synOf }
+    private val recent = ArrayDeque<String>()
+    private val kinds = ArrayList<SaKind>()
+
+    var question by mutableStateOf(newQuestion())
+        private set
+    val options = mutableStateListOf<String>()
+    var chain by mutableIntStateOf(0)
+        private set
+    var over by mutableStateOf(false)
+        private set
+    var picked by mutableStateOf<String?>(null)
+        private set
+
+    init { buildOptions() }
+
+    private fun familyOf(w: String, fams: List<Set<String>>): Set<String> = fams.filter { w in it }.flatten().toSet() + w
+
+    private fun newQuestion(): SaQuestion {
+        val last2 = kinds.takeLast(2)
+        val kind = if (last2.size == 2 && last2[0] == last2[1]) (if (last2[0] == SaKind.SINONIMO) SaKind.ANTONIMO else SaKind.SINONIMO)
+        else if (rnd.nextBoolean()) SaKind.SINONIMO else SaKind.ANTONIMO
+        kinds += kind
+        val (all, both) = if (kind == SaKind.SINONIMO) syn to synBoth else ant to antBoth
+        var pair: SynPair
+        var tries = 0
+        do {
+            val pool = if (both.isNotEmpty() && rnd.nextDouble() < 0.6) both else all
+            pair = pool[rnd.nextInt(pool.size)]
+            tries++
+        } while (pair.word in recent && tries < 30)
+        recent.addLast(pair.word); if (recent.size > 40) recent.removeFirst()
+        val other = (if (kind == SaKind.SINONIMO) antOf else synOf)[pair.word].orEmpty()
+        val fams = if (kind == SaKind.SINONIMO) synFamilies else antFamilies
+        val ansFam = familyOf(pair.synonym, fams)
+        val trick = other.filter { it != pair.synonym && it !in ansFam }.takeIf { it.isNotEmpty() && rnd.nextBoolean() }?.let { it[rnd.nextInt(it.size)] }
+        return SaQuestion(kind, pair.word, pair.synonym, trick)
+    }
+
+    private fun buildOptions() {
+        val q = question
+        val (pairs, fams) = if (q.kind == SaKind.SINONIMO) syn to synFamilies else ant to antFamilies
+        val blocked = familyOf(q.word, fams) + familyOf(q.answer, fams)
+        val otherAll = (if (q.kind == SaKind.SINONIMO) antOf else synOf)[q.word].orEmpty().toSet()
+        // Sem pegadinha, nenhuma errada é o par do outro tipo (para a pegadinha ser sempre de propósito).
+        val pool = pairs.map { it.synonym }.distinct()
+            .filter { it !in blocked && it !in otherAll && familyOf(it, fams).none { f -> f in blocked } }
+            .shuffled(rnd)
+        val wrong = if (q.trick != null) listOf(q.trick) + pool.take(2) else pool.take(3)
+        options.clear()
+        options.addAll((wrong + q.answer).shuffled(rnd))
+        picked = null
+    }
+
+    /** Responde; devolve true se acertou. */
+    fun answer(option: String): Boolean {
+        if (over || picked != null) return false
+        picked = option
+        return if (option == question.answer) { chain++; true } else { over = true; false }
+    }
+
+    fun timeUp() { if (!over && picked == null) over = true }
+
+    fun next() {
+        if (over) return
+        question = newQuestion()
+        buildOptions()
+    }
+}

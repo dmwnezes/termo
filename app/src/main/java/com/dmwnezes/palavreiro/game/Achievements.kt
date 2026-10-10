@@ -30,7 +30,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won",
             "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
             "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best",
-            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best", "mestre_played", "mestre_best", "mestre_right", "mp_played", "mp_won",
+            "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best", "mestre_played", "mestre_best", "mestre_right", "mp_played", "mp_won", "sa_best", "sa_tricks",
             "arch_played", "arch_won", "alldone_days",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
@@ -61,8 +61,8 @@ object Achievements {
             a("♻️", "Conexão sem fim", "Resolva 10 Conexões no Infinito", r["conn_inf_won"], 10),
             a("🤖", "Mais esperto que o app", "Vença o Reverso", r["rev_userwins"], 1),
             a("📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", r["def_best"], 10),
-            a("⛓️", "Corrente forte", "Faça uma cadeia de 20 sinônimos", r["syn_best"], 20),
-            a("🔄", "Do avesso", "Faça uma cadeia de 20 antônimos", r["ant_best"], 20),
+            a("⛓️", "Corrente forte", "Faça uma cadeia de 20 no Sinônimo ou Antônimo", maxOf(r["syn_best"], r["sa_best"]), 20),
+            a("🔄", "Do avesso", "Acerte 20 pegadinhas no Sinônimo ou Antônimo", maxOf(r["ant_best"], r["sa_tricks"]), 20),
             a("🕵️", "Detetive", "Faça 10 pontos no Intruso", r["intr_best"], 10),
             a("✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", r["ort_best"], 20),
             a("👑", "Obediente", "Faça 15 pontos no Mestre Mandou", r["mestre_best"], 15),

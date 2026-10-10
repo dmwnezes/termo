@@ -146,6 +146,44 @@ class NewGamesTest {
     }
 
     @Test
+    fun sinonimoOuAntonimo() {
+        val (syn, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, af) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        val synOf = syn.groupBy({ it.word }, { it.synonym }); val antOf = ant.groupBy({ it.word }, { it.synonym })
+        val g = com.dmwnezes.palavreiro.game.SynAntGame(syn, sf, ant, af, seed = 11)
+        val kinds = ArrayList<com.dmwnezes.palavreiro.game.SaKind>()
+        var tricks = 0
+        repeat(2000) {
+            val q = g.question
+            kinds += q.kind
+            assertEquals(4, g.options.size); assertEquals(4, g.options.toSet().size)
+            assertTrue(q.answer in g.options)
+            val other = (if (q.kind == com.dmwnezes.palavreiro.game.SaKind.SINONIMO) antOf else synOf)[q.word].orEmpty().toSet()
+            if (q.trick != null) { tricks++; assertTrue(q.trick in g.options); assertTrue(q.trick in other); assertTrue(q.trick != q.answer) }
+            // Sem pegadinha, o par do outro tipo nunca aparece por acaso.
+            else assertTrue(g.options.none { it in other && it != q.answer })
+            assertTrue(g.answer(q.answer)); g.next()
+        }
+        // Nunca 3 do mesmo tipo seguidos, os dois tipos aparecem e há pegadinhas.
+        assertTrue(kinds.windowed(3).none { it.toSet().size == 1 })
+        assertTrue(kinds.count { it == com.dmwnezes.palavreiro.game.SaKind.ANTONIMO } in 600..1400)
+        assertTrue("pegadinhas: $tricks", tricks in 200..1200)
+        val t = com.dmwnezes.palavreiro.game.SynAntGame(syn, sf, ant, af, seed = 3)
+        t.timeUp(); assertTrue(t.over)
+    }
+
+    @Test
+    fun desistir() {
+        val words = com.dmwnezes.palavreiro.game.Words(File("../shared/words.js").readText())
+        val g = com.dmwnezes.palavreiro.game.TermoGame(com.dmwnezes.palavreiro.data.Mode.QUARTETO, words, store = null, freePlay = true)
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        "MUN".forEach(g::type)
+        g.giveUp()
+        assertTrue(g.over); assertFalse(g.won); assertTrue(g.gaveUp); assertEquals(1, g.rows.size)
+        g.giveUp(); assertEquals(1, g.rows.size)
+    }
+
+    @Test
     fun mestreMandou() {
         val (syn, synFam) = QuizData.synonyms(asset("sinonimos.txt"))
         val (ant, antFam) = QuizData.antonyms(asset("antonimos.txt"), synFam)
@@ -160,7 +198,8 @@ class NewGamesTest {
             val r = g.round
             seen += r.type
             assertEquals(4, r.options.size); assertEquals(4, r.options.map { L(it) }.toSet().size)
-            assertEquals(if (r.type == com.dmwnezes.palavreiro.game.OrderType.TODAS) 2 else 1, r.targets.size)
+            assertEquals(1, r.targets.size)
+            assertTrue(r.text.startsWith("O mestre mandou") || r.text.startsWith("O mestre NÃO mandou"))
             // Confere as ordens de letra de forma independente.
             Regex("começa com ([A-Z])$|começam com ([A-Z])$").find(r.text)?.let { m ->
                 val c = (m.groupValues[1] + m.groupValues[2])[0]
@@ -175,13 +214,12 @@ class NewGamesTest {
             when (r.type) {
                 com.dmwnezes.palavreiro.game.OrderType.NORMAL -> g.tap(r.targets.first())
                 com.dmwnezes.palavreiro.game.OrderType.NAO_TOQUE -> g.tap(r.options.first { it !in r.targets })
-                com.dmwnezes.palavreiro.game.OrderType.TODAS -> { g.tap(r.targets.first()); assertEquals(null, g.result); g.tap(r.targets.last()) }
                 else -> g.timeUp()
             }
             assertEquals(true, g.result)
             g.next()
         }
-        assertEquals(400, g.score); assertEquals(5, seen.size)
+        assertEquals(400, g.score); assertEquals(3, seen.size)
         // Erros: tocar numa pegadinha e deixar o tempo acabar numa ordem real.
         while (!g.round.type.isTrick) { g.timeUp(); if (g.over) break; g.next() }
         if (!g.over) { g.tap(g.round.options.first()); assertEquals(false, g.result) }

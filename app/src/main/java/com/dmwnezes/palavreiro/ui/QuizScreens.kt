@@ -45,7 +45,8 @@ import com.dmwnezes.palavreiro.game.DefineGame
 import com.dmwnezes.palavreiro.game.Definition
 import com.dmwnezes.palavreiro.game.Mark
 import com.dmwnezes.palavreiro.game.SynPair
-import com.dmwnezes.palavreiro.game.SynonymGame
+import com.dmwnezes.palavreiro.game.SaKind
+import com.dmwnezes.palavreiro.game.SynAntGame
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -155,46 +156,44 @@ private fun AnswerSlots(game: DefineGame) {
     }
 }
 
-/** Sinônimos em Cadeia: escolha o sinônimo certo antes do tempo acabar. */
+/** Sinônimo ou Antônimo: cada palavra pede um sinônimo ou um antônimo; às vezes os dois aparecem nas opções. */
 @Composable
-fun SynonymScreen(
-    pairs: List<SynPair>,
-    families: List<Set<String>>,
+fun SynAntScreen(
+    syn: List<SynPair>,
+    synFamilies: List<Set<String>>,
+    ant: List<SynPair>,
+    antFamilies: List<Set<String>>,
     store: Store?,
     feedback: Feedback?,
     onBack: () -> Unit,
     seed: Long = System.nanoTime(),
-    kind: ChainKind = ChainKind.SINONIMOS,
+    autoStart: Boolean = false,
 ) {
     var round by remember { mutableIntStateOf(0) }
-    val game = remember(round) { SynonymGame(pairs, families, seed + round) }
-    var best by remember { mutableIntStateOf(store?.int(kind.bestKey) ?: 0) }
+    val game = remember(round) { SynAntGame(syn, synFamilies, ant, antFamilies, seed + round) }
+    val bestOf = { store?.let { maxOf(it.int("sa_best"), it.int("syn_best"), it.int("ant_best")) } ?: 0 }
+    var best by remember { mutableIntStateOf(bestOf()) }
     val timer = remember(round) { Animatable(1f) }
     val scope = rememberCoroutineScope()
-    var started by remember { mutableStateOf(false) }
+    var started by remember { mutableStateOf(autoStart) }
 
-    // Barra de tempo de cada pergunta.
     LaunchedEffect(game.question, started, round) {
         if (!started || game.over) return@LaunchedEffect
         timer.snapTo(1f)
         timer.animateTo(0f, tween(game.secondsPerQuestion * 1000, easing = LinearEasing))
-        if (game.picked == null && !game.over) {
-            game.timeUp()
-            feedback?.lose()
-        }
+        if (game.picked == null && !game.over) { game.timeUp(); feedback?.lose() }
     }
-
     LaunchedEffect(game.over) {
         if (game.over) {
             store?.logActivity()
-            store?.max(kind.bestKey, game.chain)
+            store?.max("sa_best", game.chain)
             best = maxOf(best, game.chain)
         }
     }
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar(kind.title, onBack)
+            TopBar("Sinônimo ou Antônimo", onBack)
             Column(
                 Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -205,29 +204,35 @@ fun SynonymScreen(
                 }
                 Spacer(Modifier.height(22.dp))
                 if (!started) {
-                    Text(kind.intro, color = Night.text, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text("Sinônimo ou Antônimo?", color = Night.text, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "Aparece uma palavra e quatro opções. Toque na que ${kind.explain}. Você tem ${game.secondsPerQuestion} segundos por palavra, e a cadeia continua até o primeiro erro.",
+                        "Cada palavra pede um sinônimo (mesmo sentido) ou um antônimo (sentido contrário). Leia bem a pergunta: às vezes os dois aparecem nas opções! Você tem ${game.secondsPerQuestion} segundos por palavra, e a cadeia continua até o primeiro erro.",
                         color = Night.muted, fontSize = 15.sp, textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(28.dp))
                     PillButton("Começar", Night.correct, modifier = Modifier.fillMaxWidth()) { started = true }
                 } else {
-                    // Barra de tempo arredondada.
+                    val q = game.question
+                    val isSyn = q.kind == SaKind.SINONIMO
+                    val kindColor = if (isSyn) Night.correct else Night.red
                     Box(Modifier.fillMaxWidth().height(10.dp).clip(Shapes.pill).background(Night.surface)) {
-                        Box(
-                            Modifier.fillMaxWidth(timer.value).height(10.dp).clip(Shapes.pill)
-                                .background(if (timer.value < 0.3f) Night.red else Night.accent)
-                        )
+                        Box(Modifier.fillMaxWidth(timer.value).height(10.dp).clip(Shapes.pill).background(if (timer.value < 0.3f) Night.red else Night.accent))
                     }
                     Spacer(Modifier.height(26.dp))
-                    Text(kind.question, color = Night.muted, fontSize = 15.sp)
-                    Spacer(Modifier.height(6.dp))
-                    Text(game.question.word, color = Night.text, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Qual é o ", color = Night.muted, fontSize = 16.sp)
+                        Text(
+                            if (isSyn) "SINÔNIMO" else "ANTÔNIMO", color = Color(0xFF1A1438), fontSize = 15.sp, fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.clip(Shapes.pill).background(kindColor).padding(horizontal = 12.dp, vertical = 4.dp),
+                        )
+                        Text(" de", color = Night.muted, fontSize = 16.sp)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text(q.word, color = Night.text, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(24.dp))
                     game.options.forEach { opt ->
-                        val isRight = opt == game.question.synonym
+                        val isRight = opt == q.answer
                         val target = when {
                             game.picked == null && !game.over -> Night.surfaceHigh
                             isRight -> Night.correct
@@ -238,28 +243,26 @@ fun SynonymScreen(
                         Text(
                             opt,
                             color = if (bg == Night.correct || bg == Night.red) Color(0xFF1A1438) else Night.text,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp).clip(RoundedCornerShape(20.dp)).background(bg)
                                 .clickable(enabled = game.picked == null && !game.over) {
                                     if (game.answer(opt)) {
+                                        if (q.trick != null) store?.add("sa_tricks")
                                         feedback?.reveal(game.chain % 5, Mark.CORRECT)
                                         scope.launch { delay(550); game.next() }
-                                    } else {
-                                        feedback?.invalid()
-                                    }
+                                    } else feedback?.invalid()
                                 }
                                 .padding(vertical = 16.dp),
                         )
                     }
                     if (game.over) {
                         Spacer(Modifier.height(18.dp))
-                        Text(
-                            if (game.picked == null) "O tempo acabou!" else "Fim da cadeia!",
-                            color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold,
-                        )
-                        Text("${game.question.word} ${kind.sign} ${game.question.synonym}", color = Night.muted, fontSize = 15.sp)
+                        Text(if (game.picked == null) "O tempo acabou!" else "Fim da cadeia!", color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("${q.word} ${if (isSyn) "=" else "≠"} ${q.answer}", color = Night.muted, fontSize = 15.sp)
+                        if (q.trick != null && game.picked == q.trick) {
+                            Spacer(Modifier.height(4.dp))
+                            Text("Pegadinha! Era o ${if (isSyn) "SINÔNIMO" else "ANTÔNIMO"} que pedia.", color = kindColor, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                        }
                         Spacer(Modifier.height(14.dp))
                         PillButton("Jogar de novo", Night.correct, modifier = Modifier.fillMaxWidth()) { round++ }
                     }
@@ -268,10 +271,4 @@ fun SynonymScreen(
             }
         }
     }
-}
-
-/** Os dois jogos de cadeia: Sinônimos (mesmo sentido) e Antônimos (sentido contrário). */
-enum class ChainKind(val title: String, val intro: String, val explain: String, val question: String, val sign: String, val bestKey: String) {
-    SINONIMOS("Sinônimos", "Escolha o sinônimo certo", "tem o mesmo sentido", "Qual é o sinônimo de", "=", "syn_best"),
-    ANTONIMOS("Antônimos", "Escolha o antônimo certo", "tem o sentido contrário", "Qual é o antônimo de", "≠", "ant_best"),
 }

@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Assert.assertEquals
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -34,7 +35,7 @@ class MultiFlowTest {
     @Test
     fun anfitriaoCriaEAmigoEntra() {
         assumeTrue(System.getenv("PV_LIVE") == "1")
-        val ntfy = Ntfy(OkHttpClient())
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
         rule.onNodeWithText("Criar partida").performClick()
@@ -52,7 +53,7 @@ class MultiFlowTest {
     @Test
     fun amigoEntraPeloLink() {
         assumeTrue(System.getenv("PV_LIVE") == "1")
-        val ntfy = Ntfy(OkHttpClient())
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         val room = Multi.newRoom('q')
         runBlocking { ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("host0001", "Daniel", true))) }
         Thread.sleep(1500)
@@ -87,7 +88,7 @@ class MultiFlowTest {
     @Test
     fun serieComTrofeu() {
         assumeTrue(System.getenv("PV_LIVE") == "1")
-        val ntfy = Ntfy(OkHttpClient())
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         val room = Multi.newRoom('t')
         runBlocking { ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("host0001", "Daniel", true))) }
         Thread.sleep(1500)
@@ -119,4 +120,31 @@ class MultiFlowTest {
         rule.waitUntil(30_000) { rule.onAllNodes(hasText("Daniel levou a série")).fetchSemanticsNodes().isNotEmpty() }
         rule.onAllNodes(hasText("Melhor de 3 · 0 × 2")).fetchSemanticsNodes().let { assert(it.isNotEmpty()) }
     }
+
+    /** O app foi fechado com a sala aberta; o amigo entrou nesse meio-tempo. Ao voltar, a partida começa (um start só). */
+    @Test
+    fun salaRetomada() {
+        assumeTrue(System.getenv("PV_LIVE") == "1")
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
+        val room = Multi.newRoom('t')
+        val hostId = "host" + Multi.randomId(4)
+        runBlocking {
+            ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello(hostId, "Daniel", true)))
+            ntfy.publish(room.topic, Multi.encode(Multi.Msg.Hello("guest001", "Ana", false)))
+        }
+        Thread.sleep(1500)
+        val session = Multi.Session(room.code, true, hostId, "Daniel", System.currentTimeMillis() - 60_000)
+        rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}, resume = session) } }
+        rule.waitUntil(30_000) { rule.onAllNodes(hasText("Você × Ana")).fetchSemanticsNodes().isNotEmpty() }
+        Thread.sleep(3000)
+        val got = mutableListOf<Multi.Msg>()
+        runBlocking { kotlinx.coroutines.withTimeoutOrNull(8000) { ntfy.events(room.topic).filterIsInstanceMsg().collect { got += it } } }
+        val starts = got.count { it is Multi.Msg.Start }
+        assertEquals(1, starts)
+    }
+
+    private fun kotlinx.coroutines.flow.Flow<Ntfy.Event>.filterIsInstanceMsg() =
+        kotlinx.coroutines.flow.flow {
+            collect { e -> if (e is Ntfy.Event.Message) Multi.decode(e.text)?.let { emit(it) } }
+        }
 }

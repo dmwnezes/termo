@@ -13,14 +13,10 @@ enum class OrderType {
     NORMAL,
     /** "O mestre mandou: NÃO toque ..." — toque em qualquer outra. */
     NAO_TOQUE,
-    /** "O mestre mandou: toque em TODAS ..." — toque nas duas certas. */
-    TODAS,
-    /** "Toque ...!" sem o mestre — não toque em nada. */
-    SEM_MESTRE,
     /** "O mestre NÃO mandou: toque ..." — não toque em nada. */
     NAO_MANDOU;
 
-    val isTrick: Boolean get() = this == SEM_MESTRE || this == NAO_MANDOU
+    val isTrick: Boolean get() = this == NAO_MANDOU
 }
 
 /** Uma rodada: a ordem, as 4 palavras e quais cumprem o critério. */
@@ -86,11 +82,7 @@ class MestreGame(private val data: MestreData, private val rnd: Random = Random.
         when (r.type) {
             OrderType.NORMAL -> if (word in r.targets) win("Isso!") else lose("Não era essa!")
             OrderType.NAO_TOQUE -> if (word in r.targets) lose("O mestre mandou NÃO tocar nessa!") else win("Boa!")
-            OrderType.TODAS -> when {
-                word !in r.targets -> lose("Essa não!")
-                r.targets.all { it in tapped } -> win("Todas!")
-            }
-            OrderType.SEM_MESTRE, OrderType.NAO_MANDOU -> lose("Pegadinha! O mestre não mandou.")
+            OrderType.NAO_MANDOU -> lose("Pegadinha! O mestre não mandou.")
         }
     }
 
@@ -115,20 +107,17 @@ class MestreGame(private val data: MestreData, private val rnd: Random = Random.
     private fun newRound(): MestreRound {
         val x = rnd.nextDouble()
         val type = when {
-            x < 0.55 -> OrderType.NORMAL
-            x < 0.67 -> OrderType.NAO_TOQUE
-            x < 0.80 -> OrderType.TODAS
-            x < 0.92 -> OrderType.SEM_MESTRE
+            x < 0.62 -> OrderType.NORMAL
+            x < 0.80 -> OrderType.NAO_TOQUE
             else -> OrderType.NAO_MANDOU
         }
-        val count = if (type == OrderType.TODAS) 2 else 1
+        // Sempre uma única palavra certa (ou nenhum toque, quando o mestre não mandou).
+        val count = 1
         var c: Criterion? = null
         while (c == null) c = criterion(count)
         val text = when (type) {
             OrderType.NORMAL -> "O mestre mandou: toque ${c.singular}"
             OrderType.NAO_TOQUE -> "O mestre mandou: NÃO toque ${c.singular}"
-            OrderType.TODAS -> "O mestre mandou: toque em TODAS ${c.plural}"
-            OrderType.SEM_MESTRE -> "Toque ${c.singular}!"
             OrderType.NAO_MANDOU -> "O mestre NÃO mandou: toque ${c.singular}"
         }
         return MestreRound(type, text, (c.targets + c.others).shuffled(rnd), c.targets.toSet())

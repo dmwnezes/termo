@@ -1,4 +1,4 @@
-// Reverso, Qual é a Palavra? e Sinônimos (site).
+// Reverso, Qual é a Palavra? e Sinônimo ou Antônimo (site).
 (function () {
   "use strict";
   const ORD = ["c", "p", "a"];
@@ -139,11 +139,7 @@
     draw();
   };
 
-  // ---------- Sinônimos e Antônimos em cadeia ----------
-  const KINDS = {
-    sinonimos: { title: "Sinônimos", intro: "Escolha o sinônimo certo", explain: "tem o mesmo sentido", question: "Qual é o sinônimo de", sign: "=", best: "syn-best" },
-    antonimos: { title: "Antônimos", intro: "Escolha o antônimo certo", explain: "tem o sentido contrário", question: "Qual é o antônimo de", sign: "≠", best: "ant-best" },
-  };
+  // ---------- Sinônimo ou Antônimo (substitui os antigos Sinônimos e Antônimos) ----------
   const parseChain = (text, pairs, fams) => text.split("\n").forEach((raw) => {
     const l = raw.trim();
     if (!l || l.startsWith("#")) return;
@@ -151,29 +147,65 @@
     else if (pairs && l.includes("|")) pairs.push({ word: l.split("|")[0].trim(), syn: l.split("|")[1].trim() });
   });
   P.parseChain = parseChain; // também usado pelo Mestre Mandou
-  P.games.antonimos = (root) => P.games.sinonimos(root, "antonimos");
-  P.games.sinonimos = async function (root, kindKey = "sinonimos") {
-    const K = KINDS[kindKey], pairs = [], fams = [];
-    if (kindKey === "antonimos") {
-      // Pares nos dois sentidos; as famílias dos sinônimos também bloqueiam alternativas ambíguas.
-      parseChain(await P.text("antonimos.txt"), pairs, fams);
-      pairs.slice().forEach((p) => pairs.push({ word: p.syn, syn: p.word }));
-      parseChain(await P.text("sinonimos.txt"), null, fams);
-    } else parseChain(await P.text("sinonimos.txt"), pairs, fams);
-    const famOf = (w) => { const s = new Set([w]); fams.forEach((f) => f.has(w) && f.forEach((x) => s.add(x))); return s; };
-    const SECS = 10;
-    let deck, idx, chain, over, picked, options, started = false, raf, t0;
-
-    const build = () => {
-      const q = deck[idx], blocked = new Set([...famOf(q.word), ...famOf(q.syn)]);
-      const pool = [...new Set(pairs.map((p) => p.syn))].filter((s) => !blocked.has(s) && ![...famOf(s)].some((f) => blocked.has(f)));
-      options = P.shuffle(P.shuffle(pool).slice(0, 3).concat(q.syn)); picked = null;
-    };
-    const reset = () => { deck = P.shuffle(pairs); idx = 0; chain = 0; over = false; build(); };
-    reset();
-
-    root.innerHTML = P.topbar(K.title) + `<div class="game" data-body style="padding-bottom:16px"></div>`;
+  P.games.antonimos = (root) => P.games.sinonimos(root); // rota antiga #/antonimos abre o mesmo jogo
+  P.games.sinonimos = async function (root) {
+    root.innerHTML = P.topbar("Sinônimo ou Antônimo") + `<div class="game" data-body style="padding-bottom:16px"></div>`;
     const body = P.$("[data-body]", root);
+    let synTxt, antTxt;
+    try { [synTxt, antTxt] = await Promise.all([P.text("sinonimos.txt"), P.text("antonimos.txt")]); }
+    catch (_) { body.innerHTML = `<p class="center muted">Não foi possível carregar as palavras.</p>`; return; }
+    if (!document.body.contains(body)) return;
+
+    // Dados exatamente como os jogos antigos: sinônimos = pares + famílias "="; antônimos = pares nos dois
+    // sentidos + famílias do antonimos.txt + famílias dos sinônimos.
+    const synPairs = [], synFams = [], antRaw = [], antOwn = [];
+    parseChain(synTxt, synPairs, synFams);
+    parseChain(antTxt, antRaw, antOwn);
+    const antPairs = antRaw.concat(antRaw.map((p) => ({ word: p.syn, syn: p.word })));
+    const antFams = antOwn.concat(synFams);
+    const famOf = (fams, w) => { const s = new Set([w]); fams.forEach((f) => f.has(w) && f.forEach((x) => s.add(x))); return s; };
+    // Pares do outro tipo (para a pegadinha): sinônimo e antônimo valem nos dois sentidos.
+    const synOf = new Map(), antOf = new Map();
+    const link = (m, a, b) => { if (!m.has(a)) m.set(a, []); if (!m.get(a).includes(b)) m.get(a).push(b); };
+    synPairs.forEach((p) => { link(synOf, p.word, p.syn); link(synOf, p.syn, p.word); });
+    antRaw.forEach((p) => { link(antOf, p.word, p.syn); link(antOf, p.syn, p.word); });
+    const T = {
+      syn: { pairs: synPairs, fams: synFams, other: antOf, label: "SINÔNIMO", sign: "=" },
+      ant: { pairs: antPairs, fams: antFams, other: synOf, label: "ANTÔNIMO", sign: "≠" },
+    };
+    Object.values(T).forEach((t) => {
+      t.pool = [...new Set(t.pairs.map((p) => p.syn))];
+      t.dual = t.pairs.filter((p) => t.other.has(p.word)); // palavras que existem nos dois arquivos
+    });
+    const rand = (a) => a[Math.floor(Math.random() * a.length)];
+    const SECS = 10;
+    let kinds, recent, q, chain, over, picked, started = false, raf, t0;
+
+    /** Sorteia o tipo (50/50, nunca 3 iguais seguidos), a palavra (60% das que têm os dois tipos) e as opções. */
+    function make() {
+      const n = kinds.length;
+      const k = n >= 2 && kinds[n - 1] === kinds[n - 2] ? (kinds[n - 1] === "syn" ? "ant" : "syn") : Math.random() < 0.5 ? "syn" : "ant";
+      kinds.push(k); if (kinds.length > 4) kinds.shift();
+      const t = T[k];
+      let p = null;
+      for (let i = 0; i < 40; i++) { p = rand(t.dual.length && Math.random() < 0.6 ? t.dual : t.pairs); if (!recent.includes(p.word)) break; }
+      recent.push(p.word); if (recent.length > 15) recent.shift();
+      // 3 erradas como nos jogos antigos: ninguém da família da palavra ou da resposta.
+      const blocked = new Set([...famOf(t.fams, p.word), ...famOf(t.fams, p.syn)]);
+      const pool = t.pool.filter((s) => !blocked.has(s) && ![...famOf(t.fams, s)].some((f) => blocked.has(f)));
+      let wrong = P.shuffle(pool).slice(0, 3);
+      // Pegadinha: em 50% das vezes, uma das erradas vira o par do OUTRO tipo (nunca a resposta nem da família dela).
+      const others = (t.other.get(p.word) || []).filter((o) => o !== p.syn && o !== p.word && !famOf(antFams, p.syn).has(o));
+      if (others.length && Math.random() < 0.5) {
+        const trap = rand(others);
+        wrong = [trap].concat(wrong.filter((w) => w !== trap).slice(0, 2));
+      }
+      const options = P.shuffle(wrong.concat(p.syn));
+      return { k, t, word: p.word, ans: p.syn, options, trick: options.find((o) => others.includes(o)) || null };
+    }
+    const reset = () => { kinds = []; recent = []; chain = 0; over = false; picked = null; q = make(); };
+    const go = () => { t0 = performance.now(); draw(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); };
+
     function tick() {
       if (!document.body.contains(body) || over || picked) return;
       const left = 1 - (performance.now() - t0) / (SECS * 1000);
@@ -182,31 +214,36 @@
       if (left <= 0) { over = true; P.fx.lose(); end(); draw(); return; }
       raf = requestAnimationFrame(tick);
     }
-    const end = () => { P.store.max(K.best, chain); P.logActivity(); };
+    const end = () => { P.store.max("sa-best", chain); P.logActivity(); };
     function draw() {
-      const best = P.store.get(K.best, 0), q = deck[idx];
+      const best = P.store.get("sa-best", 0);
       if (!started) {
         body.innerHTML = `${P.statsHTML([[0, "Cadeia"], [best, "Recorde"]], "two")}<div class="center" style="margin:auto 0">
-          <h2>${K.intro}</h2><p class="muted">Aparece uma palavra e quatro opções. Toque na que ${K.explain}. Você tem ${SECS} segundos por palavra, e a cadeia continua até o primeiro erro.</p>
+          <h2 style="font-size:1.6rem">Sinônimo ou Antônimo?</h2><p class="muted">Cada palavra pede um sinônimo (mesmo sentido) ou um antônimo (sentido contrário). Leia bem a pergunta: às vezes os dois aparecem nas opções! Você tem ${SECS} segundos por palavra, e a cadeia continua até o primeiro erro.</p>
           <button class="pill wide" data-go>Começar</button></div>`;
-        P.$("[data-go]", body).onclick = () => { started = true; t0 = performance.now(); draw(); raf = requestAnimationFrame(tick); };
+        P.$("[data-go]", body).onclick = () => { started = true; reset(); go(); };
         return;
       }
+      const trapHit = over && picked != null && picked === q.trick;
       body.innerHTML = `${P.statsHTML([[chain, "Cadeia"], [Math.max(best, chain), "Recorde"]], "two")}
         <div class="timer"><i style="width:100%"></i></div>
-        <p class="center muted" style="margin-top:24px">${K.question}</p><div class="word-big">${P.esc(q.word)}</div>
-        ${options.map((o) => { const cls = picked == null && !over ? "" : o === q.syn ? "right" : o === picked ? "wrong" : "dim"; return `<button class="opt ${cls}" data-o="${P.esc(o)}">${P.esc(o)}</button>`; }).join("")}
-        ${over ? `<h2 class="center">${picked == null ? "O tempo acabou!" : "Fim da cadeia!"}</h2><p class="center muted">${P.esc(q.word)} ${K.sign} ${P.esc(q.syn)}</p><button class="pill wide" data-again>Jogar de novo</button>` : ""}`;
+        <p class="sa-q" data-kind="${q.k}">Qual é o <span class="sa-pill ${q.k}">${q.t.label}</span> de</p><div class="word-big">${P.esc(q.word)}</div>
+        ${q.options.map((o) => { const cls = picked == null && !over ? "" : o === q.ans ? "right" : o === picked ? "wrong" : "dim"; return `<button class="opt ${cls}" data-o="${P.esc(o)}">${P.esc(o)}</button>`; }).join("")}
+        ${over ? `<h2 class="center">${picked == null ? "O tempo acabou!" : "Fim da cadeia!"}</h2><p class="center muted">${P.esc(q.word)} ${q.t.sign} ${P.esc(q.ans)}</p>
+          ${trapHit ? `<p class="sa-trap">Pegadinha! Era o ${q.t.label} que pedia.</p>` : ""}<button class="pill wide" data-again>Jogar de novo</button>` : ""}`;
       body.querySelectorAll("[data-o]").forEach((b) => (b.onclick = () => {
         if (over || picked) return;
         picked = b.dataset.o; cancelAnimationFrame(raf);
-        if (picked === q.syn) {
-          chain++; P.fx.reveal(chain % 5, "c"); draw();
-          setTimeout(() => { idx = (idx + 1) % deck.length; build(); t0 = performance.now(); draw(); raf = requestAnimationFrame(tick); }, 550);
+        if (picked === q.ans) {
+          chain++; if (q.trick) P.store.add("sa-tricks");
+          P.fx.reveal(chain % 5, "c"); draw();
+          setTimeout(() => { if (!document.body.contains(body)) return; q = make(); picked = null; go(); }, 550);
         } else { over = true; P.fx.invalid(); end(); draw(); }
       }));
-      const ag = P.$("[data-again]", body); if (ag) ag.onclick = () => { reset(); t0 = performance.now(); draw(); raf = requestAnimationFrame(tick); };
+      const ag = P.$("[data-again]", body); if (ag) ag.onclick = () => { reset(); go(); };
     }
+    // Para testes automatizados.
+    P.games.sinonimos.debug = { q: () => q, make: () => make(), state: () => ({ chain, over, picked, started }) };
     draw();
   };
 })();

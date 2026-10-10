@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Lembrete diário -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Contagem da próxima palavra como notificação ao vivo (Android 16 / Now Bar da Samsung) -->
     <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
@@ -47,6 +49,9 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Segura a sala da partida com amigo por até 10 minutos com o app fechado -->
+        <service android:name=".system.RoomKeeper" android:exported="false" android:foregroundServiceType="dataSync" />
 
         <receiver android:name=".system.ReminderReceiver" android:exported="false" />
         <receiver android:name=".system.NextWordReceiver" android:exported="false" />

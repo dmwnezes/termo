@@ -3,7 +3,7 @@
   "use strict";
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   const TABS = ["Resumo", "Conquistas", "Ajustes"];
-  const SITE_VERSION = "18";
+  const SITE_VERSION = "19";
 
   P.games.perfil = function (root) {
     const modes = [["termo", "Termo", 6], ["infinito", "Infinito", 6], ["dueto", "Dueto", 7], ["quarteto", "Quarteto", 9]];
@@ -85,8 +85,7 @@
           <div class="rec"><span>Mestre Mandou</span><span>recorde ${g("mestre-best")} · ${g("mestre-right")} acertos</span></div>
           <div class="rec"><span>Reverso</span><span>site ${g("rev-app")} × ${g("rev-user")} você</span></div>
           <div class="rec"><span>Qual é a Palavra?</span><span>recorde ${g("def-best")} seguidas · ${g("def-right")} acertos</span></div>
-          <div class="rec"><span>Sinônimos</span><span>maior cadeia: ${g("syn-best")}</span></div>
-          <div class="rec"><span>Antônimos</span><span>maior cadeia: ${g("ant-best")}</span></div>
+          <div class="rec"><span>Sinônimo ou Antônimo</span><span>maior cadeia: ${Math.max(g("sa-best") || 0, g("syn-best") || 0, g("ant-best") || 0)}</span></div>
           <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div>
           <div class="rec"><span>Com amigos</span><span>${g("mp-won")} ${g("mp-won") === 1 ? "vitória" : "vitórias"} em ${g("mp-played")} ${g("mp-played") === 1 ? "partida" : "partidas"}</span></div></div>`;
       body.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = +b.dataset.tab; draw(); }));

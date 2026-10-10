@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,6 +63,7 @@ import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.TermoGame
 import com.dmwnezes.palavreiro.game.Words
 import com.dmwnezes.palavreiro.system.Ntfy
+import com.dmwnezes.palavreiro.system.RoomKeeper
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -86,19 +88,34 @@ fun MultiScreen(
     onBack: () -> Unit,
     joinCode: String? = null,
     meanings: Map<String, String> = emptyMap(),
+    /** Sala guardada para retomar (o app foi fechado enquanto você mandava o link). */
+    resume: Multi.Session? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val myId = remember { Multi.randomId(8) }
+    val myId = remember { resume?.id ?: Multi.randomId(8) }
     val joinRoom = remember(joinCode) { joinCode?.let(Multi::parse) }
-    var phase by remember { mutableStateOf(if (joinCode == null) Phase.CREATE else if (joinRoom == null) Phase.INVALID else Phase.JOIN) }
-    var room by remember { mutableStateOf(joinRoom) }
-    var isHost by remember { mutableStateOf(joinCode == null) }
-    var name by remember { mutableStateOf(store?.text("mp_name").orEmpty()) }
+    var phase by remember {
+        mutableStateOf(
+            when {
+                resume != null -> if (resume.host) Phase.WAITING else Phase.WAIT_START
+                joinCode == null -> Phase.CREATE
+                joinRoom == null -> Phase.INVALID
+                else -> Phase.JOIN
+            }
+        )
+    }
+    var room by remember { mutableStateOf(resume?.room ?: joinRoom) }
+    var isHost by remember { mutableStateOf(resume?.host ?: (joinCode == null)) }
+    var name by remember { mutableStateOf(resume?.name ?: store?.text("mp_name").orEmpty()) }
+    // Quando a sala foi criada (para os 10 minutos em que ela fica guardada).
+    var keptAt by remember { mutableLongStateOf(resume?.at ?: 0L) }
+    var expired by remember { mutableStateOf(false) }
+    var left by remember { mutableStateOf(false) }
     var modeCode by remember { mutableStateOf(store?.text("mp_mode")?.firstOrNull()?.takeIf { it in Multi.MODES } ?: 'd') }
     var oppId by remember { mutableStateOf<String?>(null) }
     var oppName by remember { mutableStateOf<String?>(null) }
-    var joined by remember { mutableStateOf(false) }
+    var joined by remember { mutableStateOf(resume?.host == false) }
     var startedOthers by remember { mutableStateOf(false) }
     var online by remember { mutableStateOf(true) }
     // Rodada atual (muda na revanche).
@@ -117,7 +134,25 @@ fun MultiScreen(
 
     fun send(m: Msg) { val r = room ?: return; scope.launch { ntfy.publish(r.topic, Multi.encode(m)) } }
 
+    /** Guarda a sala por 10 minutos (sobrevive ao app fechado) e liga o aviso. */
+    fun keep() {
+        val r = room ?: return
+        if (keptAt == 0L) keptAt = System.currentTimeMillis()
+        store?.let { RoomKeeper.save(context, it, Multi.Session(r.code, isHost, myId, name.trim(), keptAt)) }
+    }
+    fun forget() { store?.let { RoomKeeper.clear(context, it) } }
+    /** Saída de propósito: avisa o amigo, esquece a sala e volta. */
+    fun leave() {
+        if (!left) {
+            left = true
+            room?.let { r -> if (joined || isHost) if (phase != Phase.CREATE && phase != Phase.INVALID) GlobalScope.launch { ntfy.publish(r.topic, Multi.encode(Msg.Bye(myId))) } }
+        }
+        forget()
+        onBack()
+    }
+
     fun beginRound(at: Long, newSeries: Boolean) {
+        forget() // a partida começou: a sala não precisa mais ficar guardada
         if (newSeries) series = Multi.Series()
         val t = System.currentTimeMillis()
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
@@ -133,13 +168,18 @@ fun MultiScreen(
                     if (!isHost) { oppId = m.id; oppName = m.name }
                 } else if (isHost && oppId == null) {
                     oppId = m.id; oppName = m.name
-                    send(Msg.Start(System.currentTimeMillis(), m.id))
+                    val guest = m.id
+                    // Sala retomada: espera o histórico todo chegar; se o start já foi mandado antes, não manda de novo.
+                    scope.launch {
+                        if (resume != null) delay(3000)
+                        if (phase == Phase.WAITING) send(Msg.Start(System.currentTimeMillis(), guest))
+                    }
                 }
             }
             is Msg.Start -> when {
                 isHost && m.guest == oppId -> beginRound(m.at, true)
                 !isHost && m.guest == myId -> beginRound(m.at, true)
-                !isHost -> { startedOthers = true; if (phase == Phase.WAIT_START || phase == Phase.JOIN) phase = Phase.FULL }
+                !isHost -> { startedOthers = true; if (phase == Phase.WAIT_START || phase == Phase.JOIN) { phase = Phase.FULL; forget() } }
             }
             is Msg.Row -> if (m.id == oppId && phase == Phase.PLAYING && m.row == oppRows.size) oppRows.add(m.marks)
             is Msg.End -> if (phase == Phase.PLAYING && (m.id == myId || m.id == oppId) && ends.none { it.id == m.id }) {
@@ -165,8 +205,20 @@ fun MultiScreen(
             }
         }
     }
+    // Sair da tela sem ser de propósito (app fechado pelo sistema) só avisa o amigo no meio da partida;
+    // na sala de espera, ela continua guardada por 10 minutos.
     DisposableEffect(Unit) {
-        onDispose { room?.let { r -> if (joined || isHost) GlobalScope.launch { ntfy.publish(r.topic, Multi.encode(Msg.Bye(myId))) } } }
+        onDispose { room?.let { r -> if (!left && phase == Phase.PLAYING) GlobalScope.launch { ntfy.publish(r.topic, Multi.encode(Msg.Bye(myId))) } } }
+    }
+    BackHandler { leave() }
+    // Contagem dos 10 minutos da sala de espera.
+    var nowSec by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(phase, keptAt) {
+        while ((phase == Phase.WAITING || phase == Phase.WAIT_START) && keptAt > 0) {
+            nowSec = System.currentTimeMillis()
+            if (nowSec >= keptAt + Multi.KEEP_MS) { expired = true; forget(); break }
+            delay(1000)
+        }
     }
     // Relógio da contagem 3-2-1.
     LaunchedEffect(phase, round) {
@@ -176,7 +228,7 @@ fun MultiScreen(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         when (phase) {
-            Phase.CREATE -> Lobby("Jogar com amigo", onBack) {
+            Phase.CREATE -> Lobby("Jogar com amigo", ::leave) {
                 Text("Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
@@ -188,8 +240,9 @@ fun MultiScreen(
                 Spacer(Modifier.height(22.dp))
                 PillButton("Criar partida", Night.correct, modifier = Modifier.fillMaxWidth(), enabled = Multi.validName(name)) {
                     val n = name.trim(); store?.setText("mp_name", n); store?.setText("mp_mode", modeCode.toString())
-                    room = Multi.newRoom(modeCode); isHost = true; phase = Phase.WAITING
+                    room = Multi.newRoom(modeCode); isHost = true; phase = Phase.WAITING; expired = false; keptAt = 0L
                     send(Msg.Hello(myId, n, host = true))
+                    keep()
                 }
                 if (name.isNotEmpty() && !Multi.validName(name)) {
                     Spacer(Modifier.height(8.dp)); Text("O nome precisa ter de 2 a 16 letras.", color = Night.red, fontSize = 13.sp)
@@ -230,7 +283,7 @@ fun MultiScreen(
                     PillButton("Entrar na partida", Night.accent, modifier = Modifier.weight(1.4f), enabled = pasted.isNotBlank()) { enter(pasted) }
                 }
             }
-            Phase.WAITING -> Lobby("Jogar com amigo", onBack) {
+            Phase.WAITING -> Lobby("Jogar com amigo", ::leave) {
                 val r = room!!
                 Text("${Multi.modeName(r.mode)} · mande o link para seu amigo", color = Night.text, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(12.dp))
@@ -255,11 +308,28 @@ fun MultiScreen(
                     Spacer(Modifier.height(10.dp))
                     Text("Amigo do lado? Ele aponta a câmera aqui e entra.", color = Night.muted, fontSize = 14.sp, textAlign = TextAlign.Center)
                 }
-                Spacer(Modifier.height(24.dp))
-                WaitingDots(if (oppName != null) "${oppName} entrou!" else "Esperando seu amigo entrar")
+                Spacer(Modifier.height(14.dp))
+                if (expired) {
+                    Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("A sala expirou.", color = Night.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(10.dp))
+                        PillButton("Criar outra sala", Night.correct, modifier = Modifier.fillMaxWidth()) {
+                            expired = false; keptAt = 0L; oppId = null; oppName = null; phase = Phase.CREATE
+                        }
+                    }
+                } else {
+                    if (keptAt > 0) {
+                        Text(
+                            "A sala fica aberta por mais ${formatMs(keptAt + Multi.KEEP_MS - nowSec)}, mesmo se você sair para mandar o link.",
+                            color = Night.muted, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    WaitingDots(if (oppName != null) "${oppName} entrou!" else "Esperando seu amigo entrar")
+                }
                 if (!online) { Spacer(Modifier.height(10.dp)); Text("Reconectando…", color = Night.muted, fontSize = 13.sp) }
             }
-            Phase.JOIN -> Lobby("Jogar com amigo", onBack) {
+            Phase.JOIN -> Lobby("Jogar com amigo", ::leave) {
                 val r = room!!
                 Text(
                     if (oppName != null) "$oppName te chamou para um ${Multi.modeName(r.mode)}" else "Você foi chamado para um ${Multi.modeName(r.mode)}",
@@ -275,26 +345,33 @@ fun MultiScreen(
                     if (startedOthers) { phase = Phase.FULL; return@PillButton }
                     joined = true; phase = Phase.WAIT_START
                     send(Msg.Hello(myId, n, host = false))
+                    keep()
                 }
             }
-            Phase.WAIT_START -> Lobby("Jogar com amigo", onBack) {
+            Phase.WAIT_START -> Lobby("Jogar com amigo", ::leave) {
                 Spacer(Modifier.height(30.dp))
-                WaitingDots("Esperando ${oppName ?: "seu amigo"} começar")
+                if (expired) {
+                    Text("A sala expirou.", color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                    Spacer(Modifier.height(8.dp))
+                    Text("${oppName ?: "Seu amigo"} não começou a partida a tempo. Peça um link novo.", color = Night.muted, fontSize = 15.sp)
+                    Spacer(Modifier.height(20.dp))
+                    PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
+                } else WaitingDots("Esperando ${oppName ?: "seu amigo"} começar")
                 if (!online) { Spacer(Modifier.height(10.dp)); Text("Reconectando…", color = Night.muted, fontSize = 13.sp) }
             }
-            Phase.FULL -> Lobby("Jogar com amigo", onBack) {
+            Phase.FULL -> Lobby("Jogar com amigo", ::leave) {
                 Text("A partida já está cheia", color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
                 Spacer(Modifier.height(8.dp))
                 Text("Esse link já está sendo usado por outras duas pessoas. Crie a sua partida!", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(20.dp))
-                PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = onBack)
+                PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
             }
-            Phase.INVALID -> Lobby("Jogar com amigo", onBack) {
+            Phase.INVALID -> Lobby("Jogar com amigo", ::leave) {
                 Text("Link inválido", color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
                 Spacer(Modifier.height(8.dp))
                 Text("Peça para seu amigo mandar o link de novo.", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(20.dp))
-                PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = onBack)
+                PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
             }
             Phase.PLAYING -> {
                 val r = room!!
@@ -322,7 +399,7 @@ fun MultiScreen(
                     GameScreen(
                         game = game,
                         feedback = feedback,
-                        onBack = onBack,
+                        onBack = ::leave,
                         onPlayInfinite = {},
                         onHelp = {},
                         meanings = meanings,
@@ -352,7 +429,7 @@ fun MultiScreen(
                         isHost = isHost, meanings = meanings, series = series,
                         onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis(), newSeries = series.over)) },
                         onReplay = { showEnd = false; replayTrigger++ },
-                        onLeave = onBack,
+                        onLeave = ::leave,
                         onClose = { showEnd = false },
                     )
                 }

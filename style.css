@@ -122,6 +122,7 @@ button { font-family: inherit; color: inherit; }
 .pill.ghost { background: var(--surface-high); color: var(--text); }
 .pill.accent { background: var(--accent); color: var(--dark-text); }
 .pill:disabled { opacity: .4; cursor: default; }
+.pill.danger { background: var(--red); color: var(--dark-text); }
 .row-btns { display: flex; gap: 10px; }
 .row-btns .pill { flex: 1; }
 .wide { width: 100%; }
@@ -504,3 +505,17 @@ button { font-family: inherit; color: inherit; }
 .mp-qr { margin: 16px 0 4px; padding: 16px; border-radius: 22px; background: var(--bg-bottom); text-align: center; }
 .mp-qr svg { width: min(200px, 60vw); height: auto; border-radius: 12px; display: block; margin: 0 auto; }
 .mp-qr p { margin: 10px 0 0; color: var(--muted); font-size: .9rem; }
+
+/* Sala segura por 10 minutos */
+.mp-ttl { margin: 10px 0 0; text-align: center; color: var(--muted); font-size: .82rem; font-variant-numeric: tabular-nums; }
+.mp-expired { margin: 14px 0 0; text-align: center; }
+.mp-expired p { margin: 0 0 10px; color: var(--red); font-weight: 600; }
+
+/* Sinônimo ou Antônimo */
+.sa-q { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 24px 0 0; color: var(--muted); font-size: 1.05rem; }
+.sa-pill { display: inline-block; padding: 4px 12px; border-radius: 99px; font-weight: 800; letter-spacing: .04em; color: var(--dark-text); }
+.sa-pill.syn { background: var(--correct); }
+.sa-pill.ant { background: var(--red); }
+.sa-trap { margin: 4px 0 0; text-align: center; color: var(--present); font-weight: 600; }
+.sa-ico { display: grid; gap: 5px; justify-items: center; font-size: 8px; font-weight: 800; letter-spacing: -.01em; }
+.sa-ico span { display: block; padding: 3px 5px; border-radius: 99px; white-space: nowrap; color: var(--dark-text); line-height: 1.1; }

@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   const RARE = [..."BCDFGHJLMNPQRSTVXZ"];
-  const HELP = "Faça o que a ordem pede, mas só quando começar com 'O mestre mandou'. Se o mestre não mandou, não toque em nada e espere o tempo acabar. Cuidado com o NÃO e com o TODAS. Você tem 3 vidas.";
+  const HELP = "Faça o que a ordem pede, mas só quando começar com 'O mestre mandou'. Se o mestre não mandou, não toque em nada e espere o tempo acabar. Cuidado com o NÃO. Você tem 3 vidas.";
   const up = (s) => s.toLocaleUpperCase("pt-BR");
   const rand = (a) => a[Math.floor(Math.random() * a.length)];
   // Acento = qualquer marca sobre a letra (agudo, circunflexo, til, crase…). Cedilha não conta.
@@ -45,55 +45,46 @@
     return out.length === k ? out : null;
   };
 
-  /** Critério de letra. all = TODAS (2 cumprem + 2 não). Devolve { sing, plur, words: [{d, ok}] } ou null. */
-  function letterCrit(D, all) {
-    const kinds = ["start", "end", "has", "accent", "len"].concat(all ? [] : ["longest"]);
+  /** Critério de letra: 1 palavra cumpre + 3 não. Devolve { sing, words: [{d, ok}] } ou null. */
+  function letterCrit(D) {
+    const kinds = ["start", "end", "has", "accent", "len", "longest"];
     for (let c = 0; c < 12; c++) {
       const kind = rand(kinds);
       for (let k = 0; k < 50; k++) {
         const t = rand(kind === "accent" ? D.bank.filter((w) => w.acc) : D.bank);
-        let X, test, sing, plur;
-        if (kind === "start") { X = t.n[0]; test = (w) => w.n[0] === X; sing = `na palavra que começa com ${X}`; plur = `as palavras que começam com ${X}`; }
-        else if (kind === "end") { X = t.n[t.n.length - 1]; test = (w) => w.n.endsWith(X); sing = `na palavra que termina com ${X}`; plur = `as palavras que terminam com ${X}`; }
+        let X, test, sing;
+        if (kind === "start") { X = t.n[0]; test = (w) => w.n[0] === X; sing = `na palavra que começa com ${X}`; }
+        else if (kind === "end") { X = t.n[t.n.length - 1]; test = (w) => w.n.endsWith(X); sing = `na palavra que termina com ${X}`; }
         else if (kind === "has") {
           const opts = RARE.filter((x) => t.n.includes(x)); if (!opts.length) continue;
-          X = rand(opts); test = (w) => w.n.includes(X); sing = `na palavra que tem a letra ${X}`; plur = `as palavras que têm a letra ${X}`;
-        } else if (kind === "accent") { test = (w) => w.acc; sing = "na palavra com acento"; plur = "as palavras com acento"; }
-        else if (kind === "len") { const N = letters(t.n).length; test = (w) => letters(w.n).length === N; sing = `na palavra de ${N} letras`; plur = `as palavras de ${N} letras`; }
+          X = rand(opts); test = (w) => w.n.includes(X); sing = `na palavra que tem a letra ${X}`;
+        } else if (kind === "accent") { test = (w) => w.acc; sing = "na palavra com acento"; }
+        else if (kind === "len") { const N = letters(t.n).length; test = (w) => letters(w.n).length === N; sing = `na palavra de ${N} letras`; }
         else { const N = t.n.length; if (N < 6) continue; test = (w) => w.n.length >= N; sing = "na palavra mais comprida"; }
         // Com a letra C, palavras com Ç ficam de fora (evita a dúvida C × Ç).
         const fair = (w) => X !== "C" || !w.d.includes("Ç");
         if (!fair(t)) continue;
-        const yes = D.bank.filter((w) => w !== t && fair(w) && test(w)), no = D.bank.filter((w) => fair(w) && !test(w));
-        let picks;
-        if (all) {
-          if (!yes.length) continue;
-          const t2 = rand(yes), others = pickDistinct(no.map((w) => w.d), 2, [t.d, t2.d]);
-          if (!others || P.norm(t2.d) === t.n) continue;
-          picks = [{ d: t.d, ok: true }, { d: t2.d, ok: true }].concat(others.map((d) => ({ d, ok: false })));
-        } else {
-          const others = pickDistinct(no.map((w) => w.d), 3, [t.d]);
-          if (!others) continue;
-          picks = [{ d: t.d, ok: true }].concat(others.map((d) => ({ d, ok: false })));
-        }
-        return { sing, plur, words: P.shuffle(picks) };
+        const no = D.bank.filter((w) => fair(w) && !test(w));
+        const others = pickDistinct(no.map((w) => w.d), 3, [t.d]);
+        if (!others) continue;
+        return { sing, words: P.shuffle([{ d: t.d, ok: true }].concat(others.map((d) => ({ d, ok: false })))) };
       }
     }
     return null;
   }
 
-  /** Critério de sentido: sinônimo, contrário ou categoria (só a categoria vale para TODAS). */
-  function senseCrit(D, all) {
-    const kind = all ? "cat" : rand(["syn", "ant", "cat"]);
+  /** Critério de sentido: sinônimo, contrário ou categoria (1 palavra certa + 3 erradas). */
+  function senseCrit(D) {
+    const kind = rand(["syn", "ant", "cat"]);
     for (let k = 0; k < 50; k++) {
       if (kind === "cat") {
         const base = rand(D.groups), bf = D.fam[base.name];
         const pool = D.groups.filter((g) => g !== base && !D.fam[g.name].some((f) => bf.includes(f))).flatMap((g) => g.words);
-        const right = P.shuffle(base.words).slice(0, all ? 2 : 1);
-        const others = pickDistinct(pool, all ? 2 : 3, base.words);
+        const right = P.shuffle(base.words).slice(0, 1);
+        const others = pickDistinct(pool, 3, base.words);
         if (!others) continue;
         const name = up(base.name);
-        return { sing: `na palavra do grupo ${name}`, plur: `as palavras do grupo ${name}`,
+        return { sing: `na palavra do grupo ${name}`,
           words: P.shuffle(right.map((d) => ({ d: up(d), ok: true })).concat(others.map((d) => ({ d: up(d), ok: false })))) };
       }
       const [pairs, fams] = kind === "syn" ? [D.synPairs, D.synFams] : [D.antAll, D.antFams];
@@ -107,22 +98,19 @@
     return null;
   }
 
-  /** Sorteia o tipo de ordem e o critério. */
+  /** Sorteia o tipo de ordem (normal 62%, NÃO toque 18%, o mestre NÃO mandou 20%) e o critério. */
   function makeRound(D) {
     const r = Math.random();
-    const type = r < 0.55 ? "normal" : r < 0.67 ? "nao" : r < 0.80 ? "todas" : r < 0.92 ? "sem" : "naomandou";
-    const all = type === "todas";
+    const type = r < 0.62 ? "normal" : r < 0.80 ? "nao" : "naomandou";
     let crit = null;
-    while (!crit) crit = Math.random() < 0.5 ? letterCrit(D, all) : senseCrit(D, all);
+    while (!crit) crit = Math.random() < 0.5 ? letterCrit(D) : senseCrit(D);
     const esc = P.esc, b = (s) => `<b>${s}</b>`;
     const text = {
       normal: `O mestre mandou: toque ${esc(crit.sing)}`,
       nao: `O mestre mandou: ${b("NÃO")} toque ${esc(crit.sing)}`,
-      todas: `O mestre mandou: toque em ${b("TODAS")} ${esc(crit.plur || "")}`,
-      sem: `Toque ${esc(crit.sing)}!`,
       naomandou: `O mestre ${b("NÃO")} mandou: toque ${esc(crit.sing)}`,
     }[type];
-    return { type, text, words: crit.words, tapped: [] };
+    return { type, text, words: crit.words };
   }
 
   // ---------- tela ----------
@@ -156,7 +144,7 @@
     const fs = (w) => (w.length > 14 ? "1rem" : w.length > 10 ? "1.15rem" : w.length > 8 ? "1.3rem" : "");
     function next() {
       round = makeRound(D); state = "play";
-      secs = Math.max(2.5, 6.0 - 0.15 * points) * (round.type === "sem" || round.type === "naomandou" ? 0.7 : 1);
+      secs = Math.max(2.5, 6.0 - 0.15 * points) * (round.type === "naomandou" ? 0.7 : 1);
       hud();
       P.$("[data-order]", body).innerHTML = `<span>${round.text}</span>`;
       const msg = P.$("[data-msg]", body); msg.textContent = ""; msg.className = "center intr-msg";
@@ -179,23 +167,17 @@
     function tap(i) {
       if (state !== "play") return;
       const w = round.words[i], t = round.type;
-      if (t === "sem" || t === "naomandou") return finish(false, "Pegadinha! O mestre não mandou.", i);
+      if (t === "naomandou") return finish(false, "Pegadinha! O mestre não mandou.", i);
       if (t === "normal") return w.ok ? finish(true, "Isso!", i) : finish(false, "Não era essa.", i);
-      if (t === "nao") return w.ok ? finish(false, "O mestre mandou NÃO tocar nessa!", i) : finish(true, "Isso!", i);
-      // TODAS: cada toque certo fica verde; precisa das duas.
-      if (round.tapped.includes(i)) return;
-      if (!w.ok) return finish(false, "Essa não cumpre a ordem.", i);
-      round.tapped.push(i); P.fx.type();
-      P.$(`[data-i="${i}"]`, body).classList.add("right");
-      if (round.tapped.length === round.words.filter((x) => x.ok).length) finish(true, "Isso! Todas certas.", i);
+      return w.ok ? finish(false, "O mestre mandou NÃO tocar nessa!", i) : finish(true, "Isso!", i); // "nao"
     }
     function timeUp() {
-      if (round.type === "sem" || round.type === "naomandou") finish(true, "Boa! O mestre não mandou.", -1);
+      if (round.type === "naomandou") finish(true, "Boa! O mestre não mandou.", -1);
       else finish(false, "O tempo acabou!", -1);
     }
     function finish(ok, text, i) {
       state = "result"; cancelAnimationFrame(raf);
-      const t = round.type, trap = t === "sem" || t === "naomandou";
+      const t = round.type, trap = t === "naomandou";
       body.querySelectorAll(".mm-word").forEach((b, k) => {
         const w = round.words[k];
         if (k === i) b.classList.add(ok ? "right" : "wrong");

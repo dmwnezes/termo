@@ -17,7 +17,7 @@ import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ConnectionsScreen
 import com.dmwnezes.palavreiro.ui.ReverseScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
-import com.dmwnezes.palavreiro.ui.SynonymScreen
+import com.dmwnezes.palavreiro.ui.SynAntScreen
 import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.game.ConnectionsData
 import com.dmwnezes.palavreiro.game.QuizData
@@ -272,12 +272,27 @@ class ScreensRenderTest {
     }
 
     @Test
-    fun antonimos() {
+    fun sinonimoOuAntonimoPegadinha() {
         rule.mainClock.autoAdvance = false
-        val (_, sf) = QuizData.synonyms(asset("sinonimos.txt"))
-        val (p, f) = QuizData.antonyms(asset("antonimos.txt"), sf)
-        rule.setContent { PalavreiroTheme { SynonymScreen(p, f, null, null, {}, seed = 4, kind = com.dmwnezes.palavreiro.ui.ChainKind.ANTONIMOS) } }
-        save("23-antonimos")
+        val (syn, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, af) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        // Uma semente cuja primeira pergunta tem pegadinha.
+        val seed = (1L..500L).first { com.dmwnezes.palavreiro.game.SynAntGame(syn, sf, ant, af, it).question.trick != null }
+        rule.setContent { PalavreiroTheme { SynAntScreen(syn, sf, ant, af, null, null, {}, seed = seed, autoStart = true) } }
+        save("23-sinant-pegadinha", 1200)
+    }
+
+    @Test
+    fun giveUpConfirm() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.DUETO, words, store = null) { day }
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}) } }
+        rule.onNode(androidx.compose.ui.test.hasContentDescription("Desistir")).performClick()
+        save("34-desistir")
+        rule.onNode(androidx.compose.ui.test.hasText("Desistir") and androidx.compose.ui.test.hasClickAction()).performClick()
+        save("35-desistiu", 3000)
+        assert(g.over && !g.won && g.gaveUp)
     }
 
     @Test
@@ -356,9 +371,10 @@ class ScreensRenderTest {
     @Test
     fun sinonimos() {
         rule.mainClock.autoAdvance = false
-        val (p, f) = QuizData.synonyms(asset("sinonimos.txt"))
-        rule.setContent { PalavreiroTheme { SynonymScreen(p, f, null, null, {}, seed = 4) } }
-        save("15-sinonimos")
+        val (syn, sf) = QuizData.synonyms(asset("sinonimos.txt"))
+        val (ant, af) = QuizData.antonyms(asset("antonimos.txt"), sf)
+        rule.setContent { PalavreiroTheme { SynAntScreen(syn, sf, ant, af, null, null, {}, seed = 4) } }
+        save("15-sinant-inicio")
     }
 
     @Test

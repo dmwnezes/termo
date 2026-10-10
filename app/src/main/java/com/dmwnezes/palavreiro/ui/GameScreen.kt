@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,6 +91,7 @@ fun GameScreen(
     var confettiKey by remember { mutableIntStateOf(0) }
     var showConfetti by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
+    var confirmGiveUp by remember { mutableStateOf(false) }
 
     // Replay: limpa o tabuleiro e "digita" de novo cada tentativa, virando as cores (sem som nem vibração).
     var replay by remember(game) { mutableStateOf<ReplayView?>(null) }
@@ -141,8 +143,10 @@ fun GameScreen(
             override fun onLose(answers: List<String>) {
                 feedback?.lose()
                 onFinished(false)
-                if (multiplayer) { toast.show("Suas tentativas acabaram", 2500); return }
-                toast.show(if (answers.size == 1) "A palavra era ${answers[0]}" else "Faltou: ${answers.joinToString(", ")}", 3500)
+                // Na partida com amigo, desistir não mostra a palavra (o outro ainda pode estar jogando).
+                if (multiplayer) { toast.show(if (game.gaveUp) "Você desistiu" else "Suas tentativas acabaram", 2500); return }
+                val shown = if (answers.size == 1) "a palavra era ${answers[0]}" else "faltou: ${answers.joinToString(", ")}"
+                toast.show(if (game.gaveUp) "Você desistiu · $shown" else shown.replaceFirstChar { it.uppercase() }, 3500)
                 scope.launch { delay(2200); showResult = true }
             }
         }
@@ -174,6 +178,9 @@ fun GameScreen(
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             TopBar(title = title, onBack = onBack, onHelp = if (multiplayer) null else onHelp, trailing = {
                 titleTrailing?.invoke()
+                if (!game.over && !game.busy && replay == null && inputEnabled && !game.isChallenge) {
+                    IconButton(onClick = { confirmGiveUp = true }) { Icon(Icons.Rounded.Flag, "Desistir", tint = Night.muted, modifier = Modifier.size(22.dp)) }
+                }
                 if (game.hard) {
                     Text("DIFÍCIL", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Night.red,
                         modifier = Modifier.clip(Shapes.pill).background(Night.red.copy(alpha = 0.15f)).padding(horizontal = 8.dp, vertical = 3.dp))
@@ -229,6 +236,18 @@ fun GameScreen(
             Spacer(Modifier.height(10.dp))
         }
         if (showConfetti) Confetti(confettiKey) { showConfetti = false }
+        if (confirmGiveUp && !game.over) {
+            BottomSheet({ confirmGiveUp = false }) {
+                SheetTitle(
+                    "Desistir desta partida?",
+                    if (game.boards > 1) "As palavras serão reveladas e conta como derrota." else "A palavra será revelada e conta como derrota.",
+                )
+                Spacer(Modifier.height(18.dp))
+                PillButton("Desistir", Night.red, modifier = Modifier.fillMaxWidth()) { confirmGiveUp = false; game.giveUp() }
+                Spacer(Modifier.height(10.dp))
+                PillButton("Continuar jogando", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth()) { confirmGiveUp = false }
+            }
+        }
         if (showResult && game.over && !multiplayer) {
             ResultSheet(
                 game = game,

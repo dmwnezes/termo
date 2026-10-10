@@ -28,12 +28,34 @@
 
   let S = null; // sessão atual
 
-  /** Encerra a sessão (ao sair da tela). */
-  function leave(sendBye = true) {
+  // ---------- sala guardada por 10 minutos ----------
+  // localStorage "pv-mp-session" = {code, host, id, name, at}: o anfitrião sai para mandar o link (WhatsApp)
+  // e o navegador pode descartar a aba; ao voltar, o site reabre a mesma sala com o mesmo id de jogador.
+  const KEEP_MS = 600000;
+  const codeOf = (s) => `${s.room}-${s.m}-${s.seed.toString(36)}`;
+  function remember(s) {
+    s.at = s.at || Date.now();
+    P.store.set("mp-session", { code: codeOf(s), host: !!s.me.host, id: s.me.id, name: s.me.name, at: s.at });
+  }
+  function forget() { try { localStorage.removeItem("pv-mp-session"); } catch (_) {} }
+  /** Sessão guardada ainda válida: {room, m, seed, host, id, name, at} ou null (a vencida é apagada). */
+  function saved() {
+    const v = P.store.get("mp-session", null);
+    const info = v && typeof v === "object" ? P.mp.parse(v.code) : null;
+    const ok = info && typeof v.id === "string" && /^[a-z0-9]{8}$/.test(v.id) && typeof v.name === "string" && v.name.length >= 2
+      && typeof v.at === "number" && Date.now() < v.at + KEEP_MS && v.at <= Date.now() + 60000;
+    if (!ok) { if (v != null) forget(); return null; }
+    return Object.assign(info, { host: v.host === true, id: v.id, name: v.name.slice(0, 16), at: v.at });
+  }
+  P.mp.saved = saved;
+
+  /** Encerra a sessão. Sair de propósito (padrão) também apaga a sala guardada; keep = true mantém. */
+  function leave(sendBye = true, keep = false) {
     if (!S) return;
+    if (!keep) forget();
     const s = S; S = null;
     s.closed = true;
-    clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer);
+    clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer); clearInterval(s.ttlTimer);
     if (s.es) s.es.close();
     if (sendBye && s.joined) { try { fetch(NTFY + s.topic, { method: "POST", body: JSON.stringify({ t: "bye", id: s.me.id }), keepalive: true }).catch(() => {}); } catch (_) {} }
     P.$("#mp-net")?.remove();
@@ -41,7 +63,23 @@
   }
   P.mp.leave = leave;
   P.mp.current = () => S;
-  window.addEventListener("pagehide", () => leave(true));
+  const waitingView = (s) => s.view === "wait" || s.view === "joinwait";
+  // Trocar de aba/app enquanto espera não é sair da sala: sem "bye". Na partida, sai como antes.
+  window.addEventListener("pagehide", () => { if (S && !waitingView(S)) leave(true, true); });
+  /** Voltou para a aba: relê o histórico e reabre a conexão ao vivo se ela caiu. */
+  async function refresh() {
+    const s = S;
+    if (!s || s.closed || !s.loaded || document.visibilityState !== "visible") return;
+    if (!s.es || s.es.readyState === 2) { clearTimeout(s.retry); listen(s); }
+    try {
+      const r = await fetch(`${NTFY}${s.topic}/json?poll=1&since=all`);
+      if (!r.ok || s.closed) return;
+      (await r.text()).split("\n").forEach((l) => { if (!l.trim()) return; try { ingest(s, JSON.parse(l), false); } catch (_) {} });
+      afterHistory(s);
+    } catch (_) {}
+  }
+  document.addEventListener("visibilitychange", refresh);
+  window.addEventListener("pageshow", (e) => { if (e.persisted) refresh(); });
 
   // ---------- transporte ----------
   function publish(msg) {
@@ -80,7 +118,7 @@
       const text = await r.text();
       if (s.closed) return;
       text.split("\n").forEach((l) => { if (!l.trim()) return; try { ingest(s, JSON.parse(l), false); } catch (_) {} });
-      s.loaded = true; s.onLoaded && s.onLoaded();
+      s.loaded = true; afterHistory(s); s.onLoaded && s.onLoaded();
       net(false);
     } catch (_) {
       if (s.closed) return;
@@ -88,8 +126,24 @@
     }
     listen(s);
   }
+  /** Depois de ler o histórico inteiro: manda o que ficou pendente (hello próprio que não chegou, start do anfitrião). */
+  function afterHistory(s) {
+    if (s.closed || !s.joined || s.full) return;
+    if (s.resumed && !s.sawMyHello && !s.helloResent) {
+      s.helloResent = true;
+      publish({ t: "hello", id: s.me.id, n: s.me.name, host: !!s.me.host });
+    }
+    if (s.me.host && s.pendingStart && s.guestHello && !s.started && !s.startSent) sendStart(s);
+  }
+  function sendStart(s) {
+    s.startSent = true; s.pendingStart = false;
+    waitingJoined(s);
+    publish({ t: "start", at: Date.now(), g: s.guestHello.id });
+  }
+
   function listen(s) {
     if (s.closed) return;
+    if (s.es) s.es.close();
     const es = (s.es = new EventSource(`${NTFY}${s.topic}/sse?since=${s.lastId || "all"}`));
     // O ntfy.sh leva ~1 s para guardar cada mensagem no histórico: relê o histórico logo depois de conectar
     // para não perder nada que chegou entre a leitura inicial e a conexão ao vivo (repetidas são ignoradas).
@@ -112,7 +166,7 @@
   }
 
   function session({ room, m, seed, host, name, root }) {
-    leave(false);
+    leave(false, true);
     S = { room, m, seed, mode: MODES[m], topic: "palavreiro-mp-" + room, me: { id: randStr(8), name, host }, root,
       hostHello: null, guestHello: null, started: false, startSent: false, joined: false, full: false, oppLeft: false,
       seen: new Set(), lastId: null, es: null, closed: false, queue: Promise.resolve(), round: null, view: null,
@@ -125,19 +179,22 @@
   function handle(s, m, live) {
     if (m.t === "hello" && typeof m.id === "string") {
       const who = { id: m.id, name: String(m.n || "Amigo").slice(0, 16) };
+      if (m.id === s.me.id) s.sawMyHello = true;
       if (m.host === true) { if (!s.hostHello) s.hostHello = who; }
       else if (!s.guestHello) s.guestHello = who;
       if (s.me.host && s.guestHello && s.guestHello.id === m.id && !s.started && !s.startSent) {
-        s.startSent = true;
-        waitingJoined(s);
-        publish({ t: "start", at: Date.now(), g: s.guestHello.id });
+        // Lendo o histórico (sala retomada): espera o fim, porque o start pode já estar lá.
+        if (!s.loaded && !live) s.pendingStart = true;
+        else sendStart(s);
       }
       if (!s.me.host && s.joined && s.guestHello && s.guestHello.id !== s.me.id) markFull(s);
       if (s.view === "join") joinText(s);
+      if (s.view === "joinwait" && m.host === true) { const t = P.$("[data-waittxt]", s.root); if (t) t.innerHTML = `Esperando <b>${P.esc(s.hostHello.name)}</b> começar…`; }
     } else if (m.t === "start") {
       s.started = true;
       if (!s.me.host && (!s.joined || m.g !== s.me.id)) { if (s.joined) markFull(s); else if (s.view === "join") joinText(s); return; }
       s.series = { me: 0, opp: 0 };
+      forget(); clearInterval(s.ttlTimer); // a partida começou: a sala guardada não serve mais
       beginRound(s, +m.at || Date.now(), live);
     } else if (m.t === "again") {
       if (!s.round) return;
@@ -171,6 +228,7 @@
   function markFull(s) {
     if (s.full) return;
     s.full = true; s.joined = false;
+    forget();
     const body = P.$("[data-mpbody]", s.root);
     if (body) body.innerHTML = `<div class="mp-card center"><div class="mp-big">🚪</div><h2>A partida já está cheia</h2><p class="muted">Peça para seu amigo criar uma nova partida.</p><button class="pill wide" data-home>Voltar ao início</button></div>`;
     const b = P.$("[data-home]", s.root); if (b) b.onclick = () => P.go("");
@@ -237,6 +295,7 @@
       const name = readName(root); if (!name) return;
       const s = session({ room: randStr(12), m, seed: newSeed(), host: true, name, root });
       s.joined = true;
+      remember(s);
       waiting(s);
       connect(s);
       publish({ t: "hello", id: s.me.id, n: name, host: true });
@@ -254,6 +313,7 @@
         <div class="mp-link" data-link>${P.esc(link)}</div>
         <div class="row-btns"><button class="pill" data-share>Compartilhar</button><button class="pill ghost" data-copy>Copiar link</button></div>
         ${qrBlock(link)}
+        <div data-ttlbox><p class="mp-ttl" data-ttl></p></div>
         <div class="mp-wait" data-wait><div class="mark small bounce"><span></span><span></span><span></span><span></span><span></span></div><p>Esperando seu amigo entrar…</p></div>
       </div>`;
     P.$("[data-share]", body).onclick = () => P.share(`Bora jogar ${s.mode.name} comigo no Palavreiro? Quem acertar primeiro ganha: ${link}`);
@@ -261,6 +321,28 @@
       try { await navigator.clipboard.writeText(link); P.toast("Link copiado!"); }
       catch (_) { const r = document.createRange(); r.selectNodeContents(P.$("[data-link]", body)); getSelection().removeAllRanges(); getSelection().addRange(r); P.toast("Selecione e copie o link"); }
     };
+    if (s.startSent && s.guestHello) waitingJoined(s);
+    ttl(s);
+  }
+  /** Contagem da sala aberta (10 min desde a criação). No fim, a sala expira. */
+  function ttl(s) {
+    clearInterval(s.ttlTimer);
+    const tick = () => {
+      const box = P.$("[data-ttlbox]", s.root);
+      if (S !== s || s.view !== "wait" || !box || s.startSent || s.started) { clearInterval(s.ttlTimer); if (box && (s.startSent || s.started)) box.remove(); return; }
+      const left = Math.ceil((s.at + KEEP_MS - Date.now()) / 1000);
+      if (left > 0) {
+        P.$("[data-ttl]", box).textContent = `A sala fica aberta por mais ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}, mesmo se você sair para mandar o link.`;
+        return;
+      }
+      clearInterval(s.ttlTimer);
+      box.innerHTML = `<div class="mp-expired"><p>A sala expirou.</p><button class="pill wide" data-again>Criar outra sala</button></div>`;
+      P.$("[data-wait]", s.root)?.remove();
+      const root = s.root;
+      leave(false); // apaga a sala guardada e para de ouvir
+      P.$("[data-again]", box).onclick = () => P.games.mpCreate(root);
+    };
+    tick(); s.ttlTimer = setInterval(tick, 1000);
   }
   /** QR da sala: o amigo do lado entra só apontando a câmera. */
   function qrSvg(text) {
@@ -299,12 +381,26 @@
       if (s.guestHello || s.started) return markFull(s);
       const name = readName(root); if (!name) return;
       s.me.name = name; s.joined = true;
+      remember(s);
       joinWait(s);
       publish({ t: "hello", id: s.me.id, n: name, host: false });
     };
     s.onLoaded = () => joinText(s);
     connect(s);
   };
+  /** Volta para a sala guardada (mesmo id de jogador). Devolve false se não há sala válida. */
+  P.games.mpResume = function (root) {
+    const sv = saved();
+    if (!sv) return false;
+    const s = session({ room: sv.room, m: sv.m, seed: sv.seed, host: sv.host, name: sv.name, root });
+    s.me.id = sv.id; s.at = sv.at; s.joined = true; s.resumed = true;
+    if (!sv.host) { try { sessionStorage.setItem("pv-mp-join", codeOf(s)); } catch (_) {} }
+    shell(root, "Jogar com amigo");
+    if (sv.host) waiting(s); else joinWait(s);
+    connect(s);
+    return true;
+  };
+
   function joinText(s) {
     if (s.view !== "join") return;
     if (s.guestHello || s.started) return markFull(s);

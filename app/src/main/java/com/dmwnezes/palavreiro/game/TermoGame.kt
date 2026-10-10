@@ -85,6 +85,20 @@ class TermoGame(
         private set
 
     val busy: Boolean get() = revealingRow >= 0
+    /** É um desafio de amigo por link (sem botão de desistir, como no site). */
+    val isChallenge: Boolean get() = challenge != null
+    /** Terminou porque o jogador desistiu (só nesta sessão, para o aviso). */
+    var gaveUp by mutableStateOf(false)
+        private set
+
+    /** Desiste: mesma coisa que acabarem as tentativas (derrota registrada, palavras reveladas). */
+    fun giveUp() {
+        if (over || busy) return
+        gaveUp = true
+        clearRow()
+        end(false)
+        save()
+    }
     val currentRow: Int get() = rows.size
 
     /** Compatibilidade: a resposta do primeiro tabuleiro. */

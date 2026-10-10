@@ -339,7 +339,7 @@ fun MestreScreen(
                                 val tappedIt = w in game.tapped
                                 val isTarget = w in round.targets
                                 val color = when {
-                                    // Durante a rodada: no TODAS, os toques certos já ficam verdes.
+                                    // Durante a rodada: o toque certo já fica verde.
                                     result == null -> if (tappedIt) Night.correct else Night.surfaceHigh
                                     tappedIt && result == false -> Night.red
                                     tappedIt -> Night.correct
@@ -393,14 +393,14 @@ fun MestreScreen(
 }
 
 private const val MESTRE_HELP = "Faça o que a ordem pede, mas só quando começar com \"O mestre mandou\". " +
-    "Se o mestre não mandou, não toque em nada e espere o tempo acabar. Cuidado com o NÃO e com o TODAS. Você tem 3 vidas."
+    "Se o mestre não mandou, não toque em nada e espere o tempo acabar. Cuidado com o NÃO. Você tem 3 vidas."
 
-/** Cartão da ordem: "NÃO" e "TODAS" ganham destaque amarelo. */
+/** Cartão da ordem: "NÃO" ganha destaque amarelo. */
 @Composable
 private fun OrderCard(text: String) {
     val styled = androidx.compose.ui.text.buildAnnotatedString {
         var i = 0
-        val marks = Regex("NÃO|TODAS").findAll(text).toList()
+        val marks = Regex("NÃO").findAll(text).toList()
         marks.forEach { m ->
             append(text.substring(i, m.range.first))
             pushStyle(androidx.compose.ui.text.SpanStyle(color = Night.present, fontWeight = FontWeight.ExtraBold))

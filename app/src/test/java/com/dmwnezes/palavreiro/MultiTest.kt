@@ -98,6 +98,18 @@ class MultiTest {
     }
 
     @Test
+    fun salaGuardada() {
+        val r = Multi.newRoom('q')
+        val s = Multi.Session(r.code, true, "abcd1234", "Daniel", 1_000_000L)
+        assertEquals(s, Multi.Session.decode(s.encode()))
+        assertTrue(s.valid(1_000_000L + 9 * 60_000)); assertFalse(s.valid(1_000_000L + 10 * 60_000))
+        assertNull(Multi.Session.decode("lixo")); assertNull(Multi.Session.decode(null))
+        // Mesmo formato do site (pv-mp-session).
+        val site = Multi.Session.decode("""{"code":"${r.code}","host":false,"id":"zz99yy88","name":"Ana","at":5}""")!!
+        assertEquals(r, site.room); assertFalse(site.host)
+    }
+
+    @Test
     fun marcasSemLetras() {
         val ans = Multi.words(words.answers, 42, 2)
         val g = TermoGame(Mode.DUETO, words, store = null, fixed = ans)
@@ -122,7 +134,7 @@ class MultiTest {
     @Test
     fun aoVivoPeloNtfy() = runBlocking {
         assumeTrue(System.getenv("PV_LIVE") == "1")
-        val ntfy = Ntfy(OkHttpClient())
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         val room = Multi.newRoom('t')
         assertTrue(ntfy.publish(room.topic, Multi.encode(Msg.Hello("host0001", "Host", true))))
         val got = withTimeout(30_000) {
@@ -136,7 +148,7 @@ class MultiTest {
     fun anfitriaoContraOSite() = runBlocking {
         val code = System.getenv("PV_ROOM"); assumeTrue(code != null && System.getenv("PV_HOST") == "1")
         val room = Multi.parse(code)!!
-        val ntfy = Ntfy(OkHttpClient())
+        val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         val me = "kotlin01"
         ntfy.publish(room.topic, Multi.encode(Msg.Hello(me, "Daniel", true)))
         val log = StringBuilder()

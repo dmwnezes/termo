@@ -133,4 +133,22 @@ object Multi {
         val score: String get() = "$me × $opp"
         fun plus(outcome: String?): Series = if (over) this else when (outcome) { "me" -> copy(me = me + 1); "opp" -> copy(opp = opp + 1); else -> this }
     }
+
+    // ---------- sala guardada (sobrevive ao app fechado por 10 minutos) ----------
+    /** Quanto tempo a sala fica guardada esperando o amigo. */
+    const val KEEP_MS = 10 * 60 * 1000L
+
+    /** Sessão salva: igual à do site ("pv-mp-session"): {code, host, id, name, at}. */
+    data class Session(val code: String, val host: Boolean, val id: String, val name: String, val at: Long) {
+        val room: Room? get() = parse(code)
+        val expiresAt: Long get() = at + KEEP_MS
+        fun valid(now: Long = System.currentTimeMillis()) = room != null && now < expiresAt && now >= at - 60_000
+        fun encode(): String = JSONObject().put("code", code).put("host", host).put("id", id).put("name", name).put("at", at).toString()
+        companion object {
+            fun decode(text: String?): Session? = runCatching {
+                val o = JSONObject(text ?: return null)
+                Session(o.getString("code"), o.getBoolean("host"), o.getString("id"), o.optString("name"), o.getLong("at"))
+            }.getOrNull()
+        }
+    }
 }

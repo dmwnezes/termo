@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, REVERSO, DEFINICAO, SINONIMOS, ANTONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -75,8 +75,7 @@ fun HomeScreen(
         GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
         GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
-        GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
-        GameCardInfo(Dest.ANTONIMOS, "Antônimos", "Ache o contrário antes do tempo acabar", null),
+        GameCardInfo(Dest.SINONIMOS, "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", null),
         GameCardInfo(Dest.DESAFIAR, "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", null),
     )
     Box(Modifier.fillMaxSize().background(Night.background)) {
@@ -261,15 +260,13 @@ private fun CardIcon(dest: Dest) {
             Text("👑", fontSize = 20.sp)
             Pill("TOQUE", Night.present)
         }
-        Dest.ANTONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Pill("ALTO", Night.surfaceHigh)
-            Text("≠", color = Night.muted, fontSize = 12.sp)
-            Pill("BAIXO", Night.red)
-        }
-        Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Pill("BELO", Night.surfaceHigh)
-            Text("=", color = Night.muted, fontSize = 12.sp)
-            Pill("LINDO", Night.correct)
+        Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Pill("BELO", Night.surfaceHigh); Text("=", color = Night.muted, fontSize = 10.sp); Pill("LINDO", Night.correct)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Pill("ALTO", Night.surfaceHigh); Text("≠", color = Night.muted, fontSize = 10.sp); Pill("BAIXO", Night.red)
+            }
         }
     }
 }

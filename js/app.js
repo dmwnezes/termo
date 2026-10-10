@@ -19,8 +19,8 @@
     conexoes: `<div class="mini" style="grid-template-columns:repeat(4,10px);gap:3px">${["var(--present)", "var(--correct)", "var(--blue)", "var(--purple)"].map((c) => `<i style="width:10px;height:10px;background:${c}"></i>`.repeat(4)).join("")}</div>`,
     reverso: `<div style="text-align:center"><b style="color:var(--accent);font-size:18px">?</b><div class="mini" style="grid-template-columns:repeat(5,9px)">${["--correct", "--absent", "--present", "--absent", "--correct"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div></div>`,
     definicao: `<div style="display:grid;gap:5px;justify-items:center"><i style="display:block;width:46px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><i style="display:block;width:34px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><div class="mini" style="grid-template-columns:repeat(4,11px)">${["--surface-high", "--present", "--surface-high", "--surface-high"].map((c) => `<i style="width:11px;height:11px;background:var(${c})"></i>`).join("")}</div></div>`,
-    antonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">ALTO</span>≠<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--red)">BAIXO</span></div>`,
-    sinonimos: `<div style="display:grid;gap:3px;justify-items:center;font-size:9px;font-weight:600"><span class="pill-badge" style="font-size:9px;padding:2px 8px">BELO</span>=<span class="pill-badge new" style="font-size:9px;padding:2px 8px;background:var(--correct)">LINDO</span></div>`,
+    // Sinônimo ou Antônimo: as duas mini pílulas antigas empilhadas.
+    sinonimos: `<div class="sa-ico"><span style="background:var(--correct)">BELO = LINDO</span><span style="background:var(--red)">ALTO ≠ BAIXO</span></div>`,
     intruso: `<div class="mini" style="grid-template-columns:repeat(5,9px);gap:3px">${["--absent", "--absent", "--red", "--absent", "--absent"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div>`,
     ortografia: `<div style="display:flex;gap:5px;font-weight:800;font-size:15px"><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--correct);color:var(--dark-text)">✓</span><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--red);color:var(--dark-text)">✗</span></div>`,
     mestre: `<div style="display:grid;gap:2px;justify-items:center"><span style="font-size:17px;line-height:1">👑</span><span class="pill-badge" style="font-size:9px;padding:3px 9px;background:var(--accent);color:var(--dark-text)">TOQUE</span></div>`,
@@ -47,8 +47,7 @@
       ["mestre", "Mestre Mandou", "Obedeça só quando o mestre mandar", ""],
       ["reverso", "Reverso", "O site tenta adivinhar a sua palavra", ""],
       ["definicao", "Qual é a Palavra?", "Descubra a palavra pela definição", ""],
-      ["sinonimos", "Sinônimos", "Corrente de sinônimos contra o tempo", ""],
-      ["antonimos", "Antônimos", "Ache o contrário antes do tempo acabar", ""],
+      ["sinonimos", "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
@@ -84,7 +83,7 @@
       sinonimos: () => P.games.sinonimos(app),
       antonimos: () => P.games.antonimos(app),
       desafiar: () => P.games.challengeCreate(app),
-      amigo: () => (parts[1] === "entrar" ? P.games.mpJoin(app) : P.games.mpCreate(app)),
+      amigo: () => (parts[1] === "entrar" ? P.games.mpJoin(app) : (parts[1] === "sala" && P.games.mpResume(app)) || P.games.mpCreate(app)),
       perfil: () => P.games.perfil(app),
       intruso: () => P.games.intruso(app),
       ortografia: () => P.games.ortografia(app),
@@ -110,6 +109,19 @@
   if (mpCode && P.mp.parse(mpCode)) {
     try { sessionStorage.setItem("pv-mp-join", mpCode.trim().toLowerCase()); } catch (_) {}
     history.replaceState(null, "", location.pathname + "#/amigo/entrar");
+  }
+
+  // Sala com amigo guardada (vale 10 minutos): ao abrir o site no início, em #/amigo ou no link da MESMA sala,
+  // volta direto para ela (o anfitrião costuma sair para mandar o link e o navegador pode descartar a aba).
+  const mpSaved = P.mp.saved();
+  if (mpSaved) {
+    const h = location.hash.replace(/^#\/?/, "");
+    let back = h === "" || h === "amigo" || h === "amigo/sala";
+    if (h === "amigo/entrar") {
+      let j = null; try { j = P.mp.parse(sessionStorage.getItem("pv-mp-join")); } catch (_) {}
+      back = !j || j.room === mpSaved.room;
+    }
+    if (back) history.replaceState(null, "", location.pathname + "#/amigo/sala");
   }
 
   // Botão voltar em telas criadas depois (os jogos assíncronos montam o topo depois).

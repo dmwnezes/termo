@@ -36,7 +36,7 @@ import com.dmwnezes.palavreiro.ui.ConnectionsScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
 import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ReverseScreen
-import com.dmwnezes.palavreiro.ui.SynonymScreen
+import com.dmwnezes.palavreiro.ui.SynAntScreen
 import com.dmwnezes.palavreiro.ui.ArchiveGame
 import com.dmwnezes.palavreiro.ui.ArchiveScreen
 import com.dmwnezes.palavreiro.ui.IntruderScreen
@@ -70,8 +70,14 @@ class MainActivity : ComponentActivity() {
         Launch.read(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        com.dmwnezes.palavreiro.system.RoomKeeper.appVisible = true
+    }
+
     override fun onPause() {
         super.onPause()
+        com.dmwnezes.palavreiro.system.RoomKeeper.appVisible = false
         Widget.refresh(this)
         com.dmwnezes.palavreiro.system.NextWordLive.update(this)
     }
@@ -83,12 +89,15 @@ object Launch {
     var challenge by mutableStateOf<String?>(null)
     /** Código da partida com amigo (?mp=...). */
     var multi by mutableStateOf<String?>(null)
+    /** Muda quando o app deve voltar para a sala guardada (aviso "seu amigo entrou"). */
+    var resume by mutableIntStateOf(0)
 
     fun read(intent: Intent?) {
         intent ?: return
         intent.getStringExtra("dest")?.let { pending = it }
         intent.data?.getQueryParameter("d")?.let { code -> Challenge.decode(code)?.let { challenge = it } }
         intent.data?.getQueryParameter("mp")?.let { multi = it }
+        if (intent.getBooleanExtra("mp_resume", false)) resume++
     }
 }
 
@@ -100,7 +109,7 @@ private sealed interface Screen {
     data class ChallengeGame(val word: String) : Screen
     data object Profile : Screen
     /** Partida com amigo; [code] = link recebido (null = criar uma partida). */
-    data class Multi(val code: String?) : Screen
+    data class Multi(val code: String?, val resume: com.dmwnezes.palavreiro.game.Multi.Session? = null) : Screen
     data class Archive(val game: ArchiveGame = ArchiveGame.TERMO) : Screen
     data class ArchivePlay(val game: ArchiveGame, val date: java.time.LocalDate) : Screen
 }
@@ -139,13 +148,22 @@ fun PalavreiroApp() {
     }
 
     // Abre o destino pedido por atalho, widget, notificação ou link.
-    LaunchedEffect(Launch.pending, Launch.challenge, Launch.multi, splash) {
+    LaunchedEffect(Launch.pending, Launch.challenge, Launch.multi, Launch.resume, splash) {
         if (splash) return@LaunchedEffect
-        Launch.multi?.let { screen = Screen.Multi(it); Launch.multi = null; return@LaunchedEffect }
+        Launch.multi?.let { code ->
+            Launch.multi = null
+            // O link da mesma sala em que você já está guardado: volta para ela em vez de entrar de novo.
+            val kept = com.dmwnezes.palavreiro.system.RoomKeeper.session(store)
+            val same = kept != null && com.dmwnezes.palavreiro.game.Multi.parse(code)?.room == kept.room?.room
+            if (screen !is Screen.Multi || !same) screen = if (same) Screen.Multi(null, kept) else Screen.Multi(code)
+            return@LaunchedEffect
+        }
+        // Sala guardada (o app foi fechado enquanto você mandava o link): volta direto para ela.
+        if (screen !is Screen.Multi) com.dmwnezes.palavreiro.system.RoomKeeper.session(store)?.let { screen = Screen.Multi(null, it); return@LaunchedEffect }
         Launch.challenge?.let { screen = Screen.ChallengeGame(it); Launch.challenge = null; return@LaunchedEffect }
         Launch.pending?.let { p ->
             Launch.pending = null
-            if (p == "HOME") screen = Screen.Home else runCatching { Dest.valueOf(p) }.getOrNull()?.let(::open)
+            if (p == "HOME") screen = Screen.Home else runCatching { Dest.valueOf(if (p == "ANTONIMOS") "SINONIMOS" else p) }.getOrNull()?.let(::open)
         }
     }
 
@@ -215,8 +233,7 @@ fun PalavreiroApp() {
                         Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
-                        Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
-                        Dest.ANTONIMOS -> SynonymScreen(AppGraph.antonyms, AppGraph.antonymFamilies, store, AppGraph.feedback, back, kind = com.dmwnezes.palavreiro.ui.ChainKind.ANTONIMOS)
+                        Dest.SINONIMOS -> SynAntScreen(AppGraph.synonyms, AppGraph.families, AppGraph.antonyms, AppGraph.antonymFamilies, store, AppGraph.feedback, back)
                         Dest.DESAFIAR -> {}
                         Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
@@ -256,6 +273,7 @@ fun PalavreiroApp() {
                     onBack = { screen = Screen.Home; refresh++ },
                     joinCode = s.code,
                     meanings = AppGraph.meanings,
+                    resume = s.resume,
                 )
                 is Screen.Archive -> ArchiveScreen(
                     store = store,

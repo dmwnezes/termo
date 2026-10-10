@@ -117,10 +117,12 @@
     const hasSwitch = !mp && !archDay && MODES[base].daily;
     const showTab = (inf) => P.games.termoScreen(root, inf && base === "termo" ? "infinito" : base, null, null, { free: inf && base !== "termo", quiet: true });
     const gameName = () => MODES[base].title + (g.free && base !== "termo" ? " Infinito" : "");
+    // Desistir: Termo do dia, Infinito, Dueto, Quarteto, Arquivo e partida com amigo (não no desafio por link).
+    const canGiveUp = modeKey !== "desafio";
     const title = () => mp ? mp.title : g.arch ? `${g.mode.title} · ${P.shortDay(g.arch)}` : MODES[base].title;
     root.innerHTML = P.topbar(`<span data-title>${title()}</span>`, {
       help: true,
-      extra: (mp && mp.extra ? mp.extra : "") + `<span class="badge hidden" data-hard>DIFÍCIL</span><button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
+      extra: (mp && mp.extra ? mp.extra : "") + `<span class="badge hidden" data-hard>DIFÍCIL</span>${canGiveUp ? `<button class="icon-btn hidden" data-giveup aria-label="Desistir" title="Desistir">🏳️</button>` : ""}<button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
     }) + (hasSwitch ? P.modeSwitch(g.free) : "") + `<div class="game">${mp ? `<div class="opp" data-opp></div>` : ""}<div class="boards"><div class="boards-grid"></div></div><div class="center" data-after></div></div>`;
     if (hasSwitch) P.bindModeSwitch(root, showTab);
     const grid = P.$(".boards-grid", root);
@@ -156,6 +158,8 @@
       P.$("[data-title]", root).textContent = title();
       P.$("[data-hard]", root).classList.toggle("hidden", !g.hard);
       P.$("[data-hint]", root).classList.toggle("hidden", g.over || !!mp || !!replaying);
+      const gu = P.$("[data-giveup]", root);
+      if (gu) gu.classList.toggle("hidden", g.over || busy || !!replaying || !!(mp && mp.locked()));
       grid.innerHTML = "";
       for (let b = 0; b < g.boards; b++) {
         const rows = boardRows(g, b), at = solvedAt(g, b);
@@ -236,10 +240,10 @@
       else if (g.rows.length >= g.maxTries) end(false);
       save(g); draw();
     }
-    function end(win) {
+    function end(win, gaveUp) {
       if (mp) {
         g.over = true; g.won = win;
-        if (win) { P.fx.win(); P.confetti(); } else { P.fx.lose(); P.toast("Suas tentativas acabaram", 2200); }
+        if (win) { P.fx.win(); P.confetti(); } else { P.fx.lose(); P.toast(gaveUp ? "Você desistiu" : "Suas tentativas acabaram", 2200); }
         mp.onEnd(win, g.rows.length);
         return;
       }
@@ -252,7 +256,8 @@
       } else {
         P.fx.lose();
         const miss = g.answers.filter((_, b) => solvedAt(g, b) < 0).map(P.words.display);
-        P.toast(miss.length === 1 ? `A palavra era ${miss[0]}` : `Faltou: ${miss.join(", ")}`, 3500);
+        const txt = miss.length === 1 ? `a palavra era ${miss[0]}` : `faltou: ${miss.join(", ")}`;
+        P.toast(gaveUp ? `Você desistiu · ${txt}` : txt[0].toUpperCase() + txt.slice(1), 3500);
         setTimeout(result, 2200);
       }
     }
@@ -276,6 +281,22 @@
       P.fx.reveal(pos, "c"); P.toast(`Dica: a ${ORD[pos]} letra é ${ans[pos]}`); save(g); draw();
     }
     P.$("[data-hint]", root).onclick = hint;
+
+    /** Desistir: mesmo efeito de acabarem as tentativas (derrota registrada e folha de resultado). */
+    function giveUp() {
+      if (locked()) return;
+      const ui = P.sheet(`<h2>Desistir desta partida?</h2>
+        <p class="subtitle">${g.boards > 1 ? "As palavras serão reveladas e conta como derrota." : "A palavra será revelada e conta como derrota."}</p>
+        <div class="row-btns"><button class="pill danger" data-yes>Desistir</button><button class="pill ghost" data-no>Continuar jogando</button></div>`);
+      P.$("[data-no]", ui.el).onclick = () => ui.close();
+      P.$("[data-yes]", ui.el).onclick = () => {
+        ui.close();
+        if (locked()) return;
+        g.current = [null, null, null, null, null]; g.cursor = 0;
+        end(false, true); save(g); draw();
+      };
+    }
+    const gu = P.$("[data-giveup]", root); if (gu) gu.onclick = giveUp;
     P.$("[data-help]", root).onclick = () => P.games.help();
 
     function grids() { return g.answers.map((a, b) => boardRows(g, b).map((w) => P.evaluate(w, a))); }
