@@ -1,6 +1,6 @@
 // Jogar com amigo (site): partida ao vivo pelo ntfy.sh, compatível com o app Android.
 // Link: ?mp=SALA-MODO-SEED · tópico "palavreiro-mp-" + SALA · mensagens JSON (hello, start, row, end, again, bye;
-// Bomba-Relógio: word, boom; Anagrama: solve, skip).
+// Bomba-Relógio: word, boom; Anagrama: solve, skip; reações: react).
 (function () {
   "use strict";
   // Testes: localStorage "pv-ntfy" (ex.: "http://127.0.0.1:8799/") troca o servidor do ntfy.sh.
@@ -66,6 +66,7 @@
     const s = S; S = null;
     s.closed = true;
     clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer); clearInterval(s.ttlTimer); stopGame(s);
+    closePicker();
     if (s.es) s.es.close();
     if (sendBye && s.joined) { try { fetch(NTFY + s.topic, { method: "POST", body: JSON.stringify({ t: "bye", id: s.me.id }), keepalive: true }).catch(() => {}); } catch (_) {} }
     P.$("#mp-net")?.remove();
@@ -211,9 +212,13 @@
       const seed = parseInt(String(m.seed || ""), 36);
       if (!(seed >= 0 && seed <= 2147483646)) return;
       s.seed = seed;
+      // "m" = modo da próxima partida (sem "m", continua o mesmo). Trocar de modo zera a série.
+      const nm = typeof m.m === "string" && MODES[m.m] ? m.m : s.m, switched = nm !== s.m;
+      if (switched) { s.m = nm; s.mode = MODES[nm]; }
       // "s":1 = série nova (o placar volta a 0 × 0). Série já decidida também recomeça.
-      if (m.s === 1 || seriesOver(s)) s.series = { me: 0, opp: 0 };
+      if (switched || m.s === 1 || seriesOver(s)) s.series = { me: 0, opp: 0 };
       beginRound(s, +m.at || Date.now(), live);
+      if (switched && !s.me.host) P.toast(`Novo jogo: ${s.mode.name}`, 2400);
     } else if (m.t === "word" || m.t === "boom") {
       if (s.round && s.round.kind === "b") (m.t === "word" ? bombWord : bombBoom)(s, m);
     } else if (m.t === "solve" || m.t === "skip") {
@@ -230,6 +235,13 @@
       if (!r || r.kind || r.ends.some((e) => e.id === m.id) || (m.id !== s.me.id && (!o || m.id !== o.id))) return;
       r.ends.push({ id: m.id, won: m.won === true, tries: +m.tries || 0, ms: +m.ms || 0 });
       decide(s); drawStrip(s);
+    } else if (m.t === "react") {
+      // Só reações frescas do adversário (o histórico do tópico traz as velhas); a minha já apareceu na hora.
+      const o = opp(s);
+      if (!s.round || s.view !== "game" || !o || m.id === s.me.id || m.id !== o.id || !EMOJIS.includes(m.e)) return;
+      if (!(Math.abs(Date.now() - Number(m.at)) < REACT_FRESH)) return;
+      bubble(s, m.e, o.name, false);
+      P.vibrate(40);
     } else if (m.t === "bye") {
       const o = opp(s);
       if (!o || m.id !== o.id) return;
@@ -435,6 +447,7 @@
   function beginRound(s, at, live) {
     clearInterval(s.countTimer); clearTimeout(s.sheetTimer);
     document.querySelectorAll(".overlay").forEach((o) => o.remove());
+    closePicker();
     const now = Date.now();
     // Contagem 3-2-1: usa o "at" do anfitrião quando o relógio bate; se não, conta a partir da chegada.
     let delay = at + 3000 - now;
@@ -451,7 +464,7 @@
       mp: {
         mode: s.mode.key, answers: r.answers,
         title: `Você × ${o ? o.name : "Amigo"}`,
-        extra: `<span class="mp-score" data-score></span>`,
+        extra: reactBtn(s) + `<span class="mp-score" data-score></span>`,
         locked: () => Date.now() < r.startAt || !!r.result,
         mount: (el) => { r.strip = el; drawStrip(s); },
         onRow: (row, marks) => { if (S === s && s.round === r) publish({ t: "row", id: s.me.id, r: row, m: marks }); },
@@ -579,7 +592,8 @@
     };
     const ui = P.sheet(`${head}
       <div class="mp-results">${line("Você", mine, false)}${line(P.esc(oname), theirs, s.oppLeft)}</div>
-      <div class="row-btns wrap"><button class="pill ghost" data-share>Compartilhar</button><button class="pill ghost" data-replay>▶ Replay</button></div>
+      <div class="row-btns mp-share-row"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>📸 Stories</button><button class="pill ghost" data-replay>▶ Replay</button></div>
+      ${nextBlock(s)}
       <div class="row-btns" style="margin-top:10px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>${champ ? "Nova série" : "Próxima rodada"}</button><button class="pill ghost" data-exit>Sair</button></div>
       ${s.me.host ? (s.oppLeft ? `<p class="note">${P.esc(oname)} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
     P.$("[data-share]", ui.el).onclick = () => {
@@ -589,15 +603,103 @@
       P.share(`Palavreiro · Partida com ${oname}\n${t}`);
     };
     P.$("[data-replay]", ui.el).onclick = () => { ui.close(); r.api && r.api.replay(); };
+    P.$("[data-story]", ui.el).onclick = () => storyCard(s, r);
     P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
-    P.$("[data-again]", ui.el).onclick = () => {
-      if (!s.me.host || s.oppLeft) return;
-      P.$("[data-again]", ui.el).disabled = true;
-      const msg = { t: "again", seed: newSeed().toString(36), at: Date.now() };
-      if (champ) msg.s = 1;
+    bindAgain(s, ui, champ ? "Nova série" : "Próxima rodada", !!champ);
+  }
+
+  // ---------- revanche trocando de modo (só o anfitrião escolhe) ----------
+  const NEXT = ["t", "d", "q", "b", "a"];
+  const nextBlock = (s) => (s.me.host ? `<div class="mp-next"><span>Próximo jogo</span>
+      <div class="seg mp-modes">${NEXT.map((k) => `<button data-next="${k}" class="${k === s.m ? "on" : ""}">${MODES[k].pill}</button>`).join("")}</div></div>` : "");
+  /** Botão principal da folha de fim: mesmo modo → texto de sempre; outro modo → "Jogar MODO". */
+  function bindAgain(s, ui, sameText, newSeries) {
+    const btn = P.$("[data-again]", ui.el); if (!btn) return;
+    let next = s.m;
+    const label = () => { btn.textContent = next === s.m ? sameText : `Jogar ${MODES[next].name}`; };
+    ui.el.querySelectorAll("[data-next]").forEach((b) => (b.onclick = () => {
+      next = b.dataset.next; P.fx.type();
+      ui.el.querySelectorAll("[data-next]").forEach((x) => x.classList.toggle("on", x === b));
+      label();
+    }));
+    label();
+    btn.onclick = () => {
+      if (!s.me.host || s.oppLeft || S !== s) return;
+      btn.disabled = true;
+      const msg = { t: "again", seed: newSeed().toString(36), at: Date.now(), m: next };
+      if (newSeries || next !== s.m) msg.s = 1;
       publish(msg);
     };
   }
+
+  // ---------- cartão para Stories (todos os modos) ----------
+  function storyCard(s, r) {
+    const meName = s.me.name || "Você", oName = oppName(s);
+    const nameOf = (w) => (w === "me" ? meName : oName);
+    const mine = (w) => (w === "me" ? "win" : w === "opp" ? "lose" : "draw");
+    let sc, result, detail, gold = false, res;
+    if (r.kind === "a") {
+      sc = `${r.pts.me} × ${r.pts.opp}`; res = mine(r.result); gold = r.result !== "draw";
+      result = r.result === "draw" ? "Empate" : `🏆 ${nameOf(r.result)} venceu!`;
+      detail = `${ANA_N} rodadas · ${sc}`;
+    } else {
+      const champ = seriesWinner(s);
+      sc = score(s);
+      if (champ) { result = `🏆 ${nameOf(champ)} levou a série!`; gold = true; res = mine(champ); }
+      else { result = r.result === "draw" ? "Empate" : `${nameOf(r.result)} venceu a rodada`; res = mine(r.result); }
+      if (r.kind === "b") detail = `${plural(r.words.length, "palavra", "palavras")} antes de explodir 💥`;
+      else {
+        const o = opp(s), line = (n, e, left) => `${n}: ${e ? (e.won ? `acertou em ${e.tries} · ${clockFmt(e.ms)}` : "errou") : left ? "saiu" : "não terminou"}`;
+        detail = [line(meName, r.ends.find((e) => e.id === s.me.id), false), line(oName, o && r.ends.find((e) => e.id === o.id), s.oppLeft)];
+      }
+    }
+    const pill = `${s.mode.name} ${r.kind === "b" ? "💣" : r.kind === "a" ? "🔤" : "⚔️"}`;
+    return P.storyVs({ pill, me: meName, opp: oName, score: sc, gold, result, detail, mine: res });
+  }
+  P.mp.storyCard = () => S && S.round && S.round.result ? storyCard(S, S.round) : null;
+
+  // ---------- reações rápidas ----------
+  const EMOJIS = ["😂", "😱", "🔥", "👏", "😈"];
+  const REACT_FRESH = 10000, REACT_GAP = 1500;
+  const cooling = (s) => !!s.reactAt && Date.now() - s.reactAt < REACT_GAP;
+  const reactBtn = (s) => `<button class="icon-btn mp-react${cooling(s) ? " cool" : ""}" data-react aria-label="Reagir" title="Reagir">😊</button>`;
+  function closePicker() { document.querySelectorAll(".mp-react-catch, .mp-react-pick").forEach((x) => x.remove()); }
+  function openPicker(s) {
+    if (document.querySelector(".mp-react-pick")) return closePicker();
+    if (cooling(s)) return;
+    const bar = P.$(".topbar", s.root), top = bar ? bar.getBoundingClientRect().bottom + 4 : 60;
+    const catcher = P.h(`<div class="mp-react-catch"></div>`);
+    const pick = P.h(`<div class="mp-react-pick" role="menu" aria-label="Reagir" style="top:${Math.round(top)}px">${EMOJIS.map((e) => `<button role="menuitem" data-e="${e}" aria-label="${e}">${e}</button>`).join("")}</div>`);
+    catcher.addEventListener("click", (e) => { e.stopPropagation(); closePicker(); });
+    pick.querySelectorAll("[data-e]").forEach((b) => (b.onclick = (e) => { e.stopPropagation(); closePicker(); sendReact(s, b.dataset.e); }));
+    document.body.append(catcher, pick);
+  }
+  function sendReact(s, e) {
+    if (S !== s || !s.round || cooling(s) || !EMOJIS.includes(e)) return;
+    s.reactAt = Date.now();
+    publish({ t: "react", id: s.me.id, e, at: s.reactAt });
+    bubble(s, e, "Você", true);
+    document.querySelectorAll("[data-react]").forEach((b) => b.classList.add("cool"));
+    clearTimeout(s.reactTimer);
+    s.reactTimer = setTimeout(() => document.querySelectorAll("[data-react]").forEach((b) => b.classList.remove("cool")), REACT_GAP);
+  }
+  /** Balão que sobe e some: abaixo da faixa do adversário quando houver, senão logo abaixo do topo. */
+  let bubbleN = 0;
+  function bubble(s, e, who, mine) {
+    const anchor = P.$(".opp", s.root) || P.$(".ana-opp", s.root) || P.$(".topbar", s.root);
+    const y = anchor ? anchor.getBoundingClientRect().bottom + 8 : 70;
+    const live = document.querySelectorAll(".mp-bubble").length;
+    const dx = [0, 56, -56, 112, -112][(live ? bubbleN : 0) % 5];
+    bubbleN = live ? bubbleN + 1 : 1;
+    const el = P.h(`<div class="mp-bubble${mine ? " mine" : ""}" aria-live="polite" style="top:${Math.round(y)}px;left:calc(50% + ${dx}px)"><span>${e}</span><small>${P.esc(who)}</small></div>`);
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("[data-react]");
+    if (b && S && S.round && S.view === "game") { e.stopPropagation(); openPicker(S); }
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && document.querySelector(".mp-react-pick")) closePicker(); }, true);
 
   // ================= Bomba-Relógio e Anagrama (mesma sala, mesmas mensagens do app) =================
   function stopGame(s) {
@@ -617,7 +719,7 @@
   const debug = () => { const d = P.mp.debug || window.PV_DEBUG; return d && typeof d === "object" ? d : {}; };
   /** Tela base dos dois jogos: topo "Você × NOME" + placar, área do jogo e teclado do Termo. */
   function gameShell(s, cls, inner, keys) {
-    s.root.innerHTML = P.topbar(`<span>Você × ${P.esc(oppName(s))}</span>`, { extra: `<span class="mp-score" data-score></span>` })
+    s.root.innerHTML = P.topbar(`<span>Você × ${P.esc(oppName(s))}</span>`, { extra: reactBtn(s) + `<span class="mp-score" data-score></span>` })
       + `<div class="game mpg ${cls}">${inner}</div>`;
     const game = P.$(".game", s.root);
     const kb = P.keyboard(game, keys);
@@ -810,8 +912,9 @@
     document.querySelectorAll(".overlay").forEach((x) => x.remove());
     const oname = oppName(s), champ = seriesWinner(s);
     const ui = P.sheet(`<div class="bomb-sheet-ico" aria-hidden="true">💥</div>${seriesHead(s, r, `${plural(r.words.length, "palavra", "palavras")} na rodada`)}
-      <div class="row-btns" style="margin-top:14px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>${champ ? "Nova série" : "Próxima rodada"}</button><button class="pill ghost" data-exit>Sair</button></div>
-      <div class="row-btns" style="margin-top:10px"><button class="pill ghost" data-share>Compartilhar</button></div>
+      <div class="row-btns mp-share-row" style="margin-top:14px"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>📸 Stories</button></div>
+      ${nextBlock(s)}
+      <div class="row-btns" style="margin-top:10px"><button class="pill" data-again ${s.me.host && !s.oppLeft ? "" : "disabled"}>${champ ? "Nova série" : "Próxima rodada"}</button><button class="pill ghost" data-exit>Sair</button></div>
       ${s.me.host ? (s.oppLeft ? `<p class="note">${P.esc(oname)} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
     P.$("[data-share]", ui.el).onclick = () => {
       const t = champ === "me" ? `Levei a série por ${score(s)}`
@@ -819,14 +922,9 @@
         : `${r.result === "me" ? "Venci a rodada" : "Perdi a rodada"} (série ${score(s)})`;
       P.share(`Palavreiro · Bomba-Relógio com ${oname}\n${t} 💣`);
     };
+    P.$("[data-story]", ui.el).onclick = () => storyCard(s, r);
     P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
-    P.$("[data-again]", ui.el).onclick = () => {
-      if (!s.me.host || s.oppLeft) return;
-      P.$("[data-again]", ui.el).disabled = true;
-      const msg = { t: "again", seed: newSeed().toString(36), at: Date.now() };
-      if (champ) msg.s = 1;
-      publish(msg);
-    };
+    bindAgain(s, ui, champ ? "Nova série" : "Próxima rodada", !!champ);
   }
 
   // ---------- B. Anagrama ----------
@@ -991,18 +1089,16 @@
       <h2>${r.result === "me" ? "Você venceu! 🏆" : r.result === "opp" ? `${en} venceu` : "Empate"}</h2>
       <p class="mp-series gold ana-final">${sc}</p>
       <div class="ana-rows">${rows}</div>
-      <div class="row-btns" style="margin-top:14px">${s.me.host ? `<button class="pill" data-again ${s.oppLeft ? "disabled" : ""}>Revanche</button>` : ""}<button class="pill ghost" data-exit>Sair</button><button class="pill ghost" data-share>Compartilhar</button></div>
+      <div class="row-btns mp-share-row" style="margin-top:14px"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>📸 Stories</button></div>
+      ${nextBlock(s)}
+      <div class="row-btns" style="margin-top:10px">${s.me.host ? `<button class="pill" data-again ${s.oppLeft ? "disabled" : ""}>Revanche</button>` : ""}<button class="pill ghost" data-exit>Sair</button></div>
       ${s.me.host ? (s.oppLeft ? `<p class="note">${en} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
     P.$("[data-share]", ui.el).onclick = () => {
       const t = r.result === "me" ? `Venci por ${sc}` : r.result === "opp" ? `Perdi por ${sc}` : `Empate ${sc}`;
       P.share(`Palavreiro · Anagrama com ${oname}\n${t} 🔤`);
     };
+    P.$("[data-story]", ui.el).onclick = () => storyCard(s, r);
     P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
-    const again = P.$("[data-again]", ui.el);
-    if (again) again.onclick = () => {
-      if (!s.me.host || s.oppLeft) return;
-      again.disabled = true;
-      publish({ t: "again", seed: newSeed().toString(36), at: Date.now() });
-    };
+    bindAgain(s, ui, "Revanche", false);
   }
 })();

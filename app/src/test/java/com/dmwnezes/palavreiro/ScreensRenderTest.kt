@@ -33,6 +33,8 @@ import java.io.File
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 /** Desenha as telas principais e salva imagens em app/build/frames para conferência. */
 @RunWith(RobolectricTestRunner::class)
@@ -488,4 +490,85 @@ class ScreensRenderTest {
         },
         "40-anagrama-fim", 3000,
     )
+
+    // ---------- Rodada 8: reações, próximo jogo e cartão dos Stories ----------
+    private fun reactionScreen(name: String, advance: Long, act: (com.dmwnezes.palavreiro.ui.ReactionState) -> Unit) {
+        rule.mainClock.autoAdvance = false
+        val ans = com.dmwnezes.palavreiro.game.Multi.words(words.answers, 77, 2)
+        val g = TermoGame(Mode.DUETO, words, store = null, fixed = ans)
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        var state: com.dmwnezes.palavreiro.ui.ReactionState? = null
+        rule.setContent {
+            PalavreiroTheme {
+                val st = com.dmwnezes.palavreiro.ui.rememberReactionState().also { state = it }
+                androidx.compose.foundation.layout.Box {
+                    GameScreen(g, null, {}, {}, {}, multiplayer = true, titleOverride = "Você × Ana",
+                        titleTrailing = { com.dmwnezes.palavreiro.ui.ReactAnchor(st); com.dmwnezes.palavreiro.ui.SeriesPill(com.dmwnezes.palavreiro.game.Multi.Series(1, 0)) },
+                        header = { com.dmwnezes.palavreiro.ui.OpponentStrip("Ana", 2, 7, listOf("apaca|aacpa", "ccccc|apcca"), "jogando · 2/7", true) })
+                    com.dmwnezes.palavreiro.ui.ReactionOverlay(st, 112.dp)
+                }
+            }
+        }
+        rule.mainClock.advanceTimeBy(500)
+        rule.runOnUiThread { act(state!!); androidx.compose.runtime.snapshots.Snapshot.sendApplyNotifications() }
+        save(name, advance)
+    }
+
+    @Test fun reacaoEscolher() = reactionScreen("41-reacao-escolher", 300) {}.also {
+        rule.onNode(androidx.compose.ui.test.hasContentDescription("Reagir")).performClick()
+        save("41-reacao-escolher", 300)
+    }
+
+    @Test fun reacaoBalao() = reactionScreen("42-reacao-balao", 700) {
+        it.show("😂", "Ana", mine = false); it.show("🔥", "Você", mine = true)
+    }
+
+    @Test
+    fun proximoJogoTermo() {
+        rule.mainClock.autoAdvance = false
+        val ans = com.dmwnezes.palavreiro.game.Multi.words(words.answers, 77, 1)
+        val g = TermoGame(Mode.DIARIO, words, store = null, fixed = ans)
+        ans[0].forEach(g::type); g.submit(); g.finishReveal()
+        rule.setContent {
+            PalavreiroTheme {
+                var sel by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf('t') }
+                com.dmwnezes.palavreiro.ui.EndSheet(
+                    "me", "Ana", g, com.dmwnezes.palavreiro.game.Multi.Msg.End("a", true, 1, 41000), com.dmwnezes.palavreiro.game.Multi.Msg.End("b", false, 6, 90000), true, emptyMap(),
+                    com.dmwnezes.palavreiro.game.Multi.Series(1, 0), {}, {}, {}, {},
+                    mode = 't', myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('t', sel) { sel = it },
+                )
+            }
+        }
+        rule.onNode(androidx.compose.ui.test.hasText("Bomba")).performClick()
+        save("43-proximo-jogo-termo")
+    }
+
+    @Test
+    fun proximoJogoBomba() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            PalavreiroTheme {
+                com.dmwnezes.palavreiro.ui.BombEndSheet(
+                    "me", "Ana", 7, true, com.dmwnezes.palavreiro.game.Multi.Series(2, 0), {}, {}, {},
+                    myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('b', 'b') {},
+                )
+            }
+        }
+        save("44-proximo-jogo-bomba")
+    }
+
+    private fun matchCard(name: String, s: com.dmwnezes.palavreiro.ui.MatchStory) {
+        val bmp = com.dmwnezes.palavreiro.ui.StoryCard.renderMatch(rule.activity, s)
+        File(out, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 90, it) }
+    }
+
+    @Test
+    fun cartaoAmigo() {
+        matchCard("45-stories-termo", com.dmwnezes.palavreiro.ui.MatchStory.termo(
+            'd', "Daniel", "Ana", com.dmwnezes.palavreiro.game.Multi.Series(2, 1), "me",
+            com.dmwnezes.palavreiro.game.Multi.Msg.End("a", true, 4, 83_000), com.dmwnezes.palavreiro.game.Multi.Msg.End("b", false, 7, 90_000),
+        ))
+        matchCard("46-stories-bomba", com.dmwnezes.palavreiro.ui.MatchStory.bomb("Daniel", "Ana Beatriz", com.dmwnezes.palavreiro.game.Multi.Series(1, 1), "opp", 9))
+        matchCard("47-stories-anagrama", com.dmwnezes.palavreiro.ui.MatchStory.anagram("Daniel", "Ana", 6, 4))
+    }
 }

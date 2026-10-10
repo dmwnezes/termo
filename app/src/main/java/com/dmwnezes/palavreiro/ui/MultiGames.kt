@@ -129,6 +129,10 @@ internal fun BombPlay(
     onDecided: (String) -> Unit,
     onAgain: () -> Unit,
     onLeave: () -> Unit,
+    /** Meu nome (cartão dos Stories), escolha do próximo jogo (anfitrião) e as reações. */
+    myName: String? = null,
+    next: NextGame? = null,
+    reactions: ReactionState? = null,
     clock: () -> Long = System::currentTimeMillis,
 ) {
     val now = rememberNow(clock, round)
@@ -185,7 +189,7 @@ internal fun BombPlay(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Você × $oppName", onLeave, trailing = { SeriesPill(series) })
+            TopBar("Você × $oppName", onLeave, trailing = { ReactAnchor(reactions); SeriesPill(series) })
             if (!online || oppLeft) {
                 Text(
                     if (!online) "Reconectando…" else "$oppName saiu", color = Night.muted, fontSize = 13.sp,
@@ -272,6 +276,7 @@ internal fun BombPlay(
             BombEndSheet(
                 outcome = if (state.loser == myId) "opp" else "me", oppName = oppName, count = state.count,
                 isHost = isHost, series = series, onAgain = onAgain, onLeave = onLeave, onClose = { showEnd = false },
+                myName = myName, next = next,
             )
         }
     }
@@ -282,6 +287,7 @@ internal fun BombPlay(
 internal fun BombEndSheet(
     outcome: String, oppName: String, count: Int, isHost: Boolean, series: Multi.Series,
     onAgain: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
+    myName: String? = null, next: NextGame? = null,
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
@@ -306,21 +312,20 @@ internal fun BombEndSheet(
         ResultLine("Você", if (outcome == "opp") "💥 com a bomba" else "escapou", outcome == "me")
         ResultLine(oppName, if (outcome == "me") "💥 com a bomba" else "escapou", outcome == "opp")
         Spacer(Modifier.height(18.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (isHost) PillButton(if (champ != null) "Nova série" else "Próxima rodada", Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
-            else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
-            PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.6f), onClick = onLeave)
-        }
-        Spacer(Modifier.height(10.dp))
-        PillButton("Compartilhar", Night.accent, modifier = Modifier.fillMaxWidth()) {
-            val res = when {
-                champ == "me" -> "Levei a série por ${series.score}"
-                champ == "opp" -> "Perdi a série por ${series.opp} × ${series.me}"
-                outcome == "me" -> "Venci a rodada (série ${series.score})"
-                else -> "Perdi a rodada (série ${series.score})"
-            }
-            share(context, "Palavreiro · Bomba-Relógio com $oppName\n$res 💣")
-        }
+        EndButtons(
+            isHost = isHost, next = next, sameLabel = if (champ != null) "Nova série" else "Próxima rodada", seriesOver = series.over,
+            onAgain = onAgain, onLeave = onLeave,
+            onShare = {
+                val res = when {
+                    champ == "me" -> "Levei a série por ${series.score}"
+                    champ == "opp" -> "Perdi a série por ${series.opp} × ${series.me}"
+                    outcome == "me" -> "Venci a rodada (série ${series.score})"
+                    else -> "Perdi a rodada (série ${series.score})"
+                }
+                share(context, "Palavreiro · Bomba-Relógio com $oppName\n$res 💣")
+            },
+            onStory = { StoryCard.shareMatch(context, MatchStory.bomb(myName, oppName, series, outcome, count)) },
+        )
     }
 }
 
@@ -359,6 +364,10 @@ internal fun AnagramPlay(
     onDecided: (String) -> Unit,
     onAgain: () -> Unit,
     onLeave: () -> Unit,
+    /** Meu nome (cartão dos Stories), escolha do próximo jogo (anfitrião) e as reações. */
+    myName: String? = null,
+    next: NextGame? = null,
+    reactions: ReactionState? = null,
     clock: () -> Long = System::currentTimeMillis,
 ) {
     val now = rememberNow(clock, round, 100)
@@ -424,7 +433,7 @@ internal fun AnagramPlay(
     val oppPts = state.points(oppId)
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Você × $oppName", onLeave, trailing = { AnagramPill(myPts, oppPts, (shownRound + 1).coerceAtMost(Anagram.ROUNDS)) })
+            TopBar("Você × $oppName", onLeave, trailing = { ReactAnchor(reactions); AnagramPill(myPts, oppPts, (shownRound + 1).coerceAtMost(Anagram.ROUNDS)) })
             // Faixa do amigo: pontos, ou "acertou!" piscando quando ele leva a rodada.
             val lastOpp = inGap && state.decisions[cur - 1].winner == oppId && oppId != null
             val blink = rememberInfiniteTransition(label = "pisca")
@@ -502,6 +511,7 @@ internal fun AnagramPlay(
                 oppName = oppName, me = myPts, opp = oppPts,
                 rows = answers.mapIndexed { i, w -> words.display(w) to state.decisions[i].winner.let { if (it == null) null else it == myId } },
                 isHost = isHost, onAgain = onAgain, onLeave = onLeave, onClose = { showEnd = false },
+                myName = myName, next = next,
             )
         }
     }
@@ -514,6 +524,7 @@ internal fun AnagramPlay(
 internal fun AnagramEndSheet(
     oppName: String, me: Int, opp: Int, rows: List<Pair<String, Boolean?>>, isHost: Boolean,
     onAgain: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
+    myName: String? = null, next: NextGame? = null,
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
@@ -536,15 +547,14 @@ internal fun AnagramEndSheet(
             }
         }
         Spacer(Modifier.height(16.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (isHost) PillButton("Revanche", Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
-            else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
-            PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.6f), onClick = onLeave)
-        }
-        Spacer(Modifier.height(10.dp))
-        PillButton("Compartilhar", Night.accent, modifier = Modifier.fillMaxWidth()) {
-            val res = when { me > opp -> "Venci por $me × $opp"; opp > me -> "Perdi por $me × $opp"; else -> "Empate $me × $opp" }
-            share(context, "Palavreiro · Anagrama com $oppName\n$res 🔤")
-        }
+        EndButtons(
+            isHost = isHost, next = next, sameLabel = "Revanche", seriesOver = false,
+            onAgain = onAgain, onLeave = onLeave,
+            onShare = {
+                val res = when { me > opp -> "Venci por $me × $opp"; opp > me -> "Perdi por $me × $opp"; else -> "Empate $me × $opp" }
+                share(context, "Palavreiro · Anagrama com $oppName\n$res 🔤")
+            },
+            onStory = { StoryCard.shareMatch(context, MatchStory.anagram(myName, oppName, me, opp)) },
+        )
     }
 }

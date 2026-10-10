@@ -576,3 +576,39 @@ button { font-family: inherit; color: inherit; }
 .ana-row.me span { color: var(--correct); }
 .ana-row.opp span { color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .ana-opp.got, .bw.in, .ana-l.pop, .bomb-ico.boom { animation: none; } }
+
+/* Reações rápidas na partida com amigo */
+.mp-react { position: relative; z-index: 60; width: 36px; height: 36px; font-size: 1.15rem; background: var(--surface-high); transition: opacity .2s, transform .15s; }
+.mp-react:active { transform: scale(.9); }
+.mp-react.cool { opacity: .35; pointer-events: none; }
+.mp-react-catch { position: fixed; inset: 0; z-index: 65; }
+.mp-react-pick {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 66; display: flex; gap: 4px; padding: 6px;
+  background: var(--surface); border-radius: 99px; box-shadow: 0 12px 32px rgba(0,0,0,.45), inset 0 0 0 1px var(--outline);
+  animation: reactPick .18s ease both;
+}
+.mp-react-pick button { width: 48px; height: 48px; border: none; border-radius: 50%; background: transparent; font-size: 2.1rem; line-height: 1; cursor: pointer; display: grid; place-items: center; transition: transform .12s, background .12s; }
+.mp-react-pick button:hover, .mp-react-pick button:focus-visible { background: var(--surface-high); transform: scale(1.12); outline: none; }
+@keyframes reactPick { from { opacity: 0; transform: translate(-50%, -8px) scale(.92); } }
+.mp-bubble {
+  position: fixed; z-index: 70; display: flex; flex-direction: column; align-items: center; pointer-events: none;
+  transform: translateX(-50%); animation: reactUp 2.5s ease-out forwards;
+}
+.mp-bubble span { font-size: 56px; line-height: 1; filter: drop-shadow(0 6px 14px rgba(0,0,0,.4)); }
+.mp-bubble small { margin-top: 2px; padding: 2px 10px; border-radius: 99px; background: var(--surface-high); color: var(--text); font-size: .8rem; font-weight: 700; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-bubble.mine span { font-size: 40px; }
+.mp-bubble.mine small { font-size: .7rem; color: var(--muted); }
+@keyframes reactUp {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(.5); }
+  10% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+  18% { transform: translate(-50%, -6px) scale(1); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .mp-bubble { animation: reactFade 2.5s linear forwards; } .mp-react-pick { animation: none; } }
+@keyframes reactFade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Folha de fim: Compartilhar | Stories | Replay e "Próximo jogo" */
+.mp-share-row .pill { padding: 11px 8px; font-size: .92rem; min-width: 0; }
+.mp-next { margin: 16px 0 2px; }
+.mp-next > span { display: block; margin: 0 0 6px 4px; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }

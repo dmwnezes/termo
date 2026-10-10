@@ -74,6 +74,11 @@ class Feedback(context: Context, private val store: Store) {
         vibrate(longArrayOf(0, 650))
     }
 
+    /** Partida com amigo: chegou uma reação (só uma vibração curtinha). */
+    fun react() {
+        vibrate(longArrayOf(0, 22))
+    }
+
     private fun vibrate(pattern: LongArray) {
         if (!store.vibration) return
         runCatching { vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1)) }

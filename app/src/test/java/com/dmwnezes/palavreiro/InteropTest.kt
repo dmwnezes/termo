@@ -58,6 +58,23 @@ class InteropTest {
         rule.onNodeWithText("Entrar").performClick()
         rule.waitUntil(30_000) { shown("Você × Site") }
         log("partida começou")
+        if (System.getenv("PV_R8") == "1") {
+            // Reação do site chega como balão (avança o relógio à mão para ver o balão antes de sumir).
+            rule.mainClock.autoAdvance = false
+            var saw = false
+            val until = System.currentTimeMillis() + 30_000
+            while (!saw && System.currentTimeMillis() < until) { rule.mainClock.advanceTimeBy(100); Thread.sleep(100); saw = shown("🔥") }
+            rule.mainClock.autoAdvance = true
+            log("app viu 🔥 do site: $saw")
+            rule.onNode(androidx.compose.ui.test.hasContentDescription("Reagir")).performClick()
+            rule.onAllNodes(hasText("😂") and hasClickAction()).onFirst().performClick()
+            log("app mandou 😂")
+            rule.waitUntil(90_000) { shown("venceu a rodada", true) }
+            log("fim da bomba no app")
+            rule.waitUntil(30_000) { shown("rodada 1/10") }
+            log("app trocou para o Anagrama: ${shown("Novo jogo: Anagrama")} (toast) ")
+            return
+        }
         if (room.mode == 'b') {
             val bank = ArrayDeque(listOf("PORTA", "MUNDO", "TEMPO", "LIVRO", "PEDRA", "FESTA", "PRAIA", "NOITE", "CAMPO", "PLANO", "GENTE", "FORTE", "VERDE", "LARGO", "NUVEM", "FOLHA", "TERRA", "CORPO", "BARCO", "PRATO"))
             val end = System.currentTimeMillis() + 90_000

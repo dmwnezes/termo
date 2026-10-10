@@ -88,8 +88,11 @@ object Multi {
         data class Start(val at: Long, val guest: String) : Msg
         data class Row(val id: String, val row: Int, val marks: String) : Msg
         data class End(val id: String, val won: Boolean, val tries: Int, val ms: Long) : Msg
-        /** [newSeries] = começa uma série nova (placar volta a 0 × 0). */
-        data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false) : Msg
+        /**
+         * [newSeries] = começa uma série nova (placar volta a 0 × 0).
+         * [mode] = modo da próxima partida ("m"); null = mensagem antiga, mantém o modo atual.
+         */
+        data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false, val mode: Char? = null) : Msg
         data class Bye(val id: String) : Msg
         /** Bomba-Relógio: palavra jogada; [n] = índice da jogada na rodada, [ms] = relógio da rodada de quem mandou. */
         data class Word(val id: String, val word: String, val n: Int, val ms: Long) : Msg
@@ -99,6 +102,47 @@ object Multi {
         data class Solve(val id: String, val round: Int, val ms: Long) : Msg
         /** Anagrama: ninguém acertou a rodada [round] a tempo. */
         data class Skip(val round: Int) : Msg
+        /** Reação rápida: [emoji] (um de [REACTIONS]) mandado por [id] na hora [at] (relógio de quem mandou). */
+        data class React(val id: String, val emoji: String, val at: Long) : Msg
+    }
+
+    // ---------- reações rápidas ----------
+    val REACTIONS = listOf("😂", "😱", "🔥", "👏", "😈")
+    /** Só mostra reações com menos de 10 s (o histórico do tópico traz as velhas ao reconectar). */
+    const val REACT_FRESH_MS = 10_000L
+    /** No máximo uma reação a cada 1,5 s. */
+    const val REACT_GAP_MS = 1_500L
+
+    /** Reação que deve aparecer: do amigo (não minha), com emoji conhecido e fresca. */
+    fun showReaction(m: Msg.React, myId: String, now: Long): Boolean =
+        m.id != myId && m.emoji in REACTIONS && kotlin.math.abs(now - m.at) < REACT_FRESH_MS
+
+    // ---------- revanche (trocando de modo) ----------
+    /** Emoji do modo no cartão dos Stories. */
+    fun modeEmoji(code: Char): String = when (code) { BOMB -> "💣"; ANAGRAM -> "🔤"; else -> "⚔️" }
+
+    /** Modos que contam série (melhor de 3). */
+    fun hasSeries(code: Char): Boolean = code != ANAGRAM
+
+    /** Texto do botão do anfitrião na folha de fim, conforme o próximo modo escolhido. */
+    fun againLabel(current: Char, next: Char, seriesOver: Boolean): String = when {
+        next != current -> "Jogar ${modeName(next)}"
+        current == ANAGRAM -> "Revanche"
+        seriesOver -> "Nova série"
+        else -> "Próxima rodada"
+    }
+
+    /** "again" que o anfitrião manda: sempre com o modo da próxima partida; trocar de modo zera a série. */
+    fun againFor(current: Char, next: Char, seriesOver: Boolean, seed: Long, at: Long): Msg.Again =
+        Msg.Again(seed, at, newSeries = next != current || (hasSeries(current) && seriesOver), mode = next)
+
+    /**
+     * Aplica um "again" recebido: a sala fica com a semente nova e o modo novo (se veio "m").
+     * Devolve a sala e se a série volta a 0 × 0.
+     */
+    fun applyAgain(room: Room, m: Msg.Again, seriesOver: Boolean): Pair<Room, Boolean> {
+        val mode = m.mode?.takeIf { it in CODES } ?: room.mode
+        return room.copy(mode = mode, seed = m.seed) to (m.newSeries || seriesOver || mode != room.mode)
     }
 
     fun encode(m: Msg): String = when (m) {
@@ -106,12 +150,16 @@ object Multi {
         is Msg.Start -> JSONObject().put("t", "start").put("at", m.at).put("g", m.guest)
         is Msg.Row -> JSONObject().put("t", "row").put("id", m.id).put("r", m.row).put("m", m.marks)
         is Msg.End -> JSONObject().put("t", "end").put("id", m.id).put("won", m.won).put("tries", m.tries).put("ms", m.ms)
-        is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at).apply { if (m.newSeries) put("s", 1) }
+        is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at).apply {
+            if (m.newSeries) put("s", 1)
+            m.mode?.let { put("m", it.toString()) }
+        }
         is Msg.Bye -> JSONObject().put("t", "bye").put("id", m.id)
         is Msg.Word -> JSONObject().put("t", "word").put("id", m.id).put("w", m.word).put("n", m.n).put("ms", m.ms)
         is Msg.Boom -> JSONObject().put("t", "boom").put("id", m.id)
         is Msg.Solve -> JSONObject().put("t", "solve").put("id", m.id).put("r", m.round).put("ms", m.ms)
         is Msg.Skip -> JSONObject().put("t", "skip").put("r", m.round)
+        is Msg.React -> JSONObject().put("t", "react").put("id", m.id).put("e", m.emoji).put("at", m.at)
     }.toString()
 
     fun decode(text: String): Msg? = runCatching {
@@ -121,12 +169,13 @@ object Multi {
             "start" -> Msg.Start(o.getLong("at"), o.optString("g"))
             "row" -> Msg.Row(o.getString("id"), o.getInt("r"), o.getString("m"))
             "end" -> Msg.End(o.getString("id"), o.getBoolean("won"), o.optInt("tries"), o.optLong("ms"))
-            "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1)
+            "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1, o.optString("m").singleOrNull()?.takeIf { it in CODES })
             "bye" -> Msg.Bye(o.getString("id"))
             "word" -> Msg.Word(o.getString("id"), o.getString("w"), o.getInt("n"), o.optLong("ms"))
             "boom" -> Msg.Boom(o.getString("id"))
             "solve" -> Msg.Solve(o.getString("id"), o.getInt("r"), o.optLong("ms"))
             "skip" -> Msg.Skip(o.getInt("r"))
+            "react" -> o.getString("e").takeIf { it in REACTIONS }?.let { Msg.React(o.getString("id"), it, o.getLong("at")) }
             else -> null
         }
     }.getOrNull()

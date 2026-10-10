@@ -57,7 +57,13 @@ import kotlinx.coroutines.launch
 fun TopBar(title: String, onBack: () -> Unit, onHelp: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Voltar", tint = Night.text) }
-        Text(title, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Night.text, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(start = 4.dp))
+        // Título longo (ex.: "Você × Ana" com o placar e o botão de reagir): diminui um pouco antes de cortar.
+        var size by remember(title) { mutableStateOf(24f) }
+        Text(
+            title, fontSize = size.sp, fontWeight = FontWeight.ExtraBold, color = Night.text, maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(start = 4.dp),
+            onTextLayout = { if (it.hasVisualOverflow && size > 18f) size -= 1f },
+        )
         trailing?.invoke()
         if (onHelp != null) IconButton(onClick = onHelp) { Icon(Icons.Rounded.HelpOutline, "Como jogar", tint = Night.muted) }
     }

@@ -133,8 +133,18 @@ fun MultiScreen(
     // Melhor de 3: placar da série e a última rodada já contada nele.
     var series by remember { mutableStateOf(Multi.Series()) }
     var scoredRound by remember { mutableIntStateOf(-1) }
+    // Revanche: modo escolhido pelo anfitrião para o próximo jogo (null = o mesmo).
+    var nextMode by remember { mutableStateOf<Char?>(null) }
+    val reactions = rememberReactionState()
+    val toast = rememberToast()
 
     fun send(m: Msg) { val r = room ?: return; scope.launch { ntfy.publish(r.topic, Multi.encode(m)) } }
+    reactions.onSend = { e -> send(Msg.React(myId, e, System.currentTimeMillis())) }
+    /** Anfitrião: revanche no modo escolhido (trocar de modo zera a série). */
+    fun again() {
+        val r = room ?: return
+        send(Multi.againFor(r.mode, nextMode ?: r.mode, series.over, Multi.newSeed(), System.currentTimeMillis()))
+    }
 
     /** Guarda a sala por 10 minutos (sobrevive ao app fechado) e liga o aviso. */
     fun keep() {
@@ -159,6 +169,7 @@ fun MultiScreen(
         val t = System.currentTimeMillis()
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
         oppRows.clear(); ends.clear(); roundMsgs.clear(); showEnd = false
+        nextMode = null; reactions.open = false
         round++
         phase = Phase.PLAYING
     }
@@ -190,13 +201,25 @@ fun MultiScreen(
                 if (o != null && scoredRound != round) { scoredRound = round; series = series.plus(o) }
             }
             // Série acabada + revanche de um app antigo (sem "s") também zera o placar.
-            is Msg.Again -> if (phase == Phase.PLAYING) { room = room?.withSeed(m.seed); oppLeft = false; beginRound(m.at, m.newSeries || series.over) }
+            // Com "m" o modo pode mudar: a sala vira SALA-NOVOMODO-SEED e a série zera.
+            is Msg.Again -> if (phase == Phase.PLAYING) {
+                val r = room ?: return
+                val (nr, fresh) = Multi.applyAgain(r, m, series.over)
+                room = nr; oppLeft = false
+                if (nr.mode != r.mode && !isHost) toast.show("Novo jogo: ${Multi.modeName(nr.mode)}", 2500)
+                beginRound(m.at, fresh)
+            }
             is Msg.Bye -> if (m.id == oppId) oppLeft = true
             is Msg.Word, is Msg.Boom, is Msg.Solve -> if (phase == Phase.PLAYING) {
                 val id = when (m) { is Msg.Word -> m.id; is Msg.Boom -> m.id; is Msg.Solve -> m.id; else -> null }
                 if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
             }
             is Msg.Skip -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            // Reações: só as frescas e do amigo (a minha já apareceu na hora).
+            is Msg.React -> if (phase == Phase.PLAYING && m.id == oppId && Multi.showReaction(m, myId, System.currentTimeMillis())) {
+                reactions.show(m.emoji, oppName ?: "Amigo", mine = false)
+                feedback?.react()
+            }
         }
     }
 
@@ -380,91 +403,100 @@ fun MultiScreen(
                 Spacer(Modifier.height(20.dp))
                 PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
             }
-            Phase.PLAYING -> if (!Multi.isTermo(room!!.mode)) {
-                val r = room!!
-                val counting = now < localStart
-                // Resultado (uma vez por rodada/partida): placar da série (Bomba) e contadores.
-                val decided: (String) -> Unit = { o ->
-                    if (r.mode == Multi.BOMB && scoredRound != round) { scoredRound = round; series = series.plus(o) }
-                    if (recordedRound != round) {
+            Phase.PLAYING -> Box(Modifier.fillMaxSize()) {
+                val next = if (isHost) NextGame(room!!.mode, nextMode ?: room!!.mode) { nextMode = it } else null
+                val me = name.trim()
+                if (!Multi.isTermo(room!!.mode)) {
+                    val r = room!!
+                    val counting = now < localStart
+                    // Resultado (uma vez por rodada/partida): placar da série (Bomba) e contadores.
+                    val decided: (String) -> Unit = { o ->
+                        if (r.mode == Multi.BOMB && scoredRound != round) { scoredRound = round; series = series.plus(o) }
+                        if (recordedRound != round) {
+                            recordedRound = round
+                            store?.add("mp_played"); if (o == "me") store?.add("mp_won"); store?.logActivity()
+                        }
+                    }
+                    Box(Modifier.fillMaxSize()) {
+                        if (r.mode == Multi.BOMB) BombPlay(
+                            words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, series, online, oppLeft,
+                            send = ::send, onDecided = decided,
+                            onAgain = ::again,
+                            onLeave = ::leave, myName = me, next = next, reactions = reactions,
+                        ) else AnagramPlay(
+                            words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, online, oppLeft,
+                            send = ::send, onDecided = decided,
+                            onAgain = ::again,
+                            onLeave = ::leave, myName = me, next = next, reactions = reactions,
+                        )
+                        if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
+                    }
+                } else {
+                    val r = room!!
+                    val boards = Multi.boards(r.mode)
+                    val mode = Multi.MODES.getValue(r.mode)
+                    val game = remember(r.seed, round) { TermoGame(mode, words, store = null, fixed = Multi.words(words.answers, r.seed, boards)) }
+                    val outcome = Multi.outcome(ends, myId, oppId, oppLeft)
+                    val counting = now < localStart
+                    // Envia cada tentativa revelada (só as cores).
+                    var sent by remember(game) { mutableIntStateOf(0) }
+                    val revealed = if (game.revealingRow >= 0) game.revealingRow else game.rows.size
+                    LaunchedEffect(game, revealed) {
+                        while (sent < revealed) { send(Msg.Row(myId, sent, Multi.rowMarks(game, sent))); sent++ }
+                    }
+                    // Resultado: conta uma vez por rodada e abre a folha.
+                    LaunchedEffect(outcome, round) {
+                        if (outcome == null || recordedRound == round) return@LaunchedEffect
                         recordedRound = round
-                        store?.add("mp_played"); if (o == "me") store?.add("mp_won"); store?.logActivity()
+                        store?.add("mp_played"); if (outcome == "me") store?.add("mp_won"); store?.logActivity()
+                        if (outcome == "opp") feedback?.lose()
+                        delay(if (game.over) 1500 else 600)
+                        showEnd = true
+                    }
+                    Box(Modifier.fillMaxSize()) {
+                        GameScreen(
+                            game = game,
+                            feedback = feedback,
+                            onBack = ::leave,
+                            onPlayInfinite = {},
+                            onHelp = {},
+                            meanings = meanings,
+                            multiplayer = true,
+                            titleOverride = "Você × ${oppName ?: "amigo"}",
+                            titleTrailing = { ReactAnchor(reactions); SeriesPill(series) },
+                            header = {
+                                OpponentStrip(
+                                    name = oppName ?: "Amigo", boards = boards, maxTries = mode.maxTries, rows = oppRows,
+                                    status = oppStatus(oppRows.size, mode.maxTries, ends.firstOrNull { it.id == oppId }, oppLeft),
+                                    online = online,
+                                )
+                            },
+                            inputEnabled = !counting && outcome == null,
+                            replayTrigger = replayTrigger,
+                            onFinished = { won -> send(Msg.End(myId, won, game.rows.size, System.currentTimeMillis() - localStart)) },
+                        )
+                        if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
+                        if (!showEnd && outcome != null) {
+                            PillButton("Ver resultado", Night.correct, modifier = Modifier.align(Alignment.Center)) { showEnd = true }
+                        }
+                    }
+                    if (showEnd && outcome != null) {
+                        EndSheet(
+                            outcome = outcome, oppName = oppName ?: "Amigo", game = game,
+                            mine = ends.firstOrNull { it.id == myId }, theirs = ends.firstOrNull { it.id == oppId },
+                            isHost = isHost, meanings = meanings, series = series,
+                            onAgain = ::again,
+                            onReplay = { showEnd = false; replayTrigger++ },
+                            onLeave = ::leave,
+                            onClose = { showEnd = false },
+                            mode = r.mode, myName = me, next = next,
+                        )
                     }
                 }
-                Box(Modifier.fillMaxSize()) {
-                    if (r.mode == Multi.BOMB) BombPlay(
-                        words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, series, online, oppLeft,
-                        send = ::send, onDecided = decided,
-                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis(), newSeries = series.over)) },
-                        onLeave = ::leave,
-                    ) else AnagramPlay(
-                        words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, online, oppLeft,
-                        send = ::send, onDecided = decided,
-                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis())) },
-                        onLeave = ::leave,
-                    )
-                    if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
-                }
-            } else {
-                val r = room!!
-                val boards = Multi.boards(r.mode)
-                val mode = Multi.MODES.getValue(r.mode)
-                val game = remember(r.seed, round) { TermoGame(mode, words, store = null, fixed = Multi.words(words.answers, r.seed, boards)) }
-                val outcome = Multi.outcome(ends, myId, oppId, oppLeft)
-                val counting = now < localStart
-                // Envia cada tentativa revelada (só as cores).
-                var sent by remember(game) { mutableIntStateOf(0) }
-                val revealed = if (game.revealingRow >= 0) game.revealingRow else game.rows.size
-                LaunchedEffect(game, revealed) {
-                    while (sent < revealed) { send(Msg.Row(myId, sent, Multi.rowMarks(game, sent))); sent++ }
-                }
-                // Resultado: conta uma vez por rodada e abre a folha.
-                LaunchedEffect(outcome, round) {
-                    if (outcome == null || recordedRound == round) return@LaunchedEffect
-                    recordedRound = round
-                    store?.add("mp_played"); if (outcome == "me") store?.add("mp_won"); store?.logActivity()
-                    if (outcome == "opp") feedback?.lose()
-                    delay(if (game.over) 1500 else 600)
-                    showEnd = true
-                }
-                Box(Modifier.fillMaxSize()) {
-                    GameScreen(
-                        game = game,
-                        feedback = feedback,
-                        onBack = ::leave,
-                        onPlayInfinite = {},
-                        onHelp = {},
-                        meanings = meanings,
-                        multiplayer = true,
-                        titleOverride = "Você × ${oppName ?: "amigo"}",
-                        titleTrailing = { SeriesPill(series) },
-                        header = {
-                            OpponentStrip(
-                                name = oppName ?: "Amigo", boards = boards, maxTries = mode.maxTries, rows = oppRows,
-                                status = oppStatus(oppRows.size, mode.maxTries, ends.firstOrNull { it.id == oppId }, oppLeft),
-                                online = online,
-                            )
-                        },
-                        inputEnabled = !counting && outcome == null,
-                        replayTrigger = replayTrigger,
-                        onFinished = { won -> send(Msg.End(myId, won, game.rows.size, System.currentTimeMillis() - localStart)) },
-                    )
-                    if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
-                    if (!showEnd && outcome != null) {
-                        PillButton("Ver resultado", Night.correct, modifier = Modifier.align(Alignment.Center)) { showEnd = true }
-                    }
-                }
-                if (showEnd && outcome != null) {
-                    EndSheet(
-                        outcome = outcome, oppName = oppName ?: "Amigo", game = game,
-                        mine = ends.firstOrNull { it.id == myId }, theirs = ends.firstOrNull { it.id == oppId },
-                        isHost = isHost, meanings = meanings, series = series,
-                        onAgain = { send(Msg.Again(Multi.newSeed(), System.currentTimeMillis(), newSeries = series.over)) },
-                        onReplay = { showEnd = false; replayTrigger++ },
-                        onLeave = ::leave,
-                        onClose = { showEnd = false },
-                    )
-                }
+                // Reações (por cima da contagem e da folha de fim) e o aviso de jogo novo.
+                val gap = when (room!!.mode) { Multi.BOMB -> 40.dp; Multi.ANAGRAM -> 84.dp; else -> 112.dp }
+                ReactionOverlay(reactions, gap)
+                ToastView(toast, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 96.dp))
             }
         }
     }
@@ -572,6 +604,8 @@ internal fun OpponentStrip(name: String, boards: Int, maxTries: Int, rows: List<
 internal fun EndSheet(
     outcome: String, oppName: String, game: TermoGame, mine: Msg.End?, theirs: Msg.End?, isHost: Boolean,
     meanings: Map<String, String>, series: Multi.Series, onAgain: () -> Unit, onReplay: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
+    /** Modo da partida ('t', 'd' ou 'q'), meu nome (cartão dos Stories) e a escolha do próximo jogo (anfitrião). */
+    mode: Char = 't', myName: String? = null, next: NextGame? = null,
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
@@ -605,14 +639,10 @@ internal fun EndSheet(
         ResultLine("Você", line(mine), outcome == "me")
         ResultLine(oppName, line(theirs), outcome == "opp")
         Spacer(Modifier.height(18.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (isHost) PillButton(if (champ != null) "Nova série" else "Próxima rodada", Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
-            else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
-            PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.6f), onClick = onLeave)
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PillButton("Compartilhar", Night.accent, modifier = Modifier.weight(1f)) {
+        EndButtons(
+            isHost = isHost, next = next, sameLabel = if (champ != null) "Nova série" else "Próxima rodada", seriesOver = series.over,
+            onAgain = onAgain, onLeave = onLeave,
+            onShare = {
                 val res = when {
                     champ == "me" -> "Levei a série por ${series.score} 🏆"
                     champ == "opp" -> "Perdi a série por ${series.opp} × ${series.me} ⚔️"
@@ -621,9 +651,63 @@ internal fun EndSheet(
                     else -> "Empate ⚔️ (série ${series.score})"
                 }
                 context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, "Palavreiro · Partida com $oppName\n$res"), "Compartilhar"))
-            }
-            PillButton("▶ Replay", Night.surfaceHigh, Night.text, Modifier.weight(0.8f), onClick = onReplay)
+            },
+            onStory = { StoryCard.shareMatch(context, MatchStory.termo(mode, myName, oppName, series, outcome, mine, theirs)) },
+            onReplay = onReplay,
+        )
+    }
+}
+
+/** Escolha do próximo jogo na folha de fim (só o anfitrião): [current] = modo de agora. */
+class NextGame(val current: Char, val selected: Char, val pick: (Char) -> Unit)
+
+/** "Próximo jogo" + pílulas dos 5 modos. */
+@Composable
+internal fun NextGamePicker(n: NextGame) {
+    Text("Próximo jogo", color = Night.muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+    Spacer(Modifier.height(6.dp))
+    Row(Modifier.fillMaxWidth().clip(Shapes.pill).background(Night.surfaceHigh).padding(3.dp)) {
+        for (code in Multi.CODES) {
+            val sel = code == n.selected
+            Text(
+                Multi.chipName(code), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1,
+                color = if (sel) Ink else Night.muted,
+                // Nomes mais longos (Quarteto, Anagrama) ganham mais espaço.
+                modifier = Modifier.weight(Multi.chipName(code).length + 3f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
+                    .clickable { n.pick(code) }.padding(vertical = 8.dp),
+            )
         }
+    }
+}
+
+/**
+ * Botões da folha de fim (todos os modos): próximo jogo (anfitrião), revanche/sair,
+ * Stories/Compartilhar e, no Termo, o replay.
+ */
+@Composable
+internal fun EndButtons(
+    isHost: Boolean, next: NextGame?, sameLabel: String, seriesOver: Boolean,
+    onAgain: () -> Unit, onLeave: () -> Unit, onShare: () -> Unit, onStory: () -> Unit, onReplay: (() -> Unit)? = null,
+) {
+    if (isHost && next != null) {
+        NextGamePicker(next)
+        Spacer(Modifier.height(12.dp))
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (isHost) {
+            val label = if (next != null && next.selected != next.current) Multi.againLabel(next.current, next.selected, seriesOver) else sameLabel
+            PillButton(label, Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
+        } else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
+        PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.45f), onClick = onLeave)
+    }
+    Spacer(Modifier.height(10.dp))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        PillButton("📸 Stories", Night.accent, modifier = Modifier.weight(1f), onClick = onStory)
+        PillButton("Compartilhar", Night.surfaceHigh, Night.text, Modifier.weight(1f), onClick = onShare)
+    }
+    if (onReplay != null) {
+        Spacer(Modifier.height(10.dp))
+        PillButton("▶ Replay", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth(), onClick = onReplay)
     }
 }
 

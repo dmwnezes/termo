@@ -267,8 +267,8 @@
     try { await navigator.clipboard.writeText(text); P.toast("Copiado! Cole onde quiser."); } catch (_) { P.toast("Não deu para copiar"); }
   };
 
-  /** Cartão 1080×1920 para Stories, igual ao do app. */
-  P.story = async ({ game, headline, detail, grids, stats = [] }) => {
+  /** Base dos cartões de Stories (1080×1920): fundo "Noite suave", bolhas de luz e a marca no topo. */
+  const storyBase = async () => {
     await document.fonts.ready.catch(() => {});
     const W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H;
     const g = c.getContext("2d");
@@ -277,14 +277,31 @@
     g.fillStyle = "rgba(155,140,255,.10)"; g.beginPath(); g.arc(W * 0.85, H * 0.12, 360, 0, 7); g.fill();
     g.fillStyle = "rgba(95,184,115,.07)"; g.beginPath(); g.arc(W * 0.1, H * 0.85, 420, 0, 7); g.fill();
     const rr = (x, y, w, h, r, col) => { g.fillStyle = col; g.beginPath(); g.roundRect(x, y, w, h, r); g.fill(); };
-    const txt = (s, y, size, weight, col, spacing) => {
-      g.font = `${weight} ${size}px Outfit, sans-serif`; g.fillStyle = col; g.textAlign = "center";
-      if (spacing) g.letterSpacing = spacing; while (g.measureText(s).width > W - 120 && size > 20) { size -= 2; g.font = `${weight} ${size}px Outfit, sans-serif`; }
-      g.fillText(s, W / 2, y); g.letterSpacing = "0px";
+    const font = (size, weight) => `${weight} ${size}px Outfit, "Noto Color Emoji", sans-serif`;
+    /** Texto centralizado que diminui até caber em maxW. Devolve o tamanho usado. */
+    const txt = (s, y, size, weight, col, spacing, maxW = W - 120, x = W / 2, align = "center") => {
+      g.font = font(size, weight); g.fillStyle = col; g.textAlign = align;
+      if (spacing) g.letterSpacing = spacing; while (g.measureText(s).width > maxW && size > 20) { size -= 2; g.font = font(size, weight); }
+      g.fillText(s, x, y, maxW); g.letterSpacing = "0px";
+      return size;
     };
     let x = (W - (5 * 46 + 4 * 12)) / 2;
     ["#5FB873", "#E6C14F", "#4A72CF", "#E6C14F", "#5FB873"].forEach((col) => { rr(x, 170, 46, 46, 13, col); x += 58; });
     txt("Palavreiro", 330, 92, 800, "#F4F1FF");
+    return { c, g, W, H, rr, txt, font };
+  };
+  /** Compartilha a imagem (navigator.share com arquivo) ou baixa como alternativa. */
+  const storyOut = async (c) => {
+    const blob = await new Promise((r) => c.toBlob(r, "image/png"));
+    const file = new File([blob], "palavreiro-story.png", { type: "image/png" });
+    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); return; } } catch (_) { return; }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "palavreiro-story.png"; a.click();
+    P.toast("Imagem salva: poste nos Stories!");
+  };
+
+  /** Cartão 1080×1920 para Stories, igual ao do app. */
+  P.story = async ({ game, headline, detail, grids, stats = [] }) => {
+    const { c, g, W, H, rr, txt } = await storyBase();
     txt(game.toUpperCase(), 420, 40, 600, "#A9A2D0", "7px");
     txt(headline, 560, 76, 800, "#F4F1FF");
     txt(detail, 640, 40, 400, "#A9A2D0");
@@ -312,11 +329,61 @@
     const d = new Date();
     txt(`${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`, H - 210, 36, 400, "#A9A2D0");
     txt("criado por @dmwnezes", H - 150, 38, 600, "rgba(244,241,255,.85)");
-    const blob = await new Promise((r) => c.toBlob(r, "image/png"));
-    const file = new File([blob], "palavreiro-story.png", { type: "image/png" });
-    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); return; } } catch (_) { return; }
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "palavreiro-story.png"; a.click();
-    P.toast("Imagem salva: poste nos Stories!");
+    await storyOut(c);
+  };
+
+  /**
+   * Cartão de Stories da partida com amigo: "EU  2 × 1  AMIGO", frase do resultado e detalhe do modo.
+   * {pill, me, opp, score, gold, result, detail: string | [linha1, linha2], mine: "win"|"lose"|"draw"}
+   */
+  P.storyVs = async ({ pill, me, opp, score, gold, result, detail, mine }) => {
+    const { c, g, W, H, rr, txt, font } = await storyBase();
+    // pílula do modo
+    g.font = font(44, 700);
+    const pw = g.measureText(pill).width + 84;
+    rr((W - pw) / 2, 410, pw, 88, 44, "rgba(155,140,255,.20)");
+    g.strokeStyle = "rgba(155,140,255,.55)"; g.lineWidth = 3; g.beginPath(); g.roundRect((W - pw) / 2, 410, pw, 88, 44); g.stroke();
+    txt(pill, 470, 44, 700, "#F4F1FF");
+    // Nomes dos lados do placar; se um nome não cabe grande na coluna, empilha: NOME / placar / NOME.
+    g.font = font(190, 800);
+    const sw = g.measureText(score).width, colW = (W - 120 - 80 - sw - 2 * 36) / 2;
+    const fits = (s) => { g.font = font(56, 800); return g.measureText(s).width <= colW; };
+    const side = fits(me) && fits(opp);
+    const top = side ? 680 : 640, ch = side ? 640 : 720;
+    rr(60, top, W - 120, ch, 64, "rgba(35,28,72,.82)");
+    g.strokeStyle = gold ? "rgba(245,200,76,.55)" : "rgba(155,140,255,.30)"; g.lineWidth = 4; g.beginPath(); g.roundRect(60, top, W - 120, ch, 64); g.stroke();
+    const meCol = mine === "win" ? "#5FB873" : "#F4F1FF", oppCol = mine === "lose" ? "#9B8CFF" : "#F4F1FF", scoreCol = gold ? "#F5C84C" : "#F4F1FF";
+    let lineY;
+    if (side) {
+      const cy = top + 250;
+      g.font = font(190, 800); g.textAlign = "center"; g.fillStyle = scoreCol; g.fillText(score, W / 2, cy + 66);
+      const name = (s, cx, col) => {
+        let size = 84; g.font = font(size, 800);
+        while (g.measureText(s).width > colW && size > 56) { size -= 2; g.font = font(size, 800); }
+        g.fillStyle = col; g.textAlign = "center"; g.fillText(s, cx, cy + 30, colW);
+      };
+      name(me, 60 + 40 + colW / 2, meCol);
+      name(opp, W - 60 - 40 - colW / 2, oppCol);
+      lineY = top + 400;
+    } else {
+      txt(me, top + 150, 88, 800, meCol, null, W - 220);
+      g.font = font(170, 800); g.textAlign = "center"; g.fillStyle = scoreCol; g.fillText(score, W / 2, top + 345);
+      txt(opp, top + 470, 88, 800, oppCol, null, W - 220);
+      lineY = top + 520;
+    }
+    // linha divisória e frase do resultado
+    rr(W / 2 - 60, lineY, 120, 6, 3, gold ? "rgba(245,200,76,.7)" : "rgba(155,140,255,.5)");
+    txt(result, lineY + 100, 64, 800, gold ? "#F5C84C" : mine === "win" ? "#5FB873" : "#F4F1FF", null, W - 200);
+    // detalhe do modo
+    const lines = Array.isArray(detail) ? detail : [detail];
+    g.font = font(40, 500);
+    if (lines.length === 2 && g.measureText(lines.join("  |  ")).width <= W - 160) txt(lines.join("  |  "), top + ch + 110, 40, 500, "#A9A2D0", null, W - 160);
+    else lines.forEach((l, i) => txt(l, top + ch + 110 + i * 60, 40, 500, "#A9A2D0", null, W - 160));
+    // rodapé
+    rr(120, H - 330, W - 240, 120, 60, "rgba(95,184,115,.16)");
+    txt("Jogue comigo: dmwnezes.github.io/termo", H - 255, 42, 700, "#F4F1FF", null, W - 300);
+    txt("criado por: @dmwnezes", H - 140, 38, 600, "rgba(244,241,255,.75)");
+    await storyOut(c);
   };
 
   // ---------- navegação ----------
