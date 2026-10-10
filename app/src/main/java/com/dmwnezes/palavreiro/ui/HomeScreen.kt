@@ -77,7 +77,7 @@ fun HomeScreen(
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimos", "Corrente de sinônimos contra o tempo", null),
         GameCardInfo(Dest.ANTONIMOS, "Antônimos", "Ache o contrário antes do tempo acabar", null),
-        GameCardInfo(Dest.DESAFIAR, "Desafiar um amigo", "Escolha uma palavra e mande o link", null),
+        GameCardInfo(Dest.DESAFIAR, "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", null),
     )
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(
@@ -240,11 +240,9 @@ private fun CardIcon(dest: Dest) {
                 }
             }
         }
-        Dest.DESAFIAR -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("✉", color = Night.present, fontSize = 22.sp)
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                repeat(5) { Box(Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(Night.accent)) }
-            }
+        Dest.DESAFIAR -> Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+            // Dois mini tabuleiros lado a lado: a partida com amigo.
+            MiniBoard(8.dp, 0); MiniBoard(8.dp, 3)
         }
         Dest.INTRUSO -> Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             listOf(Night.surfaceHigh, Night.surfaceHigh, Night.red, Night.surfaceHigh, Night.surfaceHigh).forEach {

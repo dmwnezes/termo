@@ -186,6 +186,16 @@ class Store(context: Context) {
         logActivity()
     }
 
+    /** Primeiros chutes das partidas de 1 palavra: [{"w","n","d"}], no máximo 500 (os mais antigos saem). */
+    fun firstGuesses(): org.json.JSONArray = runCatching { org.json.JSONArray(text("first_guesses") ?: "[]") }.getOrDefault(org.json.JSONArray())
+    fun setFirstGuesses(a: org.json.JSONArray) = setText("first_guesses", a.toString())
+    fun addFirstGuess(word: String, tries: Int, day: String) {
+        val a = firstGuesses()
+        a.put(JSONObject().put("w", word).put("n", tries).put("d", day))
+        while (a.length() > 500) a.remove(0)
+        setFirstGuesses(a)
+    }
+
     /** Todas as chaves salvas (para o código de sincronização). */
     internal val raw: SharedPreferences get() = prefs
 

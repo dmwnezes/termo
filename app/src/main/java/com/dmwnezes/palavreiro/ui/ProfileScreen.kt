@@ -134,6 +134,10 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
     Section("Evolução") {
         EvolutionChart(store?.history() ?: org.json.JSONObject())
     }
+    Section("Seus chutes") {
+        val list = store?.firstGuesses()?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it) }.map { it.optString("w") to it.optInt("n") } }.orEmpty()
+        FirstGuessSection(com.dmwnezes.palavreiro.game.FirstGuessStats.from(list))
+    }
     Section("Recordes") {
         RecordRow("Conexões", "${records.connWon} resolvidos · ${records.connPerfect} sem erro")
         RecordRow("Intruso", "recorde ${records["intr_best"]} · ${records["intr_right"]} acertos")
@@ -144,6 +148,7 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
         RecordRow("Sinônimos", "maior cadeia: ${records.synBest}")
         RecordRow("Antônimos", "maior cadeia: ${records["ant_best"]}")
         RecordRow("Arquivo", "${records["arch_played"]} ${if (records["arch_played"] == 1) "desafio" else "desafios"}")
+        RecordRow("Com amigos", "${records["mp_won"]} ${if (records["mp_won"] == 1) "vitória" else "vitórias"} em ${records["mp_played"]} ${if (records["mp_played"] == 1) "partida" else "partidas"}")
     }
 }
 
@@ -475,4 +480,31 @@ private fun ActionRow(label: String, detail: String? = null, onClick: () -> Unit
         detail?.let { Text(it, fontSize = 13.sp, color = Night.muted) }
         Text("  ›", fontSize = 18.sp, color = Night.muted)
     }
+}
+
+/** Letras mais usadas no 1º chute, chute favorito e melhor chute inicial. */
+@Composable
+fun FirstGuessSection(st: com.dmwnezes.palavreiro.game.FirstGuessStats, display: (String) -> String = { com.dmwnezes.palavreiro.AppGraph.displayWord(it) }) {
+    if (st.total == 0) {
+        Text("Jogue o Termo para ver suas letras.", fontSize = 14.sp, color = Night.muted)
+        return
+    }
+    Text("Letras que você mais usa no 1º chute", fontSize = 13.sp, color = Night.muted)
+    Spacer(Modifier.height(8.dp))
+    val max = st.letters.maxOfOrNull { it.second } ?: 1
+    st.letters.forEach { (ch, n) ->
+        Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("$ch", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Night.text, modifier = Modifier.width(22.dp))
+            Box(Modifier.weight(1f).height(14.dp)) {
+                Box(Modifier.fillMaxWidth(n / max.toFloat()).height(14.dp).clip(Shapes.pill).background(Night.accent.copy(alpha = 0.85f)))
+            }
+            Text("$n", fontSize = 13.sp, color = Night.muted, textAlign = TextAlign.End, modifier = Modifier.width(36.dp))
+        }
+    }
+    Spacer(Modifier.height(12.dp))
+    st.favorite?.let { (w, n) -> RecordRow("Seu chute favorito", "${display(w)} (${n}×)") }
+    RecordRow(
+        "Melhor chute inicial",
+        st.best?.let { (w, avg) -> "${display(w)} — média ${"%.1f".format(java.util.Locale("pt", "BR"), avg)} tentativas" } ?: "Jogue mais para descobrir",
+    )
 }

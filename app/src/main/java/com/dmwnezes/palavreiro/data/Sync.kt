@@ -41,6 +41,7 @@ object Sync {
             .put("termoDays", JSONObject(store.termoResults()))
             .put("results", store.json("results"))
             .put("history", store.history())
+            .apply { if (store.firstGuesses().length() > 0) put("firstGuesses", store.firstGuesses()) }
         return "PV1-" + Base64.getUrlEncoder().withoutPadding().encodeToString(o.toString().toByteArray(Charsets.UTF_8))
     }
 
@@ -89,6 +90,19 @@ object Sync {
                 cur.put(day, mine)
             }
             store.setJson("history", cur)
+        }
+        d.optJSONArray("firstGuesses")?.let { inc ->
+            val cur = store.firstGuesses()
+            fun key(o: JSONObject) = o.optString("d") + "|" + o.optString("w") + "|" + o.optInt("n")
+            val have = (0 until cur.length()).mapNotNull { cur.optJSONObject(it) }.map(::key).toHashSet()
+            val all = (0 until cur.length()).mapNotNull { cur.optJSONObject(it) }.toMutableList()
+            for (i in 0 until inc.length()) {
+                val o = inc.optJSONObject(i) ?: continue
+                if (o.optString("w").isBlank() || !have.add(key(o))) continue
+                all += JSONObject().put("w", o.optString("w")).put("n", o.optInt("n")).put("d", o.optString("d"))
+            }
+            val sorted = all.sortedBy { it.optString("d") }.takeLast(500)
+            store.setFirstGuesses(JSONArray().apply { sorted.forEach { put(it) } })
         }
         return true
     }

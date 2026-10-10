@@ -72,12 +72,45 @@ fun GameScreen(
     /** Aba atual do seletor "Do dia | Infinito" (null = sem seletor, ex.: Arquivo e desafio de amigo). */
     infiniteTab: Boolean? = null,
     onSwitchTab: (Boolean) -> Unit = {},
+    /** Partida com amigo: sem dicas e sem a folha de resultado própria (a tela da partida mostra a dela). */
+    multiplayer: Boolean = false,
+    titleOverride: String? = null,
+    /** Conteúdo acima do tabuleiro (faixa do adversário na partida com amigo). */
+    header: (@Composable () -> Unit)? = null,
+    /** false bloqueia o teclado (contagem 3-2-1 ou partida decidida). */
+    inputEnabled: Boolean = true,
+    /** Cada mudança (> 0) toca o replay da partida. */
+    replayTrigger: Int = 0,
+    onFinished: (won: Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val toast = rememberToast()
     var confettiKey by remember { mutableIntStateOf(0) }
     var showConfetti by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
+
+    // Replay: limpa o tabuleiro e "digita" de novo cada tentativa, virando as cores (sem som nem vibração).
+    var replay by remember(game) { mutableStateOf<ReplayView?>(null) }
+    var replayJob by remember(game) { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    fun stopReplay() { replayJob?.cancel(); replayJob = null; replay = null }
+    fun startReplay() {
+        replayJob?.cancel()
+        replayJob = scope.launch {
+            showResult = false
+            val rows = game.rows.toList()
+            replay = ReplayView(0, "", -1)
+            delay(350)
+            for ((r, w) in rows.withIndex()) {
+                for (k in 1..w.length) { replay = ReplayView(r, w.take(k), -1); delay(110) }
+                delay(120)
+                replay = ReplayView(r + 1, "", r)
+                delay(FLIP_STEP * 4 + FLIP_HALF * 2 + 400L)
+            }
+            replay = null
+            replayJob = null
+        }
+    }
+    LaunchedEffect(replayTrigger) { if (replayTrigger > 0) startReplay() }
 
     LaunchedEffect(game) {
         game.refreshIfNewDay()
@@ -88,6 +121,7 @@ fun GameScreen(
             override fun onBoardSolved(board: Int) { feedback?.win(); toast.show("Palavra ${board + 1} certa!") }
             override fun onWin(tries: Int) {
                 feedback?.win()
+                onFinished(true)
                 val spare = game.maxTries - tries
                 toast.show(
                     when {
@@ -100,15 +134,17 @@ fun GameScreen(
                 )
                 confettiKey++
                 showConfetti = true
-                scope.launch { delay(1800); showResult = true }
+                if (!multiplayer) scope.launch { delay(1800); showResult = true }
             }
             override fun onLose(answers: List<String>) {
                 feedback?.lose()
+                onFinished(false)
+                if (multiplayer) { toast.show("Suas tentativas acabaram", 2500); return }
                 toast.show(if (answers.size == 1) "A palavra era ${answers[0]}" else "Faltou: ${answers.joinToString(", ")}", 3500)
                 scope.launch { delay(2200); showResult = true }
             }
         }
-        if (game.over) showResult = true
+        if (game.over && !multiplayer) showResult = true
     }
 
     // Revelação: vira cada quadrado com 250 ms de intervalo e então fecha a rodada.
@@ -126,7 +162,7 @@ fun GameScreen(
         game.finishReveal()
     }
 
-    val title = buildString {
+    val title = titleOverride ?: buildString {
         append(if (game.mode == Mode.INFINITO) "Termo" else game.mode.title)
         game.archive?.let { append(" · " + shortDay(it)) }
     }
@@ -139,7 +175,7 @@ fun GameScreen(
                     Text("DIFÍCIL", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Night.red,
                         modifier = Modifier.clip(Shapes.pill).background(Night.red.copy(alpha = 0.15f)).padding(horizontal = 8.dp, vertical = 3.dp))
                 }
-                if (!game.over) {
+                if (!game.over && !multiplayer) {
                     val left = game.maxHints - game.hints.size
                     IconButton(onClick = {
                         val pos = game.hint()
@@ -155,11 +191,18 @@ fun GameScreen(
                 }
             })
             infiniteTab?.let { inf -> ModeSwitch(inf, Modifier.padding(horizontal = 16.dp)) { onSwitchTab(it) } }
+            header?.invoke()
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Boards(game)
+                Boards(game, replay)
+                if (replay != null) {
+                    // Toque no tabuleiro pula o replay.
+                    Box(Modifier.matchParentSize().clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { stopReplay() })
+                }
                 Column(Modifier.align(Alignment.BottomCenter).padding(bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     ToastView(toast)
-                    if (game.over && game.isArchive && toast.text == null && !showResult) {
+                    if (replay != null || multiplayer) {
+                        // Durante o replay (e na partida com amigo) os botões de fim ficam escondidos.
+                    } else if (game.over && game.isArchive && toast.text == null && !showResult) {
                         PillButton("Voltar ao arquivo", Night.correct, onClick = onBack)
                     } else if (game.over && !game.isDaily && game.mode.free && toast.text == null && !showResult) {
                         PillButton(if (game.boards == 1) "Nova palavra" else "Jogar de novo", Night.correct) { game.newWord() }
@@ -168,19 +211,22 @@ fun GameScreen(
                             PillButton("Ver resultado", Night.surfaceHigh, Night.text) { showResult = true }
                             PillButton("Jogar Infinito", Night.correct, onClick = onPlayInfinite)
                         }
+                    } else if (game.over && toast.text == null && !showResult) {
+                        PillButton("Ver resultado", Night.correct) { showResult = true }
                     }
                 }
             }
+            val locked = replay != null || !inputEnabled
             LetterKeyboard(
-                colorsFor = { ch -> keyMarks(game, ch) },
-                onLetter = game::type,
-                onEnter = game::submit,
-                onDelete = game::delete,
+                colorsFor = { ch -> keyMarks(game, ch, replay?.shown) },
+                onLetter = { if (!locked) game.type(it) },
+                onEnter = { if (!locked) game.submit() },
+                onDelete = { if (!locked) game.delete() },
             )
             Spacer(Modifier.height(10.dp))
         }
         if (showConfetti) Confetti(confettiKey) { showConfetti = false }
-        if (showResult && game.over) {
+        if (showResult && game.over && !multiplayer) {
             ResultSheet(
                 game = game,
                 onClose = { showResult = false },
@@ -188,14 +234,15 @@ fun GameScreen(
                 onPlayInfinite = { showResult = false; onPlayInfinite() },
                 meanings = meanings,
                 onBack = onBack,
+                onReplay = { startReplay() },
             )
         }
     }
 }
 
 /** Cor da tecla em cada tabuleiro, só com linhas já reveladas. Tabuleiro resolvido fica sem cor. */
-private fun keyMarks(game: TermoGame, ch: Char): List<Mark?> {
-    val revealed = game.revealedRows
+private fun keyMarks(game: TermoGame, ch: Char, upTo: Int? = null): List<Mark?> {
+    val revealed = upTo ?: game.revealedRows
     return game.answers.indices.map { b ->
         val list = game.boardGuesses(b).take(revealed)
         if (game.boards > 1 && game.isSolved(b, revealed)) null
@@ -203,8 +250,11 @@ private fun keyMarks(game: TermoGame, ch: Char): List<Mark?> {
     }.let { if (game.boards == 1) it else it }
 }
 
+/** O que o replay mostra agora: [shown] linhas prontas, [typed] letras da próxima, [revealing] linha virando. */
+data class ReplayView(val shown: Int, val typed: String, val revealing: Int)
+
 @Composable
-private fun Boards(game: TermoGame) {
+private fun Boards(game: TermoGame, replay: ReplayView? = null) {
     BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = if (game.boards == 1) 24.dp else 10.dp, vertical = 6.dp), contentAlignment = Alignment.Center) {
         val gap = if (game.boards == 1) 6.dp else 3.dp
         val boardGap = 12.dp
@@ -219,7 +269,9 @@ private fun Boards(game: TermoGame) {
                 Row(horizontalArrangement = Arrangement.spacedBy(boardGap)) {
                     for (gc in 0 until cols) {
                         val b = gr * cols + gc
-                        if (b < game.boards) SingleBoard(game, b, tile, gap)
+                        if (b < game.boards) {
+                            if (replay != null) ReplayBoard(game, b, tile, gap, replay) else SingleBoard(game, b, tile, gap)
+                        }
                     }
                 }
             }
@@ -258,6 +310,32 @@ private fun SingleBoard(game: TermoGame, board: Int, tile: Dp, gap: Dp) {
                             size = tile,
                         ) { game.select(c) }
                         else -> EmptyTile(tile, faded = game.isSolved(board) && r > game.solvedAt(board))
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Tabuleiro durante o replay. */
+@Composable
+private fun ReplayBoard(game: TermoGame, board: Int, tile: Dp, gap: Dp, rp: ReplayView) {
+    val guesses = game.boardGuesses(board)
+    val solvedRow = game.solvedAt(board)
+    val solvedShown = solvedRow in 0 until rp.shown
+    Column(
+        Modifier.alpha(if (solvedShown && game.boards > 1 && rp.revealing != solvedRow) 0.75f else 1f),
+        verticalArrangement = Arrangement.spacedBy(gap),
+    ) {
+        for (r in 0 until game.maxTries) {
+            val g = if (r < rp.shown) guesses.getOrNull(r) else null
+            val typing = r == rp.shown && rp.typed.isNotEmpty() && !solvedShown
+            Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                for (c in 0 until Words.WORD_LENGTH) {
+                    when {
+                        g != null -> RevealTile(g, c, tile, animate = r == rp.revealing)
+                        typing -> InputTile(letter = rp.typed.getOrNull(c), selected = false, size = tile) {}
+                        else -> EmptyTile(tile, faded = solvedShown && r > solvedRow)
                     }
                 }
             }
@@ -342,6 +420,7 @@ private fun ResultSheet(
     onPlayInfinite: () -> Unit,
     meanings: Map<String, String>,
     onBack: () -> Unit = {},
+    onReplay: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val stats = remember(game.over, game.rows.size) { game.stats() }
@@ -393,8 +472,11 @@ private fun ResultSheet(
             }
         }
         Spacer(Modifier.height(10.dp))
-        PillButton("Cartão para Stories", Night.accent, modifier = Modifier.fillMaxWidth()) {
-            StoryCard.share(context, storyFor(game, stats))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            PillButton("📸 Stories", Night.accent, modifier = Modifier.weight(1f)) {
+                StoryCard.share(context, storyFor(game, stats))
+            }
+            PillButton("▶ Replay", Night.surfaceHigh, Night.text, Modifier.weight(1f), onClick = onReplay)
         }
         if (game.mode.daily && game.isDaily) {
             Spacer(Modifier.height(12.dp))
@@ -434,6 +516,8 @@ fun HelpSheet(onClose: () -> Unit) {
             Example("TERMO", 4, Mark.ABSENT, "O O não está na palavra.")
             Spacer(Modifier.height(8.dp))
             Text("Toque num quadrado da linha para escolher onde a próxima letra entra.", color = Night.muted, fontSize = 14.sp)
+            Spacer(Modifier.height(6.dp))
+            Text("Com a vibração ligada, o verde dá um toque e o amarelo dá dois.", color = Night.muted, fontSize = 14.sp)
             Spacer(Modifier.height(6.dp))
             Text("No Dueto (7 tentativas) e no Quarteto (9) você descobre 2 ou 4 palavras ao mesmo tempo. Cada tecla mostra as cores de cada tabuleiro.", color = Night.muted, fontSize = 14.sp)
             Spacer(Modifier.height(6.dp))

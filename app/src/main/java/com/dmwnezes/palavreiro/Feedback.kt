@@ -39,6 +39,12 @@ class Feedback(context: Context, private val store: Store) {
     fun reveal(index: Int, mark: Mark) {
         val base = when (mark) { Mark.CORRECT -> 587.0; Mark.PRESENT -> 494.0; Mark.ABSENT -> 330.0 }
         tone(listOf(base * (1 + index * 0.06) to 70), volume = 0.12)
+        // Vibração por cor: verde = um toque, amarelo = dois toques, cinza = nada.
+        when (mark) {
+            Mark.CORRECT -> vibrate(longArrayOf(0, 35))
+            Mark.PRESENT -> vibrate(longArrayOf(0, 25, 70, 25))
+            Mark.ABSENT -> {}
+        }
     }
 
     fun invalid() {

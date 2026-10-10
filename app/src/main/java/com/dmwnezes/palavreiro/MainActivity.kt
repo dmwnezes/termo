@@ -77,11 +77,14 @@ class MainActivity : ComponentActivity() {
 object Launch {
     var pending by mutableStateOf<String?>(null)
     var challenge by mutableStateOf<String?>(null)
+    /** Código da partida com amigo (?mp=...). */
+    var multi by mutableStateOf<String?>(null)
 
     fun read(intent: Intent?) {
         intent ?: return
         intent.getStringExtra("dest")?.let { pending = it }
         intent.data?.getQueryParameter("d")?.let { code -> Challenge.decode(code)?.let { challenge = it } }
+        intent.data?.getQueryParameter("mp")?.let { multi = it }
     }
 }
 
@@ -92,6 +95,8 @@ private sealed interface Screen {
     data class Other(val dest: Dest) : Screen
     data class ChallengeGame(val word: String) : Screen
     data object Profile : Screen
+    /** Partida com amigo; [code] = link recebido (null = criar uma partida). */
+    data class Multi(val code: String?) : Screen
     data class Archive(val game: ArchiveGame = ArchiveGame.TERMO) : Screen
     data class ArchivePlay(val game: ArchiveGame, val date: java.time.LocalDate) : Screen
 }
@@ -124,13 +129,15 @@ fun PalavreiroApp() {
             Dest.DUETO -> Screen.Game(Mode.DUETO)
             Dest.QUARTETO -> Screen.Game(Mode.QUARTETO)
             Dest.ARQUIVO -> Screen.Archive()
+            Dest.DESAFIAR -> Screen.Multi(null)
             else -> Screen.Other(d)
         }
     }
 
     // Abre o destino pedido por atalho, widget, notificação ou link.
-    LaunchedEffect(Launch.pending, Launch.challenge, splash) {
+    LaunchedEffect(Launch.pending, Launch.challenge, Launch.multi, splash) {
         if (splash) return@LaunchedEffect
+        Launch.multi?.let { screen = Screen.Multi(it); Launch.multi = null; return@LaunchedEffect }
         Launch.challenge?.let { screen = Screen.ChallengeGame(it); Launch.challenge = null; return@LaunchedEffect }
         Launch.pending?.let { p ->
             Launch.pending = null
@@ -206,7 +213,7 @@ fun PalavreiroApp() {
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynonymScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         Dest.ANTONIMOS -> SynonymScreen(AppGraph.antonyms, AppGraph.antonymFamilies, store, AppGraph.feedback, back, kind = com.dmwnezes.palavreiro.ui.ChainKind.ANTONIMOS)
-                        Dest.DESAFIAR -> ChallengeScreen(AppGraph.words, AppGraph.feedback, back)
+                        Dest.DESAFIAR -> {}
                         Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
                         Dest.MESTRE -> com.dmwnezes.palavreiro.ui.MestreScreen(AppGraph.mestre, store, AppGraph.feedback, back)
@@ -237,6 +244,15 @@ fun PalavreiroApp() {
                         onSwitchTab = { screen = tab(s, it) },
                     )
                 }
+                is Screen.Multi -> com.dmwnezes.palavreiro.ui.MultiScreen(
+                    words = AppGraph.words,
+                    store = store,
+                    ntfy = AppGraph.ntfy,
+                    feedback = AppGraph.feedback,
+                    onBack = { screen = Screen.Home; refresh++ },
+                    joinCode = s.code,
+                    meanings = AppGraph.meanings,
+                )
                 is Screen.Archive -> ArchiveScreen(
                     store = store,
                     onBack = { screen = Screen.Home; refresh++ },

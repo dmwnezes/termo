@@ -57,7 +57,13 @@
     return g;
   }
 
-  const save = (g) => P.store.set(g.slot, { key: g.key, answers: g.answers, rows: g.rows, over: g.over, won: g.won, hints: g.hints, hard: g.hard });
+  /** Partida com amigo: palavras fixas, sem save, sem dicas, sem modo difícil e sem estatísticas. */
+  function mpGame(mp) {
+    const mode = MODES[mp.mode];
+    return { modeKey: mp.mode, mode, boards: mode.boards, maxTries: 5 + mode.boards, rows: [], current: [null, null, null, null, null], cursor: 0, over: false, won: false, hints: [], hard: false, isDaily: false, key: "mp", slot: null, arch: null, free: false, mp: true, answers: mp.answers.slice() };
+  }
+
+  const save = (g) => g.slot && P.store.set(g.slot, { key: g.key, answers: g.answers, rows: g.rows, over: g.over, won: g.won, hints: g.hints, hard: g.hard });
   const solvedAt = (g, b, upTo = g.rows.length) => { const i = g.rows.indexOf(g.answers[b]); return i >= 0 && i < upTo ? i : -1; };
   const boardRows = (g, b) => { const at = solvedAt(g, b); return at >= 0 ? g.rows.slice(0, at + 1) : g.rows.slice(); };
 
@@ -73,6 +79,9 @@
   }
 
   function record(g) {
+    if (g.mp) return;
+    // Estatística das letras: 1º chute das partidas de 1 tabuleiro (Termo, Infinito, Arquivo do Termo, desafio).
+    if (g.boards === 1 && g.rows.length) P.addFirstGuess(g.rows[0], g.won ? g.rows.length : 7);
     if (g.arch) return P.archiveDone(g.modeKey, g.arch, g.won);
     if (g.isDaily && g.mode.daily) {
       P.setResult(g.modeKey, P.dayKey(), g.won);
@@ -95,24 +104,30 @@
 
   /** Desenha a tela do jogo. */
   P.games.termoScreen = function (root, modeKey, challenge, archDay, opts = {}) {
-    let g = createGame(modeKey, challenge, archDay, opts.free);
+    const mp = opts.mp || null;
+    let g = mp ? mpGame(mp) : createGame(modeKey, challenge, archDay, opts.free);
     let busy = false;
+    let replaying = null, replayed = false;
+    const locked = () => g.over || busy || replaying || (mp && mp.locked());
     let meanings = {};
     P.meanings().then((m) => (meanings = m));
 
     // Seletor "Do dia | Infinito": Termo ↔ Infinito; Dueto/Quarteto ↔ partidas livres.
     const base = modeKey === "infinito" ? "termo" : modeKey;
-    const hasSwitch = !archDay && MODES[base].daily;
+    const hasSwitch = !mp && !archDay && MODES[base].daily;
     const showTab = (inf) => P.games.termoScreen(root, inf && base === "termo" ? "infinito" : base, null, null, { free: inf && base !== "termo", quiet: true });
     const gameName = () => MODES[base].title + (g.free && base !== "termo" ? " Infinito" : "");
-    const title = () => g.arch ? `${g.mode.title} · ${P.shortDay(g.arch)}` : MODES[base].title;
+    const title = () => mp ? mp.title : g.arch ? `${g.mode.title} · ${P.shortDay(g.arch)}` : MODES[base].title;
     root.innerHTML = P.topbar(`<span data-title>${title()}</span>`, {
       help: true,
       extra: `<span class="badge hidden" data-hard>DIFÍCIL</span><button class="icon-btn" data-hint aria-label="Dica">💡</button>`,
-    }) + (hasSwitch ? P.modeSwitch(g.free) : "") + `<div class="game"><div class="boards"><div class="boards-grid"></div></div><div class="center" data-after></div></div>`;
+    }) + (hasSwitch ? P.modeSwitch(g.free) : "") + `<div class="game">${mp ? `<div class="opp" data-opp></div>` : ""}<div class="boards"><div class="boards-grid"></div></div><div class="center" data-after></div></div>`;
     if (hasSwitch) P.bindModeSwitch(root, showTab);
     const grid = P.$(".boards-grid", root);
+    // Durante o replay, um toque no tabuleiro pula para o fim.
+    P.$(".boards", root).addEventListener("click", () => { if (replaying) replaying.skip = true; });
     const after = P.$("[data-after]", root);
+    if (mp && mp.mount) mp.mount(P.$("[data-opp]", root));
 
     const kb = P.keyboard(root, {
       onLetter: (c) => type(c), onEnter: () => submit(), onDelete: () => del(),
@@ -140,7 +155,7 @@
     function draw(revealRow = -1) {
       P.$("[data-title]", root).textContent = title();
       P.$("[data-hard]", root).classList.toggle("hidden", !g.hard);
-      P.$("[data-hint]", root).classList.toggle("hidden", g.over);
+      P.$("[data-hint]", root).classList.toggle("hidden", g.over || !!mp || !!replaying);
       grid.innerHTML = "";
       for (let b = 0; b < g.boards; b++) {
         const rows = boardRows(g, b), at = solvedAt(g, b);
@@ -158,7 +173,7 @@
             } else if (isCur) {
               t.classList.add("input"); if (c === g.cursor && !busy) t.classList.add("sel");
               t.textContent = g.current[c] || "";
-              t.addEventListener("click", () => { if (!g.over && !busy) { g.cursor = c; draw(); } });
+              t.addEventListener("click", () => { if (!locked()) { g.cursor = c; draw(); } });
             } else if (at >= 0 && r > at) t.classList.add("fade");
             row.appendChild(t);
           }
@@ -168,11 +183,13 @@
       }
       kb.paint();
       after.innerHTML = "";
-      if (g.over && g.arch) {
+      if (g.over && mp) mp.after(after);
+      else if (g.over && g.arch) {
         const r = P.h(`<button class="pill ghost">Ver resultado</button>`); r.onclick = () => result();
         const b = P.h(`<button class="pill" style="margin-left:8px">Voltar ao arquivo</button>`); b.onclick = () => P.go("arquivo");
         after.append(r, b);
       } else if (g.over && g.free) {
+        if (replayed) { const r = P.h(`<button class="pill ghost" style="margin-right:8px">Ver resultado</button>`); r.onclick = () => result(); after.appendChild(r); }
         const b = P.h(`<button class="pill">${g.boards === 1 ? "Nova palavra" : "Jogar de novo"}</button>`);
         b.onclick = () => newWord(); after.appendChild(b);
       } else if (g.over) {
@@ -183,12 +200,12 @@
 
     function nextEmpty(from) { for (let i = from; i < 5; i++) if (!g.current[i]) return i; for (let i = 0; i < Math.min(from, 5); i++) if (!g.current[i]) return i; return -1; }
     function type(c) {
-      if (g.over || busy) return;
+      if (locked()) return;
       g.current[g.cursor] = c; const n = nextEmpty(g.cursor + 1);
       g.cursor = n === -1 ? Math.min(g.cursor + 1, 4) : n; P.fx.type(); draw();
     }
     function del() {
-      if (g.over || busy) return;
+      if (locked()) return;
       if (g.current[g.cursor]) g.current[g.cursor] = null; else if (g.cursor > 0) { g.cursor--; g.current[g.cursor] = null; }
       draw();
     }
@@ -197,7 +214,7 @@
       grid.querySelectorAll(`.brow[data-r="${g.rows.length}"]`).forEach((r) => { r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake"); });
     }
     async function submit() {
-      if (g.over || busy) return;
+      if (locked()) return;
       if (g.current.some((x) => !x)) return shake("Palavra incompleta");
       const word = g.current.join("");
       if (!P.words.ok(word) && word !== g.answers[0]) return shake("Palavra não aceita");
@@ -211,12 +228,21 @@
       for (let i = 0; i < 5; i++) { await P.sleep(i ? 250 : 160); P.fx.reveal(i, marks[i]); }
       await P.sleep(280);
       busy = false;
+      if (g.over) { draw(); return; } // partida com amigo encerrada pelo adversário durante a revelação
+      // Partida com amigo: manda só as cores (tabuleiro resolvido antes desta linha vai vazio).
+      if (mp) mp.onRow(row, g.answers.map((a, b) => (solvedAt(g, b, row) >= 0 ? "" : P.evaluate(word, a).join(""))).join("|"));
       g.answers.forEach((a, b) => { if (g.boards > 1 && solvedAt(g, b) === row) { P.fx.win(); P.toast(`Palavra ${b + 1} certa!`); } });
       if (g.answers.every((_, b) => solvedAt(g, b) >= 0)) end(true);
       else if (g.rows.length >= g.maxTries) end(false);
       save(g); draw();
     }
     function end(win) {
+      if (mp) {
+        g.over = true; g.won = win;
+        if (win) { P.fx.win(); P.confetti(); } else { P.fx.lose(); P.toast("Suas tentativas acabaram", 2200); }
+        mp.onEnd(win, g.rows.length);
+        return;
+      }
       g.over = true; g.won = win; record(g);
       if (win) {
         const spare = g.maxTries - g.rows.length;
@@ -238,7 +264,7 @@
       save(g); draw();
     }
     function hint() {
-      if (g.over || busy) return;
+      if (locked() || mp) return;
       if (g.hints.length >= 2) return P.toast("Sem dicas nesta partida");
       const b = g.answers.findIndex((_, i) => solvedAt(g, i) < 0); if (b < 0) return;
       const ans = g.answers[b];
@@ -253,7 +279,31 @@
     P.$("[data-help]", root).onclick = () => P.games.help();
 
     function grids() { return g.answers.map((a, b) => boardRows(g, b).map((w) => P.evaluate(w, a))); }
+    /** Replay: limpa o tabuleiro e refaz a partida letra por letra, sem som e sem vibração. */
+    async function replay() {
+      if (replaying || busy || !g.over) return;
+      const full = { rows: g.rows.slice(), won: g.won }, st = (replaying = { skip: false });
+      const alive = () => document.body.contains(grid) && !st.skip;
+      const blank = () => [null, null, null, null, null];
+      const wait = async (ms) => { const until = Date.now() + ms; while (Date.now() < until && alive()) await P.sleep(40); };
+      P.fx.muted = true;
+      g.rows = []; g.over = false; g.current = blank(); g.cursor = 0;
+      draw(); await wait(350);
+      for (const word of full.rows) {
+        for (let i = 0; i < 5 && alive(); i++) { g.current[i] = word[i]; g.cursor = Math.min(i + 1, 4); draw(); await wait(110); }
+        if (!alive()) break;
+        g.rows.push(word); g.current = blank(); busy = true; draw(g.rows.length - 1);
+        await wait(160 + 250 * 4 + 340); busy = false;
+        if (!alive()) break;
+        draw(); await wait(400);
+      }
+      g.rows = full.rows; g.over = true; g.won = full.won; g.current = blank(); g.cursor = 0;
+      busy = false; replaying = null; replayed = true; P.fx.muted = false;
+      if (document.body.contains(grid)) draw();
+    }
+
     function result() {
+      if (mp) return mp.showResult();
       const s = P.stats(g.modeKey);
       const defs = g.answers.map((a) => meanings[a] ? `<b>${P.words.display(a)}</b>${P.esc(meanings[a])}` : "").filter(Boolean);
       const plural = g.boards > 1;
@@ -262,13 +312,14 @@
         ${defs.length ? `<div class="meaning"><small>O que significa</small>${defs.join("")}</div>` : ""}
         ${g.modeKey === "desafio" || g.arch ? "" : P.statsHTML([[s.played, "Jogos"], [Math.round((s.won / Math.max(1, s.played)) * 100) + "%", "Vitórias"], [s.streak, "Sequência"], [s.maxStreak, "Melhor"]]) + P.distHTML(s.dist, g.won ? g.rows.length : -1, g.maxTries)}
         <div class="row-btns"><button class="pill ghost" data-share>Compartilhar</button><button class="pill" data-next>${g.arch ? "Voltar ao arquivo" : g.free ? (g.boards === 1 ? "Nova palavra" : "Jogar de novo") : "Jogar Infinito"}</button></div>
-        <button class="pill accent wide" style="margin-top:10px" data-story>Cartão para Stories</button>
+        <div class="row-btns wrap" style="margin-top:10px"><button class="pill ghost" data-replay>▶ Replay</button><button class="pill accent" data-story>Cartão para Stories</button></div>
         <p class="note">${g.arch ? `Desafio de ${P.shortDay(g.arch)} do arquivo.` : g.mode.daily && g.isDaily ? (g.boards === 1 ? "Uma palavra nova aparece amanhã." : "Palavras novas aparecem amanhã.") : ""}</p>`);
       P.$("[data-share]", ui.el).onclick = () => {
         const score = (g.won ? `${g.rows.length}/${g.maxTries}` : `X/${g.maxTries}`) + (g.hard ? "*" : "") + (g.hints.length ? ` 💡${g.hints.length}` : "");
         const em = { c: "🟩", p: "🟨", a: "⬛" };
         P.share(`Palavreiro · ${g.arch ? title() : gameName()} ${score}\n\n${grids().map((b) => b.map((r) => r.map((m) => em[m]).join("")).join("\n")).join("\n\n")}\n\n${location.origin}${location.pathname}`);
       };
+      P.$("[data-replay]", ui.el).onclick = () => { ui.close(); replay(); };
       P.$("[data-next]", ui.el).onclick = () => { ui.close(); if (g.arch) P.go("arquivo"); else if (g.free) newWord(); else if (hasSwitch) showTab(true); else P.go("infinito"); };
       P.$("[data-story]", ui.el).onclick = () => P.story({
         game: g.arch ? title() : gameName() + (g.isDaily && g.mode.daily ? " do dia" : ""),
@@ -282,6 +333,14 @@
     sizeBoards(); draw();
     window.addEventListener("resize", () => { if (document.body.contains(grid)) { sizeBoards(); } });
     if (g.over && !opts.quiet) setTimeout(result, 400);
+    return {
+      get game() { return g; },
+      replay,
+      /** Partida com amigo: o adversário já venceu, encerra sem mexer em nada. */
+      stop() { if (!g.over) { g.over = true; g.won = false; if (!busy) draw(); } },
+      redraw: () => { if (!replaying && !busy && document.body.contains(grid)) draw(); },
+      resize: () => sizeBoards(),
+    };
   };
 
   /** Janela de ajuda do Termo. */
@@ -291,6 +350,7 @@
       <p>Descubra a palavra de 5 letras em até 6 tentativas. Os acentos aparecem sozinhos.</p>
       ${ex("PEDRA", 0, "c", "O P está no lugar certo.")}${ex("CAMPO", 2, "p", "O M está na palavra, mas em outro lugar.")}${ex("TERMO", 4, "a", "O O não está na palavra.")}
       <p class="muted">Toque num quadrado da linha para escolher onde a próxima letra entra. No Dueto (7 tentativas) e no Quarteto (9) você descobre 2 ou 4 palavras ao mesmo tempo.</p>
+      <p class="muted">Com a vibração ligada, o verde dá um toque e o amarelo dá dois.</p>
       <p class="muted">💡 A lâmpada revela uma letra (até 2 por partida). No modo difícil, ligado no Perfil, as letras verdes precisam ficar no lugar e as amarelas precisam ser usadas.</p>
       <div class="footer">${P.creditHTML()}</div>`);
   };

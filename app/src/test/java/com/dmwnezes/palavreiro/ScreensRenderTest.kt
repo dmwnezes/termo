@@ -177,6 +177,55 @@ class ScreensRenderTest {
         save("25-dueto-infinito")
     }
 
+    private val offline = com.dmwnezes.palavreiro.system.Ntfy(okhttp3.OkHttpClient(), "http://127.0.0.1:9")
+
+    @Test
+    fun amigoCriar() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
+        save("26-amigo-criar")
+    }
+
+    @Test
+    fun amigoEntrar() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}, joinCode = "abc123xyz789-d-21i3v9") } }
+        save("27-amigo-entrar")
+    }
+
+    @Test
+    fun amigoPartida() {
+        rule.mainClock.autoAdvance = false
+        val ans = com.dmwnezes.palavreiro.game.Multi.words(words.answers, 77, 2)
+        val g = TermoGame(Mode.DUETO, words, store = null, fixed = ans)
+        "CARRO".forEach(g::type); g.submit(); g.finishReveal()
+        rule.setContent {
+            PalavreiroTheme {
+                GameScreen(g, null, {}, {}, {}, multiplayer = true, titleOverride = "Você × Ana", header = {
+                    com.dmwnezes.palavreiro.ui.OpponentStrip("Ana", 2, 7, listOf("apaca|aacpa", "ccccc|apcca", "|ccacc"), "jogando · 3/7", true)
+                })
+            }
+        }
+        save("28-amigo-partida")
+    }
+
+    @Test
+    fun replayNoMeio() {
+        rule.mainClock.autoAdvance = false
+        val g = TermoGame(Mode.DIARIO, words, store = null) { day }
+        for (w in listOf("CARRO", "MUNDO", g.answers[0])) { w.forEach(g::type); g.submit(); g.finishReveal() }
+        rule.setContent { PalavreiroTheme { GameScreen(g, null, {}, {}, {}, multiplayer = true, replayTrigger = 1) } }
+        save("29-replay", 2950)
+    }
+
+    @Test
+    fun seusChutes() {
+        rule.mainClock.autoAdvance = false
+        val st = com.dmwnezes.palavreiro.game.FirstGuessStats.from(listOf("CARRO" to 4, "CARRO" to 3, "CARRO" to 5, "PEDRA" to 2, "PEDRA" to 3, "PEDRA" to 2, "MUNDO" to 7, "SERTÃO" to 4))
+        rule.setContent { PalavreiroTheme { androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(com.dmwnezes.palavreiro.ui.Night.surface).padding(18.dp)) { com.dmwnezes.palavreiro.ui.FirstGuessSection(st) { it } } } }
+        save("30-seus-chutes")
+    }
+
     @Test
     fun antonimos() {
         rule.mainClock.autoAdvance = false

@@ -24,6 +24,10 @@
     intruso: `<div class="mini" style="grid-template-columns:repeat(5,9px);gap:3px">${["--absent", "--absent", "--red", "--absent", "--absent"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div>`,
     ortografia: `<div style="display:flex;gap:5px;font-weight:800;font-size:15px"><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--correct);color:var(--dark-text)">✓</span><span style="display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--red);color:var(--dark-text)">✗</span></div>`,
     mestre: `<div style="display:grid;gap:2px;justify-items:center"><span style="font-size:17px;line-height:1">👑</span><span class="pill-badge" style="font-size:9px;padding:3px 9px;background:var(--accent);color:var(--dark-text)">TOQUE</span></div>`,
+    amigo: `<div style="display:flex;gap:5px">${(() => {
+      const g = (cells) => `<div class="mini" style="grid-template-columns:repeat(3,8px)">${cells.map((c) => `<i style="width:8px;height:8px;background:var(${c})"></i>`).join("")}</div>`;
+      return g(["--absent", "--present", "--absent", "--absent", "--correct", "--absent", "--correct", "--correct", "--correct"]) + g(["--absent", "--absent", "--present", "--present", "--absent", "--absent", "--surface-high", "--surface-high", "--surface-high"]);
+    })()}</div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
 
@@ -45,7 +49,7 @@
       ["definicao", "Qual é a Palavra?", "Descubra a palavra pela definição", ""],
       ["sinonimos", "Sinônimos", "Corrente de sinônimos contra o tempo", ""],
       ["antonimos", "Antônimos", "Ache o contrário antes do tempo acabar", ""],
-      ["desafiar", "Desafiar um amigo", "Escolha uma palavra e mande o link", ""],
+      ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
     app.innerHTML = `<div class="home-head"><div class="title"><h1>Palavreiro</h1><div class="mark small"><span></span><span></span><span></span><span></span><span></span></div></div>
@@ -64,6 +68,7 @@
 
   function route() {
     const parts = (location.hash.replace(/^#\/?/, "") || "").split("/"), r = parts[0];
+    if (P.mp) P.mp.leave(); // sai da partida com amigo (manda "bye")
     app.innerHTML = "";
     document.querySelectorAll(".overlay").forEach((o) => o.remove());
     window.scrollTo(0, 0);
@@ -79,6 +84,7 @@
       sinonimos: () => P.games.sinonimos(app),
       antonimos: () => P.games.antonimos(app),
       desafiar: () => P.games.challengeCreate(app),
+      amigo: () => (parts[1] === "entrar" ? P.games.mpJoin(app) : P.games.mpCreate(app)),
       perfil: () => P.games.perfil(app),
       intruso: () => P.games.intruso(app),
       ortografia: () => P.games.ortografia(app),
@@ -97,6 +103,13 @@
   if (code && P.challenge.decode(code)) {
     try { sessionStorage.setItem("pv-challenge", code); } catch (_) {}
     history.replaceState(null, "", location.pathname + "#/desafio");
+  }
+
+  // Link de partida com amigo (?mp=SALA-MODO-SEED): abre a tela de entrar.
+  const mpCode = new URLSearchParams(location.search).get("mp");
+  if (mpCode && P.mp.parse(mpCode)) {
+    try { sessionStorage.setItem("pv-mp-join", mpCode.trim().toLowerCase()); } catch (_) {}
+    history.replaceState(null, "", location.pathname + "#/amigo/entrar");
   }
 
   // Botão voltar em telas criadas depois (os jogos assíncronos montam o topo depois).
@@ -145,7 +158,7 @@
     };
     requestAnimationFrame(frame);
   })();
-  const close = () => { sp.classList.add("hide"); setTimeout(() => sp.remove(), 400); if (!P.store.get("seen-help") && !location.hash.includes("desafio")) { P.store.set("seen-help", true); P.games.help(); } };
+  const close = () => { sp.classList.add("hide"); setTimeout(() => sp.remove(), 400); if (!P.store.get("seen-help") && !location.hash.includes("desafio") && !location.hash.includes("amigo/entrar")) { P.store.set("seen-help", true); P.games.help(); } };
   const t = setTimeout(close, 3600);
   sp.addEventListener("click", (e) => { if (!e.target.closest(".credit")) { clearTimeout(t); close(); } });
 })();

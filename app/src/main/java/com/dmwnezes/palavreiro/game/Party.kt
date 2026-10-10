@@ -125,3 +125,25 @@ object Evolution {
         }
     }
 }
+
+/** "Seus chutes": letras mais usadas no 1º chute, chute favorito e melhor chute inicial. */
+data class FirstGuessStats(
+    val letters: List<Pair<Char, Int>>,
+    val favorite: Pair<String, Int>?,
+    /** Melhor chute inicial (usado ≥ 3 vezes): palavra e média de tentativas. */
+    val best: Pair<String, Double>?,
+    val total: Int,
+) {
+    companion object {
+        fun from(list: List<Pair<String, Int>>): FirstGuessStats {
+            val words = list.map { Words.normalize(it.first) to it.second }
+            val letters = words.flatMap { it.first.toList() }.filter { it in 'A'..'Z' }
+                .groupingBy { it }.eachCount().entries.sortedWith(compareBy({ -it.value }, { it.key })).take(8).map { it.key to it.value }
+            val byWord = words.groupBy { it.first }
+            val favorite = byWord.entries.sortedWith(compareBy({ -it.value.size }, { it.key })).firstOrNull()?.let { it.key to it.value.size }
+            val best = byWord.filter { it.value.size >= 3 }.map { (w, l) -> w to l.map { it.second }.average() }
+                .sortedWith(compareBy({ it.second }, { it.first })).firstOrNull()
+            return FirstGuessStats(letters, favorite, best, words.size)
+        }
+    }
+}

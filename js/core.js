@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "17"; // versão dos arquivos de conteúdo
+  const V = "18"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -40,6 +40,16 @@
     const i = P.dayIndex(d), n = poolSize(i), out = [];
     for (let k = 0; out.length < count; k++) {
       const w = P.words.answers[mod(i * 7919 + 104729 + salt * 3331 + k * 577, n)];
+      if (!out.includes(w)) out.push(w);
+    }
+    return out;
+  };
+
+  /** Palavras de uma partida com amigo (mesma conta do app): lista completa, sem repetir. */
+  P.mpWords = (seed, count) => {
+    const list = P.words.answers, n = list.length, out = [];
+    for (let k = 0; out.length < count && k < n * 4; k++) {
+      const w = list[((seed % n) * 7919 % n + 104729 + k * 577) % n];
       if (!out.includes(w)) out.push(w);
     }
     return out;
@@ -95,6 +105,13 @@
   P.setHistory = (day, field, n) => { const h = P.store.get("history", {}); h[day] = Object.assign(h[day] || {}, { [field]: n }); P.store.set("history", h); };
   /** Partida do arquivo terminada. */
   P.archiveDone = (game, day, won) => { P.setResult(game, day, won); P.store.add("arch-played"); if (won) P.store.add("arch-won"); P.logActivity(); };
+  /** 1º chute de cada partida de 1 tabuleiro: [{w, n (7 = errou), d}], no máximo 500 (sai o mais antigo). */
+  P.addFirstGuess = (w, n) => {
+    const l = P.store.get("first-guesses", []);
+    const list = Array.isArray(l) ? l : [];
+    list.push({ w, n, d: P.dayKey() });
+    P.store.set("first-guesses", list.slice(-500));
+  };
   /** "2026-03-12" → Date local; "12/03". */
   P.parseDay = (k) => { const [y, m, d] = String(k).split("-").map(Number); return new Date(y, m - 1, d); };
   P.shortDay = (k) => k.slice(8, 10) + "/" + k.slice(5, 7);
@@ -113,7 +130,7 @@
   P.settings = () => Object.assign({ sound: true, vibration: true, hard: false }, P.store.get("settings", {}));
   P.saveSettings = (s) => P.store.set("settings", s);
   P.tone = (notes, vol = 0.12) => {
-    if (!P.settings().sound) return;
+    if (P.fx.muted || !P.settings().sound) return;
     try {
       ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
       let t = ctx.currentTime;
@@ -125,10 +142,12 @@
       });
     } catch (_) {}
   };
-  P.vibrate = (p) => { if (P.settings().vibration && navigator.vibrate) navigator.vibrate(p); };
+  P.vibrate = (p) => { if (!P.fx.muted && P.settings().vibration && navigator.vibrate) try { navigator.vibrate(p); } catch (_) {} };
   P.fx = {
+    muted: false, // ligado durante o replay: sem som e sem vibração
     type: () => { P.tone([[660, 28]], 0.08); P.vibrate(8); },
-    reveal: (i, m) => P.tone([[({ c: 587, p: 494, a: 330 }[m] || 400) * (1 + i * 0.06), 70]]),
+    // Verde = 1 toque curto; amarelo = 2 toques curtos; cinza = nada.
+    reveal: (i, m) => { P.tone([[({ c: 587, p: 494, a: 330 }[m] || 400) * (1 + i * 0.06), 70]]); if (m === "c") P.vibrate(35); else if (m === "p") P.vibrate([25, 70, 25]); },
     invalid: () => { P.tone([[196, 90], [165, 120]]); P.vibrate([40, 60, 40]); },
     win: () => { P.tone([[523.25, 110], [659.25, 110], [783.99, 110], [1046.5, 260]], 0.14); P.vibrate([30, 70, 30, 70, 90]); },
     lose: () => { P.tone([[392, 160], [311.1, 160], [261.6, 320]]); P.vibrate(180); },

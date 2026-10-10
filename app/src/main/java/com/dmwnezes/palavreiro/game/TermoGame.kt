@@ -36,6 +36,8 @@ class TermoGame(
     val archive: LocalDate? = null,
     /** Partidas livres (aba Infinito) do Dueto/Quarteto, salvas à parte do desafio do dia. */
     val freePlay: Boolean = false,
+    /** Palavras fixas da partida com amigo (multiplayer): nada é salvo nem conta nas estatísticas. */
+    val fixed: List<String>? = null,
     private val today: () -> LocalDate = { LocalDate.now() },
 ) {
     val isArchive: Boolean get() = archive != null
@@ -99,6 +101,12 @@ class TermoGame(
     private val salt: Int get() = when (mode) { Mode.DUETO -> 1; Mode.QUARTETO -> 2; else -> 0 }
 
     private fun load() {
+        if (fixed != null) {
+            isDaily = false
+            key = "amigo"
+            restore(fixed.map { Words.normalize(it) }, null)
+            return
+        }
         val saved = store?.game(slot)
         if (archive != null) {
             val list = words.dailySet(archive, boards, salt)
@@ -295,6 +303,8 @@ class TermoGame(
     private fun end(win: Boolean) {
         over = true
         won = win
+        // Primeiro chute de cada partida de 1 palavra (estatística "Seus chutes" do perfil).
+        if (boards == 1 && fixed == null && rows.isNotEmpty()) store?.addFirstGuess(rows[0], if (win) rows.size else 7, todayKey())
         if (archive != null) {
             store?.archiveDone(resultName, archive.toString(), win)
             if (win) events.onWin(rows.size) else events.onLose(answers.filter { !isSolved(answers.indexOf(it)) }.map(words::display))

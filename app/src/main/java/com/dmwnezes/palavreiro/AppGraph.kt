@@ -53,7 +53,13 @@ object AppGraph {
     lateinit var meanings: Map<String, String>
         private set
 
+    /** Mensagens da partida com amigo (ntfy.sh). */
+    val ntfy by lazy { com.dmwnezes.palavreiro.system.Ntfy(http) }
+
     private var ready = false
+
+    /** Palavra com acento para exibir (cai na própria palavra se ainda não carregou). */
+    fun displayWord(w: String): String = if (::words.isInitialized) words.display(com.dmwnezes.palavreiro.game.Words.normalize(w)) else w
 
     fun init(context: Context) {
         if (ready) return

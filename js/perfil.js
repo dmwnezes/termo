@@ -3,7 +3,7 @@
   "use strict";
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   const TABS = ["Resumo", "Conquistas", "Ajustes"];
-  const SITE_VERSION = "14";
+  const SITE_VERSION = "18";
 
   P.games.perfil = function (root) {
     const modes = [["termo", "Termo", 6], ["infinito", "Infinito", 6], ["dueto", "Dueto", 7], ["quarteto", "Quarteto", 9]];
@@ -47,6 +47,25 @@
         <div class="cal">${cells}</div><p class="muted" style="font-size:.85rem">${played} ${played === 1 ? "dia jogado" : "dias jogados"} · ${games} ${games === 1 ? "jogo" : "jogos"} no mês</p>`;
     }
 
+    /** Seção "Seus chutes": letras do 1º chute, chute favorito e melhor chute inicial. */
+    function chutes() {
+      const list = (P.store.get("first-guesses", []) || []).filter((x) => x && typeof x.w === "string" && x.w.length === 5);
+      if (!list.length) return `<p class="muted fg-empty">Jogue o Termo para ver suas letras.</p>`;
+      const letters = {}, words = {};
+      list.forEach(({ w, n }) => {
+        [...w].forEach((c) => (letters[c] = (letters[c] || 0) + 1));
+        const o = (words[w] = words[w] || { c: 0, sum: 0 }); o.c++; o.sum += Math.min(7, Math.max(1, +n || 7));
+      });
+      const top = Object.entries(letters).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8), max = top[0][1];
+      const fav = Object.entries(words).sort((a, b) => b[1].c - a[1].c || a[0].localeCompare(b[0]))[0];
+      const best = Object.entries(words).filter(([, o]) => o.c >= 3).map(([w, o]) => [w, o.sum / o.c]).sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))[0];
+      const fmt = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      return `<p class="muted fg-label">Letras que você mais usa no 1º chute</p>
+        <div class="fg-bars">${top.map(([c, v]) => `<div><b>${c}</b><span class="fg-track"><i style="width:${Math.max(6, (v / max) * 100)}%"></i></span><small>${v}</small></div>`).join("")}</div>
+        <p class="fg-line">Seu chute favorito: <b>${P.words.display(fav[0])}</b> (${fav[1].c}×)</p>
+        <p class="fg-line">Melhor chute inicial: ${best ? `<b>${P.words.display(best[0])}</b> — média ${fmt(best[1])} tentativas` : `<span class="muted">Jogue mais para descobrir</span>`}</p>`;
+    }
+
     function resumo() {
       const s = P.stats(modes[tab][0]);
       body.innerHTML = `
@@ -58,6 +77,7 @@
         <div class="section"><h3>Evolução</h3>
           <div class="seg evo-seg">${evoKinds.map(([k, n, u]) => `<button class="${k === evo ? "on" : ""}" data-evo="${k}">${n}<small>${u}</small></button>`).join("")}</div>
           ${P.evolutionHTML(evo)}</div>
+        <div class="section"><h3>Seus chutes</h3>${chutes()}</div>
         <div class="section"><h3>Recordes</h3>
           <div class="rec"><span>Conexões</span><span>${g("conn-won")} resolvidos · ${g("conn-perfect")} sem erro</span></div>
           <div class="rec"><span>Intruso</span><span>recorde ${g("intr-best")} · ${g("intr-right")} acertos</span></div>
@@ -67,7 +87,8 @@
           <div class="rec"><span>Qual é a Palavra?</span><span>recorde ${g("def-best")} seguidas · ${g("def-right")} acertos</span></div>
           <div class="rec"><span>Sinônimos</span><span>maior cadeia: ${g("syn-best")}</span></div>
           <div class="rec"><span>Antônimos</span><span>maior cadeia: ${g("ant-best")}</span></div>
-          <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div></div>`;
+          <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div>
+          <div class="rec"><span>Com amigos</span><span>${g("mp-won")} ${g("mp-won") === 1 ? "vitória" : "vitórias"} em ${g("mp-played")} ${g("mp-played") === 1 ? "partida" : "partidas"}</span></div></div>`;
       body.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = +b.dataset.tab; draw(); }));
       body.querySelectorAll("[data-evo]").forEach((b) => (b.onclick = () => { evo = b.dataset.evo; draw(); }));
       P.$("[data-prev]", body).onclick = () => { ym = ym[1] === 0 ? [ym[0] - 1, 11] : [ym[0], ym[1] - 1]; draw(); };

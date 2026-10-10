@@ -55,6 +55,7 @@
       ["🕵️", "Detetive", "Faça 10 pontos no Intruso", n("intr-best"), 10],
       ["✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", n("ort-best"), 20],
       ["👑", "Obediente", "Faça 15 pontos no Mestre Mandou", n("mestre-best"), 15],
+      ["⚔️", "Duelista", "Vença 5 partidas com amigos", n("mp-won"), 5],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
       ["🌟", "Dia completo", "Faça os 4 desafios do dia", n("alldone-days"), 1],
     ].map(([emoji, title, desc, v, goal]) => ({ emoji, title, desc, goal, progress: Math.min(v, goal), ok: v >= goal }));
@@ -87,7 +88,8 @@
   // Nome canônico (app) → chave do site. As chaves ws_* (Caça-Palavras, removido) ficam só por compatibilidade.
   const COUNTERS = ["conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won", "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
     "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best", "intr_played", "intr_best", "intr_right",
-    "ort_played", "ort_best", "ort_right", "mestre_played", "mestre_best", "mestre_right", "ant_best", "arch_played", "arch_won", "alldone_days"];
+    "ort_played", "ort_best", "ort_right", "mestre_played", "mestre_best", "mestre_right", "ant_best", "arch_played", "arch_won", "alldone_days",
+    "mp_played", "mp_won"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));
   const MODES = ["termo", "infinito", "dueto", "quarteto"];
   const toB64 = (str) => { let bin = ""; new TextEncoder().encode(str).forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
@@ -100,6 +102,10 @@
       firstTry: int(o.firstTry), dist: Array.from({ length: 9 }, (_, i) => int((o.dist || [])[i])) };
   };
 
+  /** 1º chutes válidos: {w: 5 letras A-Z, n: 1..7, d: AAAA-MM-DD}. */
+  const cleanGuesses = (l) => (Array.isArray(l) ? l : []).filter((x) => x && typeof x.w === "string" && /^[A-Z]{5}$/.test(x.w) && int(x.n) >= 1 && int(x.n) <= 7 && /^\d{4}-\d{2}-\d{2}$/.test(String(x.d)))
+    .map((x) => ({ w: x.w, n: int(x.n), d: String(x.d) }));
+
   P.syncExport = () => {
     const data = {
       v: 1,
@@ -108,6 +114,8 @@
       activity: P.store.get("activity", {}), termoDays: P.store.get("termo-days", {}),
       results: P.store.get("results", {}), history: P.store.get("history", {}),
     };
+    const fg = cleanGuesses(P.store.get("first-guesses", []));
+    if (fg.length) data.firstGuesses = fg;
     return "PV1-" + toB64(JSON.stringify(data));
   };
 
@@ -143,6 +151,13 @@
       });
       P.store.set(key, cur);
     };
+    if (Array.isArray(d.firstGuesses)) {
+      // União por (d, w, n), em ordem de data, até 500 (ficam os mais recentes).
+      const cur = cleanGuesses(P.store.get("first-guesses", [])), seen = new Set(cur.map((x) => x.d + "|" + x.w + "|" + x.n));
+      cleanGuesses(d.firstGuesses).forEach((x) => { const k = x.d + "|" + x.w + "|" + x.n; if (!seen.has(k)) { seen.add(k); cur.push(x); } });
+      const sorted = cur.map((x, i) => [x, i]).sort((a, b) => (a[0].d < b[0].d ? -1 : a[0].d > b[0].d ? 1 : a[1] - b[1])).map((p) => p[0]);
+      P.store.set("first-guesses", sorted.slice(-500));
+    }
     union("termo-days", d.termoDays); union("results", d.results); union("history", d.history, true);
     return true;
   };
