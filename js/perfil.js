@@ -66,8 +66,33 @@
         <p class="fg-line">Melhor chute inicial: ${best ? `<b>${P.words.display(best[0])}</b> — média ${fmt(best[1])} tentativas` : `<span class="muted">Jogue mais para descobrir</span>`}</p>`;
     }
 
+    /** Recordes: um cartão por jogo com ícone, número principal grande e uma linha secundária. */
+    function records() {
+      const best = g("ws-best") || 0, pl = (v, one, many) => `${v} ${v === 1 ? one : many}`;
+      const chain = Math.max(g("sa-best") || 0, g("syn-best") || 0, g("ant-best") || 0);
+      const tricks = Math.max(g("sa-tricks") || 0, g("ant-best") || 0);
+      const cards = [
+        ["🧩", "Conexões", "var(--correct)", g("conn-won"), g("conn-won") === 1 ? "resolvido" : "resolvidos", pl(g("conn-perfect"), "sem erro", "sem erro")],
+        ["🔎", "Caça-Palavras", "var(--present)", best ? P.fmtTime(best) : "—", "melhor tempo", pl(g("ws-played"), "grade", "grades")],
+        ["🕵️", "Intruso", "var(--red)", g("intr-best"), "recorde", pl(g("intr-right"), "acerto", "acertos")],
+        ["✍️", "Certo ou Errado", "var(--blue)", g("ort-best"), "recorde", pl(g("ort-right"), "acerto", "acertos")],
+        ["👑", "Mestre Mandou", "var(--accent)", g("mestre-best"), "recorde", pl(g("mestre-right"), "acerto", "acertos")],
+        ["📖", "Qual é a Palavra?", "var(--purple)", g("def-best"), g("def-best") === 1 ? "seguida" : "seguidas", pl(g("def-right"), "acerto", "acertos")],
+        ["⛓️", "Sinônimo ou Antônimo", "var(--correct)", chain, "maior cadeia", pl(tricks, "pegadinha", "pegadinhas")],
+        ["🗂️", "Arquivo", "var(--present)", g("arch-played"), g("arch-played") === 1 ? "desafio" : "desafios", pl(g("arch-won") || 0, "vencido", "vencidos")],
+        ["⚔️", "Com amigos", "var(--blue)", g("mp-won"), g("mp-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("mp-played"), "partida", "partidas")}`],
+      ];
+      return `<div class="recs">${cards.map(([ico, name, col, v, unit, sub]) => {
+        const zero = !v || v === "—";
+        return `<div class="recc${zero ? " zero" : ""}" style="--c:${col}">
+          <div class="recc-top"><span class="recc-ico" aria-hidden="true">${ico}</span><span class="recc-name">${name}</span></div>
+          <div class="recc-val"><b>${v || 0}</b><span>${unit}</span></div>
+          <small class="recc-sub">${sub}</small></div>`;
+      }).join("")}</div>`;
+    }
+
     function resumo() {
-      const s = P.stats(modes[tab][0]), best = g("ws-best");
+      const s = P.stats(modes[tab][0]);
       body.innerHTML = `
         <div class="section"><h3>Calendário</h3>${calendar()}</div>
         <div class="section"><h3>Estatísticas</h3>
@@ -78,16 +103,7 @@
           <div class="seg evo-seg">${evoKinds.map(([k, n, u]) => `<button class="${k === evo ? "on" : ""}" data-evo="${k}">${n}<small>${u}</small></button>`).join("")}</div>
           ${P.evolutionHTML(evo)}</div>
         <div class="section"><h3>Seus chutes</h3>${chutes()}</div>
-        <div class="section"><h3>Recordes</h3>
-          <div class="rec"><span>Conexões</span><span>${g("conn-won")} resolvidos · ${g("conn-perfect")} sem erro</span></div>
-          <div class="rec"><span>Caça-Palavras</span><span>${g("ws-played")} grades · melhor ${best ? P.fmtTime(best) : "—"}</span></div>
-          <div class="rec"><span>Intruso</span><span>recorde ${g("intr-best")} · ${g("intr-right")} acertos</span></div>
-          <div class="rec"><span>Certo ou Errado</span><span>recorde ${g("ort-best")} · ${g("ort-right")} acertos</span></div>
-          <div class="rec"><span>Mestre Mandou</span><span>recorde ${g("mestre-best")} · ${g("mestre-right")} acertos</span></div>
-          <div class="rec"><span>Qual é a Palavra?</span><span>recorde ${g("def-best")} seguidas · ${g("def-right")} acertos</span></div>
-          <div class="rec"><span>Sinônimo ou Antônimo</span><span>maior cadeia: ${Math.max(g("sa-best") || 0, g("syn-best") || 0, g("ant-best") || 0)}</span></div>
-          <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div>
-          <div class="rec"><span>Com amigos</span><span>${g("mp-won")} ${g("mp-won") === 1 ? "vitória" : "vitórias"} em ${g("mp-played")} ${g("mp-played") === 1 ? "partida" : "partidas"}</span></div></div>`;
+        <div class="section"><h3>Recordes</h3>${records()}</div>`;
       body.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = +b.dataset.tab; draw(); }));
       body.querySelectorAll("[data-evo]").forEach((b) => (b.onclick = () => { evo = b.dataset.evo; draw(); }));
       P.$("[data-prev]", body).onclick = () => { ym = ym[1] === 0 ? [ym[0] - 1, 11] : [ym[0], ym[1] - 1]; draw(); };
