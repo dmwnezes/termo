@@ -106,7 +106,7 @@
 
   // Link de partida com amigo (?mp=SALA-MODO-SEED): abre a tela de entrar.
   const mpCode = new URLSearchParams(location.search).get("mp");
-  if (mpCode && P.mp.parse(mpCode)) {
+  if (mpCode && (P.mp.parse(mpCode) || P.mp.gone(mpCode))) { // link antigo da Bomba: a tela de entrar avisa que o jogo saiu
     try { sessionStorage.setItem("pv-mp-join", mpCode.trim().toLowerCase()); } catch (_) {}
     history.replaceState(null, "", location.pathname + "#/amigo/entrar");
   }
@@ -118,8 +118,8 @@
     const h = location.hash.replace(/^#\/?/, "");
     let back = h === "" || h === "amigo" || h === "amigo/sala";
     if (h === "amigo/entrar") {
-      let j = null; try { j = P.mp.parse(sessionStorage.getItem("pv-mp-join")); } catch (_) {}
-      back = !j || j.room === mpSaved.room;
+      let j = null, raw = null; try { raw = sessionStorage.getItem("pv-mp-join"); j = P.mp.parse(raw); } catch (_) {}
+      back = j ? j.room === mpSaved.room : !P.mp.gone(raw);
     }
     if (back) history.replaceState(null, "", location.pathname + "#/amigo/sala");
   }

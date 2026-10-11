@@ -33,6 +33,25 @@
     return null;
   }
 
+  /** Casa [linha, coluna] da grade sob o ponteiro. */
+  const cellIn = (wrap, e, n = N) => {
+    const r = wrap.getBoundingClientRect(), cell = r.width / n;
+    return [Math.min(n - 1, Math.max(0, Math.floor((e.clientY - r.top) / cell))), Math.min(n - 1, Math.max(0, Math.floor((e.clientX - r.left) / cell)))];
+  };
+  /** Prende o fim da seleção numa linha reta (horizontal, vertical ou diagonal). */
+  const snap = ([r1, c1], [r2, c2]) => {
+    const dr = r2 - r1, dc = c2 - c1;
+    if (!dr || !dc) return [r2, c2];
+    const a = Math.abs(dr), b = Math.abs(dc);
+    if (a > 2 * b) return [r2, c1]; if (b > 2 * a) return [r1, c2];
+    const n = Math.min(a, b); return [r1 + Math.sign(dr) * n, c1 + Math.sign(dc) * n];
+  };
+  /** Casas da linha de "a" até "b" (já presa por snap). */
+  const lineCells = ([r1, c1], [r2, c2]) => {
+    const n = Math.max(Math.abs(r2 - r1), Math.abs(c2 - c1));
+    return Array.from({ length: n + 1 }, (_, k) => [r1 + Math.sign(r2 - r1) * k, c1 + Math.sign(c2 - c1) * k]);
+  };
+
   const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   P.fmtTime = fmt;
 
@@ -50,6 +69,8 @@
     return null;
   };
   const newSeed = () => Math.floor(Math.random() * 2147483647);
+  // Também usados pelo Caça-Palavras da partida com amigo (js/multi-games.js).
+  P.caca = { N, COLORS, build, parseThemes, cellIn, snap, lineCells };
 
   P.games.caca = async function (root, inf = false, arch = null) {
     const [themes, extra] = await Promise.all([P.text("caca.txt").then(parseThemes), P.text("caca-extra.txt").then(parseThemes)]);
@@ -108,17 +129,7 @@
         if (inf) { const n = P.h(`<button class="pill" style="margin-left:8px">Próxima grade</button>`); n.onclick = next; after.appendChild(n); }
       }
     }
-    const cellAt = (e) => {
-      const r = wrap.getBoundingClientRect(), cell = r.width / N;
-      return [Math.min(N - 1, Math.max(0, Math.floor((e.clientY - r.top) / cell))), Math.min(N - 1, Math.max(0, Math.floor((e.clientX - r.left) / cell)))];
-    };
-    const snap = ([r1, c1], [r2, c2]) => {
-      const dr = r2 - r1, dc = c2 - c1;
-      if (!dr || !dc) return [r2, c2];
-      const a = Math.abs(dr), b = Math.abs(dc);
-      if (a > 2 * b) return [r2, c1]; if (b > 2 * a) return [r1, c2];
-      const n = Math.min(a, b); return [r1 + Math.sign(dr) * n, c1 + Math.sign(dc) * n];
-    };
+    const cellAt = (e) => cellIn(wrap, e);
     wrap.addEventListener("pointerdown", (e) => { if (done()) return; wrap.setPointerCapture(e.pointerId); start = cellAt(e); end = start; paint(); });
     wrap.addEventListener("pointermove", (e) => { if (!start) return; end = snap(start, cellAt(e)); paint(); });
     const up = () => {
