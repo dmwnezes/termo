@@ -215,4 +215,19 @@ class Store(context: Context) {
     var skippedUpdate: String?
         get() = prefs.getString("skipped_update", null)
         set(v) = prefs.edit().putString("skipped_update", v).apply()
+
+    /** Baixa e instala atualizações sozinho (Perfil › Ajustes). */
+    var autoUpdate: Boolean
+        get() = prefs.getBoolean("auto_update", true)
+        set(v) = prefs.edit().putBoolean("auto_update", v).apply()
+
+    /** Atualização já baixada esperando instalação: "tag|caminho do APK". */
+    var pendingUpdate: String?
+        get() = prefs.getString("pending_update", null)
+        set(v) = prefs.edit().putString("pending_update", v).apply()
+
+    /** Conquistas já vistas (para avisar só das novas). null = ainda não registrado neste aparelho. */
+    var achievementsSeen: Set<String>?
+        get() = prefs.getString("ach_seen", null)?.let { s -> if (s.isEmpty()) emptySet() else s.split('\n').toSet() }
+        set(v) = prefs.edit().putString("ach_seen", v?.joinToString("\n")).apply()
 }

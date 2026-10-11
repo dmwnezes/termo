@@ -66,6 +66,10 @@ object AppGraph {
 
     private var ready = false
 
+    /** Sons e vibração, ou null antes de [init] (ex.: telas desenhadas nos testes). */
+    val feedbackOrNull: Feedback? get() = if (::feedback.isInitialized) feedback else null
+    val storeOrNull: Store? get() = if (::store.isInitialized) store else null
+
     /** Palavra com acento para exibir (cai na própria palavra se ainda não carregou). */
     fun displayWord(w: String): String = if (::words.isInitialized) words.display(com.dmwnezes.palavreiro.game.Words.normalize(w)) else w
 

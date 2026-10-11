@@ -27,9 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -62,6 +65,7 @@ fun HomeScreen(
     onProfile: () -> Unit,
     today: com.dmwnezes.palavreiro.system.DailyStatus? = null,
     celebrate: Boolean = false,
+    scroll: androidx.compose.foundation.ScrollState = rememberScrollState(),
 ) {
     val guess = listOf(
         GameCardInfo(Dest.TERMO, "Termo", "Uma palavra nova por dia", badges[Dest.TERMO]),
@@ -101,7 +105,7 @@ fun HomeScreen(
             }
             Spacer(Modifier.height(18.dp))
             Column(
-                Modifier.weight(1f).verticalScroll(rememberScrollState()),
+                Modifier.weight(1f).verticalScroll(scroll),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 today?.let { TodayPanel(it, onOpen) }
@@ -188,7 +192,8 @@ private fun GameCard(info: GameCardInfo, onClick: () -> Unit) {
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(info.title, fontSize = 21.sp, fontWeight = FontWeight.SemiBold, color = Night.text, maxLines = 1)
+                // Nomes longos ("Sinônimo ou Antônimo") diminuem um pouco a letra para caber numa linha, sem cortar.
+                FitTitle(info.title, Modifier.weight(1f, fill = false))
                 info.badge?.let {
                     Spacer(Modifier.width(8.dp))
                     val fresh = it == "Novo"
@@ -210,9 +215,21 @@ private fun GameCard(info: GameCardInfo, onClick: () -> Unit) {
     }
 }
 
-/** Desenhos pequenos de cada cartão. */
+/** Título do cartão numa linha só: começa em 21sp e encolhe (até 16sp) se não couber. */
 @Composable
-private fun CardIcon(dest: Dest) {
+private fun FitTitle(text: String, modifier: Modifier = Modifier) {
+    var size by androidx.compose.runtime.remember(text) { androidx.compose.runtime.mutableFloatStateOf(21f) }
+    var ready by androidx.compose.runtime.remember(text) { androidx.compose.runtime.mutableStateOf(false) }
+    Text(
+        text, fontSize = size.sp, fontWeight = FontWeight.SemiBold, color = Night.text, maxLines = 1, softWrap = false,
+        onTextLayout = { r -> if (r.didOverflowWidth && size > 16f) size -= 0.5f else ready = true },
+        modifier = modifier.drawWithContent { if (ready) drawContent() },
+    )
+}
+
+/** Desenhos pequenos de cada cartão (também usados nos recordes do Perfil). */
+@Composable
+internal fun CardIcon(dest: Dest) {
     when (dest) {
         Dest.TERMO, Dest.INFINITO -> MiniBoard(12.dp, 0)
         Dest.DUETO -> Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { MiniBoard(7.dp, 0); MiniBoard(7.dp, 2) }
@@ -273,12 +290,20 @@ private fun CardIcon(dest: Dest) {
             Text("👑", fontSize = 20.sp)
             Pill("TOQUE", Night.present)
         }
-        Dest.SINONIMOS -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                Pill("BELO", Night.surfaceHigh); Text("=", color = Night.muted, fontSize = 10.sp); Pill("LINDO", Night.correct)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                Pill("ALTO", Night.surfaceHigh); Text("≠", color = Night.muted, fontSize = 10.sp); Pill("BAIXO", Night.red)
+        Dest.SINONIMOS -> SynAntIcon()
+    }
+}
+
+/** Sinônimo ou Antônimo: pílula verde "=" sobre pílula vermelha "≠", com um quadradinho de palavra ao lado de cada. */
+@Composable
+private fun SynAntIcon() {
+    Column(verticalArrangement = Arrangement.spacedBy(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        listOf("=" to Night.correct, "≠" to Night.red).forEach { (sym, c) ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Box(Modifier.size(width = 14.dp, height = 20.dp).clip(RoundedCornerShape(5.dp)).background(Night.surfaceHigh))
+                Box(Modifier.size(width = 32.dp, height = 20.dp).clip(Shapes.pill).background(c), contentAlignment = Alignment.Center) {
+                    Text(sym, color = Color(0xFF1A1438), fontSize = 16.sp, lineHeight = 16.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, softWrap = false)
+                }
             }
         }
     }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Próxima palavra (médio): contagem, situação do Termo de hoje e botão Jogar -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView style="@style/WTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Próxima palavra" android:textSize="15sp" />
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+            <TextView style="@style/WSquare" android:background="@drawable/wsq_green" />
+            <TextView style="@style/WSquare" android:background="@drawable/wsq_yellow" />
+            <TextView style="@style/WSquare" android:background="@drawable/wsq_blue" />
+            <TextView style="@style/WSquare" android:background="@drawable/wsq_yellow" />
+            <TextView style="@style/WSquare" android:layout_marginEnd="0dp" android:background="@drawable/wsq_green" />
+        </LinearLayout>
+    </LinearLayout>
+    <Chronometer android:id="@+id/w_timer" style="@style/WTitle" android:layout_width="wrap_content" android:layout_height="0dp"
+        android:layout_weight="1" android:gravity="center_vertical" android:countDown="true" android:textSize="34sp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:id="@+id/w_status" style="@style/WMuted" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Termo de hoje ✓" android:textSize="12sp" android:maxLines="2" />
+        <TextView android:id="@+id/w_play" style="@style/WPlay" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Jogar" />
+    </LinearLayout>
+</LinearLayout>

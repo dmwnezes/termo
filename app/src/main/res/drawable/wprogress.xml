@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barra do dia dos widgets: trilho escuro e preenchimento verde arredondado -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape><solid android:color="#FF120E2B" /><corners android:radius="99dp" /></shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip><shape><solid android:color="#FF5FB873" /><corners android:radius="99dp" /></shape></clip>
+    </item>
+</layer-list>

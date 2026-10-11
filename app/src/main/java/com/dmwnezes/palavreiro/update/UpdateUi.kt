@@ -1,6 +1,11 @@
 package com.dmwnezes.palavreiro.update
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -66,15 +71,15 @@ fun UpdateDialog(initial: Release? = null, onSkip: (Release) -> Unit = {}, onDis
         state = UpdateState.Downloading(r, 0f)
         job = scope.launch {
             state = runCatching { updater.download(context, r) { p -> state = UpdateState.Downloading(r, p) } }.fold(
-                { f -> UpdateState.Ready(r, f) },
+                { f -> AppGraph.store.pendingUpdate = "${r.tag}|${f.path}"; UpdateState.Ready(r, f) },
                 { UpdateState.Failed("O download falhou. Tente de novo.") },
             )
         }
     }
 
     fun install(s: UpdateState.Ready) {
-        if (!updater.canInstall(context)) updater.openInstallPermission(context)
-        else updater.install(context, s.apk)
+        // Sessão do PackageInstaller: assim o Palavreiro vira o instalador e as próximas atualizações entram sozinhas.
+        AutoUpdate.installFromUser(context, AutoUpdate.Ready(s.release.tag, s.apk))
     }
 
     LaunchedEffect(Unit) { if (initial == null) check() }
@@ -150,5 +155,37 @@ private fun Notes(r: Release) {
         Column(Modifier.heightIn(max = 220.dp).verticalScroll(rememberScrollState())) {
             Text(r.notes, fontSize = 14.sp)
         }
+    }
+}
+
+/** Pílula no rodapé quando a atualização já foi baixada: "Nova versão baixada · Instalar". */
+@Composable
+fun UpdateReadyPill(ready: AutoUpdate.Ready, onInstall: () -> Unit, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+    val night = com.dmwnezes.palavreiro.ui.Night
+    androidx.compose.foundation.layout.Row(
+        modifier
+            .padding(horizontal = 16.dp)
+            .clip(com.dmwnezes.palavreiro.ui.Shapes.pill)
+            .background(night.surfaceHigh)
+            .border(1.5.dp, night.correct.copy(alpha = 0.6f), com.dmwnezes.palavreiro.ui.Shapes.pill)
+            .padding(start = 16.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        Text("⬇", fontSize = 15.sp, color = night.correct)
+        androidx.compose.foundation.layout.Spacer(Modifier.width(8.dp))
+        Column(Modifier.weight(1f, fill = false)) {
+            Text("Nova versão baixada", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = night.text, maxLines = 1)
+            Text("Versão ${ready.tag.removePrefix("v")}", fontSize = 12.sp, color = night.muted, maxLines = 1)
+        }
+        androidx.compose.foundation.layout.Spacer(Modifier.width(10.dp))
+        Text(
+            "Instalar", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A1438),
+            modifier = Modifier.clip(com.dmwnezes.palavreiro.ui.Shapes.pill).background(night.correct)
+                .clickable(onClick = onInstall).padding(horizontal = 16.dp, vertical = 9.dp),
+        )
+        Text(
+            "✕", fontSize = 14.sp, color = night.muted,
+            modifier = Modifier.clip(com.dmwnezes.palavreiro.ui.Shapes.pill).clickable(onClick = onDismiss).padding(horizontal = 10.dp, vertical = 9.dp),
+        )
     }
 }

@@ -74,3 +74,18 @@ object Achievements {
         )
     }
 }
+
+/** Aviso de conquista nova: compara as desbloqueadas com as já vistas (salvas em "ach_seen"). */
+object AchievementWatch {
+    /**
+     * Devolve as conquistas recém-desbloqueadas e o novo conjunto de vistas.
+     * [seen] null = primeira vez neste aparelho (ou logo após atualizar): nada é avisado e
+     * todas as já desbloqueadas passam a contar como vistas.
+     */
+    fun newlyUnlocked(all: List<Achievement>, seen: Set<String>?): Pair<List<Achievement>, Set<String>> {
+        val unlocked = all.filter { it.unlocked }
+        if (seen == null) return emptyList<Achievement>() to unlocked.map { it.title }.toSet()
+        val fresh = unlocked.filter { it.title !in seen }
+        return fresh to (seen + fresh.map { it.title })
+    }
+}

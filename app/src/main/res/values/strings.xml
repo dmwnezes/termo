@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Palavreiro</string>
     <string name="widget_desc">Sua sequência e os jogos do dia</string>
+    <string name="widget_streak_desc">Sua sequência de dias no Termo e o seu recorde</string>
+    <string name="widget_next_desc">Contagem regressiva até a próxima palavra do dia</string>
+    <string name="widget_flash_desc">Palavra Relâmpago: leia a definição e toque na palavra certa, direto na tela inicial</string>
     <string name="sc_termo">Termo</string>
     <string name="sc_termo_long">Termo do dia</string>
     <string name="sc_conexoes">Conexões</string>

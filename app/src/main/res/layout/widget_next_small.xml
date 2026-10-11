@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Próxima palavra (pequeno): contagem regressiva até a meia-noite -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <TextView style="@style/WMuted" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Próxima em" android:textSize="12sp" android:maxLines="1" />
+    <Chronometer android:id="@+id/w_timer" style="@style/WTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:countDown="true" android:textSize="24sp" />
+    <TextView android:id="@+id/w_status" style="@style/WMuted" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:text="✓ Termo feito" android:textSize="11sp" android:maxLines="1" />
+</LinearLayout>
