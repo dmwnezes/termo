@@ -42,10 +42,12 @@ class Rodada8Test {
 
     @Test
     fun againComModo() {
-        val b = Msg.Again(99, 5, newSeries = true, mode = 'b')
-        assertEquals(mapOf("t" to "again", "seed" to "2r", "at" to 5, "s" to 1, "m" to "b"), keys(Multi.encode(b)))
+        val b = Msg.Again(99, 5, newSeries = true, mode = 'x')
+        assertEquals(mapOf("t" to "again", "seed" to "2r", "at" to 5, "s" to 1, "m" to "x"), keys(Multi.encode(b)))
         assertEquals(b, Multi.decode(Multi.encode(b)))
-        assertEquals(b, Multi.decode("""{"t":"again","seed":"2r","at":5,"s":1,"m":"b"}"""))
+        assertEquals(b, Multi.decode("""{"t":"again","seed":"2r","at":5,"s":1,"m":"x"}"""))
+        // "b" (Bomba-Relógio) saiu: vira modo desconhecido.
+        assertEquals(Msg.Again(99, 5, true, null), Multi.decode("""{"t":"again","seed":"2r","at":5,"s":1,"m":"b"}"""))
         // Sem "s", com "m" igual ao atual.
         assertEquals(mapOf("t" to "again", "seed" to "2r", "at" to 5, "m" to "t"), keys(Multi.encode(Msg.Again(99, 5, mode = 't'))))
         assertEquals(Msg.Again(99, 5, false, 'a'), Multi.decode("""{"t":"again","seed":"2r","at":5,"m":"a"}"""))
@@ -62,33 +64,35 @@ class Rodada8Test {
         val same = Multi.againFor('t', 't', seriesOver = false, seed = 77, at = 1)
         assertEquals(Msg.Again(77, 1, false, 't'), same)
         assertEquals(Msg.Again(77, 1, true, 't'), Multi.againFor('t', 't', seriesOver = true, seed = 77, at = 1))
-        val toBomb = Multi.againFor('t', 'b', seriesOver = false, seed = 77, at = 1)
-        assertEquals(Msg.Again(77, 1, true, 'b'), toBomb)
+        val toBomb = Multi.againFor('t', 'v', seriesOver = false, seed = 77, at = 1)
+        assertEquals(Msg.Again(77, 1, true, 'v'), toBomb)
         assertEquals(Msg.Again(77, 1, false, 'a'), Multi.againFor('a', 'a', seriesOver = true, seed = 77, at = 1))
 
         // Quem recebe: modo novo → sala com outro código e série zerada.
         val (r1, reset1) = Multi.applyAgain(room, toBomb, seriesOver = false)
-        assertEquals('b', r1.mode); assertEquals(77L, r1.seed); assertTrue(reset1)
-        assertEquals("abc123xyz789-b-25", r1.code)
+        assertEquals('v', r1.mode); assertEquals(77L, r1.seed); assertTrue(reset1)
+        assertEquals("abc123xyz789-v-25", r1.code)
         assertEquals(room.topic, r1.topic) // mesmo tópico: continua a mesma sala
         assertEquals(r1, Multi.parse(r1.code))
         // Mesmo modo: série continua.
-        val (r2, reset2) = Multi.applyAgain(room, same, seriesOver = false)
+        val (r2, reset2, _) = Multi.applyAgain(room, same, seriesOver = false)
         assertEquals('t', r2.mode); assertFalse(reset2)
         // Sem "m": mantém o modo; série acabada zera.
         val (r3, reset3) = Multi.applyAgain(r1, Msg.Again(5, 1), seriesOver = true)
-        assertEquals('b', r3.mode); assertTrue(reset3)
+        assertEquals('v', r3.mode); assertTrue(reset3)
         // A sessão guardada usa o código novo.
-        assertEquals('b', Multi.Session(r1.code, true, "id", "Ana", 0).room!!.mode)
+        assertEquals('v', Multi.Session(r1.code, true, "id", "Ana", 0).room!!.mode)
     }
 
     @Test
     fun botaoDaRevanche() {
         assertEquals("Próxima rodada", Multi.againLabel('t', 't', false))
-        assertEquals("Nova série", Multi.againLabel('b', 'b', true))
+        assertEquals("Nova série", Multi.againLabel('x', 'x', true))
+        assertEquals("Revanche", Multi.againLabel('p', 'p', true))
         assertEquals("Revanche", Multi.againLabel('a', 'a', false))
-        assertEquals("Jogar Bomba-Relógio", Multi.againLabel('t', 'b', false))
-        assertEquals("Jogar Anagrama", Multi.againLabel('b', 'a', true))
+        assertEquals("Jogar Jogo da Velha", Multi.againLabel('t', 'v', false))
+        assertEquals("Jogar Anagrama", Multi.againLabel('x', 'a', true))
+        assertEquals("Jogar Qual é a Palavra?", Multi.againLabel('c', 'p', false))
         assertEquals("Jogar Dueto", Multi.againLabel('a', 'd', false))
     }
 
@@ -107,11 +111,14 @@ class Rodada8Test {
         assertEquals("Ana venceu a rodada", r.result)
         assertEquals("Você: jogando  |  Ana: acertou em 3 · 0:20", r.detail)
         assertEquals("Empate", MatchStory.termo('q', "Dan", "Ana", Multi.Series(1, 1), "draw", null, null).result)
-        val b = MatchStory.bomb("Daniel", "Ana", Multi.Series(1, 0), "me", 7)
-        assertEquals("Bomba-Relógio 💣", b.modeLabel)
+        val b = MatchStory.series('c', "Daniel", "Ana", Multi.Series(1, 0), "me", "Palavras: 5 × 3")
+        assertEquals("Caça-Palavras 🔍", b.modeLabel)
         assertEquals("Daniel venceu a rodada", b.result)
-        assertEquals("7 palavras antes de explodir 💥", b.detail)
-        assertEquals("1 palavra antes de explodir 💥", MatchStory.bomb(null, "Ana", Multi.Series(), "opp", 1).detail)
+        assertEquals("Palavras: 5 × 3", b.detail)
+        assertEquals("🏆 Ana venceu!", MatchStory.series('x', null, "Ana", Multi.Series(0, 1, best = 1), "opp", "Peças: 0 × 3").result)
+        assertEquals("Damas ♟️", MatchStory.series('x', null, "Ana", Multi.Series(), "opp", "").modeLabel)
+        val p = MatchStory.points('p', "Daniel", "Ana", 9, 6, 15)
+        assertEquals("Qual é a Palavra? 💡", p.modeLabel); assertEquals("15 rodadas · 9 × 6", p.detail)
         val a = MatchStory.anagram("Daniel", "Ana", 6, 4)
         assertEquals("Anagrama 🔤", a.modeLabel)
         assertEquals("Daniel  6 × 4  Ana", a.headline)

@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.dmwnezes.palavreiro.game.Anagram
-import com.dmwnezes.palavreiro.game.Bomb
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.Words
@@ -34,9 +33,9 @@ import org.robolectric.annotation.LooperMode
 import java.io.File
 import java.util.Collections
 
-/** Bomba-Relógio e Anagrama pela rede (rode com PV_LIVE=1 e PV_NTFY apontando para o ntfy de teste). */
+/** Anagrama pela rede (rode com PV_LIVE=1 e PV_NTFY apontando para o ntfy de teste). */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [34], qualifiers = "w360dp-h780dp")
 @LooperMode(LooperMode.Mode.PAUSED)
 class MultiGamesFlowTest {
     @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
@@ -49,74 +48,6 @@ class MultiGamesFlowTest {
         w.forEach { ch -> rule.onAllNodes(hasText(ch.toString()) and hasClickAction()).onFirst().performClick() }
         rule.onAllNodes(hasText("ENTER") and hasClickAction()).onFirst().performClick()
         rule.waitForIdle()
-    }
-
-    /**
-     * Bomba: o app entra como convidado; o anfitrião (de mentira) joga uma palavra, o app responde,
-     * o anfitrião joga outra e a bomba explode com o app (que manda o "boom" dele).
-     */
-    @Test
-    fun bombaExplode() {
-        assumeTrue(System.getenv("PV_LIVE") == "1")
-        val ntfy = ntfy()
-        // SEED 0: pavio de 25 s e o anfitrião começa.
-        val room = Multi.Room(Multi.randomId(12), 'b', 0)
-        assertEquals(25_000L, Bomb.fuse(0)); assertTrue(Bomb.hostStarts(0))
-        val hostId = "host0001"
-        runBlocking { ntfy.publish(room.topic, Multi.encode(Msg.Hello(hostId, "Daniel", true))) }
-        Thread.sleep(1000)
-        val got = Collections.synchronizedList(mutableListOf<Msg>())
-        val host = Thread {
-            runCatching {
-                runBlocking {
-                    withTimeout(70_000) {
-                        var start = 0L
-                        ntfy.events(room.topic).collect { e ->
-                            if (e !is Ntfy.Event.Message) return@collect
-                            val m = Multi.decode(e.text) ?: return@collect
-                            got += m
-                            when {
-                                m is Msg.Hello && !m.host -> {
-                                    val at = System.currentTimeMillis(); start = at + 3000
-                                    ntfy.publish(room.topic, Multi.encode(Msg.Start(at, m.id)))
-                                    delay(4000)
-                                    ntfy.publish(room.topic, Multi.encode(Msg.Word(hostId, "CARRO", 0, System.currentTimeMillis() - start)))
-                                }
-                                m is Msg.Word && m.id != hostId && m.n == 1 -> {
-                                    delay(800)
-                                    ntfy.publish(room.topic, Multi.encode(Msg.Word(hostId, "MUNDO", 2, System.currentTimeMillis() - start)))
-                                }
-                                m is Msg.Boom -> throw CancellationException("ok")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}, joinCode = room.code) } }
-        rule.waitUntil(20_000) { shown("Daniel te chamou para uma Bomba-Relógio") }
-        host.start()
-        rule.onNodeWithText("Seu nome").performTextInput("Convidado")
-        rule.onNodeWithText("Entrar").performClick()
-        rule.waitUntil(30_000) { shown("Você × Daniel") }
-        rule.waitUntil(20_000) { shown("Sua vez!") && shown("CARRO") }
-        // Palavra repetida: aviso e não manda.
-        typeWord("CARRO")
-        rule.waitUntil(5_000) { shown("Essa palavra já foi") }
-        // Apaga e manda uma palavra nova.
-        repeat(5) { rule.onAllNodes(androidx.compose.ui.test.hasContentDescription("Apagar")).onFirst().performClick() }
-        typeWord("PORTA")
-        rule.waitUntil(15_000) { shown("MUNDO") && shown("3 palavras") }
-        rule.waitUntil(15_000) { shown("Sua vez!") }
-        // Ninguém mais joga: no pavio (25 s) a bomba explode com o app.
-        rule.waitUntil(40_000) { shown("A bomba explodiu com você!") }
-        rule.waitUntil(10_000) { shown("Daniel venceu a rodada") && shown("3 palavras na rodada") }
-        host.join(10_000)
-        val words = got.filterIsInstance<Msg.Word>()
-        assertEquals(listOf("CARRO", "PORTA", "MUNDO"), words.map { it.word })
-        val guestId = words[1].id
-        assertEquals(1, words[1].n)
-        assertEquals(Msg.Boom(guestId), got.filterIsInstance<Msg.Boom>().first())
     }
 
     /**

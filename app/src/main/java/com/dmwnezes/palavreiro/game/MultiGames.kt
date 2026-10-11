@@ -6,73 +6,49 @@ import com.dmwnezes.palavreiro.game.Multi.Msg
 data class Timed(val at: Long, val msg: Msg)
 
 /**
- * Bomba-Relógio (modo "b" da partida com amigo): os dois se revezam mandando palavras de 5 letras,
- * sem repetir; a bomba explode num momento secreto e perde quem estiver com a vez.
- * Tudo aqui é igual ao site (js/multi.js), para app e site jogarem entre si.
+ * Rodadas de pontos (Anagrama e Qual é a Palavra?): cada rodada termina no PRIMEIRO "solve" ou "skip"
+ * dela na ordem do tópico; as rodadas contam em sequência a partir da 0.
  */
-object Bomb {
-    /** Pavio secreto da rodada, em ms desde o fim da contagem: entre 25 s e 60 s. */
-    fun fuse(seed: Long): Long = 25000L + ((seed % 35001L) * 7919L % 35001L)
+object PointRounds {
+    /** Rodada decidida: [winner] = id de quem acertou (null = ninguém); [at] = quando a decisão chegou aqui. */
+    data class Decision(val winner: String?, val at: Long)
 
-    /** SEED par → o anfitrião começa; ímpar → o convidado. */
-    fun hostStarts(seed: Long): Boolean = seed % 2L == 0L
-
-    /** Quanto tempo esperar o "boom" do outro depois que o seu relógio chegou ao pavio. */
-    const val BOOM_WAIT_MS = 4000L
-
-    data class Play(val id: String, val word: String, val ms: Long)
-
-    /**
-     * Estado da rodada a partir das mensagens na ordem do tópico.
-     * [turn] = quem está com a bomba; [loser] = com quem ela explodiu (null enquanto não explodiu).
-     */
-    data class State(val plays: List<Play>, val turn: String, val loser: String?) {
-        val used: Set<String> get() = plays.mapTo(HashSet()) { it.word }
-        val count: Int get() = plays.size
+    data class State(val decisions: List<Decision>, val rounds: Int, val gapMs: Long) {
+        /** Rodada em jogo (0..N-1) ou N quando acabou. */
+        val current: Int get() = decisions.size
+        val over: Boolean get() = decisions.size >= rounds
+        fun points(id: String?): Int = decisions.count { it.winner != null && it.winner == id }
+        /** Início da rodada [r] no relógio deste aparelho. */
+        fun startOf(r: Int, localStart: Long): Long = if (r == 0) localStart else decisions[r - 1].at + gapMs
+        /** "me", "opp" ou "draw" quando acabou; null antes. */
+        fun outcome(me: String, opp: String?): String? {
+            if (!over) return null
+            val a = points(me); val b = points(opp)
+            return when { a > b -> "me"; b > a -> "opp"; else -> "draw" }
+        }
     }
 
-    /** [hostId]/[guestId] = ids dos dois jogadores; mensagens de outros ids são ignoradas. */
-    fun state(msgs: List<Msg>, seed: Long, hostId: String, guestId: String): State {
-        val f = fuse(seed)
-        var turn = if (hostStarts(seed)) hostId else guestId
-        val plays = ArrayList<Play>()
-        val used = HashSet<String>()
-        for (m in msgs) {
-            when (m) {
-                is Msg.Word -> {
-                    val w = Words.normalize(m.word)
-                    if (m.id == turn && m.n == plays.size && w !in used && m.ms < f) {
-                        plays += Play(m.id, w, m.ms); used += w
-                        turn = if (turn == hostId) guestId else hostId
-                    }
-                }
-                is Msg.Boom -> if (m.id == hostId || m.id == guestId) return State(plays, turn, m.id)
+    fun state(msgs: List<Timed>, players: Set<String>, rounds: Int, gapMs: Long): State {
+        val first = HashMap<Int, Decision>()
+        for (t in msgs) {
+            when (val m = t.msg) {
+                is Msg.Solve -> if (m.round in 0 until rounds && m.id in players && m.round !in first) first[m.round] = Decision(m.id, t.at)
+                is Msg.Skip -> if (m.round in 0 until rounds && m.round !in first) first[m.round] = Decision(null, t.at)
                 else -> {}
             }
         }
-        return State(plays, turn, null)
-    }
-
-    /** Aviso ao tentar mandar [word] (já normalizada); null = pode mandar. */
-    fun check(word: String, state: State, accepted: (String) -> Boolean): String? = when {
-        word.length != Words.WORD_LENGTH -> "Só palavras de 5 letras"
-        !accepted(word) -> "Palavra não aceita"
-        word in state.used -> "Essa palavra já foi"
-        else -> null
-    }
-
-    /** Período do pulso da bomba: ~1,2 s no começo até ~0,25 s perto do pavio. */
-    fun pulseMs(elapsed: Long, fuse: Long): Int {
-        val p = (elapsed.toDouble() / fuse).coerceIn(0.0, 1.0)
-        return (1200 - 950 * p).toInt()
+        val out = ArrayList<Decision>()
+        while (out.size < rounds) out += first[out.size] ?: break
+        return State(out, rounds, gapMs)
     }
 }
 
 /**
- * Anagrama (modo "a"): 10 rodadas com as mesmas 5 letras embaralhadas para os dois;
+ * Anagrama (modo "a"): N rodadas (5/10/15) com as mesmas 5 letras embaralhadas para os dois;
  * quem achar a palavra primeiro leva o ponto.
  */
 object Anagram {
+    /** Rodadas padrão (sem "r" no hello). */
     const val ROUNDS = 10
     const val ROUND_MS = 45_000L
     /** O convidado só manda o "skip" se o anfitrião saiu ou depois de 50 s. */
@@ -80,8 +56,8 @@ object Anagram {
     /** Tempo mostrando a resposta antes da próxima rodada. */
     const val GAP_MS = 2_500L
 
-    /** As 10 palavras da partida (mesma fórmula das palavras do Termo com amigo). */
-    fun words(answers: List<String>, seed: Long): List<String> = Multi.words(answers, seed, ROUNDS)
+    /** As N palavras da partida (mesma fórmula das palavras do Termo com amigo). */
+    fun words(answers: List<String>, seed: Long, rounds: Int = ROUNDS): List<String> = Multi.words(answers, seed, rounds)
 
     /** Embaralhamento da palavra [k], igual nos dois aparelhos (e no site). */
     fun shuffle(word: String, seed: Long, k: Int): String {
@@ -105,39 +81,66 @@ object Anagram {
     fun solves(guess: String, answer: String, accepted: (String) -> Boolean): Boolean =
         guess.length == answer.length && sameLetters(guess, answer) && (guess == answer || accepted(guess))
 
-    /** Rodada decidida: [winner] = id de quem acertou (null = ninguém); [at] = quando a decisão chegou aqui. */
-    data class Decision(val winner: String?, val at: Long)
+    fun state(msgs: List<Timed>, players: Set<String>, rounds: Int = ROUNDS): PointRounds.State =
+        PointRounds.state(msgs, players, rounds, GAP_MS)
+}
 
-    data class State(val decisions: List<Decision>) {
-        /** Rodada em jogo (0..9) ou 10 quando acabou. */
-        val current: Int get() = decisions.size
-        val over: Boolean get() = decisions.size >= ROUNDS
-        fun points(id: String?): Int = decisions.count { it.winner != null && it.winner == id }
-        /** Início da rodada [r] no relógio deste aparelho. */
-        fun startOf(r: Int, localStart: Long): Long = if (r == 0) localStart else decisions[r - 1].at + GAP_MS
-        /** "me", "opp" ou "draw" quando acabou; null antes. */
-        fun outcome(me: String, opp: String?): String? {
-            if (!over) return null
-            val a = points(me); val b = points(opp)
-            return when { a > b -> "me"; b > a -> "opp"; else -> "draw" }
-        }
-    }
+/**
+ * Qual é a Palavra? com amigo (modo "p"): N rodadas com a mesma definição para os dois;
+ * quem acertar a palavra primeiro leva o ponto. Mensagens e decisão iguais às do Anagrama.
+ */
+object DefineDuel {
+    const val ROUND_MS = 60_000L
+    const val GUEST_SKIP_MS = 65_000L
+    const val GAP_MS = 2_500L
+    /** Dicas automáticas: 1ª letra aos 20 s, também a última aos 40 s. */
+    const val HINT_FIRST_MS = 20_000L
+    const val HINT_LAST_MS = 40_000L
+
+    /** Linhas válidas de definicoes.txt (PALAVRA|definição), na ordem do arquivo. */
+    fun parse(text: String): List<Definition> = text.lines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() && !it.startsWith("#") && '|' in it }
+        .map { Definition(it.substringBefore('|').trim(), it.substringAfter('|').trim()) }
+        .filter { it.word.isNotEmpty() && it.text.isNotEmpty() }
 
     /**
-     * Rodada R termina no PRIMEIRO "solve" ou "skip" dela na ordem do tópico.
-     * As rodadas contam em sequência a partir da 0 (uma rodada só vale depois da anterior decidida).
+     * As [count] definições da partida: idx = ((SEED mod M)·7919 mod M + 104729 + k·577) mod M, pulando repetidas.
      */
-    fun state(msgs: List<Timed>, players: Set<String>): State {
-        val first = HashMap<Int, Decision>()
-        for (t in msgs) {
-            when (val m = t.msg) {
-                is Msg.Solve -> if (m.round in 0 until ROUNDS && m.id in players && m.round !in first) first[m.round] = Decision(m.id, t.at)
-                is Msg.Skip -> if (m.round in 0 until ROUNDS && m.round !in first) first[m.round] = Decision(null, t.at)
-                else -> {}
-            }
+    fun pick(defs: List<Definition>, seed: Long, count: Int): List<Definition> {
+        val m = defs.size.toLong()
+        if (m == 0L) return emptyList()
+        val seen = LinkedHashSet<Int>()
+        val words = HashSet<String>()
+        val out = ArrayList<Definition>()
+        var k = 0L
+        while (out.size < count && k < m * 4 + 2000) {
+            val idx = (((seed % m) * 7919 % m + 104729 + k * 577) % m).toInt()
+            k++
+            if (!seen.add(idx)) continue
+            val d = defs[idx]
+            if (!words.add(Words.normalize(d.word))) continue
+            out += d
         }
-        val out = ArrayList<Decision>()
-        while (out.size < ROUNDS) out += first[out.size] ?: break
-        return State(out)
+        return out
     }
+
+    /** Letras da resposta para comparar (maiúsculas, sem acento, só A–Z). */
+    fun key(word: String): String = Words.normalize(word).filter { it in 'A'..'Z' }
+
+    fun solves(guess: String, word: String): Boolean = key(guess) == key(word)
+
+    /** Posições (no texto sem acento) das letras reveladas pela dica após [elapsed] ms. */
+    fun hints(word: String, elapsed: Long): Set<Int> {
+        val t = Words.normalize(word)
+        val letters = t.indices.filter { t[it] in 'A'..'Z' }
+        if (letters.isEmpty()) return emptySet()
+        val out = HashSet<Int>()
+        if (elapsed >= HINT_FIRST_MS) out += letters.first()
+        if (elapsed >= HINT_LAST_MS) out += letters.last()
+        return out
+    }
+
+    fun state(msgs: List<Timed>, players: Set<String>, rounds: Int): PointRounds.State =
+        PointRounds.state(msgs, players, rounds, GAP_MS)
 }

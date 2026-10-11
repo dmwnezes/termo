@@ -34,7 +34,7 @@ import java.util.Collections
 
 /** Rodada 8 pela rede: reações e revanche trocando de modo (rode com PV_LIVE=1 e PV_NTFY no ntfy de teste). */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [34], qualifiers = "w360dp-h780dp")
 @LooperMode(LooperMode.Mode.PAUSED)
 class Rodada8FlowTest {
     @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
@@ -95,7 +95,7 @@ class Rodada8FlowTest {
             }
         }
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}, joinCode = room.code) } }
-        rule.waitUntil(20_000) { shown("Daniel te chamou para um Termo") }
+        rule.waitUntil(20_000) { shown("Daniel te chamou para um Termo · melhor de 3") }
         host.start()
         rule.onNodeWithText("Seu nome").performTextInput("Convidado")
         rule.onNodeWithText("Entrar").performClick()
@@ -124,7 +124,7 @@ class Rodada8FlowTest {
 
     /**
      * O app cria um Termo; o convidado (de mentira) acerta logo. Na folha de fim o anfitrião escolhe
-     * "Bomba" e toca em "Jogar Bomba-Relógio": vai o "again" com "m":"b" e os dois começam a Bomba-Relógio.
+     * "Velha" e toca em "Jogar Jogo da Velha": vai o "again" com "m":"v" e os dois começam o Jogo da Velha.
      */
     @Test
     fun revancheTrocandoDeModo() {
@@ -169,15 +169,16 @@ class Rodada8FlowTest {
         rule.waitUntil(30_000) { shown("Ana venceu a rodada") }
         assertTrue(shown("Próximo jogo"))
         assertTrue(shown("Próxima rodada"))
-        rule.onNode(hasText("Bomba")).performClick()
-        rule.waitUntil(5_000) { shown("Jogar Bomba-Relógio") }
-        rule.onNodeWithText("Jogar Bomba-Relógio").performClick()
-        // A Bomba-Relógio começa (série zerada) depois da contagem.
-        rule.waitUntil(30_000) { shown("Sua vez!") || shown("Vez de Ana…") }
+        rule.onNode(hasText("Velha")).performClick()
+        rule.waitUntil(5_000) { shown("Jogar Jogo da Velha") }
+        rule.onNodeWithText("Jogar Jogo da Velha").performClick()
+        // O Jogo da Velha começa (série zerada) depois da contagem; na RODADA 1 o anfitrião é O.
+        rule.waitUntil(30_000) { shown("Vez de Ana (X)") }
         assertTrue(shown("0 × 0"))
         guest.join(10_000)
         val again = got.filterIsInstance<Msg.Again>().first()
-        assertEquals('b', again.mode)
+        assertEquals('v', again.mode)
+        assertEquals(3, again.rounds)
         assertTrue(again.newSeries)
     }
 }

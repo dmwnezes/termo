@@ -70,28 +70,12 @@ class InteropTest {
             rule.onAllNodes(hasText("😂") and hasClickAction()).onFirst().performClick()
             log("app mandou 😂")
             rule.waitUntil(90_000) { shown("venceu a rodada", true) }
-            log("fim da bomba no app")
+            log("fim da rodada no app")
             rule.waitUntil(30_000) { shown("rodada 1/10") }
             log("app trocou para o Anagrama: ${shown("Novo jogo: Anagrama")} (toast) ")
             return
         }
-        if (room.mode == 'b') {
-            val bank = ArrayDeque(listOf("PORTA", "MUNDO", "TEMPO", "LIVRO", "PEDRA", "FESTA", "PRAIA", "NOITE", "CAMPO", "PLANO", "GENTE", "FORTE", "VERDE", "LARGO", "NUVEM", "FOLHA", "TERRA", "CORPO", "BARCO", "PRATO"))
-            val end = System.currentTimeMillis() + 90_000
-            while (System.currentTimeMillis() < end && !shown("A bomba explodiu com", true)) {
-                if (shown("Sua vez!") && bank.isNotEmpty()) {
-                    val w = bank.removeFirst(); typeWord(w); pause(400)
-                    val msgs = listOf("Essa palavra já foi", "Palavra não aceita", "Só palavras de 5 letras").filter { shown(it) }
-                    val tiles = rule.onAllNodes(hasText(w.substring(0, 1))).fetchSemanticsNodes().size
-                    if (msgs.isNotEmpty()) { log("recusada $w $msgs"); clear() } else log("app jogou $w (nós com ${w[0]}: $tiles)")
-                }
-                pause(300)
-            }
-            rule.waitUntil(15_000) { shown("venceu a rodada", true) }
-            log("resultado: " + (if (shown("A bomba explodiu com você!")) "explodiu com o app" else "explodiu com o site") +
-                " | " + (if (shown("Você venceu a rodada!")) "app venceu" else "site venceu") + " | " +
-                (if (shown("palavras na rodada", true)) rule.onAllNodes(hasText("palavras na rodada", substring = true)).fetchSemanticsNodes().first().config[androidx.compose.ui.semantics.SemanticsProperties.Text].joinToString { it.text } else "?"))
-        } else {
+        run {
             val answers = Anagram.words(words.answers, room.seed)
             // O app tenta as rodadas ímpares; as pares são do site.
             val end = System.currentTimeMillis() + 200_000
