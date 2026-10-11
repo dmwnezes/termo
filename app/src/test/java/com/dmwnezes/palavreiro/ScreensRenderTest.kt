@@ -25,6 +25,7 @@ import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -424,7 +425,7 @@ class ScreensRenderTest {
         save("18-resultado")
     }
 
-    // ---------- Bomba-Relógio e Anagrama (partida com amigo) ----------
+    // ---------- Partida com amigo: modos e Anagrama ----------
     private val T = 1_800_000_000_000L
     private fun tm(at: Long, m: com.dmwnezes.palavreiro.game.Multi.Msg) = com.dmwnezes.palavreiro.game.Timed(at, m)
 
@@ -432,33 +433,26 @@ class ScreensRenderTest {
     fun amigoModos() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
-        rule.onNode(androidx.compose.ui.test.hasText("Bomba")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Velha")).performClick()
         save("36-amigo-modos")
     }
 
-    private fun bomb(msgs: List<com.dmwnezes.palavreiro.game.Timed>, name: String, advance: Long = 1500) {
+    @Test
+    fun amigoModosPontos() {
         rule.mainClock.autoAdvance = false
-        // SEED 123456789 é ímpar: o convidado ("op") começa.
-        rule.setContent {
-            PalavreiroTheme {
-                com.dmwnezes.palavreiro.ui.BombPlay(
-                    words, null, 123456789, 1, "me", "op", "Ana", true, msgs, T - 20_000,
-                    com.dmwnezes.palavreiro.game.Multi.Series(1, 0), true, false, {}, {}, {}, {}, clock = { T },
-                )
-            }
-        }
-        save(name, advance)
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
+        rule.onNode(androidx.compose.ui.test.hasText("Palavra?")).performClick()
+        rule.mainClock.advanceTimeBy(200)
+        rule.onNode(androidx.compose.ui.test.hasText("15 rodadas")).performClick()
+        save("36b-amigo-modos-pontos")
     }
 
-    private val bombWords = listOf("CARRO", "PORTA", "MUNDO", "LIVRO", "TERMO", "FESTA", "PRATO").mapIndexed { i, w ->
-        tm(T - 18_000 + i * 2000, com.dmwnezes.palavreiro.game.Multi.Msg.Word(if (i % 2 == 0) "op" else "me", w, i, 2000L + i * 2000))
+    @Test
+    fun amigoLinkBomba() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}, joinCode = "abc123xyz789-b-21i3v9") } }
+        save("36c-amigo-link-bomba")
     }
-
-    @Test fun bomba() = bomb(bombWords, "37-bomba")
-
-    @Test fun bombaExplodiu() = bomb(bombWords.take(6) + tm(T, com.dmwnezes.palavreiro.game.Multi.Msg.Boom("op")), "38-bomba-explodiu", 2500)
-
-    @Test fun bombaExplodiuComVoce() = bomb(bombWords.take(5) + tm(T - 100, com.dmwnezes.palavreiro.game.Multi.Msg.Boom("me")), "38b-bomba-explodiu-voce", 400)
 
     private fun anagram(msgs: List<com.dmwnezes.palavreiro.game.Timed>, name: String, advance: Long = 1500) {
         rule.mainClock.autoAdvance = false
@@ -543,26 +537,28 @@ class ScreensRenderTest {
                 com.dmwnezes.palavreiro.ui.EndSheet(
                     "me", "Ana", g, com.dmwnezes.palavreiro.game.Multi.Msg.End("a", true, 1, 41000), com.dmwnezes.palavreiro.game.Multi.Msg.End("b", false, 6, 90000), true, emptyMap(),
                     com.dmwnezes.palavreiro.game.Multi.Series(1, 0), {}, {}, {}, {},
-                    mode = 't', myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('t', sel) { sel = it },
+                    mode = 't', myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('t', sel, { sel = it }),
                 )
             }
         }
-        rule.onNode(androidx.compose.ui.test.hasText("Bomba")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Damas")).performClick()
         save("43-proximo-jogo-termo")
     }
 
     @Test
-    fun proximoJogoBomba() {
+    fun proximoJogoDamas() {
         rule.mainClock.autoAdvance = false
+        val ser = com.dmwnezes.palavreiro.game.Multi.Series(2, 0)
         rule.setContent {
             PalavreiroTheme {
-                com.dmwnezes.palavreiro.ui.BombEndSheet(
-                    "me", "Ana", 7, true, com.dmwnezes.palavreiro.game.Multi.Series(2, 0), {}, {}, {},
-                    myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('b', 'b') {},
+                com.dmwnezes.palavreiro.ui.SeriesEndSheet(
+                    'x', "me", "Ana", "Peças: 5 × 0", "brancas · 5 peças", "pretas · 0 peças", true, ser, {}, {}, {},
+                    com.dmwnezes.palavreiro.ui.MatchStory.series('x', "Daniel", "Ana", ser, "me", "Peças: 5 × 0"), "Peças: 5 × 0",
+                    myName = "Daniel", next = com.dmwnezes.palavreiro.ui.NextGame('x', 'x', {}, 3, 3, {}),
                 )
             }
         }
-        save("44-proximo-jogo-bomba")
+        save("44-proximo-jogo-damas")
     }
 
     private fun matchCard(name: String, s: com.dmwnezes.palavreiro.ui.MatchStory) {
@@ -576,7 +572,183 @@ class ScreensRenderTest {
             'd', "Daniel", "Ana", com.dmwnezes.palavreiro.game.Multi.Series(2, 1), "me",
             com.dmwnezes.palavreiro.game.Multi.Msg.End("a", true, 4, 83_000), com.dmwnezes.palavreiro.game.Multi.Msg.End("b", false, 7, 90_000),
         ))
-        matchCard("46-stories-bomba", com.dmwnezes.palavreiro.ui.MatchStory.bomb("Daniel", "Ana Beatriz", com.dmwnezes.palavreiro.game.Multi.Series(1, 1), "opp", 9))
+        matchCard("46-stories-caca", com.dmwnezes.palavreiro.ui.MatchStory.series('c', "Daniel", "Ana Beatriz", com.dmwnezes.palavreiro.game.Multi.Series(1, 1), "opp", "Palavras: 3 × 5"))
+        matchCard("46b-stories-damas", com.dmwnezes.palavreiro.ui.MatchStory.series('x', "Daniel", "Ana", com.dmwnezes.palavreiro.game.Multi.Series(3, 1, 5), "me", "Peças: 4 × 0"))
+        matchCard("46c-stories-velha", com.dmwnezes.palavreiro.ui.MatchStory.series('v', "Daniel", "Ana", com.dmwnezes.palavreiro.game.Multi.Series(1, 0, 1), "me", "Você fez a linha com X"))
+        matchCard("46d-stories-palavra", com.dmwnezes.palavreiro.ui.MatchStory.points('p', "Daniel", "Ana", 7, 3, 10))
         matchCard("47-stories-anagrama", com.dmwnezes.palavreiro.ui.MatchStory.anagram("Daniel", "Ana", 6, 4))
+    }
+
+    // ---------- Rodada 10: modos novos da partida com amigo ----------
+    private fun duel(n: Int = 0, localStart: Long = T - 60_000, series: com.dmwnezes.palavreiro.game.Multi.Series = com.dmwnezes.palavreiro.game.Multi.Series(1, 0)) =
+        com.dmwnezes.palavreiro.ui.Duel(
+            myId = "me", oppId = "op", oppName = "Ana", isHost = true, round = n + 1, n = n, localStart = localStart, series = series,
+            online = true, oppLeft = false, send = {}, onDecided = {}, onAgain = {}, onLeave = {}, myName = "Daniel", clock = { T },
+        )
+
+    @Test
+    fun cacaDuelo() {
+        rule.mainClock.autoAdvance = false
+        val pool = WordSearchData.parse(File("../shared/caca.txt").readText()) + WordSearchData.parse(File("../shared/caca-extra.txt").readText())
+        val g = com.dmwnezes.palavreiro.game.HuntDuel.build(pool, emptySet(), 0, kotlin.random.Random(7))
+        val k = g.words.map(com.dmwnezes.palavreiro.game.HuntDuel::key)
+        val msgs = listOf(
+            com.dmwnezes.palavreiro.game.Multi.Msg.Found("me", 0, k[0]), com.dmwnezes.palavreiro.game.Multi.Msg.Found("op", 0, k[1]),
+            com.dmwnezes.palavreiro.game.Multi.Msg.Found("me", 0, k[2]), com.dmwnezes.palavreiro.game.Multi.Msg.Found("op", 0, k[3]),
+            com.dmwnezes.palavreiro.game.Multi.Msg.Found("me", 0, k[4]),
+        )
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.HuntPlay(g, msgs, duel()) } }
+        save("50-caca-duelo")
+    }
+
+    @Test
+    fun cacaPreparando() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.HuntPlay(null, emptyList(), duel(localStart = T - 500)) } }
+        save("50b-caca-preparando")
+    }
+
+    @Test
+    fun palavraDuelo() {
+        rule.mainClock.autoAdvance = false
+        val defs = com.dmwnezes.palavreiro.game.DefineDuel.parse(File("../shared/definicoes.txt").readText())
+        val msgs = listOf(
+            tm(T - 70_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("op", 0, 9000)),
+            tm(T - 50_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("me", 1, 12000)),
+        )
+        // A rodada 3 começou há 47,5 s: já aparecem a 1ª e a última letra.
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.DefinePlay(defs, 123456789, 10, msgs, duel(localStart = T - 90_000)) } }
+        save("51-palavra-duelo")
+    }
+
+    @Test
+    fun palavraAcertou() {
+        rule.mainClock.autoAdvance = false
+        val defs = com.dmwnezes.palavreiro.game.DefineDuel.parse(File("../shared/definicoes.txt").readText())
+        val msgs = listOf(tm(T - 1_000, com.dmwnezes.palavreiro.game.Multi.Msg.Solve("op", 0, 9000)))
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.DefinePlay(defs, 123456789, 5, msgs, duel(localStart = T - 20_000)) } }
+        save("51b-palavra-amigo-acertou", 300)
+    }
+
+    @Test
+    fun velha() {
+        rule.mainClock.autoAdvance = false
+        val msgs = listOf(4, 0, 2, 6).mapIndexed { i, c -> com.dmwnezes.palavreiro.game.Multi.Msg.Cell(if (i % 2 == 0) "me" else "op", i, c) }
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.TicTacPlay(msgs, duel()) } }
+        save("52-velha")
+    }
+
+    @Test
+    fun velhaVitoria() {
+        rule.mainClock.autoAdvance = false
+        val msgs = listOf(4, 0, 2, 6, 3, 1, 5).mapIndexed { i, c -> com.dmwnezes.palavreiro.game.Multi.Msg.Cell(if (i % 2 == 0) "me" else "op", i, c) }
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.TicTacPlay(msgs, duel()) } }
+        save("52b-velha-vitoria", 600)
+    }
+
+    @Test
+    fun damasInicio() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.CheckersPlay(emptyList(), duel()) } }
+        save("53-damas-inicio")
+    }
+
+    /** Joga uma abertura (sempre a mesma) até as brancas terem captura obrigatória. */
+    private fun damasMeio(): Pair<List<com.dmwnezes.palavreiro.game.Multi.Msg>, com.dmwnezes.palavreiro.game.Checkers.State> {
+        val C = com.dmwnezes.palavreiro.game.Checkers
+        val rnd = kotlin.random.Random(3)
+        while (true) {
+            var st = C.start()
+            val msgs = ArrayList<com.dmwnezes.palavreiro.game.Multi.Msg>()
+            for (i in 0 until 30) {
+                if (st.over) break
+                if (i >= 8 && st.turn == C.WHITE && st.mustCapture && st.legal.map { it[0] }.toSet().size >= 1 && st.legal.any { it.size >= 3 }) return msgs to st
+                val mv = st.legal[rnd.nextInt(st.legal.size)]
+                msgs += com.dmwnezes.palavreiro.game.Multi.Msg.Move(if (st.turn == C.WHITE) "me" else "op", st.moves, mv)
+                st = C.play(st, st.turn, st.moves, mv)!!
+            }
+        }
+    }
+
+    @Test
+    fun damasCaptura() {
+        rule.mainClock.autoAdvance = false
+        val (msgs, st) = damasMeio()
+        println("damas meio: jogadas ${st.moves}, legais ${st.legal}")
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.CheckersPlay(msgs, duel(), initialSel = listOf(st.legal.first { it.size >= 3 }[0])) } }
+        save("54-damas-captura")
+    }
+
+    @Test
+    fun damasPretas() {
+        rule.mainClock.autoAdvance = false
+        // RODADA 1: o anfitrião joga de pretas (tabuleiro girado); a última jogada da Ana (brancas) fica destacada.
+        val msgs = listOf(com.dmwnezes.palavreiro.game.Multi.Msg.Move("op", 0, listOf(42, 33)))
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.CheckersPlay(msgs, duel(n = 1)) } }
+        save("54b-damas-pretas")
+    }
+
+    @Test
+    fun leitorQr() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.QrScanner({}, {}, granted = true, camera = false) } }
+        save("55-leitor-qr")
+    }
+
+    @Test
+    fun leitorQrSemCamera() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.QrScanner({}, {}, granted = false, camera = false) } }
+        save("55b-leitor-qr-sem-camera")
+    }
+
+    @Test
+    fun damasToques() {
+        // Convidado de pretas: toca na peça e no destino e a jogada vai para a sala.
+        val sent = mutableListOf<com.dmwnezes.palavreiro.game.Multi.Msg>()
+        val msgs = listOf(com.dmwnezes.palavreiro.game.Multi.Msg.Move("op", 0, listOf(44, 35)))
+        val d = com.dmwnezes.palavreiro.ui.Duel(
+            myId = "me", oppId = "op", oppName = "Ana", isHost = false, round = 1, n = 0, localStart = T - 60_000,
+            series = com.dmwnezes.palavreiro.game.Multi.Series(), online = true, oppLeft = false, send = { sent += it },
+            onDecided = {}, onAgain = {}, onLeave = {}, clock = { T },
+        )
+        rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.CheckersPlay(msgs, d) } }
+        rule.onNode(androidx.compose.ui.test.hasContentDescription("Casa 21")).performClick()
+        save("54c-damas-selecionada", 300)
+        rule.onNode(androidx.compose.ui.test.hasContentDescription("Casa 28")).performClick()
+        rule.waitForIdle()
+        org.junit.Assert.assertEquals(listOf(com.dmwnezes.palavreiro.game.Multi.Msg.Move("me", 1, listOf(21, 28))), sent)
+    }
+
+    @Test
+    fun cacaArrastar() {
+        // Arrastar de trás para frente sobre uma palavra manda o "found" (forma sem acento).
+        val pool = WordSearchData.parse(File("../shared/caca.txt").readText()) + WordSearchData.parse(File("../shared/caca-extra.txt").readText())
+        val g = com.dmwnezes.palavreiro.game.HuntDuel.build(pool, emptySet(), 0, kotlin.random.Random(21))
+        val sent = mutableListOf<com.dmwnezes.palavreiro.game.Multi.Msg>()
+        var ls by androidx.compose.runtime.mutableLongStateOf(T + 2_000)
+        rule.setContent {
+            PalavreiroTheme {
+                com.dmwnezes.palavreiro.ui.HuntPlay(g, emptyList(), com.dmwnezes.palavreiro.ui.Duel(
+                    myId = "me", oppId = "op", oppName = "Ana", isHost = false, round = 1, n = 0, localStart = ls,
+                    series = com.dmwnezes.palavreiro.game.Multi.Series(), online = true, oppLeft = false, send = { sent += it },
+                    onDecided = {}, onAgain = {}, onLeave = {}, clock = { T },
+                ))
+            }
+        }
+        rule.waitForIdle()
+        // A contagem acaba depois da primeira composição (como na partida de verdade).
+        ls = T - 1_000
+        rule.mainClock.advanceTimeBy(500)
+        val cells = com.dmwnezes.palavreiro.game.HuntDuel.locate(g.rows, g.words[0])!!
+        rule.onNode(androidx.compose.ui.test.hasContentDescription("Grade")).performTouchInput {
+            val c = width / 10f
+            fun at(rc: Pair<Int, Int>) = androidx.compose.ui.geometry.Offset(rc.second * c + c / 2, rc.first * c + c / 2)
+            down(at(cells.last()))
+            for (i in 1..12) moveTo(at(cells.last()) + (at(cells.first()) - at(cells.last())) * (i / 12f))
+            up()
+        }
+        rule.waitForIdle()
+        org.junit.Assert.assertEquals(listOf(com.dmwnezes.palavreiro.game.Multi.Msg.Found("me", 0, com.dmwnezes.palavreiro.game.HuntDuel.key(g.words[0]))), sent)
     }
 }

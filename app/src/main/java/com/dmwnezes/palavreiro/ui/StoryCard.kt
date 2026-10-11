@@ -33,7 +33,7 @@ data class StoryData(
 
 /**
  * Cartão dos Stories da partida com amigo (todos os modos).
- * [me]/[opp] = nomes; placar = série (Termo, Dueto, Quarteto, Bomba) ou pontos (Anagrama).
+ * [me]/[opp] = nomes; placar = série (Termo, Dueto, Quarteto, Caça, Velha, Damas) ou pontos (Anagrama, Qual é a Palavra?).
  * [winner]: "me", "opp" ou null (destaca o nome de quem venceu).
  */
 data class MatchStory(
@@ -56,7 +56,8 @@ data class MatchStory(
         private fun time(ms: Long): String { val s = (ms / 1000).coerceAtLeast(0); return "%d:%02d".format(s / 60, s % 60) }
 
         private fun roundResult(me: String, opp: String, series: com.dmwnezes.palavreiro.game.Multi.Series, outcome: String?): Pair<String, String?> =
-            when (series.winner) {
+            if (series.best <= 1 && series.winner != null) (if (series.winner == "me") "🏆 $me venceu!" to "me" else "🏆 $opp venceu!" to "opp")
+            else when (series.winner) {
                 "me" -> "🏆 $me levou a série!" to "me"
                 "opp" -> "🏆 $opp levou a série!" to "opp"
                 else -> when (outcome) {
@@ -81,27 +82,27 @@ data class MatchStory(
             return MatchStory(mode, me, opp, series.me, series.opp, res, line(me, mine) + "  |  " + line(opp, theirs), w)
         }
 
-        /** Bomba-Relógio: placar da série e quantas palavras saíram antes de explodir. */
-        fun bomb(myName: String?, opp: String, series: com.dmwnezes.palavreiro.game.Multi.Series, outcome: String?, count: Int): MatchStory {
+        /** Caça-Palavras, Velha e Damas: placar da série e o detalhe do modo ("Palavras: 5 × 3"). */
+        fun series(mode: Char, myName: String?, opp: String, series: com.dmwnezes.palavreiro.game.Multi.Series, outcome: String?, detail: String): MatchStory {
             val me = myName(myName)
             val (res, w) = roundResult(me, opp, series, outcome)
-            val words = if (count == 1) "1 palavra" else "$count palavras"
-            return MatchStory(com.dmwnezes.palavreiro.game.Multi.BOMB, me, opp, series.me, series.opp, res, "$words antes de explodir 💥", w)
+            return MatchStory(mode, me, opp, series.me, series.opp, res, detail, w)
         }
 
-        /** Anagrama: pontos da partida. */
-        fun anagram(myName: String?, opp: String, myPts: Int, oppPts: Int): MatchStory {
+        /** Modos de pontos (Anagrama, Qual é a Palavra?): pontos da partida. */
+        fun points(mode: Char, myName: String?, opp: String, myPts: Int, oppPts: Int, rounds: Int): MatchStory {
             val me = myName(myName)
             val (res, w) = when {
                 myPts > oppPts -> "🏆 $me venceu!" to "me"
                 oppPts > myPts -> "🏆 $opp venceu!" to "opp"
                 else -> "Empate" to null
             }
-            return MatchStory(
-                com.dmwnezes.palavreiro.game.Multi.ANAGRAM, me, opp, myPts, oppPts, res,
-                "${com.dmwnezes.palavreiro.game.Anagram.ROUNDS} rodadas · $myPts × $oppPts", w,
-            )
+            return MatchStory(mode, me, opp, myPts, oppPts, res, "$rounds rodadas · $myPts × $oppPts", w)
         }
+
+        /** Anagrama: pontos da partida. */
+        fun anagram(myName: String?, opp: String, myPts: Int, oppPts: Int, rounds: Int = com.dmwnezes.palavreiro.game.Anagram.ROUNDS): MatchStory =
+            points(com.dmwnezes.palavreiro.game.Multi.ANAGRAM, myName, opp, myPts, oppPts, rounds)
     }
 }
 

@@ -1,7 +1,6 @@
 package com.dmwnezes.palavreiro
 
 import com.dmwnezes.palavreiro.game.Anagram
-import com.dmwnezes.palavreiro.game.Bomb
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.Timed
@@ -14,23 +13,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/** Bomba-Relógio e Anagrama da partida com amigo (lógica pura, igual ao site). */
+/** Anagrama da partida com amigo (lógica pura, igual ao site). */
 class MultiGamesTest {
     private val words = Words(File("../shared/words.js").readText())
     private val seed = 123456789L
 
     @Test
     fun valoresDeReferencia() {
-        val f = Bomb.fuse(seed)
-        println("SEED $seed · pavio F = $f ms · começa: ${if (Bomb.hostStarts(seed)) "anfitrião" else "convidado"}")
-        assertEquals(25000L + ((seed % 35001) * 7919 % 35001), f)
-        assertTrue(f in 25000L..60000L)
-        assertFalse(Bomb.hostStarts(seed)) // ímpar → convidado
-        assertTrue(Bomb.hostStarts(2))
-        for (s in listOf(0L, 1L, 35000L, 2147483646L)) assertTrue(Bomb.fuse(s) in 25000L..60000L)
         val list = Anagram.words(words.answers, seed)
         assertEquals(10, list.size)
         assertEquals(listOf("LENHA", "MOVER", "BUCHO", "FEBRE"), list.take(4))
+        assertEquals(list.take(5), Anagram.words(words.answers, seed, 5))
+        assertEquals(15, Anagram.words(words.answers, seed, 15).size)
         list.forEachIndexed { k, w ->
             val s = Anagram.shuffle(w, seed, k)
             println("anagrama $k: $w → $s")
@@ -67,42 +61,6 @@ class MultiGamesTest {
     }
 
     @Test
-    fun bombaMaquinaDeEstados() {
-        val host = "host0001"; val guest = "guest001"
-        val s = seed // ímpar: o convidado começa
-        val f = Bomb.fuse(s)
-        fun st(vararg m: Msg) = Bomb.state(m.toList(), s, host, guest)
-        assertEquals(guest, st().turn)
-        // Jogada válida passa a vez.
-        val a = st(Msg.Word(guest, "CARRO", 0, 1000))
-        assertEquals(host, a.turn); assertEquals(1, a.count)
-        // Fora da vez, n errado, repetida (com acento/minúscula) e atrasada: ignoradas.
-        val b = st(
-            Msg.Word(host, "MUNDO", 0, 500),           // não é a vez do anfitrião
-            Msg.Word(guest, "CARRO", 0, 1000),
-            Msg.Word(host, "TERMO", 0, 2000),          // n errado
-            Msg.Word(host, "cárro", 1, 2100),          // repetida
-            Msg.Word(host, "PORTA", 1, f),             // depois do pavio
-            Msg.Word("intruso", "LIVRO", 1, 3000),
-        )
-        assertEquals(1, b.count); assertEquals(host, b.turn); assertNull(b.loser)
-        // Palavra válida de última hora (ms < F) que chega antes do boom ainda passa a vez.
-        val c = st(Msg.Word(guest, "CARRO", 0, 1000), Msg.Word(host, "PORTA", 1, f - 1))
-        assertEquals(guest, c.turn); assertEquals(listOf("CARRO", "PORTA"), c.plays.map { it.word })
-        // O primeiro boom decide; depois tudo é ignorado.
-        val d = st(Msg.Word(guest, "CARRO", 0, 1000), Msg.Boom(host), Msg.Boom(guest), Msg.Word(host, "PORTA", 1, 2000))
-        assertEquals(host, d.loser); assertEquals(1, d.count)
-        // Boom de quem não está na sala é ignorado.
-        assertNull(st(Msg.Boom("outro")).loser)
-        // Avisos ao mandar.
-        assertEquals("Palavra não aceita", Bomb.check("XXXXX", a, words::isAccepted))
-        assertEquals("Essa palavra já foi", Bomb.check("CARRO", a, words::isAccepted))
-        assertNull(Bomb.check("PORTA", a, words::isAccepted))
-        // Pulso: de ~1,2 s até ~0,25 s.
-        assertEquals(1200, Bomb.pulseMs(0, f)); assertEquals(250, Bomb.pulseMs(f, f))
-    }
-
-    @Test
     fun anagramaEstado() {
         val me = "me000001"; val op = "op000001"; val players = setOf(me, op)
         fun st(vararg m: Pair<Long, Msg>) = Anagram.state(m.map { Timed(it.first, it.second) }, players)
@@ -134,34 +92,39 @@ class MultiGamesTest {
     }
 
     @Test
+    fun anagramaComRodadas() {
+        val me = "me000001"; val op = "op000001"
+        val msgs = (0 until 6).map { r -> Timed(r.toLong(), Msg.Solve(if (r < 3) me else op, r, 1)) }
+        val five = Anagram.state(msgs, setOf(me, op), 5)
+        assertTrue(five.over); assertEquals(5, five.current); assertEquals("me", five.outcome(me, op))
+        assertFalse(Anagram.state(msgs, setOf(me, op), 10).over)
+    }
+
+    @Test
     fun mensagensNovasELink() {
-        val all = listOf(Msg.Word("ab12cd34", "CARRO", 3, 12345), Msg.Boom("ab12cd34"), Msg.Solve("ab12cd34", 7, 8000), Msg.Skip(9))
+        val all = listOf(Msg.Solve("ab12cd34", 7, 8000), Msg.Skip(9))
         all.forEach { assertEquals(it, Multi.decode(Multi.encode(it))) }
-        // Formato exato do spec.
-        assertEquals(Msg.Word("q1", "CARRO", 0, 1500), Multi.decode("""{"t":"word","id":"q1","w":"CARRO","n":0,"ms":1500}"""))
-        assertEquals(Msg.Boom("q1"), Multi.decode("""{"t":"boom","id":"q1"}"""))
         assertEquals(Msg.Solve("q1", 4, 9000), Multi.decode("""{"t":"solve","id":"q1","r":4,"ms":9000}"""))
         assertEquals(Msg.Skip(2), Multi.decode("""{"t":"skip","r":2}"""))
-        val o = org.json.JSONObject(Multi.encode(Msg.Word("q1", "CARRO", 0, 1500)))
-        assertEquals(listOf("word", "q1", "CARRO", 0, 1500), listOf(o.get("t"), o.get("id"), o.get("w"), o.getInt("n"), o.getInt("ms")))
         assertEquals(2, org.json.JSONObject(Multi.encode(Msg.Skip(2))).getInt("r"))
-        for (m in listOf('b', 'a')) {
+        // Mensagens da Bomba-Relógio (que saiu) são ignoradas.
+        assertNull(Multi.decode("""{"t":"word","id":"q1","w":"CARRO","n":0,"ms":1500}"""))
+        assertNull(Multi.decode("""{"t":"boom","id":"q1"}"""))
+        for (m in listOf('a', 'c', 'p', 'v', 'x')) {
             val r = Multi.Room("abc123xyz789", m, 123456789)
             assertEquals("https://dmwnezes.github.io/termo/?mp=abc123xyz789-$m-21i3v9", r.link)
             assertEquals(r, Multi.parse(r.code))
             assertEquals(r, Multi.fromPasted(r.link))
-            assertEquals(r, Multi.fromPasted("Bora jogar ${Multi.modeName(m)} no Palavreiro? Quem acertar primeiro ganha! ${r.code}"))
+            assertEquals(r, Multi.fromPasted("Bora jogar ${Multi.modeName(m)} no Palavreiro? ${r.code}"))
             assertEquals(1, Multi.boards(m))
             assertFalse(Multi.isTermo(m))
         }
-        assertNull(Multi.fromPasted("abc123xyz789-x-21i3v9"))
-        assertEquals("Bomba-Relógio", Multi.modeName('b')); assertEquals("Anagrama", Multi.modeName('a'))
-        assertEquals("uma Bomba-Relógio", Multi.withArticle('b')); assertEquals("um Anagrama", Multi.withArticle('a')); assertEquals("um Dueto", Multi.withArticle('d'))
-        assertEquals(listOf("Termo", "Dueto", "Quarteto", "Bomba", "Anagrama"), Multi.CODES.map(Multi::chipName))
+        assertNull(Multi.fromPasted("abc123xyz789-z-21i3v9"))
+        assertEquals("Anagrama", Multi.modeName('a'))
+        assertEquals("um Anagrama", Multi.withArticle('a')); assertEquals("um Dueto", Multi.withArticle('d'))
         assertTrue(Multi.isTermo('t') && Multi.isTermo('d') && Multi.isTermo('q'))
-        // Sessão guardada com os modos novos continua valendo.
-        val sess = Multi.Session("abc123xyz789-b-21i3v9", true, "id", "Daniel", System.currentTimeMillis())
-        assertEquals('b', Multi.Session.decode(sess.encode())!!.room!!.mode)
+        val sess = Multi.Session("abc123xyz789-x-21i3v9", true, "id", "Daniel", System.currentTimeMillis())
+        assertEquals('x', Multi.Session.decode(sess.encode())!!.room!!.mode)
         assertTrue(sess.valid())
     }
 }

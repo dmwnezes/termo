@@ -14,20 +14,47 @@ object Multi {
 
     /** Modos da partida no estilo Termo: letra do link → modo do jogo. */
     val MODES = linkedMapOf('t' to Mode.DIARIO, 'd' to Mode.DUETO, 'q' to Mode.QUARTETO)
-    const val BOMB = 'b'
     const val ANAGRAM = 'a'
+    const val HUNT = 'c'
+    const val DEFINE = 'p'
+    const val TICTAC = 'v'
+    const val CHECKERS = 'x'
+    /** Bomba-Relógio: saiu do Palavreiro (link antigo com "b" → aviso). */
+    const val REMOVED = 'b'
     /** Todas as letras de modo aceitas no link, na ordem das pílulas da tela de criar. */
-    val CODES = listOf('t', 'd', 'q', BOMB, ANAGRAM)
+    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, TICTAC, CHECKERS)
     fun modeName(code: Char): String = when (code) {
-        'd' -> "Dueto"; 'q' -> "Quarteto"; BOMB -> "Bomba-Relógio"; ANAGRAM -> "Anagrama"; else -> "Termo"
+        'd' -> "Dueto"; 'q' -> "Quarteto"; ANAGRAM -> "Anagrama"; HUNT -> "Caça-Palavras"
+        DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"; else -> "Termo"
     }
     /** Nome curto da pílula na tela de criar. */
-    fun chipName(code: Char): String = if (code == BOMB) "Bomba" else modeName(code)
-    /** "um Termo", "uma Bomba-Relógio", "um Anagrama". */
-    fun withArticle(code: Char): String = (if (code == BOMB) "uma " else "um ") + modeName(code)
-    /** Modos que seguem o fluxo do Termo (Termo, Dueto, Quarteto); Bomba e Anagrama têm jogo próprio. */
+    fun chipName(code: Char): String = when (code) {
+        HUNT -> "Caça"; DEFINE -> "Palavra?"; TICTAC -> "Velha"; else -> modeName(code)
+    }
+    /** "um Termo", "uma partida de Damas", "um Qual é a Palavra?". */
+    fun withArticle(code: Char): String = if (code == CHECKERS) "uma partida de Damas" else "um " + modeName(code)
+    /** Modos que seguem o fluxo do Termo (Termo, Dueto, Quarteto); os outros têm jogo próprio. */
     fun isTermo(code: Char): Boolean = code in MODES
     fun boards(code: Char): Int = MODES[code]?.boards ?: 1
+
+    // ---------- rodadas (melhor de N ou N rodadas) ----------
+    /** Modos de pontos (Anagrama e Qual é a Palavra?): N rodadas; os outros jogam uma série melhor de N. */
+    fun pointsMode(code: Char): Boolean = code == ANAGRAM || code == DEFINE
+    fun roundOptions(code: Char): List<Int> = if (pointsMode(code)) listOf(5, 10, 15) else listOf(1, 3, 5)
+    fun defaultRounds(code: Char): Int = if (pointsMode(code)) 10 else 3
+    /** Valor do "r" válido para o modo; qualquer outro (ou nenhum) vira o padrão. */
+    fun rounds(code: Char, r: Int?): Int = r?.takeIf { it in roundOptions(code) } ?: defaultRounds(code)
+    fun roundsLabel(code: Char, n: Int): String = when {
+        pointsMode(code) -> "$n rodadas"
+        n == 1 -> "1 partida"
+        else -> "Melhor de $n"
+    }
+    /** Complemento do convite: " · melhor de 3", " · 15 rodadas" ou nada (1 partida). */
+    fun roundsSuffix(code: Char, n: Int): String = when {
+        pointsMode(code) -> " · $n rodadas"
+        n == 1 -> ""
+        else -> " · melhor de $n"
+    }
 
     /** Dados do link ?mp=ROOM-MODO-SEED. */
     data class Room(val room: String, val mode: Char, val seed: Long) {
@@ -38,7 +65,7 @@ object Multi {
     }
 
     fun parse(code: String?): Room? {
-        val p = code?.trim()?.split('-') ?: return null
+        val p = code?.trim()?.lowercase()?.split('-') ?: return null
         if (p.size != 3) return null
         val room = p[0]; val mode = p[1].singleOrNull(); val seed = p[2].toLongOrNull(36)
         if (!room.matches(Regex("[a-z0-9]{6,32}")) || mode == null || mode !in CODES || seed == null || seed !in 0..2147483646L) return null
@@ -49,8 +76,17 @@ object Multi {
     fun fromPasted(text: String?): Room? {
         val t = text?.trim().orEmpty()
         Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
-        Regex("\\b([a-z0-9]{12}-[tdqba]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        Regex("\\b([a-z0-9]{12}-[tdqacpvx]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
         return null
+    }
+
+    /** Link (ou código) de um jogo que saiu do Palavreiro (Bomba-Relógio, "b"). */
+    fun removedGame(text: String?): Boolean {
+        val t = text?.trim()?.lowercase().orEmpty()
+        val code = Regex("[?&]mp=([a-z0-9-]+)").find(t)?.groupValues?.get(1)
+            ?: Regex("\\b([a-z0-9]{6,32}-b-[0-9a-z]{1,7})\\b").find(t)?.groupValues?.get(1) ?: return false
+        val p = code.split('-')
+        return p.size == 3 && p[1] == "b" && p[0].matches(Regex("[a-z0-9]{6,32}")) && p[2].toLongOrNull(36) != null
     }
 
     private const val ALPHA = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -84,26 +120,36 @@ object Multi {
 
     // ---------- mensagens ----------
     sealed interface Msg {
-        data class Hello(val id: String, val name: String, val host: Boolean) : Msg
+        /** [rounds] = "r" do anfitrião (1/3/5 ou 5/10/15); null = padrão do modo. */
+        data class Hello(val id: String, val name: String, val host: Boolean, val rounds: Int? = null) : Msg
         data class Start(val at: Long, val guest: String) : Msg
         data class Row(val id: String, val row: Int, val marks: String) : Msg
         data class End(val id: String, val won: Boolean, val tries: Int, val ms: Long) : Msg
         /**
          * [newSeries] = começa uma série nova (placar volta a 0 × 0).
          * [mode] = modo da próxima partida ("m"); null = mensagem antiga, mantém o modo atual.
+         * [rounds] = "r" quando o anfitrião muda o modo/as rodadas; null = mantém (ou padrão do modo novo).
          */
-        data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false, val mode: Char? = null) : Msg
+        data class Again(val seed: Long, val at: Long, val newSeries: Boolean = false, val mode: Char? = null, val rounds: Int? = null) : Msg
         data class Bye(val id: String) : Msg
-        /** Bomba-Relógio: palavra jogada; [n] = índice da jogada na rodada, [ms] = relógio da rodada de quem mandou. */
-        data class Word(val id: String, val word: String, val n: Int, val ms: Long) : Msg
-        /** Bomba-Relógio: a bomba explodiu com [id]. */
-        data class Boom(val id: String) : Msg
-        /** Anagrama: [id] acertou a rodada [round]. */
+        /** Anagrama e Qual é a Palavra?: [id] acertou a rodada [round]. */
         data class Solve(val id: String, val round: Int, val ms: Long) : Msg
-        /** Anagrama: ninguém acertou a rodada [round] a tempo. */
+        /** Anagrama e Qual é a Palavra?: ninguém acertou a rodada [round] a tempo. */
         data class Skip(val round: Int) : Msg
         /** Reação rápida: [emoji] (um de [REACTIONS]) mandado por [id] na hora [at] (relógio de quem mandou). */
         data class React(val id: String, val emoji: String, val at: Long) : Msg
+        /** Caça-Palavras: grade da rodada [n] (start/again da sala), mandada pelo anfitrião. */
+        data class Grid(val n: Int, val theme: String, val rows: List<String>, val words: List<String>) : Msg
+        /** Caça-Palavras: [id] achou [word] (maiúsculas sem acento) na rodada [n]. */
+        data class Found(val id: String, val n: Int, val word: String) : Msg
+        /** Caça-Palavras: acabou o tempo da rodada [n]. */
+        data class TimeUp(val n: Int) : Msg
+        /** Jogo da Velha: [id] marcou a casa [cell] (0..8) na jogada [n]. */
+        data class Cell(val id: String, val n: Int, val cell: Int) : Msg
+        /** Damas: [id] fez a jogada [n] pelo caminho [path] (origem e cada casa onde a peça para). */
+        data class Move(val id: String, val n: Int, val path: List<Int>) : Msg
+        /** Damas: [id] desistiu da rodada. */
+        data class Resign(val id: String) : Msg
     }
 
     // ---------- reações rápidas ----------
@@ -119,63 +165,98 @@ object Multi {
 
     // ---------- revanche (trocando de modo) ----------
     /** Emoji do modo no cartão dos Stories. */
-    fun modeEmoji(code: Char): String = when (code) { BOMB -> "💣"; ANAGRAM -> "🔤"; else -> "⚔️" }
+    fun modeEmoji(code: Char): String = when (code) {
+        ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"; else -> "⚔️"
+    }
 
-    /** Modos que contam série (melhor de 3). */
-    fun hasSeries(code: Char): Boolean = code != ANAGRAM
+    /** Modos que contam série (melhor de N). */
+    fun hasSeries(code: Char): Boolean = !pointsMode(code)
 
     /** Texto do botão do anfitrião na folha de fim, conforme o próximo modo escolhido. */
     fun againLabel(current: Char, next: Char, seriesOver: Boolean): String = when {
         next != current -> "Jogar ${modeName(next)}"
-        current == ANAGRAM -> "Revanche"
+        pointsMode(current) -> "Revanche"
         seriesOver -> "Nova série"
         else -> "Próxima rodada"
     }
 
-    /** "again" que o anfitrião manda: sempre com o modo da próxima partida; trocar de modo zera a série. */
-    fun againFor(current: Char, next: Char, seriesOver: Boolean, seed: Long, at: Long): Msg.Again =
-        Msg.Again(seed, at, newSeries = next != current || (hasSeries(current) && seriesOver), mode = next)
-
     /**
-     * Aplica um "again" recebido: a sala fica com a semente nova e o modo novo (se veio "m").
-     * Devolve a sala e se a série volta a 0 × 0.
+     * "again" que o anfitrião manda: sempre com o modo da próxima partida; trocar de modo (ou de rodadas) zera a série.
+     * [rounds]/[nextRounds] = rodadas de agora e as escolhidas para a próxima; "r" vai quando muda o modo ou as rodadas.
      */
-    fun applyAgain(room: Room, m: Msg.Again, seriesOver: Boolean): Pair<Room, Boolean> {
+    fun againFor(current: Char, next: Char, seriesOver: Boolean, seed: Long, at: Long, rounds: Int? = null, nextRounds: Int? = null): Msg.Again {
+        val changed = nextRounds != null && nextRounds != rounds
+        return Msg.Again(
+            seed, at, newSeries = next != current || changed || (hasSeries(current) && seriesOver), mode = next,
+            rounds = if (next != current || changed) nextRounds else null,
+        )
+    }
+
+    /** Resultado de um "again" recebido: sala nova, se a série zera e as rodadas da próxima partida. */
+    data class AgainResult(val room: Room, val fresh: Boolean, val rounds: Int)
+
+    /** Aplica um "again" recebido: semente nova, modo novo (se veio "m") e rodadas ("r", ou padrão do modo novo). */
+    fun applyAgain(room: Room, m: Msg.Again, seriesOver: Boolean, rounds: Int = defaultRounds(room.mode)): AgainResult {
         val mode = m.mode?.takeIf { it in CODES } ?: room.mode
-        return room.copy(mode = mode, seed = m.seed) to (m.newSeries || seriesOver || mode != room.mode)
+        val nr = when {
+            m.rounds != null -> rounds(mode, m.rounds)
+            mode != room.mode -> defaultRounds(mode)
+            else -> rounds
+        }
+        return AgainResult(room.copy(mode = mode, seed = m.seed), m.newSeries || seriesOver || mode != room.mode || nr != rounds, nr)
     }
 
     fun encode(m: Msg): String = when (m) {
-        is Msg.Hello -> JSONObject().put("t", "hello").put("id", m.id).put("n", m.name).put("host", m.host)
+        is Msg.Hello -> JSONObject().put("t", "hello").put("id", m.id).put("n", m.name).put("host", m.host).apply { m.rounds?.let { put("r", it) } }
         is Msg.Start -> JSONObject().put("t", "start").put("at", m.at).put("g", m.guest)
         is Msg.Row -> JSONObject().put("t", "row").put("id", m.id).put("r", m.row).put("m", m.marks)
         is Msg.End -> JSONObject().put("t", "end").put("id", m.id).put("won", m.won).put("tries", m.tries).put("ms", m.ms)
         is Msg.Again -> JSONObject().put("t", "again").put("seed", m.seed.toString(36)).put("at", m.at).apply {
             if (m.newSeries) put("s", 1)
             m.mode?.let { put("m", it.toString()) }
+            m.rounds?.let { put("r", it) }
         }
         is Msg.Bye -> JSONObject().put("t", "bye").put("id", m.id)
-        is Msg.Word -> JSONObject().put("t", "word").put("id", m.id).put("w", m.word).put("n", m.n).put("ms", m.ms)
-        is Msg.Boom -> JSONObject().put("t", "boom").put("id", m.id)
         is Msg.Solve -> JSONObject().put("t", "solve").put("id", m.id).put("r", m.round).put("ms", m.ms)
         is Msg.Skip -> JSONObject().put("t", "skip").put("r", m.round)
         is Msg.React -> JSONObject().put("t", "react").put("id", m.id).put("e", m.emoji).put("at", m.at)
+        is Msg.Grid -> JSONObject().put("t", "grid").put("n", m.n).put("th", m.theme).put("g", m.rows.joinToString("|"))
+            .put("w", org.json.JSONArray().apply { m.words.forEach { put(it) } })
+        is Msg.Found -> JSONObject().put("t", "found").put("id", m.id).put("n", m.n).put("w", m.word)
+        is Msg.TimeUp -> JSONObject().put("t", "timeup").put("n", m.n)
+        is Msg.Cell -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("c", m.cell)
+        is Msg.Move -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("p", org.json.JSONArray().apply { m.path.forEach { put(it) } })
+        is Msg.Resign -> JSONObject().put("t", "resign").put("id", m.id)
     }.toString()
+
+    private fun optRounds(o: JSONObject): Int? = if (o.has("r")) o.optInt("r", -1).takeIf { it > 0 } else null
 
     fun decode(text: String): Msg? = runCatching {
         val o = JSONObject(text)
         when (o.optString("t")) {
-            "hello" -> Msg.Hello(o.getString("id"), o.optString("n").take(16), o.optBoolean("host"))
+            "hello" -> Msg.Hello(o.getString("id"), o.optString("n").take(16), o.optBoolean("host"), optRounds(o))
             "start" -> Msg.Start(o.getLong("at"), o.optString("g"))
             "row" -> Msg.Row(o.getString("id"), o.getInt("r"), o.getString("m"))
             "end" -> Msg.End(o.getString("id"), o.getBoolean("won"), o.optInt("tries"), o.optLong("ms"))
-            "again" -> Msg.Again(o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1, o.optString("m").singleOrNull()?.takeIf { it in CODES })
+            "again" -> Msg.Again(
+                o.getString("seed").toLong(36), o.optLong("at"), o.optInt("s") == 1,
+                o.optString("m").singleOrNull()?.takeIf { it in CODES }, optRounds(o),
+            )
             "bye" -> Msg.Bye(o.getString("id"))
-            "word" -> Msg.Word(o.getString("id"), o.getString("w"), o.getInt("n"), o.optLong("ms"))
-            "boom" -> Msg.Boom(o.getString("id"))
             "solve" -> Msg.Solve(o.getString("id"), o.getInt("r"), o.optLong("ms"))
             "skip" -> Msg.Skip(o.getInt("r"))
             "react" -> o.getString("e").takeIf { it in REACTIONS }?.let { Msg.React(o.getString("id"), it, o.getLong("at")) }
+            "grid" -> {
+                val w = o.getJSONArray("w")
+                Msg.Grid(o.getInt("n"), o.optString("th"), o.getString("g").split('|'), (0 until w.length()).map { w.getString(it) })
+            }
+            "found" -> Msg.Found(o.getString("id"), o.getInt("n"), o.getString("w"))
+            "timeup" -> Msg.TimeUp(o.getInt("n"))
+            "move" -> if (o.has("p")) {
+                val p = o.getJSONArray("p")
+                Msg.Move(o.getString("id"), o.getInt("n"), (0 until p.length()).map { p.getInt(it) })
+            } else Msg.Cell(o.getString("id"), o.getInt("n"), o.getInt("c"))
+            "resign" -> Msg.Resign(o.getString("id"))
             else -> null
         }
     }.getOrNull()
@@ -198,16 +279,22 @@ object Multi {
         }
     }
 
-    // ---------- melhor de 3 ----------
-    /** Vitórias para levar a série (melhor de 3; empates não contam). */
+    // ---------- melhor de N ----------
+    /** Vitórias para levar a série melhor de 3 (padrão). */
     const val SERIES_WINS = 2
 
-    /** Placar da série: soma o resultado de cada rodada; quem chegar a 2 leva o troféu. */
-    data class Series(val me: Int = 0, val opp: Int = 0) {
-        val over: Boolean get() = me >= SERIES_WINS || opp >= SERIES_WINS
+    /**
+     * Placar da série melhor de [best] (1, 3 ou 5): quem chegar a (best+1)/2 vitórias leva o troféu.
+     * Empates não contam.
+     */
+    data class Series(val me: Int = 0, val opp: Int = 0, val best: Int = 3) {
+        val wins: Int get() = (best + 1) / 2
+        val over: Boolean get() = me >= wins || opp >= wins
         /** "me", "opp" ou null enquanto a série continua. */
-        val winner: String? get() = when { me >= SERIES_WINS -> "me"; opp >= SERIES_WINS -> "opp"; else -> null }
+        val winner: String? get() = when { me >= wins -> "me"; opp >= wins -> "opp"; else -> null }
         val score: String get() = "$me × $opp"
+        /** "melhor de 3"; vazio quando é uma partida só. */
+        val label: String get() = if (best <= 1) "" else "melhor de $best"
         fun plus(outcome: String?): Series = if (over) this else when (outcome) { "me" -> copy(me = me + 1); "opp" -> copy(opp = opp + 1); else -> this }
     }
 

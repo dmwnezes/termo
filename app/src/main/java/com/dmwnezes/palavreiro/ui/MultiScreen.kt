@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,8 +59,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmwnezes.palavreiro.Feedback
 import com.dmwnezes.palavreiro.data.Store
+import com.dmwnezes.palavreiro.game.DefineDuel
+import com.dmwnezes.palavreiro.game.Definition
+import com.dmwnezes.palavreiro.game.HuntDuel
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
+import com.dmwnezes.palavreiro.game.SearchTheme
+import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.game.TermoGame
 import com.dmwnezes.palavreiro.game.Words
 import com.dmwnezes.palavreiro.system.Ntfy
@@ -90,8 +96,20 @@ fun MultiScreen(
     meanings: Map<String, String> = emptyMap(),
     /** Sala guardada para retomar (o app foi fechado enquanto você mandava o link). */
     resume: Multi.Session? = null,
+    /** Temas do Caça-Palavras (caca.txt + caca-extra.txt) e definições do Qual é a Palavra?; null = lê dos assets. */
+    themes: List<SearchTheme>? = null,
+    definitions: List<Definition>? = null,
 ) {
     val context = LocalContext.current
+    val themePool = remember(themes) {
+        themes ?: runCatching {
+            fun asset(n: String) = context.assets.open(n).bufferedReader().use { it.readText() }
+            WordSearchData.parse(asset("caca.txt")) + WordSearchData.parse(asset("caca-extra.txt"))
+        }.getOrDefault(emptyList())
+    }
+    val defs = remember(definitions) {
+        definitions ?: runCatching { DefineDuel.parse(context.assets.open("definicoes.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
+    }
     val scope = rememberCoroutineScope()
     val myId = remember { resume?.id ?: Multi.randomId(8) }
     val joinRoom = remember(joinCode) { joinCode?.let(Multi::parse) }
@@ -113,6 +131,14 @@ fun MultiScreen(
     var expired by remember { mutableStateOf(false) }
     var left by remember { mutableStateOf(false) }
     var modeCode by remember { mutableStateOf(store?.text("mp_mode")?.firstOrNull()?.takeIf { it in Multi.CODES } ?: 'd') }
+    /** Rodadas escolhidas para cada modo (guardadas em "mp_rounds_<modo>"). */
+    fun savedRounds(code: Char): Int = Multi.rounds(code, store?.int("mp_rounds_$code")?.takeIf { it > 0 })
+    var pickRounds by remember { mutableIntStateOf(savedRounds(modeCode)) }
+    // Rodadas da partida em jogo (melhor de N ou N rodadas): vêm do hello do anfitrião e mudam no "again".
+    var rounds by remember { mutableIntStateOf(Multi.defaultRounds(joinRoom?.mode ?: resume?.room?.mode ?: modeCode)) }
+    // Link antigo de um jogo que saiu (Bomba-Relógio).
+    val removedLink = remember(joinCode) { joinRoom == null && Multi.removedGame(joinCode) }
+    var scanning by remember { mutableStateOf(false) }
     var oppId by remember { mutableStateOf<String?>(null) }
     var oppName by remember { mutableStateOf<String?>(null) }
     var joined by remember { mutableStateOf(resume?.host == false) }
@@ -123,27 +149,42 @@ fun MultiScreen(
     var localStart by remember { mutableLongStateOf(0L) }
     val oppRows = remember { mutableStateListOf<String>() }
     val ends = remember { mutableStateListOf<Msg.End>() }
-    // Bomba-Relógio e Anagrama: mensagens da rodada atual (zeradas a cada start/again), com a hora de chegada.
+    // Jogos próprios: mensagens da rodada atual (zeradas a cada start/again), com a hora de chegada.
     val roundMsgs = remember { mutableStateListOf<com.dmwnezes.palavreiro.game.Timed>() }
+    // Caça-Palavras: grade de cada RODADA (start/again da sala) e os temas já usados (anfitrião).
+    val grids = remember { mutableStateMapOf<Int, Msg.Grid>() }
+    val usedThemes = remember { mutableStateListOf<String>() }
     var oppLeft by remember { mutableStateOf(false) }
     var recordedRound by remember { mutableIntStateOf(-1) }
     var showEnd by remember { mutableStateOf(false) }
     var replayTrigger by remember { mutableIntStateOf(0) }
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     // Melhor de 3: placar da série e a última rodada já contada nele.
-    var series by remember { mutableStateOf(Multi.Series()) }
+    var series by remember { mutableStateOf(Multi.Series(best = rounds)) }
     var scoredRound by remember { mutableIntStateOf(-1) }
-    // Revanche: modo escolhido pelo anfitrião para o próximo jogo (null = o mesmo).
+    // Revanche: modo e rodadas escolhidos pelo anfitrião para o próximo jogo (null = os mesmos).
     var nextMode by remember { mutableStateOf<Char?>(null) }
+    var nextRounds by remember { mutableStateOf<Int?>(null) }
     val reactions = rememberReactionState()
     val toast = rememberToast()
 
     fun send(m: Msg) { val r = room ?: return; scope.launch { ntfy.publish(r.topic, Multi.encode(m)) } }
+    /** Manda em sequência (a ordem no tópico importa: start/again antes do grid). */
+    fun sendAll(vararg ms: Msg) { val r = room ?: return; scope.launch { ms.forEach { ntfy.publish(r.topic, Multi.encode(it)) } } }
     reactions.onSend = { e -> send(Msg.React(myId, e, System.currentTimeMillis())) }
-    /** Anfitrião: revanche no modo escolhido (trocar de modo zera a série). */
+    /** Anfitrião, Caça-Palavras: grade da RODADA [n] com um tema que ainda não saiu na sala. */
+    fun gridFor(n: Int): Msg.Grid? = runCatching {
+        HuntDuel.build(themePool, usedThemes.toSet(), n).also { usedThemes += it.theme }
+    }.getOrNull()
+    /** Anfitrião: revanche no modo escolhido (trocar de modo ou de rodadas zera a série). */
     fun again() {
         val r = room ?: return
-        send(Multi.againFor(r.mode, nextMode ?: r.mode, series.over, Multi.newSeed(), System.currentTimeMillis()))
+        val next = nextMode ?: r.mode
+        val nr = nextRounds ?: if (next == r.mode) rounds else savedRounds(next)
+        val m = Multi.againFor(r.mode, next, series.over, Multi.newSeed(), System.currentTimeMillis(), rounds, nr)
+        // RODADA do próximo jogo = quantos start/again a sala já teve.
+        val g = if (next == Multi.HUNT) gridFor(round) else null
+        if (g != null) sendAll(m, g) else send(m)
     }
 
     /** Guarda a sala por 10 minutos (sobrevive ao app fechado) e liga o aviso. */
@@ -165,27 +206,37 @@ fun MultiScreen(
 
     fun beginRound(at: Long, newSeries: Boolean) {
         forget() // a partida começou: a sala não precisa mais ficar guardada
-        if (newSeries) series = Multi.Series()
+        if (newSeries) series = Multi.Series(best = rounds)
         val t = System.currentTimeMillis()
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
         oppRows.clear(); ends.clear(); roundMsgs.clear(); showEnd = false
-        nextMode = null; reactions.open = false
+        nextMode = null; nextRounds = null; reactions.open = false
         round++
         phase = Phase.PLAYING
     }
 
     fun process(m: Msg) {
         when (m) {
-            is Msg.Hello -> if (m.id != myId) {
+            is Msg.Hello -> if (m.id == myId) {
+                // Sala retomada pelo anfitrião: as rodadas estão no hello dele.
+                if (m.host && phase != Phase.PLAYING) room?.let { rounds = Multi.rounds(it.mode, m.rounds); series = Multi.Series(best = rounds) }
+            } else {
                 if (m.host) {
-                    if (!isHost) { oppId = m.id; oppName = m.name }
+                    if (!isHost) {
+                        oppId = m.id; oppName = m.name
+                        if (phase != Phase.PLAYING) room?.let { rounds = Multi.rounds(it.mode, m.rounds); series = Multi.Series(best = rounds) }
+                    }
                 } else if (isHost && oppId == null) {
                     oppId = m.id; oppName = m.name
                     val guest = m.id
                     // Sala retomada: espera o histórico todo chegar; se o start já foi mandado antes, não manda de novo.
                     scope.launch {
                         if (resume != null) delay(3000)
-                        if (phase == Phase.WAITING) send(Msg.Start(System.currentTimeMillis(), guest))
+                        if (phase == Phase.WAITING) {
+                            val st = Msg.Start(System.currentTimeMillis(), guest)
+                            val g = if (room?.mode == Multi.HUNT) gridFor(0) else null
+                            if (g != null) sendAll(st, g) else send(st)
+                        }
                     }
                 }
             }
@@ -204,17 +255,21 @@ fun MultiScreen(
             // Com "m" o modo pode mudar: a sala vira SALA-NOVOMODO-SEED e a série zera.
             is Msg.Again -> if (phase == Phase.PLAYING) {
                 val r = room ?: return
-                val (nr, fresh) = Multi.applyAgain(r, m, series.over)
-                room = nr; oppLeft = false
+                val res = Multi.applyAgain(r, m, series.over, rounds)
+                val nr = res.room
+                room = nr; oppLeft = false; rounds = res.rounds
+                val fresh = res.fresh
                 if (nr.mode != r.mode && !isHost) toast.show("Novo jogo: ${Multi.modeName(nr.mode)}", 2500)
                 beginRound(m.at, fresh)
             }
             is Msg.Bye -> if (m.id == oppId) oppLeft = true
-            is Msg.Word, is Msg.Boom, is Msg.Solve -> if (phase == Phase.PLAYING) {
-                val id = when (m) { is Msg.Word -> m.id; is Msg.Boom -> m.id; is Msg.Solve -> m.id; else -> null }
+            is Msg.Solve, is Msg.Found, is Msg.Cell, is Msg.Move, is Msg.Resign -> if (phase == Phase.PLAYING) {
+                val id = when (m) { is Msg.Solve -> m.id; is Msg.Found -> m.id; is Msg.Cell -> m.id; is Msg.Move -> m.id; is Msg.Resign -> m.id; else -> null }
                 if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
             }
-            is Msg.Skip -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            is Msg.Skip, is Msg.TimeUp -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            // Grade do Caça-Palavras: guardada pela RODADA (pode chegar logo depois do start/again).
+            is Msg.Grid -> if (HuntDuel.valid(m) && m.n !in grids) grids[m.n] = m
             // Reações: só as frescas e do amigo (a minha já apareceu na hora).
             is Msg.React -> if (phase == Phase.PLAYING && m.id == oppId && Multi.showReaction(m, myId, System.currentTimeMillis())) {
                 reactions.show(m.emoji, oppName ?: "Amigo", mine = false)
@@ -259,19 +314,26 @@ fun MultiScreen(
     Box(Modifier.fillMaxSize().background(Night.background)) {
         when (phase) {
             Phase.CREATE -> Lobby("Jogar com amigo", ::leave) {
-                Text(modeRules(modeCode, create = true), color = Night.muted, fontSize = 15.sp)
+                Text(modeRules(modeCode, pickRounds, create = true), color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(16.dp))
                 Text("Modo", color = Night.muted, fontSize = 13.sp)
                 Spacer(Modifier.height(6.dp))
                 val codes = Multi.CODES
-                ChipTabs(codes.map(Multi::chipName), codes.indexOf(modeCode)) { modeCode = codes[it] }
+                ChipTabs(codes.map(Multi::chipName), codes.indexOf(modeCode)) { modeCode = codes[it]; pickRounds = savedRounds(modeCode) }
+                Spacer(Modifier.height(14.dp))
+                Text("Rodadas", color = Night.muted, fontSize = 13.sp)
+                Spacer(Modifier.height(6.dp))
+                val opts = Multi.roundOptions(modeCode)
+                ChipTabs(opts.map { Multi.roundsLabel(modeCode, it) }, opts.indexOf(pickRounds)) { pickRounds = opts[it] }
                 Spacer(Modifier.height(22.dp))
                 PillButton("Criar partida", Night.correct, modifier = Modifier.fillMaxWidth(), enabled = Multi.validName(name)) {
                     val n = name.trim(); store?.setText("mp_name", n); store?.setText("mp_mode", modeCode.toString())
+                    store?.setInt("mp_rounds_$modeCode", pickRounds)
                     room = Multi.newRoom(modeCode); isHost = true; phase = Phase.WAITING; expired = false; keptAt = 0L
-                    send(Msg.Hello(myId, n, host = true))
+                    rounds = pickRounds; series = Multi.Series(best = rounds)
+                    send(Msg.Hello(myId, n, host = true, rounds = pickRounds))
                     keep()
                 }
                 if (name.isNotEmpty() && !Multi.validName(name)) {
@@ -290,7 +352,19 @@ fun MultiScreen(
                 fun enter(text: String) {
                     val r = Multi.fromPasted(text)
                     if (r == null) { bad = true; return }
-                    bad = false; room = r; isHost = false; oppName = null; phase = Phase.JOIN
+                    bad = false; room = r; isHost = false; oppName = null; rounds = Multi.defaultRounds(r.mode); phase = Phase.JOIN
+                }
+                if (scanning) {
+                    androidx.compose.ui.window.Dialog(
+                        onDismissRequest = { scanning = false },
+                        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+                    ) {
+                        QrScanner(
+                            onResult = { t -> scanning = false; pasted = t; enter(t) },
+                            onClose = { scanning = false },
+                            accept = { Multi.fromPasted(it) != null },
+                        )
+                    }
                 }
                 OutlinedTextField(
                     value = pasted, onValueChange = { pasted = it; bad = false }, singleLine = true,
@@ -302,7 +376,13 @@ fun MultiScreen(
                         errorBorderColor = Night.red, errorLabelColor = Night.red, errorTextColor = Night.text, errorCursorColor = Night.red,
                     ),
                 )
-                if (bad) { Spacer(Modifier.height(6.dp)); Text("Esse link não é de uma partida do Palavreiro.", color = Night.red, fontSize = 13.sp) }
+                if (bad) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        if (Multi.removedGame(pasted)) REMOVED_TEXT else "Esse link não é de uma partida do Palavreiro.",
+                        color = Night.red, fontSize = 13.sp,
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PillButton("Colar", Night.surfaceHigh, Night.text, Modifier.weight(1f)) {
@@ -310,18 +390,20 @@ fun MultiScreen(
                         pasted = clip
                         if (Multi.fromPasted(clip) != null) enter(clip) else bad = clip.isNotBlank()
                     }
-                    PillButton("Entrar na partida", Night.accent, modifier = Modifier.weight(1.4f), enabled = pasted.isNotBlank()) { enter(pasted) }
+                    PillButton("📷 Ler QR", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { scanning = true }
                 }
+                Spacer(Modifier.height(10.dp))
+                PillButton("Entrar na partida", Night.accent, modifier = Modifier.fillMaxWidth(), enabled = pasted.isNotBlank()) { enter(pasted) }
             }
             Phase.WAITING -> Lobby("Jogar com amigo", ::leave) {
                 val r = room!!
-                Text("${Multi.modeName(r.mode)} · mande o link para seu amigo", color = Night.text, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Text("${Multi.modeName(r.mode)}${Multi.roundsSuffix(r.mode, rounds)} · mande o link para seu amigo", color = Night.text, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(12.dp))
                 Text(r.link, color = Night.accent, fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(14.dp))
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PillButton("Compartilhar", Night.correct, modifier = Modifier.weight(1f)) {
-                        val text = "Bora jogar ${Multi.modeName(r.mode)} no Palavreiro? Quem acertar primeiro ganha! ${r.link}"
+                        val text = "Bora jogar ${Multi.modeName(r.mode)}${Multi.roundsSuffix(r.mode, rounds)} no Palavreiro? ${r.link}"
                         context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Compartilhar"))
                     }
                     PillButton("Copiar link", Night.surfaceHigh, Night.text, Modifier.weight(1f)) {
@@ -362,11 +444,12 @@ fun MultiScreen(
             Phase.JOIN -> Lobby("Jogar com amigo", ::leave) {
                 val r = room!!
                 Text(
-                    if (oppName != null) "$oppName te chamou para ${Multi.withArticle(r.mode)}" else "Você foi chamado para ${Multi.withArticle(r.mode)}",
+                    (if (oppName != null) "$oppName te chamou para ${Multi.withArticle(r.mode)}" else "Você foi chamado para ${Multi.withArticle(r.mode)}") +
+                        Multi.roundsSuffix(r.mode, rounds),
                     color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold,
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(modeRules(r.mode, create = false), color = Night.muted, fontSize = 15.sp)
+                Text(modeRules(r.mode, rounds, create = false), color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 NameField(name) { name = it }
                 Spacer(Modifier.height(20.dp))
@@ -399,36 +482,50 @@ fun MultiScreen(
             Phase.INVALID -> Lobby("Jogar com amigo", ::leave) {
                 Text("Link inválido", color = Night.text, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
                 Spacer(Modifier.height(8.dp))
-                Text("Peça para seu amigo mandar o link de novo.", color = Night.muted, fontSize = 15.sp)
+                Text(if (removedLink) REMOVED_TEXT else "Peça para seu amigo mandar o link de novo.", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(20.dp))
                 PillButton("Voltar", Night.correct, modifier = Modifier.fillMaxWidth(), onClick = ::leave)
             }
             Phase.PLAYING -> Box(Modifier.fillMaxSize()) {
-                val next = if (isHost) NextGame(room!!.mode, nextMode ?: room!!.mode) { nextMode = it } else null
+                val cur = room!!.mode
+                val next = if (isHost) {
+                    val sel = nextMode ?: cur
+                    NextGame(
+                        cur, sel, { nextMode = it; nextRounds = if (it == cur) null else savedRounds(it) },
+                        currentRounds = rounds, rounds = nextRounds ?: if (sel == cur) rounds else savedRounds(sel),
+                        pickRounds = { nextRounds = it; store?.setInt("mp_rounds_$sel", it) },
+                    )
+                } else null
                 val me = name.trim()
                 if (!Multi.isTermo(room!!.mode)) {
                     val r = room!!
                     val counting = now < localStart
-                    // Resultado (uma vez por rodada/partida): placar da série (Bomba) e contadores.
+                    // Resultado (uma vez por rodada/partida): placar da série e contadores.
                     val decided: (String) -> Unit = { o ->
-                        if (r.mode == Multi.BOMB && scoredRound != round) { scoredRound = round; series = series.plus(o) }
+                        if (Multi.hasSeries(r.mode) && scoredRound != round) { scoredRound = round; series = series.plus(o) }
                         if (recordedRound != round) {
                             recordedRound = round
                             store?.add("mp_played"); if (o == "me") store?.add("mp_won"); store?.logActivity()
                         }
                     }
+                    val duel = Duel(
+                        myId = myId, oppId = oppId, oppName = oppName ?: "Amigo", isHost = isHost, round = round, n = round - 1,
+                        localStart = localStart, series = series, online = online, oppLeft = oppLeft, send = ::send, onDecided = decided,
+                        onAgain = ::again, onLeave = ::leave, myName = me, next = next, reactions = reactions, feedback = feedback,
+                    )
                     Box(Modifier.fillMaxSize()) {
-                        if (r.mode == Multi.BOMB) BombPlay(
-                            words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, series, online, oppLeft,
-                            send = ::send, onDecided = decided,
-                            onAgain = ::again,
-                            onLeave = ::leave, myName = me, next = next, reactions = reactions,
-                        ) else AnagramPlay(
-                            words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, online, oppLeft,
-                            send = ::send, onDecided = decided,
-                            onAgain = ::again,
-                            onLeave = ::leave, myName = me, next = next, reactions = reactions,
-                        )
+                        when (r.mode) {
+                            Multi.ANAGRAM -> AnagramPlay(
+                                words, feedback, r.seed, round, myId, oppId, oppName ?: "Amigo", isHost, roundMsgs, localStart, online, oppLeft,
+                                send = ::send, onDecided = decided,
+                                onAgain = ::again,
+                                onLeave = ::leave, myName = me, next = next, reactions = reactions, rounds = rounds,
+                            )
+                            Multi.DEFINE -> DefinePlay(defs, r.seed, rounds, roundMsgs, duel)
+                            Multi.HUNT -> HuntPlay(grids[round - 1], roundMsgs.map { it.msg }, duel)
+                            Multi.TICTAC -> TicTacPlay(roundMsgs.map { it.msg }, duel)
+                            Multi.CHECKERS -> CheckersPlay(roundMsgs.map { it.msg }, duel)
+                        }
                         if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
                     }
                 } else {
@@ -494,7 +591,7 @@ fun MultiScreen(
                     }
                 }
                 // Reações (por cima da contagem e da folha de fim) e o aviso de jogo novo.
-                val gap = when (room!!.mode) { Multi.BOMB -> 40.dp; Multi.ANAGRAM -> 84.dp; else -> 112.dp }
+                val gap = when (room!!.mode) { Multi.ANAGRAM, Multi.DEFINE, Multi.HUNT, Multi.TICTAC, Multi.CHECKERS -> 84.dp; else -> 112.dp }
                 ReactionOverlay(reactions, gap)
                 ToastView(toast, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 96.dp))
             }
@@ -502,12 +599,24 @@ fun MultiScreen(
     }
 }
 
-/** Explicação curta do modo nas telas de criar e de entrar. */
-private fun modeRules(code: Char, create: Boolean): String = when (code) {
-    Multi.BOMB -> "Vocês se revezam mandando palavras de 5 letras, sem repetir. A bomba explode num momento secreto: perde quem estiver com ela. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
-    Multi.ANAGRAM -> "10 rodadas com as mesmas 5 letras embaralhadas para os dois: quem achar a palavra primeiro leva o ponto. Vence quem fizer mais pontos 🏆"
-    else -> if (create) "Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
-    else "Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras. Melhor de 3: quem vencer 2 rodadas leva o troféu 🏆"
+/** Aviso do link antigo da Bomba-Relógio. */
+private const val REMOVED_TEXT = "Esse jogo saiu do Palavreiro. Crie uma partida nova!"
+
+/** Explicação curta do modo nas telas de criar e de entrar, com as rodadas escolhidas. */
+private fun modeRules(code: Char, rounds: Int, create: Boolean): String {
+    val series = when (rounds) {
+        1 -> " Uma partida só: quem vencer leva o troféu 🏆"
+        else -> " Melhor de $rounds: quem vencer ${(rounds + 1) / 2} rodadas leva o troféu 🏆"
+    }
+    return when (code) {
+        Multi.ANAGRAM -> "$rounds rodadas com as mesmas 5 letras embaralhadas para os dois: quem achar a palavra primeiro leva o ponto. Vence quem fizer mais pontos 🏆"
+        Multi.DEFINE -> "$rounds rodadas com a mesma definição para os dois: quem acertar a palavra primeiro leva o ponto. Aos 20 s aparece a 1ª letra e aos 40 s a última. Vence quem fizer mais pontos 🏆"
+        Multi.HUNT -> "A mesma grade para os dois: cada palavra é de quem achar primeiro. 5 minutos por rodada; vence a rodada quem pegar mais palavras." + series
+        Multi.TICTAC -> "Jogo da Velha ao vivo: X sempre começa e os símbolos trocam a cada rodada. Velha não conta." + series
+        Multi.CHECKERS -> "Damas com as regras brasileiras: captura obrigatória, lei da maioria e dama voadora. Brancas começam e as cores trocam a cada rodada." + series
+        else -> (if (create) "Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras."
+        else "Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras.") + series
+    }
 }
 
 private fun oppStatus(rows: Int, max: Int, end: Msg.End?, left: Boolean): String = when {
@@ -613,7 +722,10 @@ internal fun EndSheet(
         val champ = series.winner
         if (champ != null) {
             // Fim da série: troféu para quem levou.
-            Trophy(if (champ == "me") "Você levou a série!" else "$oppName levou a série", "Melhor de 3 · ${series.score}", champ == "me")
+            Trophy(
+                if (series.best <= 1) (if (champ == "me") "Você venceu!" else "$oppName venceu") else if (champ == "me") "Você levou a série!" else "$oppName levou a série",
+                (if (series.best <= 1) "1 partida" else "Melhor de ${series.best}") + " · ${series.score}", champ == "me",
+            )
             Spacer(Modifier.height(10.dp))
             Text(
                 when (outcome) { "me" -> "Você venceu a última rodada. "; "opp" -> "$oppName venceu a última rodada. "; else -> "" } + words,
@@ -626,7 +738,7 @@ internal fun EndSheet(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                "Série: Você ${series.score} $oppName · melhor de 3",
+                "Série: Você ${series.score} $oppName · ${series.label}",
                 color = Night.accent, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -658,24 +770,52 @@ internal fun EndSheet(
     }
 }
 
-/** Escolha do próximo jogo na folha de fim (só o anfitrião): [current] = modo de agora. */
-class NextGame(val current: Char, val selected: Char, val pick: (Char) -> Unit)
+/**
+ * Escolha do próximo jogo na folha de fim (só o anfitrião): [current] = modo de agora, [selected] = escolhido;
+ * [currentRounds]/[rounds] = rodadas de agora e as escolhidas para o próximo jogo.
+ */
+class NextGame(
+    val current: Char, val selected: Char, val pick: (Char) -> Unit,
+    val currentRounds: Int = Multi.defaultRounds(current), val rounds: Int = Multi.defaultRounds(selected), val pickRounds: (Int) -> Unit = {},
+) {
+    /** Muda alguma coisa em relação à partida de agora? */
+    val changed: Boolean get() = selected != current || rounds != currentRounds
+}
 
-/** "Próximo jogo" + pílulas dos 5 modos. */
+/** "Próximo jogo" + pílulas dos 8 modos (duas linhas) e, pequeno, o seletor de rodadas. */
 @Composable
 internal fun NextGamePicker(n: NextGame) {
     Text("Próximo jogo", color = Night.muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
     Spacer(Modifier.height(6.dp))
-    Row(Modifier.fillMaxWidth().clip(Shapes.pill).background(Night.surfaceHigh).padding(3.dp)) {
-        for (code in Multi.CODES) {
-            val sel = code == n.selected
-            Text(
-                Multi.chipName(code), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1,
-                color = if (sel) Ink else Night.muted,
-                // Nomes mais longos (Quarteto, Anagrama) ganham mais espaço.
-                modifier = Modifier.weight(Multi.chipName(code).length + 3f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
-                    .clickable { n.pick(code) }.padding(vertical = 8.dp),
-            )
+    Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surfaceHigh).padding(3.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        for (line in Multi.CODES.chunked(4)) {
+            Row(Modifier.fillMaxWidth()) {
+                for (code in line) {
+                    val sel = code == n.selected
+                    Text(
+                        Multi.chipName(code), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1,
+                        color = if (sel) Ink else Night.muted,
+                        // Nomes mais longos (Quarteto, Anagrama) ganham mais espaço.
+                        modifier = Modifier.weight(Multi.chipName(code).length + 3f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
+                            .clickable { n.pick(code) }.padding(vertical = 8.dp),
+                    )
+                }
+            }
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Rodadas", color = Night.muted, fontSize = 12.sp, modifier = Modifier.padding(end = 8.dp))
+        Row(Modifier.weight(1f).clip(Shapes.pill).background(Night.surfaceHigh).padding(3.dp)) {
+            for (r in Multi.roundOptions(n.selected)) {
+                val sel = r == n.rounds
+                Text(
+                    Multi.roundsLabel(n.selected, r), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, textAlign = TextAlign.Center,
+                    color = if (sel) Ink else Night.muted,
+                    modifier = Modifier.weight(1f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
+                        .clickable { n.pickRounds(r) }.padding(vertical = 5.dp),
+                )
+            }
         }
     }
 }
@@ -695,7 +835,11 @@ internal fun EndButtons(
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         if (isHost) {
-            val label = if (next != null && next.selected != next.current) Multi.againLabel(next.current, next.selected, seriesOver) else sameLabel
+            val label = when {
+                next != null && next.selected != next.current -> Multi.againLabel(next.current, next.selected, seriesOver)
+                next != null && next.changed -> if (Multi.pointsMode(next.current)) "Revanche" else "Nova série"
+                else -> sameLabel
+            }
             PillButton(label, Night.correct, modifier = Modifier.weight(1f), onClick = onAgain)
         } else PillButton("Esperando o anfitrião", Night.correct, modifier = Modifier.weight(1f), enabled = false) {}
         PillButton("Sair", Night.surfaceHigh, Night.text, Modifier.weight(0.45f), onClick = onLeave)
@@ -735,7 +879,7 @@ internal fun SeriesPill(series: Multi.Series) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text((if (series.over) "🏆 " else "") + series.score, color = if (series.over) gold else Night.text, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
-        Text("melhor de 3", color = Night.muted, fontSize = 9.sp, lineHeight = 10.sp)
+        if (series.label.isNotEmpty()) Text(series.label, color = Night.muted, fontSize = 9.sp, lineHeight = 10.sp)
     }
 }
 

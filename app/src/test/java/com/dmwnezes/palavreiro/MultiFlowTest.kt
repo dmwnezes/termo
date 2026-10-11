@@ -26,7 +26,7 @@ import java.io.File
 
 /** Fluxo completo de "Jogar com amigo" pela rede de verdade (rode com PV_LIVE=1). */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [34], qualifiers = "w360dp-h780dp")
 @LooperMode(LooperMode.Mode.PAUSED)
 class MultiFlowTest {
     @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
