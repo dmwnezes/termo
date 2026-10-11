@@ -3,11 +3,11 @@
   "use strict";
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   const TABS = ["Resumo", "Conquistas", "Ajustes"];
-  const SITE_VERSION = "19";
+  const SITE_VERSION = "20";
 
   P.games.perfil = function (root) {
     const modes = [["termo", "Termo", 6], ["infinito", "Infinito", 6], ["dueto", "Dueto", 7], ["quarteto", "Quarteto", 9]];
-    const evoKinds = [["termo", "Termo", "tentativas"], ["conn", "Conexões", "erros"]];
+    const evoKinds = [["termo", "Termo", "tentativas"], ["conn", "Conexões", "erros"], ["caca", "Caça", "tempo"]];
     let tab = 0, page = 0, evo = "termo";
     try { page = Math.max(0, Math.min(2, +sessionStorage.getItem("pv-profile-tab") || 0)); } catch (_) {}
     const now = new Date();
@@ -67,7 +67,7 @@
     }
 
     function resumo() {
-      const s = P.stats(modes[tab][0]);
+      const s = P.stats(modes[tab][0]), best = g("ws-best");
       body.innerHTML = `
         <div class="section"><h3>Calendário</h3>${calendar()}</div>
         <div class="section"><h3>Estatísticas</h3>
@@ -80,10 +80,10 @@
         <div class="section"><h3>Seus chutes</h3>${chutes()}</div>
         <div class="section"><h3>Recordes</h3>
           <div class="rec"><span>Conexões</span><span>${g("conn-won")} resolvidos · ${g("conn-perfect")} sem erro</span></div>
+          <div class="rec"><span>Caça-Palavras</span><span>${g("ws-played")} grades · melhor ${best ? P.fmtTime(best) : "—"}</span></div>
           <div class="rec"><span>Intruso</span><span>recorde ${g("intr-best")} · ${g("intr-right")} acertos</span></div>
           <div class="rec"><span>Certo ou Errado</span><span>recorde ${g("ort-best")} · ${g("ort-right")} acertos</span></div>
           <div class="rec"><span>Mestre Mandou</span><span>recorde ${g("mestre-best")} · ${g("mestre-right")} acertos</span></div>
-          <div class="rec"><span>Reverso</span><span>site ${g("rev-app")} × ${g("rev-user")} você</span></div>
           <div class="rec"><span>Qual é a Palavra?</span><span>recorde ${g("def-best")} seguidas · ${g("def-right")} acertos</span></div>
           <div class="rec"><span>Sinônimo ou Antônimo</span><span>maior cadeia: ${Math.max(g("sa-best") || 0, g("syn-best") || 0, g("ant-best") || 0)}</span></div>
           <div class="rec"><span>Arquivo</span><span>${g("arch-played")} ${g("arch-played") === 1 ? "desafio" : "desafios"}</span></div>

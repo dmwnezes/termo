@@ -57,7 +57,7 @@ object Reminder {
     /** Nomes dos desafios do dia que ainda faltam. */
     fun missing(status: DailyStatus): List<String> = listOfNotNull(
         "Termo".takeIf { !status.termo }, "Dueto".takeIf { !status.dueto }, "Quarteto".takeIf { !status.quarteto },
-        "Conexões".takeIf { !status.conexoes },
+        "Conexões".takeIf { !status.conexoes }, "Caça-Palavras".takeIf { !status.caca },
     )
 
     /** Texto do lembrete, ou null se não precisa avisar. */

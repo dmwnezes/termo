@@ -6,10 +6,10 @@ import com.dmwnezes.palavreiro.game.ConnectionsGame
 import com.dmwnezes.palavreiro.game.DefineGame
 import com.dmwnezes.palavreiro.game.Mark
 import com.dmwnezes.palavreiro.game.QuizData
-import com.dmwnezes.palavreiro.game.ReverseGame
-import com.dmwnezes.palavreiro.game.Rules
 import com.dmwnezes.palavreiro.game.SynonymGame
 import com.dmwnezes.palavreiro.game.TermoGame
+import com.dmwnezes.palavreiro.game.WordSearch
+import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.game.Words
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -65,21 +65,19 @@ class NewGamesTest {
     }
 
     @Test
-    fun reversoAdivinhaQuaseSempre() {
-        var ok = 0
-        val sample = words.answers.filterIndexed { i, _ -> i % 10 == 0 }
-        for (secret in sample) {
-            val g = ReverseGame(words)
-            while (!g.over) {
-                val fb = Rules.evaluate(g.guess, secret)
-                fb.forEachIndexed { i, m -> g.setMark(i, m) }
-                g.answer()
+    fun cacaPalavrasMontaTodasAsGrades() {
+        val themes = WordSearchData.parse(asset("caca.txt"))
+        assertTrue(themes.size >= 30)
+        for ((i, t) in themes.withIndex()) {
+            val ws = WordSearch(t, seed = i * 7L)
+            assertEquals(t.name, t.words.size, ws.placed.size)
+            for (p in ws.placed) {
+                p.cells.forEachIndexed { k, (r, c) -> assertEquals(p.word[k], ws.grid[r][c]) }
             }
-            assertFalse("contradição com $secret", g.contradiction)
-            if (g.appWon) ok++
+            val p = ws.placed.first()
+            val (r2, c2) = p.cells.last()
+            assertNotNull(ws.check(r2, c2, p.row, p.col)) // de trás para frente também vale
         }
-        println("Reverso acertou $ok de ${sample.size}")
-        assertTrue(ok >= sample.size * 0.85)
     }
 
     @Test
@@ -124,6 +122,19 @@ class NewGamesTest {
             seen += p.groups.joinToString { it.name }
         }
         assertTrue(seen.size > 450)
+    }
+
+    @Test
+    fun cacaInfinito() {
+        val pool = WordSearchData.parse(asset("caca.txt")) + WordSearchData.parse(asset("caca-extra.txt"))
+        val names = HashSet<String>()
+        for (seed in 0L until 300L) {
+            val w = WordSearchData.infinite(pool, seed)
+            assertEquals(8, w.placed.size)
+            names += w.theme.name
+            assertEquals(w.grid.map { String(it) }, WordSearchData.infinite(pool, seed).grid.map { String(it) })
+        }
+        assertTrue(names.size > 50)
     }
 
     @Test

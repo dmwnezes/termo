@@ -230,6 +230,18 @@ button { font-family: inherit; color: inherit; }
 .dots i.off { background: var(--absent); }
 .lv0 { background: var(--present); } .lv1 { background: var(--correct); } .lv2 { background: var(--blue); } .lv3 { background: var(--purple); }
 
+/* ---------- caça-palavras ---------- */
+.ws-theme { text-align: center; }
+.ws-theme small { color: var(--muted); }
+.ws-theme h2 { margin: 0 0 10px; font-weight: 800; }
+.ws-wrap { position: relative; width: 100%; max-width: 440px; margin: 0 auto; aspect-ratio: 1; border-radius: 24px; background: var(--surface); touch-action: none; user-select: none; }
+.ws-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ws-grid { position: absolute; inset: 0; display: grid; }
+.ws-grid span { display: grid; place-items: center; font-weight: 600; font-size: clamp(14px, 4.4vw, 22px); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0; }
+.chips span { background: var(--surface-high); border-radius: 99px; padding: 6px 12px; font-weight: 600; }
+.chips span.found { text-decoration: line-through; color: var(--muted); }
+
 /* ---------- quizzes ---------- */
 .big-q { background: var(--surface); border-radius: var(--r-card); padding: 22px; text-align: center; font-size: 1.2rem; line-height: 1.4; font-weight: 500; }
 .slots { display: flex; justify-content: center; gap: 4px; margin: 20px 0 8px; flex-wrap: nowrap; }
@@ -271,10 +283,6 @@ button { font-family: inherit; color: inherit; }
 .cal .day.on { color: var(--text); }
 .cal .day.today { outline: 2px solid var(--text); }
 .cal .day i { position: absolute; bottom: 4px; width: 5px; height: 5px; border-radius: 50%; }
-
-/* ---------- reverso ---------- */
-.mark-row { display: flex; gap: 8px; justify-content: center; }
-.mark-row .tile { --tile: 58px; border: 2px solid rgba(244, 241, 255, .25); cursor: pointer; }
 
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 80; }
 

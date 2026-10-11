@@ -17,7 +17,7 @@
     dueto: `<div style="display:flex;gap:4px">${mini(7, 0)}${mini(7, 2)}</div>`,
     quarteto: `<div style="display:grid;grid-template-columns:auto auto;gap:4px">${mini(7, 0)}${mini(7, 1)}${mini(7, 2)}${mini(7, 3)}</div>`,
     conexoes: `<div class="mini" style="grid-template-columns:repeat(4,10px);gap:3px">${["var(--present)", "var(--correct)", "var(--blue)", "var(--purple)"].map((c) => `<i style="width:10px;height:10px;background:${c}"></i>`.repeat(4)).join("")}</div>`,
-    reverso: `<div style="text-align:center"><b style="color:var(--accent);font-size:18px">?</b><div class="mini" style="grid-template-columns:repeat(5,9px)">${["--correct", "--absent", "--present", "--absent", "--correct"].map((c) => `<i style="width:9px;height:9px;background:var(${c})"></i>`).join("")}</div></div>`,
+    caca: `<div style="font-weight:600;font-size:12px;line-height:1.5;letter-spacing:6px;position:relative">CAS<br>OLE<br>PAJ<span style="position:absolute;left:-2px;top:6px;width:58px;height:10px;border-radius:9px;background:rgba(230,193,79,.6);transform:rotate(38deg);transform-origin:left"></span></div>`,
     definicao: `<div style="display:grid;gap:5px;justify-items:center"><i style="display:block;width:46px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><i style="display:block;width:34px;height:5px;border-radius:9px;background:var(--muted);opacity:.6"></i><div class="mini" style="grid-template-columns:repeat(4,11px)">${["--surface-high", "--present", "--surface-high", "--surface-high"].map((c) => `<i style="width:11px;height:11px;background:var(${c})"></i>`).join("")}</div></div>`,
     // Sinônimo ou Antônimo: as duas mini pílulas antigas empilhadas.
     sinonimos: `<div class="sa-ico"><span style="background:var(--correct)">BELO = LINDO</span><span style="background:var(--red)">ALTO ≠ BAIXO</span></div>`,
@@ -42,10 +42,10 @@
     ];
     const more = [
       ["conexoes", "Conexões", "Separe 16 palavras em 4 grupos", badge(P.store.get("conn-done") === today)],
+      ["caca", "Caça-Palavras", "Ache as palavras do tema do dia", badge(P.store.get("ws-done") === today)],
       ["intruso", "Intruso", "Ache a palavra que não pertence ao grupo", ""],
       ["ortografia", "Certo ou Errado", "A palavra está escrita certo?", ""],
       ["mestre", "Mestre Mandou", "Obedeça só quando o mestre mandar", ""],
-      ["reverso", "Reverso", "O site tenta adivinhar a sua palavra", ""],
       ["definicao", "Qual é a Palavra?", "Descubra a palavra pela definição", ""],
       ["sinonimos", "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
@@ -78,7 +78,7 @@
       quarteto: () => P.games.termoScreen(app, "quarteto"),
       conexoes: () => P.games.conexoes(app),
       mestre: () => P.games.mestre(app),
-      reverso: () => P.games.reverso(app),
+      caca: () => P.games.caca(app),
       definicao: () => P.games.definicao(app),
       sinonimos: () => P.games.sinonimos(app),
       antonimos: () => P.games.antonimos(app),

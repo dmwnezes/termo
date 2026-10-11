@@ -35,9 +35,9 @@ import com.dmwnezes.palavreiro.game.TermoGame
 import com.dmwnezes.palavreiro.ui.ConnectionsScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
 import com.dmwnezes.palavreiro.ui.Dest
-import com.dmwnezes.palavreiro.ui.ReverseScreen
 import com.dmwnezes.palavreiro.ui.SynAntScreen
 import com.dmwnezes.palavreiro.ui.ArchiveGame
+import com.dmwnezes.palavreiro.ui.WordSearchScreen
 import com.dmwnezes.palavreiro.ui.ArchiveScreen
 import com.dmwnezes.palavreiro.ui.IntruderScreen
 import com.dmwnezes.palavreiro.ui.SpellingScreen
@@ -163,7 +163,7 @@ fun PalavreiroApp() {
         Launch.challenge?.let { screen = Screen.ChallengeGame(it); Launch.challenge = null; return@LaunchedEffect }
         Launch.pending?.let { p ->
             Launch.pending = null
-            if (p == "HOME") screen = Screen.Home else runCatching { Dest.valueOf(if (p == "ANTONIMOS") "SINONIMOS" else p) }.getOrNull()?.let(::open)
+            if (p == "HOME" || p == "REVERSO") screen = Screen.Home else runCatching { Dest.valueOf(if (p == "ANTONIMOS") "SINONIMOS" else p) }.getOrNull()?.let(::open)
         }
     }
 
@@ -209,13 +209,14 @@ fun PalavreiroApp() {
                             Dest.DUETO to daily(Mode.DUETO),
                             Dest.QUARTETO to daily(Mode.QUARTETO),
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                         )
                     }
                     // Painel "Hoje" e confete uma vez por dia quando os 5 desafios estiverem feitos.
                     val status = remember(refresh) { DailyStatus.read(store) }
                     val celebrate = remember(refresh) {
                         val today = java.time.LocalDate.now().toString()
-                        (status.doneCount == 5 && store.text("alldone_day") != today).also {
+                        (status.doneCount == status.total && store.text("alldone_day") != today).also {
                             if (it) { store.setText("alldone_day", today); store.add("alldone_days") }
                         }
                     }
@@ -231,7 +232,7 @@ fun PalavreiroApp() {
                     val back: () -> Unit = { screen = Screen.Home; refresh++ }
                     when (s.dest) {
                         Dest.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
-                        Dest.REVERSO -> ReverseScreen(AppGraph.words, store, AppGraph.feedback, back)
+                        Dest.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back)
                         Dest.DEFINICAO -> DefineScreen(AppGraph.definitions, store, AppGraph.feedback, back)
                         Dest.SINONIMOS -> SynAntScreen(AppGraph.synonyms, AppGraph.families, AppGraph.antonyms, AppGraph.antonymFamilies, store, AppGraph.feedback, back)
                         Dest.DESAFIAR -> {}
@@ -285,6 +286,7 @@ fun PalavreiroApp() {
                     val back: () -> Unit = { screen = Screen.Archive(s.game); refresh++ }
                     when (s.game) {
                         ArchiveGame.CONEXOES -> ConnectionsScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back, date = s.date, archive = true)
+                        ArchiveGame.CACA -> WordSearchScreen(AppGraph.themes, AppGraph.themesInfinite, store, AppGraph.feedback, back, date = s.date, archive = true)
                         else -> {
                             val mode = when (s.game) { ArchiveGame.DUETO -> Mode.DUETO; ArchiveGame.QUARTETO -> Mode.QUARTETO; else -> Mode.DIARIO }
                             val g = remember(s) { TermoGame(mode, AppGraph.words, store, archive = s.date) }

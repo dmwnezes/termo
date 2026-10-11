@@ -208,9 +208,9 @@ class StoreFeaturesTest {
 
     @Test
     fun lembrete() {
-        val all = DailyStatus(true, true, true, true, 4)
+        val all = DailyStatus(true, true, true, true, true, 4)
         assertNull(Reminder.message(all, null)); assertNull(Reminder.message(all, Reminder.KIND_STREAK))
-        val some = DailyStatus(termo = false, dueto = true, quarteto = true, conexoes = false, streak = 4)
+        val some = DailyStatus(termo = false, dueto = true, quarteto = true, conexoes = false, caca = true, streak = 4)
         val (t, x) = Reminder.message(some, null)!!
         assertEquals("Faltam 2 desafios hoje", t); assertTrue(x.contains("Termo e Conexões") && x.contains("sequência de 4"))
         assertTrue(Reminder.message(some, Reminder.KIND_STREAK)!!.second.contains("4 dias"))

@@ -15,11 +15,12 @@ import com.dmwnezes.palavreiro.ui.ProfileScreen
 import com.dmwnezes.palavreiro.ui.SplashCredits
 import com.dmwnezes.palavreiro.ui.Dest
 import com.dmwnezes.palavreiro.ui.ConnectionsScreen
-import com.dmwnezes.palavreiro.ui.ReverseScreen
+import com.dmwnezes.palavreiro.ui.WordSearchScreen
 import com.dmwnezes.palavreiro.ui.DefineScreen
 import com.dmwnezes.palavreiro.ui.SynAntScreen
 import com.dmwnezes.palavreiro.game.Records
 import com.dmwnezes.palavreiro.game.ConnectionsData
+import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
 import androidx.compose.ui.test.performTextInput
@@ -69,7 +70,7 @@ class ScreensRenderTest {
     @Test
     fun inicio() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { HomeScreen(mapOf(Dest.TERMO to "Novo", Dest.DUETO to "Feito hoje ✓", Dest.CONEXOES to "Novo"), {}, {}) } }
+        rule.setContent { PalavreiroTheme { HomeScreen(mapOf(Dest.TERMO to "Novo", Dest.DUETO to "Feito hoje ✓", Dest.CONEXOES to "Novo", Dest.CACA to "Novo"), {}, {}) } }
         save("2-inicio")
     }
 
@@ -133,7 +134,7 @@ class ScreensRenderTest {
     @Test
     fun inicioHoje() {
         rule.mainClock.autoAdvance = false
-        val st = com.dmwnezes.palavreiro.system.DailyStatus(termo = true, dueto = true, quarteto = false, conexoes = true, streak = 3)
+        val st = com.dmwnezes.palavreiro.system.DailyStatus(termo = true, dueto = true, quarteto = false, conexoes = true, caca = false, streak = 3)
         rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), {}, {}, today = st) } }
         save("2b-inicio-hoje")
     }
@@ -357,10 +358,17 @@ class ScreensRenderTest {
     }
 
     @Test
-    fun reverso() {
+    fun caca() {
         rule.mainClock.autoAdvance = false
-        rule.setContent { PalavreiroTheme { ReverseScreen(words, null, null, {}) } }
-        save("13-reverso")
+        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day) } }
+        save("12-caca")
+    }
+
+    @Test
+    fun cacaInfinito() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { WordSearchScreen(WordSearchData.parse(asset("caca.txt")), WordSearchData.parse(asset("caca-extra.txt")), null, null, {}, day, startInfinite = true) } }
+        save("12b-caca-infinito")
     }
 
     @Test

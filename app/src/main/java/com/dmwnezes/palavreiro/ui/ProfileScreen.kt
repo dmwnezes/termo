@@ -140,10 +140,10 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
     }
     Section("Recordes") {
         RecordRow("Conexões", "${records.connWon} resolvidos · ${records.connPerfect} sem erro")
+        RecordRow("Caça-Palavras", "${records.wsPlayed} grades · melhor ${if (records.wsBest > 0) formatTime(records.wsBest) else "—"}")
         RecordRow("Intruso", "recorde ${records["intr_best"]} · ${records["intr_right"]} acertos")
         RecordRow("Certo ou Errado", "recorde ${records["ort_best"]} · ${records["ort_right"]} acertos")
         RecordRow("Mestre Mandou", "recorde ${records["mestre_best"]} · ${records["mestre_right"]} acertos")
-        RecordRow("Reverso", "app ${records.revApp} × ${records.revUser} você")
         RecordRow("Qual é a Palavra?", "recorde ${records.defBest} seguidas · ${records.defRight} acertos")
         RecordRow("Sinônimo ou Antônimo", "maior cadeia: ${maxOf(records["sa_best"], records.synBest, records["ant_best"])}")
         RecordRow("Arquivo", "${records["arch_played"]} ${if (records["arch_played"] == 1) "desafio" else "desafios"}")
@@ -155,11 +155,11 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
 @Composable
 fun EvolutionChart(history: org.json.JSONObject, today: LocalDate = LocalDate.now()) {
     var field by remember { mutableIntStateOf(0) }
-    val fields = listOf("termo", "conn")
-    Segmented(listOf("Termo", "Conexões"), field) { field = it }
+    val fields = listOf("termo", "conn", "caca")
+    Segmented(listOf("Termo", "Conexões", "Caça"), field) { field = it }
     Spacer(Modifier.height(6.dp))
     Text(
-        listOf("Média de tentativas por semana", "Média de erros por semana")[field],
+        listOf("Média de tentativas por semana", "Média de erros por semana", "Tempo médio por semana")[field],
         fontSize = 13.sp, color = Night.muted,
     )
     Spacer(Modifier.height(12.dp))
@@ -169,7 +169,7 @@ fun EvolutionChart(history: org.json.JSONObject, today: LocalDate = LocalDate.no
         return
     }
     val max = weeks.mapNotNull { it.second }.maxOrNull()?.coerceAtLeast(1.0) ?: 1.0
-    fun label(v: Double) = "%.1f".format(java.util.Locale("pt", "BR"), v)
+    fun label(v: Double) = if (field == 2) formatTime(Math.round(v).toInt()) else "%.1f".format(java.util.Locale("pt", "BR"), v)
     Row(Modifier.fillMaxWidth().height(150.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Bottom) {
         weeks.forEachIndexed { i, (_, v) ->
             Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {

@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, REVERSO, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -70,10 +70,10 @@ fun HomeScreen(
     )
     val more = listOf(
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
+        GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
-        GameCardInfo(Dest.REVERSO, "Reverso", "O app tenta adivinhar a sua palavra", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", null),
         GameCardInfo(Dest.DESAFIAR, "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", null),
@@ -125,6 +125,7 @@ private fun TodayPanel(status: com.dmwnezes.palavreiro.system.DailyStatus, onOpe
     val items = listOf(
         Triple(Dest.TERMO, "Termo", status.termo), Triple(Dest.DUETO, "Dueto", status.dueto),
         Triple(Dest.QUARTETO, "Quarteto", status.quarteto), Triple(Dest.CONEXOES, "Conexões", status.conexoes),
+        Triple(Dest.CACA, "Caça", status.caca),
     )
     val done = status.doneCount
     Column(
@@ -224,10 +225,22 @@ private fun CardIcon(dest: Dest) {
                 Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) { repeat(4) { Box(Modifier.size(10.dp).clip(RoundedCornerShape(3.dp)).background(c)) } }
             }
         }
-        Dest.REVERSO -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("?", color = Night.accent, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                listOf(Night.correct, Night.absent, Night.present, Night.absent, Night.correct).forEach { Box(Modifier.size(9.dp).clip(RoundedCornerShape(3.dp)).background(it)) }
+        Dest.CACA -> Box(Modifier.size(49.dp)) {
+            // Grade 3×3 de letras com a marcação na diagonal (centro da 1ª à última casa).
+            Canvas(Modifier.fillMaxSize()) {
+                val c = size.width * 7.5f / 49f
+                drawLine(Night.present.copy(alpha = 0.7f), Offset(c, c), Offset(size.width - c, size.height - c), strokeWidth = size.width * 0.28f, cap = StrokeCap.Round)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                listOf("CAS", "OLE", "PAJ").forEach { line ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        line.forEach {
+                            Box(Modifier.size(15.dp), contentAlignment = Alignment.Center) {
+                                Text("$it", color = Night.text, fontSize = 11.sp, lineHeight = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false)
+                            }
+                        }
+                    }
+                }
             }
         }
         Dest.DEFINICAO -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {

@@ -38,7 +38,7 @@ import java.time.YearMonth
 /** Jogos com desafio do dia que podem ser jogados pelo Arquivo. */
 enum class ArchiveGame(val key: String, val title: String) {
     TERMO("termo", "Termo"), DUETO("dueto", "Dueto"), QUARTETO("quarteto", "Quarteto"),
-    CONEXOES("conexoes", "Conexões"),
+    CONEXOES("conexoes", "Conexões"), CACA("caca", "Caça"),
 }
 
 private val FIRST_DAY: LocalDate = LocalDate.of(2026, 1, 1)

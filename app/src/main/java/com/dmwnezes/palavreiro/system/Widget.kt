@@ -41,11 +41,13 @@ class Widget : AppWidgetProvider() {
             v.setTextViewText(R.id.w_dueto, "${mark(s.dueto)}  Dueto")
             v.setTextViewText(R.id.w_quarteto, "${mark(s.quarteto)}  Quarteto")
             v.setTextViewText(R.id.w_conexoes, "${mark(s.conexoes)}  Conexões")
+            v.setTextViewText(R.id.w_caca, "${mark(s.caca)}  Caça-Palavras")
             v.setOnClickPendingIntent(R.id.w_root, open(context, "HOME", 10))
             v.setOnClickPendingIntent(R.id.w_termo, open(context, "TERMO", 11))
             v.setOnClickPendingIntent(R.id.w_dueto, open(context, "DUETO", 12))
             v.setOnClickPendingIntent(R.id.w_quarteto, open(context, "QUARTETO", 13))
             v.setOnClickPendingIntent(R.id.w_conexoes, open(context, "CONEXOES", 14))
+            v.setOnClickPendingIntent(R.id.w_caca, open(context, "CACA", 15))
             return v
         }
     }

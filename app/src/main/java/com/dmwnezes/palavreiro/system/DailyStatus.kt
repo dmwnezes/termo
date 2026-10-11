@@ -10,10 +10,11 @@ data class DailyStatus(
     val dueto: Boolean,
     val quarteto: Boolean,
     val conexoes: Boolean,
+    val caca: Boolean,
     val streak: Int,
 ) {
-    val total: Int get() = 4
-    val doneCount: Int get() = listOf(termo, dueto, quarteto, conexoes).count { it }
+    val total: Int get() = 5
+    val doneCount: Int get() = listOf(termo, dueto, quarteto, conexoes, caca).count { it }
 
     companion object {
         fun read(store: Store, today: LocalDate = LocalDate.now()): DailyStatus {
@@ -27,6 +28,7 @@ data class DailyStatus(
                 dueto = store.text("daily_done_${Mode.DUETO.key}") == d,
                 quarteto = store.text("daily_done_${Mode.QUARTETO.key}") == d,
                 conexoes = store.text("conn_done") == d,
+                caca = store.text("ws_done") == d,
                 streak = streak,
             )
         }

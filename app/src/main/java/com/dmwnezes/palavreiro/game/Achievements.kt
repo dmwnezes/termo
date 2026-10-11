@@ -18,8 +18,8 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
     operator fun get(key: String): Int = values[key] ?: 0
     val connWon get() = this["conn_won"]
     val connPerfect get() = this["conn_perfect"]
-    val revApp get() = this["rev_appwins"]
-    val revUser get() = this["rev_userwins"]
+    val wsPlayed get() = this["ws_played"]
+    val wsBest get() = this["ws_best"]
     val defBest get() = this["def_best"]
     val defRight get() = this["def_right"]
     val synBest get() = this["syn_best"]
@@ -44,6 +44,7 @@ object Achievements {
         val wins = daily.won + infinite.won
         val firstTry = daily.firstTry + infinite.firstTry
         val twoTries = daily.dist[1] + infinite.dist[1]
+        val fastWs = listOf(r["ws_best"], r["ws_inf_best"]).any { it in 1..119 }
         fun a(e: String, t: String, d: String, v: Int, goal: Int) = Achievement(e, t, d, minOf(v, goal), goal)
         return listOf(
             a("🌱", "Primeira palavra", "Acerte sua primeira palavra", wins, 1),
@@ -59,7 +60,8 @@ object Achievements {
             a("🧩", "Conectado", "Resolva um Conexões", r["conn_won"], 1),
             a("💎", "Sem errar", "Resolva um Conexões sem erros", r["conn_perfect"], 1),
             a("♻️", "Conexão sem fim", "Resolva 10 Conexões no Infinito", r["conn_inf_won"], 10),
-            a("🤖", "Mais esperto que o app", "Vença o Reverso", r["rev_userwins"], 1),
+            a("🔎", "Olho de águia", "Termine um Caça-Palavras em menos de 2 minutos", if (fastWs) 1 else 0, 1),
+            a("🗺️", "Caçador incansável", "Termine 10 grades no Caça-Palavras Infinito", r["ws_inf_played"], 10),
             a("📖", "Dicionário ambulante", "Acerte 10 seguidas no Qual é a Palavra?", r["def_best"], 10),
             a("⛓️", "Corrente forte", "Faça uma cadeia de 20 no Sinônimo ou Antônimo", maxOf(r["syn_best"], r["sa_best"]), 20),
             a("🔄", "Do avesso", "Acerte 20 pegadinhas no Sinônimo ou Antônimo", maxOf(r["ant_best"], r["sa_tricks"]), 20),
@@ -68,7 +70,7 @@ object Achievements {
             a("👑", "Obediente", "Faça 15 pontos no Mestre Mandou", r["mestre_best"], 15),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
-            a("🌟", "Dia completo", "Faça os 4 desafios do dia", r["alldone_days"], 1),
+            a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),
         )
     }
 }
