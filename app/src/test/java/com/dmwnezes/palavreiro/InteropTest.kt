@@ -58,6 +58,25 @@ class InteropTest {
         rule.onNodeWithText("Entrar").performClick()
         rule.waitUntil(30_000) { shown("Você × Site") }
         log("partida começou")
+        if (room.mode == 'v') {
+            for (cell in listOf(3, 4)) {
+                rule.waitUntil(60_000) { shown("Sua vez", true) }
+                pause(500)
+                rule.onNode(androidx.compose.ui.test.hasContentDescription("Casa $cell")).performClick()
+                log("app O em $cell"); pause(1500)
+            }
+            rule.waitUntil(30_000) { shown("venceu a rodada", true) }
+            log("fim no app: " + listOf("Site venceu a rodada", "Você venceu a rodada!").filter { shown(it) })
+            return
+        }
+        if (room.mode == 'x') {
+            rule.waitUntil(60_000) { shown("Sua vez", true) }
+            pause(500)
+            rule.onNode(androidx.compose.ui.test.hasContentDescription("Casa 17")).performClick(); pause(300)
+            rule.onNode(androidx.compose.ui.test.hasContentDescription("Casa 26")).performClick()
+            log("app pretas 17→26"); pause(3000)
+            return
+        }
         if (System.getenv("PV_R8") == "1") {
             // Reação do site chega como balão (avança o relógio à mão para ver o balão antes de sumir).
             rule.mainClock.autoAdvance = false
