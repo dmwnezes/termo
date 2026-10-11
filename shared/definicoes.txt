@@ -121,3 +121,486 @@ TORCIDA|Grupo de pessoas que apoiam um time.
 XADREZ|Jogo de tabuleiro com rei, rainha, torres, bispos, cavalos e peões.
 QUEBRA-CABEÇA|Jogo de encaixar peças para montar uma imagem.
 ESCONDE-ESCONDE|Brincadeira em que um conta e os outros se escondem.
+CADEIRA|Móvel com encosto, feito para uma pessoa se sentar.
+SOFÁ|Assento estofado e comprido, para várias pessoas, comum na sala.
+CAMA|Móvel onde a gente se deita para dormir.
+MESA|Móvel com tampo e pernas, onde se come, escreve ou trabalha.
+ARMÁRIO|Móvel com portas e prateleiras para guardar roupas ou objetos.
+GAVETA|Caixa que desliza para dentro e para fora de um móvel.
+TAPETE|Peça de tecido grosso estendida sobre o chão.
+CORTINA|Pano pendurado na janela para tapar a luz ou a vista.
+TOALHA|Pano felpudo usado para se enxugar depois do banho.
+SABONETE|Barra perfumada usada para lavar o corpo com água.
+ESCOVA|Objeto com cerdas usado para pentear o cabelo ou limpar os dentes.
+PENTE|Objeto com dentes finos usado para arrumar o cabelo.
+CHUVEIRO|Aparelho do banheiro de onde cai a água do banho.
+TORNEIRA|Peça que se abre e fecha para deixar sair a água.
+PIA|Bacia fixa com torneira, onde se lava a louça ou as mãos.
+FOGÃO|Aparelho da cozinha com bocas de fogo para cozinhar.
+PANELA|Recipiente fundo, com cabo ou alças, usado para cozinhar no fogo.
+FRIGIDEIRA|Panela rasa de cabo comprido, usada para fritar.
+GARFO|Talher com dentes usado para espetar a comida.
+COLHER|Talher de ponta arredondada e funda, usado para tomar sopa.
+FACA|Instrumento com lâmina afiada usado para cortar.
+PRATO|Peça rasa onde se serve a comida.
+COPO|Recipiente sem alça usado para beber.
+XÍCARA|Pequeno recipiente com asa, usado para tomar café ou chá.
+GARRAFA|Recipiente de gargalo estreito para guardar líquidos.
+LIQUIDIFICADOR|Aparelho com lâminas que tritura e mistura alimentos, como sucos e vitaminas.
+VENTILADOR|Aparelho com hélices que faz vento para refrescar.
+TELEVISÃO|Aparelho que mostra imagens e sons de programas e filmes.
+LÂMPADA|Peça que acende e ilumina quando recebe energia elétrica.
+INTERRUPTOR|Botão na parede que acende e apaga a luz.
+CAMPAINHA|Botão na porta que faz um som para avisar que alguém chegou.
+FECHADURA|Peça da porta onde se coloca a chave para trancar.
+CHAVE|Pequena peça de metal que abre e fecha fechaduras.
+PORTÃO|Porta grande que dá entrada a um terreno, garagem ou quintal.
+QUINTAL|Terreno nos fundos da casa, ao ar livre.
+VARANDA|Parte da casa aberta para fora, coberta e com parapeito.
+GARAGEM|Lugar coberto onde se guarda o carro.
+COZINHA|Cômodo da casa onde se preparam as refeições.
+BANHEIRO|Cômodo com vaso sanitário, pia e chuveiro.
+CABIDE|Objeto onde se pendura a roupa dentro do armário.
+VARAL|Corda ou fio onde se estende a roupa lavada para secar.
+PREGADOR|Pecinha que prende a roupa no varal.
+BALDE|Recipiente com alça usado para carregar água.
+RODO|Utensílio com borracha e cabo, usado para puxar a água do chão.
+ESPONJA|Material macio e cheio de buraquinhos usado para lavar louça.
+LIXEIRA|Recipiente onde se joga o lixo.
+CESTO|Recipiente trançado usado para guardar ou carregar coisas.
+VELA|Bastão de cera com pavio, que se acende para iluminar.
+FÓSFORO|Palito com ponta que pega fogo quando riscado.
+ISQUEIRO|Pequeno aparelho de bolso que acende uma chama.
+REDE|Tecido pendurado pelas pontas, onde se deita para descansar ou dormir.
+COBERTOR|Peça grossa de tecido usada para se aquecer na cama.
+LENÇOL|Pano que cobre o colchão da cama.
+COLCHÃO|Parte macia e grossa da cama, onde o corpo se apoia.
+ALMOFADA|Saco macio e recheado usado para apoiar as costas ou enfeitar o sofá.
+ABAJUR|Pequena luminária com cúpula, usada sobre a mesa de cabeceira.
+QUADRO|Pintura ou foto com moldura, pendurada na parede; também a lousa da sala de aula.
+PORTA-RETRATO|Moldura pequena para exibir uma foto em pé.
+CAIXA|Recipiente com tampa usado para guardar ou transportar coisas.
+ENVELOPE|Papel dobrado e colado onde se coloca uma carta.
+SELO|Pequena estampa colada na carta para pagar o envio pelo correio.
+CARTA|Mensagem escrita enviada a alguém pelo correio.
+LÁPIS|Objeto de madeira com grafite dentro, usado para escrever e desenhar.
+CANETA|Objeto com tinta usado para escrever.
+BORRACHA|Objeto usado para apagar o que foi escrito a lápis.
+CADERNO|Conjunto de folhas pautadas presas, usado para anotar as lições.
+RÉGUA|Peça reta com marcas em centímetros, usada para medir e traçar linhas.
+ESTOJO|Pequena bolsa ou caixa onde se guardam lápis e canetas.
+APONTADOR|Objeto com lâmina que faz a ponta do lápis.
+LOUSA|Quadro da sala de aula onde o professor escreve.
+GIZ|Bastão branco usado para escrever no quadro-negro.
+RECREIO|Intervalo entre as aulas para os alunos brincarem e lancharem.
+PROVA|Avaliação com perguntas feita para ver o que o aluno aprendeu.
+DIRETOR|Pessoa que comanda uma escola ou uma empresa.
+ALUNO|Pessoa que estuda numa escola.
+LIVRO|Conjunto de páginas impressas e encadernadas para leitura.
+REDAÇÃO|Texto escrito pelo aluno sobre um tema.
+MATEMÁTICA|Matéria que estuda os números, as contas e as formas.
+GEOGRAFIA|Matéria que estuda a Terra, seus lugares, climas e povos.
+UNIFORME|Roupa igual usada por todos de uma escola, empresa ou time.
+FÉRIAS|Período de descanso, sem aulas ou sem trabalho.
+DIPLOMA|Documento que comprova que alguém concluiu um curso.
+COLA|Substância usada para grudar papel e outros materiais.
+CALCULADORA|Aparelho que faz contas.
+COMPUTADOR|Máquina eletrônica usada para escrever, calcular e navegar na internet.
+TECLADO|Conjunto de teclas usado para digitar ou tocar música.
+IMPRESSORA|Aparelho que passa para o papel textos e imagens do computador.
+INTERNET|Rede mundial que conecta computadores e celulares.
+CÂMERA|Aparelho que tira fotos ou grava vídeos.
+FOTOGRAFIA|Imagem registrada por uma câmera.
+CARREGADOR|Aparelho que recarrega a bateria do celular.
+BATERIA|Peça que guarda energia; também o conjunto de tambores tocado por um músico.
+MENSAGEM|Texto ou recado enviado a alguém.
+VÍDEO|Gravação de imagens em movimento.
+CABELO|Fios que nascem na cabeça.
+OLHO|Órgão da visão.
+NARIZ|Parte do rosto por onde se respira e se sentem os cheiros.
+ORELHA|Parte de fora do órgão da audição, de cada lado da cabeça.
+BOCA|Abertura do rosto por onde se come e se fala.
+DENTE|Cada peça dura e branca da boca, usada para mastigar.
+LÍNGUA|Órgão dentro da boca que sente o gosto dos alimentos; também o idioma.
+PESCOÇO|Parte do corpo que liga a cabeça ao tronco.
+OMBRO|Parte do corpo onde o braço se junta ao tronco.
+COTOVELO|Articulação no meio do braço, que permite dobrá-lo.
+JOELHO|Articulação no meio da perna, que permite dobrá-la.
+UMBIGO|Marca no meio da barriga, onde ficava o cordão do bebê.
+CORAÇÃO|Órgão que bombeia o sangue pelo corpo.
+PULMÃO|Órgão do peito responsável pela respiração.
+ESTÔMAGO|Órgão onde a comida começa a ser digerida.
+CÉREBRO|Órgão dentro da cabeça que comanda o corpo e o pensamento.
+OSSO|Parte dura e branca que forma o esqueleto.
+SANGUE|Líquido vermelho que corre pelas veias.
+UNHA|Lâmina dura na ponta dos dedos.
+SOBRANCELHA|Fileira de pelos acima de cada olho.
+BARBA|Pelos que crescem no rosto, no queixo e nas bochechas.
+FEBRE|Temperatura do corpo mais alta que o normal, sinal de doença.
+GRIPE|Doença causada por vírus, com febre, tosse e nariz escorrendo.
+TOSSE|Expulsão forte e barulhenta de ar pela boca.
+ESPIRRO|Saída rápida e sem querer de ar pelo nariz e pela boca.
+VACINA|Substância aplicada para proteger o corpo contra uma doença.
+REMÉDIO|Substância tomada para tratar uma doença ou aliviar a dor.
+CURATIVO|Proteção colocada sobre um machucado.
+HOSPITAL|Lugar onde doentes e feridos recebem tratamento.
+FARMÁCIA|Loja onde se compram remédios.
+DENTISTA|Profissional que cuida dos dentes.
+MÉDICO|Profissional que examina e trata pessoas doentes.
+ENFERMEIRO|Profissional que cuida dos pacientes e aplica remédios no hospital.
+AMBULÂNCIA|Veículo que leva doentes e feridos ao hospital.
+ÓCULOS|Par de lentes presas a uma armação, usado para enxergar melhor.
+SONO|Vontade de dormir; também o estado de quem dorme.
+FOME|Vontade de comer.
+SEDE|Vontade de beber água.
+SUOR|Líquido que sai pela pele quando sentimos calor.
+LÁGRIMA|Gota que sai dos olhos quando se chora.
+BOCEJO|Abertura da boca sem querer, sinal de sono ou cansaço.
+SOLUÇO|Contração involuntária que faz um barulhinho na garganta.
+CÓCEGAS|Sensação na pele que faz rir sem querer.
+ARREPIO|Pelos em pé causados por frio ou medo.
+ARROZ|Grão branco cozido, presença diária no prato do brasileiro.
+FEIJÃO|Grão cozido em caldo, companheiro do arroz.
+FAROFA|Farinha de mandioca torrada na manteiga ou no óleo, com temperos.
+MACARRÃO|Massa de farinha e ovos, cozida em água, em fios ou outros formatos.
+PÃO|Alimento feito de massa de farinha assada no forno.
+MANTEIGA|Gordura amarela feita do creme do leite, passada no pão.
+QUEIJO|Alimento feito do leite coalhado.
+OVO|Alimento posto pela galinha, com casca, clara e gema.
+LEITE|Líquido branco produzido pela vaca e por outras fêmeas mamíferas.
+CAFÉ|Bebida escura feita com grãos torrados e moídos.
+SUCO|Bebida feita espremendo ou batendo frutas.
+CHÁ|Bebida feita com folhas ou ervas fervidas em água.
+BOLO|Massa doce assada no forno, comum em aniversários.
+BISCOITO|Pequena massa assada e crocante, doce ou salgada.
+CHOCOLATE|Doce feito do cacau.
+PIZZA|Massa redonda e achatada, coberta de molho e recheios, assada no forno.
+PASTEL|Massa fina frita com recheio, vendida em feiras.
+COXINHA|Salgado empanado e frito com recheio de frango, em formato de gota.
+SALADA|Prato frio de verduras e legumes.
+SOPA|Prato líquido e quente, com legumes, carne ou macarrão.
+MEL|Líquido doce produzido pelas abelhas.
+AÇÚCAR|Substância branca que adoça os alimentos.
+SAL|Tempero branco que deixa a comida salgada.
+VINAGRE|Líquido azedo usado para temperar saladas.
+PAMONHA|Massa de milho verde cozida dentro da palha.
+CANJICA|Doce de milho branco cozido com leite e açúcar.
+CARNE|Parte dos animais usada como alimento.
+FRANGO|Galinha nova, usada como alimento.
+PEIXE|Animal que vive na água, respira por guelras e nada com nadadeiras.
+MAÇÃ|Fruta redonda, vermelha ou verde, crocante por dentro.
+BANANA|Fruta comprida e amarela, que se descasca com a mão.
+LARANJA|Fruta cítrica e redonda, de casca alaranjada, muito usada em sucos.
+LIMÃO|Fruta cítrica pequena e azeda.
+MELANCIA|Fruta grande de casca verde e polpa vermelha cheia de água.
+ABACAXI|Fruta de casca áspera e coroa de folhas, doce e azedinha.
+UVA|Fruta pequena que nasce em cachos e é usada para fazer vinho.
+MANGA|Fruta de polpa amarela e caroço grande; também a parte da roupa que cobre o braço.
+COCO|Fruto do coqueiro, com água dentro e polpa branca.
+CAJU|Fruta do Nordeste com a castanha do lado de fora.
+GOIABA|Fruta de polpa rosada e muitas sementinhas, usada para fazer doce.
+MORANGO|Fruta pequena e vermelha, com sementinhas por fora.
+TOMATE|Fruto vermelho usado em saladas e molhos.
+CEBOLA|Bulbo de cheiro forte que faz chorar quando cortado.
+ALHO|Tempero de cheiro forte, formado por pequenos dentes.
+CENOURA|Raiz alaranjada e comprida, comida crua ou cozida.
+BATATA|Tubérculo que se come cozido, frito ou em purê.
+MANDIOCA|Raiz de casca marrom que dá a farinha, a goma e a tapioca.
+MILHO|Grão amarelo que nasce em espigas.
+PIMENTA|Tempero que deixa a comida ardida.
+PICOLÉ|Sorvete preso a um palito.
+REFRIGERANTE|Bebida doce e com gás, vendida em lata ou garrafa.
+MERENDA|Lanche servido aos alunos na escola.
+LANCHE|Refeição leve entre as principais.
+ALMOÇO|Refeição feita por volta do meio-dia.
+JANTAR|Refeição feita à noite.
+RECEITA|Instruções para preparar um prato; também o papel em que o médico indica remédios.
+GELO|Água congelada.
+FORNO|Parte fechada do fogão onde se assam bolos e pães.
+CACHORRO|Animal doméstico que late, conhecido como o melhor amigo do homem.
+GATO|Animal doméstico que mia e gosta de caçar ratos.
+VACA|Fêmea do boi, que dá leite.
+CAVALO|Animal grande de crina e cascos, usado para montaria.
+GALINHA|Ave doméstica que bota ovos e cacareja.
+PATO|Ave aquática de bico achatado que faz quá-quá.
+PORCO|Animal de focinho achatado, criado para dar carne.
+JUMENTO|Animal de carga menor que o cavalo, de orelhas compridas, comum no sertão.
+BODE|Macho da cabra.
+LEÃO|Felino grande de juba, chamado de rei da selva.
+ELEFANTE|Maior animal terrestre, com tromba e presas.
+GIRAFA|Animal de pescoço muito comprido, com manchas no corpo.
+MACACO|Animal ágil que vive em árvores e tem mãos parecidas com as nossas.
+COBRA|Réptil sem pernas que se arrasta pelo chão.
+JACARÉ|Réptil grande de boca cheia de dentes, que vive nos rios.
+SAPO|Anfíbio que pula e coaxa perto da água.
+BORBOLETA|Inseto de asas coloridas que nasce de uma lagarta.
+ABELHA|Inseto que produz mel e pode picar.
+FORMIGA|Pequeno inseto que vive em colônias e carrega folhas.
+MOSQUITO|Inseto pequeno que pica e zumbe no ouvido.
+BARATA|Inseto marrom e rápido que aparece em lugares sujos.
+ARANHA|Animal de oito patas que tece teias.
+LAGARTIXA|Pequeno réptil que anda pelas paredes caçando insetos.
+CORUJA|Ave noturna de olhos grandes que gira bem a cabeça.
+PAPAGAIO|Ave verde que consegue imitar a fala humana.
+URUBU|Ave preta que se alimenta de animais mortos.
+BEIJA-FLOR|Pássaro pequeno que bate as asas muito rápido para tomar o néctar das flores.
+GALO|Macho da galinha, que canta de manhã cedo.
+PINTINHO|Filhote da galinha.
+BALEIA|Maior animal do mar, um mamífero que sobe à superfície para respirar.
+TUBARÃO|Peixe grande e veloz do mar, com muitos dentes afiados.
+GOLFINHO|Mamífero marinho brincalhão e inteligente.
+CARANGUEJO|Crustáceo que anda de lado e vive no mangue.
+CAMARÃO|Pequeno crustáceo muito usado na culinária.
+CARACOL|Molusco lento que carrega uma concha nas costas.
+MINHOCA|Bicho comprido e sem patas que vive debaixo da terra.
+COELHO|Animal de orelhas compridas que gosta de cenoura.
+RATO|Pequeno roedor de rabo comprido.
+TATU|Animal com carapaça que cava buracos no chão.
+JABUTI|Réptil terrestre de casco, parente da tartaruga.
+VAGA-LUME|Inseto que acende uma luz no corpo à noite.
+ZEBRA|Animal africano parecido com o cavalo, com listras pretas e brancas.
+PINGUIM|Ave que não voa, nada muito bem e vive em lugares frios.
+CAMELO|Animal do deserto com corcovas nas costas.
+PAVÃO|Ave cujo macho abre uma cauda enorme e colorida.
+OVELHA|Animal criado para dar lã.
+CARNEIRO|Macho da ovelha.
+BEZERRO|Filhote da vaca.
+CHUVA|Água que cai das nuvens.
+NUVEM|Massa branca ou cinza de vapor de água que flutua no céu.
+VENTO|Ar em movimento.
+TROVÃO|Barulho forte que vem do céu durante uma tempestade.
+RELÂMPAGO|Clarão rápido no céu durante uma tempestade.
+NEVE|Flocos de gelo que caem do céu em lugares muito frios.
+SOL|Estrela que ilumina e aquece a Terra durante o dia.
+LUA|Astro que gira em volta da Terra e brilha à noite.
+ESTRELA|Ponto brilhante que aparece no céu à noite.
+MAR|Grande extensão de água salgada.
+RIO|Curso de água doce que corre até o mar ou um lago.
+LAGO|Água parada cercada de terra.
+PRAIA|Faixa de areia à beira do mar.
+ONDA|Água do mar que se levanta e quebra na areia.
+ILHA|Pedaço de terra cercado de água por todos os lados.
+MONTANHA|Grande elevação de terra, bem mais alta que um morro.
+AREIA|Grãozinhos que formam as praias e as dunas.
+PEDRA|Pedaço duro de rocha.
+ÁRVORE|Planta grande com tronco, galhos e folhas.
+FOLHA|Parte verde da planta que nasce nos galhos; também cada página de papel.
+FLOR|Parte colorida e perfumada da planta, que depois vira fruto.
+GRAMA|Planta baixa e verde que cobre campos e jardins.
+SOMBRA|Área escura que se forma quando algo bloqueia a luz.
+POEIRA|Pó fino que se acumula nos móveis ou sobe da estrada.
+LAMA|Mistura de terra e água.
+ORVALHO|Gotinhas de água que aparecem nas plantas de manhã cedo.
+NEBLINA|Nuvem baixa que dificulta enxergar ao longe.
+SECA|Longo período sem chuva.
+ENCHENTE|Água de chuva ou de rio que transborda e invade as ruas.
+TERREMOTO|Tremor forte do chão.
+FOGO|Calor e luz que saem de algo que está queimando.
+FUMAÇA|Nuvem escura que sobe de algo que está queimando.
+MADRUGADA|Parte da noite entre a meia-noite e o amanhecer.
+PRIMAVERA|Estação do ano das flores.
+INVERNO|Estação mais fria do ano.
+VERÃO|Estação mais quente do ano.
+OUTONO|Estação do ano em que as folhas caem.
+ÔNIBUS|Veículo grande que transporta muitos passageiros pela cidade.
+TREM|Veículo de vagões que anda sobre trilhos.
+AVIÃO|Veículo com asas que voa levando passageiros.
+NAVIO|Embarcação grande que viaja pelo mar.
+MOTO|Veículo de duas rodas com motor.
+CAMINHÃO|Veículo grande usado para transportar cargas.
+TÁXI|Carro de aluguel que leva passageiros e cobra pela corrida.
+METRÔ|Trem que circula, em geral, por baixo da terra nas grandes cidades.
+ESTRADA|Caminho largo que liga uma cidade a outra.
+PONTE|Construção que passa por cima de um rio ou de um vale.
+CALÇADA|Parte da rua reservada para quem anda a pé.
+ESQUINA|Ponto onde duas ruas se cruzam.
+PRAÇA|Espaço público aberto, com bancos e árvores.
+FEIRA|Mercado de rua com barracas de frutas, verduras e outros produtos.
+PADARIA|Loja onde se fazem e vendem pães.
+AÇOUGUE|Loja onde se vende carne.
+SUPERMERCADO|Loja grande onde se compram alimentos e produtos para a casa.
+BANCO|Lugar onde se guarda dinheiro; também assento comprido.
+CORREIO|Serviço que entrega cartas e encomendas.
+PREFEITURA|Sede do governo de uma cidade.
+IGREJA|Templo onde os fiéis se reúnem para rezar.
+ESCOLA|Lugar onde se aprende com professores.
+CINEMA|Sala escura onde se assistem filmes numa tela grande.
+TEATRO|Lugar onde atores apresentam peças num palco.
+MUSEU|Lugar onde se guardam e expõem objetos de arte ou de história.
+ESTÁDIO|Lugar grande com arquibancadas onde acontecem jogos.
+ZOOLÓGICO|Lugar onde ficam animais de várias partes do mundo para visitação.
+HOTEL|Lugar onde viajantes pagam para se hospedar.
+RODOVIÁRIA|Estação de onde partem e chegam os ônibus de viagem.
+GASOLINA|Combustível usado em carros e motos.
+PEDÁGIO|Taxa paga para passar por certas estradas.
+PNEU|Peça de borracha cheia de ar que envolve a roda.
+VOLANTE|Peça redonda usada para guiar o carro.
+BUZINA|Aparelho do carro que faz um som alto para avisar.
+CARONA|Viagem de graça no carro de outra pessoa.
+TRÂNSITO|Movimento de carros e pessoas nas ruas.
+FILA|Pessoas uma atrás da outra esperando a vez.
+TROCO|Dinheiro que volta para quem pagou a mais.
+DINHEIRO|Notas e moedas usadas para comprar coisas.
+MOEDA|Peça redonda de metal que vale dinheiro.
+CARTEIRA|Pequena bolsa onde se guardam dinheiro e documentos.
+PREÇO|Quanto custa uma coisa.
+SALÁRIO|Dinheiro que a pessoa recebe pelo seu trabalho.
+EMPREGO|Trabalho fixo pelo qual se recebe salário.
+CHEFE|Pessoa que comanda um grupo de trabalho.
+VIZINHO|Pessoa que mora ao lado ou perto da nossa casa.
+POLÍCIA|Força que cuida da segurança e combate o crime.
+LADRÃO|Pessoa que rouba.
+JUIZ|Pessoa que julga processos no tribunal ou apita uma partida.
+PEDREIRO|Profissional que levanta paredes e constrói casas.
+ELETRICISTA|Profissional que instala e conserta fiações elétricas.
+ENCANADOR|Profissional que conserta canos e vazamentos.
+MECÂNICO|Profissional que conserta carros e motores.
+COSTUREIRA|Profissional que faz e conserta roupas.
+BARBEIRO|Profissional que corta o cabelo e faz a barba.
+PESCADOR|Pessoa que vive de pescar.
+AGRICULTOR|Pessoa que planta e colhe na roça.
+VAQUEIRO|Homem do sertão que cuida do gado montado a cavalo.
+VENDEDOR|Pessoa que vende produtos numa loja ou na rua.
+GARÇOM|Profissional que serve as mesas num restaurante.
+CANTOR|Pessoa que canta.
+ATOR|Pessoa que interpreta personagens no teatro, no cinema ou na TV.
+ESCRITOR|Pessoa que escreve livros.
+JORNALISTA|Profissional que apura e divulga notícias.
+VETERINÁRIO|Médico que cuida dos animais.
+CARPINTEIRO|Profissional que trabalha com madeira.
+PINTOR|Profissional que pinta paredes ou quadros.
+SOLDADO|Membro do exército.
+FOTÓGRAFO|Profissional que tira fotos.
+AVÓ|Mãe do pai ou da mãe.
+TIO|Irmão do pai ou da mãe.
+PRIMO|Filho do tio ou da tia.
+SOBRINHO|Filho do irmão ou da irmã.
+NETO|Filho do filho ou da filha.
+SOGRA|Mãe do marido ou da esposa.
+CUNHADO|Irmão do marido ou da esposa; também o marido da irmã.
+PADRINHO|Homem que apadrinha alguém no batismo ou no casamento.
+GÊMEOS|Irmãos que nasceram no mesmo parto.
+BEBÊ|Criança bem pequena, que ainda não anda.
+AMIGO|Pessoa de quem se gosta e em quem se confia.
+NAMORADO|Pessoa com quem se tem um relacionamento amoroso antes do casamento.
+CASAMENTO|Cerimônia em que duas pessoas se unem como casal.
+FAMÍLIA|Grupo de pessoas ligadas por parentesco.
+AMIZADE|Laço de carinho e confiança entre amigos.
+ALEGRIA|Sentimento de contentamento e felicidade.
+TRISTEZA|Sentimento de quem está para baixo, com vontade de chorar.
+RAIVA|Sentimento forte de irritação contra algo ou alguém.
+MEDO|Sensação de perigo ou ameaça.
+VERGONHA|Sentimento de constrangimento diante dos outros.
+ESPERANÇA|Confiança de que algo bom vai acontecer.
+INVEJA|Desejo de ter o que é do outro.
+ORGULHO|Satisfação com algo que se fez ou com alguém.
+SUSTO|Medo repentino causado por algo inesperado.
+MENTIRA|Aquilo que se diz sabendo que não é verdade.
+VERDADE|Aquilo que está de acordo com os fatos.
+PROMESSA|Compromisso de fazer algo no futuro.
+DESCULPA|Pedido de perdão por um erro.
+PERGUNTA|Frase que se diz para saber alguma coisa.
+RESPOSTA|O que se diz para responder a uma pergunta.
+IDEIA|Pensamento ou plano que surge na mente.
+SILÊNCIO|Ausência de barulho.
+BARULHO|Som alto e incômodo.
+PRESSA|Necessidade de fazer algo rápido.
+SORTE|Acontecimento bom que vem por acaso.
+AZAR|Má sorte.
+CANSAÇO|Falta de energia depois de muito esforço.
+PROBLEMA|Situação difícil que precisa ser resolvida.
+NOTÍCIA|Informação sobre algo que aconteceu.
+FESTA|Reunião de pessoas para comemorar.
+PIADA|História curta e engraçada contada para fazer rir.
+NOME|Palavra pela qual uma pessoa ou coisa é chamada.
+IDADE|Quantos anos uma pessoa tem.
+SEMANA|Período de sete dias.
+MÊS|Cada uma das doze partes do ano.
+ANO|Período de doze meses.
+SÉCULO|Período de cem anos.
+DÉCADA|Período de dez anos.
+MINUTO|Período de sessenta segundos.
+HORA|Período de sessenta minutos.
+MANHÃ|Parte do dia que vai do amanhecer até o meio-dia.
+ONTEM|O dia antes de hoje.
+AMANHÃ|O dia depois de hoje.
+DOMINGO|Dia da semana entre o sábado e a segunda-feira.
+NATAL|Festa de 25 de dezembro; também a capital do Rio Grande do Norte.
+PÁSCOA|Festa cristã em que se costuma dar ovos de chocolate.
+RÉVEILLON|Festa da virada do ano, na noite de 31 de dezembro.
+FUTEBOL|Esporte de dois times que tentam fazer gol chutando a bola.
+BOLA|Objeto redondo usado em muitos jogos e esportes.
+GOL|Ponto marcado quando a bola entra na trave.
+CAMPEONATO|Competição com várias partidas para decidir o campeão.
+MEDALHA|Prêmio de metal entregue aos vencedores de uma competição.
+NATAÇÃO|Esporte de nadar.
+SURFE|Esporte de deslizar nas ondas em cima de uma prancha.
+SKATE|Prancha com rodinhas usada para deslizar e fazer manobras.
+PATINS|Calçados com rodinhas para deslizar.
+BALÃO|Bola de borracha que se enche de ar; também o enfeite junino que sobe com fogo.
+BONECA|Brinquedo em forma de pessoa.
+IOIÔ|Brinquedo de dois discos que sobe e desce preso a um cordão.
+DOMINÓ|Jogo de peças retangulares marcadas com pontos.
+BARALHO|Conjunto de cartas usado em jogos.
+DADO|Pequeno cubo com pontos de um a seis em cada face.
+AMARELINHA|Brincadeira de pular num desenho de casas riscado no chão.
+GANGORRA|Brinquedo de tábua que sobe e desce, com uma pessoa em cada ponta.
+BALANÇO|Assento preso por cordas ou correntes que vai e vem.
+ESCORREGADOR|Brinquedo de parque por onde se desce deslizando.
+VIOLÃO|Instrumento de seis cordas tocado com os dedos.
+PANDEIRO|Instrumento de percussão com platinelas, tocado com a mão.
+TAMBOR|Instrumento de percussão com pele esticada, tocado com baquetas.
+MÚSICA|Arte de combinar sons e ritmos.
+CANÇÃO|Música com letra, feita para ser cantada.
+FILME|História contada em imagens para o cinema ou a TV.
+NOVELA|História em capítulos exibida na TV.
+DESENHO|Imagem feita com lápis ou caneta; também filme animado.
+PINTURA|Arte de criar imagens com tintas.
+PALCO|Lugar elevado onde os artistas se apresentam.
+PLATEIA|Público que assiste a um espetáculo.
+APLAUSO|Bater de palmas para mostrar aprovação.
+INGRESSO|Bilhete que dá direito a entrar num show, jogo ou cinema.
+CAMISA|Peça de roupa que cobre o tronco, com mangas e gola.
+CALÇA|Peça de roupa que cobre cada perna separadamente.
+BERMUDA|Calça curta que vai até perto do joelho.
+SAIA|Peça de roupa que cai da cintura para baixo, sem separar as pernas.
+VESTIDO|Roupa feminina inteira, que cobre o tronco e desce como saia.
+MEIA|Peça que cobre o pé, usada por baixo do sapato.
+SAPATO|Calçado fechado que protege o pé.
+SANDÁLIA|Calçado aberto preso ao pé por tiras.
+BONÉ|Chapéu com aba na frente, usado para proteger do sol.
+CHAPÉU|Acessório que se usa na cabeça, com aba em volta.
+CASACO|Roupa grossa usada por cima das outras para esquentar.
+PIJAMA|Roupa usada para dormir.
+CINTO|Tira usada na cintura para segurar a calça.
+BOLSO|Pequeno saco costurado na roupa para guardar coisas.
+BOTÃO|Pecinha redonda que fecha a roupa passando por uma casa.
+ZÍPER|Fecho de dentinhos que se abre e fecha puxando uma pecinha.
+ANEL|Aro usado no dedo como enfeite.
+BRINCO|Enfeite usado na orelha.
+COLAR|Enfeite usado em volta do pescoço.
+BIQUÍNI|Roupa de banho feminina de duas peças.
+LUVA|Peça que cobre a mão e os dedos.
+MARTELO|Ferramenta usada para bater pregos.
+PREGO|Haste de metal pontuda que se bate com martelo.
+PARAFUSO|Peça de metal com rosca que se aperta girando.
+ALICATE|Ferramenta de duas hastes usada para segurar, dobrar ou cortar fios.
+SERROTE|Ferramenta de lâmina dentada usada para cortar madeira.
+TRENA|Fita métrica enrolada numa caixinha, usada para medir.
+ENXADA|Ferramenta de cabo comprido usada para capinar e cavar a terra.
+REGADOR|Recipiente com bico usado para molhar as plantas.
+CORDA|Fios trançados usados para amarrar ou puxar.
+CADEADO|Fechadura portátil que tranca com uma argola.
+AGULHA|Haste fina de metal com um furinho, usada para costurar.
+LINHA|Fio fino usado para costurar; também um traço comprido.
+BALANÇA|Aparelho que mede o peso.
+ÍMÃ|Objeto que atrai metais como o ferro.
+LUPA|Lente que aumenta o tamanho do que se olha.
+MICROFONE|Aparelho que capta a voz para gravar ou aumentar o som.
+GUARDANAPO|Papel ou pano usado para limpar a boca durante a refeição.
+CANUDO|Tubinho usado para tomar bebidas.
+SACOLA|Bolsa de plástico ou pano usada para carregar compras.
+ETIQUETA|Pequeno papel com informações, como o preço, preso a um produto.
+BILHETE|Recado curto escrito num papel.
+JORNAL|Publicação com as notícias do dia.
+REVISTA|Publicação periódica com reportagens e fotos.

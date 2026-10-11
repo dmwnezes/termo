@@ -50,7 +50,10 @@ class NewGamesTest {
     @Test
     fun conexoesTemDesafiosValidos() {
         val ps = ConnectionsData.parse(asset("conexoes.txt"))
-        assertTrue(ps.size >= 30)
+        assertTrue(ps.size >= 45)
+        // Nome de grupo é a chave das famílias: não pode repetir.
+        val names = ps.flatMap { p -> p.groups.map { it.name } }
+        assertEquals(names.size, names.toSet().size)
         ps.forEachIndexed { i, p ->
             assertEquals("desafio $i", 4, p.groups.size)
             p.groups.forEach { g -> assertEquals("${g.name}", 4, g.words.size) }
@@ -67,7 +70,13 @@ class NewGamesTest {
     @Test
     fun cacaPalavrasMontaTodasAsGrades() {
         val themes = WordSearchData.parse(asset("caca.txt"))
-        assertTrue(themes.size >= 30)
+        assertTrue(themes.size >= 45)
+        // Os temas do dia têm 8 palavras de até 10 letras, sem repetir.
+        themes.forEach { th ->
+            assertEquals(th.name, 8, th.words.size)
+            assertEquals(th.name, 8, th.words.map { Words.normalize(it) }.toSet().size)
+            assertTrue(th.name, th.words.all { w -> Words.normalize(w).count { it in 'A'..'Z' } in 2..10 })
+        }
         for ((i, t) in themes.withIndex()) {
             val ws = WordSearch(t, seed = i * 7L)
             assertEquals(t.name, t.words.size, ws.placed.size)
@@ -83,14 +92,22 @@ class NewGamesTest {
     @Test
     fun definicoesESinonimos() {
         val defs = QuizData.definitions(asset("definicoes.txt"))
-        assertTrue(defs.size >= 100)
+        assertTrue(defs.size >= 600)
+        // Sem palavras repetidas (nem pela forma sem acento), sem espaço e sem a palavra dentro da própria definição.
+        assertEquals(defs.size, defs.map { Words.normalize(it.word) }.toSet().size)
+        defs.forEach { d ->
+            assertFalse(d.word, ' ' in d.word)
+            assertTrue(d.word, d.text.endsWith("."))
+            assertFalse(d.word, Regex("\\b${Words.normalize(d.word)}\\b").containsMatchIn(Words.normalize(d.text)))
+        }
         val d = DefineGame(defs, seed = 3)
         val target = d.target
         target.filter { it in 'A'..'Z' }.forEachIndexed { k, c -> if (d.slots[k] !in d.revealed) d.type(c) }
         assertEquals(true, d.submit())
 
         val (pairs, fams) = QuizData.synonyms(asset("sinonimos.txt"))
-        assertTrue(pairs.size >= 120)
+        assertTrue(pairs.size >= 320)
+        assertEquals(pairs.size, pairs.toSet().size)
         val s = SynonymGame(pairs, fams, seed = 5)
         repeat(60) {
             assertEquals(4, s.options.toSet().size)
@@ -134,14 +151,14 @@ class NewGamesTest {
             names += w.theme.name
             assertEquals(w.grid.map { String(it) }, WordSearchData.infinite(pool, seed).grid.map { String(it) })
         }
-        assertTrue(names.size > 50)
+        assertTrue("temas: ${names.size}", names.size > 90)
     }
 
     @Test
     fun antonimos() {
         val (_, synFam) = QuizData.synonyms(asset("sinonimos.txt"))
         val (pairs, fam) = QuizData.antonyms(asset("antonimos.txt"), synFam)
-        assertTrue(pairs.size >= 280)
+        assertTrue(pairs.size >= 480)
         // Cada palavra tem um único antônimo (senão a pergunta ao contrário teria duas respostas).
         assertEquals(pairs.size, pairs.map { it.word }.toSet().size)
         val g = com.dmwnezes.palavreiro.game.SynonymGame(pairs, fam, seed = 7)
@@ -201,7 +218,7 @@ class NewGamesTest {
         val data = com.dmwnezes.palavreiro.game.MestreData(
             ConnectionsData.parse(asset("conexoes.txt")), ConnectionsData.families(asset("conexoes-familias.txt")), syn, synFam, ant, antFam,
         )
-        assertTrue(data.bank.size > 300)
+        assertTrue(data.bank.size > 600)
         val g = com.dmwnezes.palavreiro.game.MestreGame(data, kotlin.random.Random(9))
         val seen = HashSet<com.dmwnezes.palavreiro.game.OrderType>()
         val L = com.dmwnezes.palavreiro.game.MestreData::letters

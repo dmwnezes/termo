@@ -168,25 +168,56 @@ class StoreFeaturesTest {
     @Test
     fun intruso() {
         val fam = ConnectionsData.families(asset("conexoes-familias.txt"))
-        val g = IntruderGame(ConnectionsData.parse(asset("conexoes.txt")), fam, Random(1))
+        val puzzles = ConnectionsData.parse(asset("conexoes.txt"))
+        val banned = setOf("lacuna", "palavra", "fora")
+        val pool = puzzles.flatMap { it.groups }.filter { it.words.size == 4 && fam.getValue(it.name).none { f -> f in banned } }
+        val g = IntruderGame(puzzles, fam, Random(1))
         val seen = HashSet<String>()
-        repeat(60) {
+        var nearRounds = 0; var lateRounds = 0
+        repeat(80) {
             val r = g.round
-            assertEquals(5, r.options.size); assertEquals(5, r.options.toSet().size)
+            val n = IntruderGame.optionsFor(g.score)
+            // 4 opções no começo, 5 a partir de 5 pontos.
+            assertEquals(if (g.score >= 5) 5 else 4, n)
+            assertEquals(n, r.options.size); assertEquals(n, r.options.map { Words.normalize(it) }.toSet().size)
             assertTrue(r.intruder in r.options && r.intruder !in r.group.words)
+            assertTrue(r.options.filter { it != r.intruder }.all { it in r.group.words })
             val f = fam.getValue(r.group.name)
-            assertTrue(f.none { it in setOf("lacuna", "palavra", "fora") })
+            assertTrue(f.none { it in banned })
+            // Justo: a intrusa não aparece em nenhum grupo com assunto em comum com o grupo da rodada.
+            val owners = pool.filter { o -> o.words.any { Words.normalize(it) == Words.normalize(r.intruder) } }
+            assertTrue(owners.isNotEmpty())
+            assertTrue(r.intruder, owners.none { o -> fam.getValue(o.name).any { it in f } })
+            // A partir de 3 pontos, a intrusa vem de um assunto vizinho sempre que existe um com palavra válida.
+            val related = pool.filter { o -> fam.getValue(o.name).any { it in f } }.flatMap { it.words }.map { Words.normalize(it) }.toSet()
+            val nearExists = pool.any { o -> g.isNear(r.group.name, o.name) && o.words.any { Words.normalize(it) !in related } }
+            if (g.score >= 3 && nearExists) { lateRounds++; if (owners.any { g.isNear(r.group.name, it.name) }) nearRounds++ }
+            // Tempo: começa em 12 s e encurta até 4 s.
+            assertEquals(maxOf(4.0, 12.0 - 0.3 * g.score), g.seconds, 1e-9)
             seen += r.group.name
             g.pick(r.intruder); g.next()
         }
-        assertEquals(60, g.score); assertTrue(seen.size >= 50)
-        g.pick(g.round.options.first { it != g.round.intruder }); assertEquals(2, g.lives)
+        assertEquals(80, g.score); assertTrue(seen.size >= 70)
+        assertTrue(lateRounds > 50); assertEquals(lateRounds, nearRounds)
+        // Vizinhos valem nos dois sentidos e nunca têm família em comum.
+        assertTrue(g.isNear("Aves", "Árvores") && g.isNear("Árvores", "Aves"))
+        assertFalse(g.isNear("Aves", "Insetos"))
+        assertEquals(12.0, IntruderGame.secondsFor(0), 1e-9); assertEquals(4.0, IntruderGame.secondsFor(40), 1e-9)
+        // Errar e deixar o tempo acabar custam uma vida cada.
+        g.pick(g.round.options.first { it != g.round.intruder }); assertEquals(2, g.lives); g.next()
+        g.timeUp(); assertTrue(g.timedOut); assertEquals(1, g.lives)
+        g.timeUp(); assertEquals(1, g.lives) // só uma vez por rodada
+        g.next(); assertFalse(g.timedOut)
+        g.timeUp(); assertTrue(g.over)
     }
 
     @Test
     fun certoOuErrado() {
         val pairs = SpellingData.parse(asset("ortografia.txt"))
-        assertTrue(pairs.size > 120)
+        assertTrue(pairs.size >= 280)
+        // Sem repetidas, e nenhuma forma errada é a grafia certa de outra palavra.
+        assertEquals(pairs.size, pairs.map { it.right }.toSet().size)
+        assertTrue(pairs.none { p -> pairs.any { it.right == p.wrong } })
         assertTrue(pairs.all { it.right != it.wrong && it.right.isNotBlank() && it.wrong.isNotBlank() })
         val g = SpellingGame(pairs, Random(2))
         repeat(5) { g.answer(g.showsRight); g.next() }

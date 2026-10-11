@@ -80,7 +80,12 @@ private fun EndSheet(title: String, score: Int, best: Int, total: Int, shareText
     }
 }
 
-/** Intruso: 5 palavras, uma não pertence ao grupo. */
+/** Texto de ajuda do Intruso (o mesmo do site). */
+private const val INTRUSO_HELP = "Todas as palavras menos uma têm algo em comum. Toque na intrusa antes de o tempo acabar. " +
+    "A partir de 3 pontos a intrusa vem de um assunto parecido; a partir de 5 pontos são 5 palavras em vez de 4; " +
+    "e o tempo encurta a cada acerto, de 12 até 4 segundos. Errar ou deixar o tempo acabar custa uma das 3 vidas."
+
+/** Intruso: 4 ou 5 palavras, uma não pertence ao grupo; rodadas com tempo. */
 @Composable
 fun IntruderScreen(
     puzzles: List<ConnPuzzle>,
@@ -95,8 +100,19 @@ fun IntruderScreen(
     var best by remember { mutableIntStateOf(store?.int("intr_best") ?: 0) }
     var showEnd by remember(run) { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(false) }
+    val timer = remember(run) { androidx.compose.animation.core.Animatable(1f) }
+    var timerFor by remember(run) { mutableStateOf<Any?>(null) }
     val picked = game.picked
 
+    // Barra de tempo da rodada: para quando responde e pausa com a ajuda aberta; se acabar, perde uma vida.
+    LaunchedEffect(game.round, picked, run, showHelp) {
+        if (picked != null || game.over || showHelp) return@LaunchedEffect
+        if (timerFor !== game.round) { timer.snapTo(1f); timerFor = game.round }
+        val ms = (game.seconds * 1000 * timer.value).toInt()
+        timer.animateTo(0f, androidx.compose.animation.core.tween(ms, easing = androidx.compose.animation.core.LinearEasing))
+        game.timeUp()
+        feedback?.invalid()
+    }
     // Depois de responder: mostra o grupo e passa para a próxima rodada (ou termina).
     LaunchedEffect(picked, run) {
         if (picked == null) return@LaunchedEffect
@@ -117,7 +133,14 @@ fun IntruderScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ScoreLives(game.score, game.lives, maxOf(best, game.score))
-                Spacer(Modifier.height(18.dp))
+                Spacer(Modifier.height(14.dp))
+                Box(Modifier.fillMaxWidth().height(10.dp).clip(Shapes.pill).background(Night.surface)) {
+                    Box(
+                        Modifier.fillMaxWidth(timer.value).height(10.dp).clip(Shapes.pill)
+                            .background(if (timer.value < 0.3f) Night.red else Night.accent)
+                    )
+                }
+                Spacer(Modifier.height(14.dp))
                 Text("Qual palavra não pertence ao grupo?", color = Night.muted, fontSize = 15.sp)
                 Spacer(Modifier.height(14.dp))
                 game.round.options.forEach { w ->
@@ -145,7 +168,7 @@ fun IntruderScreen(
                 Spacer(Modifier.height(14.dp))
                 if (picked != null) {
                     Text(
-                        "Eram todos: ${game.round.group.name}",
+                        (if (game.timedOut) "O tempo acabou! " else "") + "Eram todos: ${game.round.group.name}",
                         color = Night.text, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                         modifier = Modifier.clip(Shapes.pill).background(Night.surface).padding(horizontal = 16.dp, vertical = 10.dp),
                     )
@@ -164,7 +187,7 @@ fun IntruderScreen(
             BottomSheet({ showHelp = false }) {
                 SheetTitle("Como jogar Intruso")
                 Spacer(Modifier.height(12.dp))
-                Text("Quatro palavras têm algo em comum. Toque na que não pertence ao grupo. Você tem 3 vidas.", color = Night.text, fontSize = 15.sp)
+                Text(INTRUSO_HELP, color = Night.text, fontSize = 15.sp)
                 Spacer(Modifier.height(18.dp))
                 PillButton("Entendi", Night.correct, modifier = Modifier.fillMaxWidth()) { showHelp = false }
             }

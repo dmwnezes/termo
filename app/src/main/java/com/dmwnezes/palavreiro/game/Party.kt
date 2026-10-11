@@ -9,39 +9,65 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import kotlin.random.Random
 
-/** Rodada do Intruso: 4 palavras de um grupo + 1 intrusa, embaralhadas. */
+/** Rodada do Intruso: 3 ou 4 palavras de um grupo + 1 intrusa, embaralhadas. */
 data class IntruderRound(val group: ConnGroup, val intruder: String, val options: List<String>)
 
 /**
- * Intruso: ache a palavra que não pertence ao grupo. 3 vidas; cada acerto vale 1 ponto.
- * Usa os grupos do Conexões; a intrusa vem de um grupo sem nenhum assunto em comum.
+ * Intruso: ache a palavra que não pertence ao grupo, antes do tempo acabar. 3 vidas; cada acerto vale 1 ponto.
+ * Usa os grupos do Conexões. A intrusa nunca vem de um grupo com assunto (família) em comum com o grupo
+ * da rodada — assim ela é sempre inequívoca. A dificuldade sobe com os pontos (mesmas regras do site):
+ *  - até 4 pontos: 3 palavras do grupo + a intrusa (4 opções); a partir de 5 pontos: 4 + a intrusa (5 opções);
+ *  - a partir de 3 pontos a intrusa vem de um assunto "vizinho" (a 1ª família de cada grupo forma um par de
+ *    [NEAR], como animal e natureza), quando houver; antes disso, de qualquer assunto diferente;
+ *  - o tempo da rodada é max(4, 12 − 0,3 × pontos) segundos; deixar acabar custa uma vida.
  */
 class IntruderGame(puzzles: List<ConnPuzzle>, private val families: Map<String, Set<String>>, private val rnd: Random = Random.Default) {
     private val banned = setOf("lacuna", "palavra", "fora")
     private val groups = puzzles.flatMap { it.groups }
         .filter { g -> g.words.size == 4 && families[g.name]?.let { f -> f.isNotEmpty() && f.none { it in banned } } == true }
+        .distinctBy { it.name }
     private val used = HashSet<String>()
 
-    var round by mutableStateOf(nextRound())
-        private set
     var score by mutableIntStateOf(0)
         private set
     var lives by mutableIntStateOf(3)
         private set
-    /** Palavra tocada nesta rodada (null = ainda não respondeu). */
+    /** Palavra tocada nesta rodada (null = ainda não respondeu; [TIME_UP] = o tempo acabou). */
     var picked by mutableStateOf<String?>(null)
         private set
+    var round by mutableStateOf(nextRound())
+        private set
     val over: Boolean get() = lives <= 0
+    /** A rodada acabou porque o tempo esgotou. */
+    val timedOut: Boolean get() = picked == TIME_UP
+    /** Segundos da rodada atual. */
+    val seconds: Double get() = secondsFor(score)
+
+    /** O grupo [other] é de um assunto vizinho ao de [base]: sem família em comum, e as famílias principais (1ª da lista) formam um par de [NEAR]. */
+    fun isNear(base: String, other: String): Boolean {
+        val fb = families.getValue(base); val fo = families.getValue(other)
+        return fb.none { it in fo } && "${fb.first()}-${fo.first()}" in NEAR
+    }
 
     private fun nextRound(): IntruderRound {
         if (used.size >= groups.size) used.clear()
-        val base = groups.filter { it.name !in used }.random(rnd)
-        used += base.name
-        val fam = families.getValue(base.name)
-        val inBase = base.words.map { Words.normalize(it) }.toSet()
-        val others = groups.filter { o -> o.name != base.name && families.getValue(o.name).none { it in fam } }
-        val intruder = others.flatMap { it.words }.filter { Words.normalize(it) !in inBase }.random(rnd)
-        return IntruderRound(base, intruder, (base.words + intruder).shuffled(rnd))
+        val fresh = groups.filter { it.name !in used }
+        repeat(100) {
+            val base = fresh.random(rnd)
+            val fam = families.getValue(base.name)
+            val far = groups.filter { o -> o.name != base.name && families.getValue(o.name).none { it in fam } }
+            // Palavras que também aparecem num grupo de assunto em comum (inclusive o próprio) nunca são intrusas.
+            val inBase = (groups - far.toSet()).flatMap { it.words }.map { Words.normalize(it) }.toSet()
+            fun words(gs: List<ConnGroup>) = gs.flatMap { it.words }.filter { Words.normalize(it) !in inBase }
+            val close = if (score >= NEAR_FROM) words(far.filter { isNear(base.name, it.name) }) else emptyList()
+            val cands = close.ifEmpty { words(far) }
+            if (cands.isEmpty()) return@repeat
+            used += base.name
+            val intruder = cands.random(rnd)
+            val shown = base.words.shuffled(rnd).take(optionsFor(score) - 1)
+            return IntruderRound(base, intruder, (shown + intruder).shuffled(rnd))
+        }
+        error("Intruso sem grupos válidos")
     }
 
     /** Responde a rodada. Devolve true se acertou a intrusa. */
@@ -51,6 +77,25 @@ class IntruderGame(puzzles: List<ConnPuzzle>, private val families: Map<String, 
         val right = word == round.intruder
         if (right) score++ else lives--
         return right
+    }
+
+    /** O tempo acabou sem resposta: perde uma vida. */
+    fun timeUp() {
+        if (picked != null || over) return
+        picked = TIME_UP
+        lives--
+    }
+
+    companion object {
+        const val TIME_UP = ""
+        /** Assuntos vizinhos (vale nos dois sentidos); a mesma lista está no js/intruso.js. */
+        val NEAR: Set<String> = """animal-natureza comida-natureza comida-casa comida-festa casa-escola casa-tecnologia roupa-corpo roupa-esporte roupa-artesanato corpo-saude esporte-jogo esporte-praia jogo-festa musica-festa musica-arte arte-artesanato ceu-natureza ceu-tempo ceu-mito tempo-festa tempo-medida lugar-transporte lugar-praia transporte-tecnologia escola-trabalho escola-jogo trabalho-saude trabalho-dinheiro mineral-natureza mineral-cor cor-arte forma-escola forma-medida sentimento-familia mito-signo""".split(' ').flatMap { p -> listOf(p, p.split('-').reversed().joinToString("-")) }.toSet()
+        /** A partir destes pontos a intrusa vem de um assunto vizinho. */
+        const val NEAR_FROM = 3
+        /** A partir destes pontos a rodada tem 5 opções (4 do grupo + a intrusa). */
+        const val FIVE_FROM = 5
+        fun optionsFor(score: Int): Int = if (score >= FIVE_FROM) 5 else 4
+        fun secondsFor(score: Int): Double = maxOf(4.0, 12.0 - 0.3 * score)
     }
 
     fun next() {

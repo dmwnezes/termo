@@ -69,7 +69,7 @@ Deuses gregos: mito
 Continentes: lugar
 Rios brasileiros: lugar
 Mão de ___: lacuna, animal, mineral, casa
-Profissões da saúde: trabalho
+Profissões da saúde: trabalho, saude
 Animais de estimação: animal
 Jogos de cartas: jogo
 Bom ___: lacuna, tempo
@@ -121,3 +121,67 @@ Frutos do mar: animal, comida
 Instrumentos de percussão: musica
 Coisas do futebol: esporte
 Ficar de ___: lacuna, corpo, comida
+Animais da floresta: animal, natureza, sentimento
+Eletrodomésticos: casa, tecnologia
+Partes da mão: corpo, natureza
+Chave de ___: lacuna, casa, corpo, mineral
+Partes do rosto: corpo
+Coisas de aniversário: festa, comida, casa, ceu, transporte
+Meios de pagamento: dinheiro, tecnologia, esporte
+Meia-___: lacuna, tempo, ceu, roupa
+Verduras: comida, natureza
+Utensílios de limpeza: casa
+Estados do Norte: lugar
+Segunda ___: lacuna, tempo, corpo, escola, lugar
+Filhotes: animal, comida
+Roupas de frio: roupa, esporte
+Artistas de circo: trabalho, arte, festa
+Bolo de ___: lacuna, comida, natureza, casa
+Sabores: comida
+Esportes de luta: esporte, musica
+Partes da camisa: roupa, comida, natureza
+Bola de ___: lacuna, jogo, ceu, natureza, mineral
+Coisas do quarto: casa
+Partes do dia: tempo, ceu
+Trabalho no campo: trabalho, natureza, animal
+Papel de ___: lacuna, casa, escola, comida, roupa
+Sentimentos: sentimento
+Medidas de tempo: tempo, medida
+Lugares da escola: escola, lugar, casa
+Peixe-___: lacuna, animal, casa, trabalho, artesanato
+Salgadinhos de festa: comida, festa
+Partes do celular: tecnologia, musica, transporte, arte
+Brincadeiras de rua: jogo, esporte, natureza
+Mesa de ___: lacuna, casa, jogo, comida, lugar
+Acessórios: roupa, mineral
+Ingredientes de bolo: comida
+Bichos da noite: animal, ceu
+Banana-___: lacuna, comida, mineral, cor, natureza
+Embarcações: transporte, praia
+Partes da perna: corpo, comida
+Jogos de tabuleiro: jogo, roupa
+Ovo de ___: lacuna, comida, animal, tempo
+Frutas vermelhas: comida, natureza, cor
+Profissões da justiça: trabalho
+Objetos de escritório: escola, casa, comida
+Dente de ___: lacuna, comida, animal, corpo, natureza
+Doenças comuns: saude
+Moradias: casa, lugar
+Roedores: animal
+Vale-___: lacuna, transporte, comida, dinheiro, casa
+Instrumentos de corda: musica
+Primeiros socorros: saude, casa
+Esportes radicais: esporte, natureza
+Leite de ___: lacuna, comida, animal, natureza
+Comidas italianas: comida
+Partes da porta: casa
+Parentes: familia
+Boca de ___: lacuna, animal, casa, comida, lugar
+Tipos de chuva: ceu, natureza
+Itens de costura: artesanato, roupa, casa
+Partes do avião: transporte, animal
+Cartão de ___: lacuna, dinheiro, tempo, transporte, casa
+Sabores de sorvete: comida
+Animais da Amazônia: animal, natureza, comida
+No trânsito: transporte, lugar
+Cabo de ___: lacuna, jogo, casa, mineral, trabalho
