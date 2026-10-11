@@ -70,6 +70,7 @@ fun ProfileScreen(
     onHelp: () -> Unit,
     onSynced: () -> Unit = {},
     startTab: Int = 0,
+    scroll: androidx.compose.foundation.ScrollState = rememberScrollState(),
 ) {
     var page by remember { mutableIntStateOf(startTab) }
     val daily = stats[Mode.DIARIO] ?: Stats()
@@ -100,7 +101,7 @@ fun ProfileScreen(
                 ChipTabs(listOf("Resumo", "Conquistas", "Ajustes"), page) { page = it }
                 Spacer(Modifier.height(16.dp))
             }
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
+            Column(Modifier.weight(1f).verticalScroll(scroll).padding(horizontal = 20.dp)) {
                 when (page) {
                     0 -> SummaryTab(store, stats, records)
                     1 -> AchievementsTab(achievements)
@@ -139,15 +140,7 @@ private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records)
         FirstGuessSection(com.dmwnezes.palavreiro.game.FirstGuessStats.from(list))
     }
     Section("Recordes") {
-        RecordRow("Conexões", "${records.connWon} resolvidos · ${records.connPerfect} sem erro")
-        RecordRow("Caça-Palavras", "${records.wsPlayed} grades · melhor ${if (records.wsBest > 0) formatTime(records.wsBest) else "—"}")
-        RecordRow("Intruso", "recorde ${records["intr_best"]} · ${records["intr_right"]} acertos")
-        RecordRow("Certo ou Errado", "recorde ${records["ort_best"]} · ${records["ort_right"]} acertos")
-        RecordRow("Mestre Mandou", "recorde ${records["mestre_best"]} · ${records["mestre_right"]} acertos")
-        RecordRow("Qual é a Palavra?", "recorde ${records.defBest} seguidas · ${records.defRight} acertos")
-        RecordRow("Sinônimo ou Antônimo", "maior cadeia: ${maxOf(records["sa_best"], records.synBest, records["ant_best"])}")
-        RecordRow("Arquivo", "${records["arch_played"]} ${if (records["arch_played"] == 1) "desafio" else "desafios"}")
-        RecordRow("Com amigos", "${records["mp_won"]} ${if (records["mp_won"] == 1) "vitória" else "vitórias"} em ${records["mp_played"]} ${if (records["mp_played"] == 1) "partida" else "partidas"}")
+        RecordsSection(stats[Mode.DIARIO] ?: Stats(), stats[Mode.INFINITO] ?: Stats(), records)
     }
 }
 
@@ -311,6 +304,13 @@ private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () ->
     }
     Section("Sobre") {
         ActionRow("Como jogar", onClick = onHelp)
+        var auto by remember { mutableStateOf(store?.autoUpdate ?: true) }
+        ToggleRow("Atualizar automaticamente", auto) {
+            auto = it; store?.autoUpdate = it
+            com.dmwnezes.palavreiro.update.AutoUpdate.schedule(context)
+            if (it) com.dmwnezes.palavreiro.update.AutoUpdate.checkNow(context)
+        }
+        Text("Baixa a versão nova sozinho e instala quando o app não estiver na tela.", fontSize = 12.sp, color = Night.muted)
         ActionRow("Buscar atualização", detail = "Versão ${Updater.currentName}", onClick = onCheckUpdates)
     }
     if (showImport) {

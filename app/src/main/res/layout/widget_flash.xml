@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Palavra Relâmpago (médio): definição e 3 botões empilhados -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView style="@style/WTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="⚡ Palavra Relâmpago" android:textSize="16sp" />
+        <TextView android:id="@+id/w_streak" style="@style/WPill" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="🔥 3" />
+    </LinearLayout>
+    <TextView android:id="@+id/w_best" style="@style/WMuted" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="recorde 8 · 12 acertos" android:textSize="12sp" android:maxLines="1" />
+    <TextView android:id="@+id/w_def" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:layout_marginTop="8dp" android:gravity="center_vertical" android:fontFamily="@font/outfit_medium" android:textColor="#FFF4F1FF"
+        android:text="Sentimento de falta de alguém, de um lugar ou de um tempo que ficou para trás."
+        android:textSize="16sp" android:maxLines="5" android:ellipsize="end" />
+    <TextView android:id="@+id/w_opt0" style="@style/WOption" android:layout_width="match_parent" android:layout_height="42dp"
+        android:layout_marginTop="8dp" android:textSize="16sp" android:text="SAUDADE" />
+    <TextView android:id="@+id/w_opt1" style="@style/WOption" android:layout_width="match_parent" android:layout_height="42dp"
+        android:layout_marginTop="6dp" android:textSize="16sp" android:text="JANGADA" />
+    <TextView android:id="@+id/w_opt2" style="@style/WOption" android:layout_width="match_parent" android:layout_height="42dp"
+        android:layout_marginTop="6dp" android:textSize="16sp" android:text="CUSCUZ" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:id="@+id/w_feedback" style="@style/WMuted" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Qual palavra é essa?" android:textSize="14sp" android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/w_next" style="@style/WPill" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:paddingTop="6dp" android:paddingBottom="6dp" android:text="Próxima ›" android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

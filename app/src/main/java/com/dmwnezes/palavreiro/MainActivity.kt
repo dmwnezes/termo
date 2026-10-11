@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import com.dmwnezes.palavreiro.data.Mode
 import com.dmwnezes.palavreiro.game.Challenge
 import com.dmwnezes.palavreiro.game.Records
@@ -62,12 +64,27 @@ class MainActivity : ComponentActivity() {
         com.dmwnezes.palavreiro.system.CrashLog.install(this)
         AppGraph.init(this)
         if (savedInstanceState == null) Launch.read(intent)
+        // Atualização automática: busca diária em segundo plano e versão já baixada esperando.
+        com.dmwnezes.palavreiro.update.AutoUpdate.schedule(this)
+        com.dmwnezes.palavreiro.update.AutoUpdate.restore(this)
         setContent { PalavreiroTheme { PalavreiroApp() } }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Launch.read(intent)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        com.dmwnezes.palavreiro.update.AutoUpdate.foreground = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        com.dmwnezes.palavreiro.update.AutoUpdate.foreground = false
+        // Saiu da tela com uma versão nova já baixada: instala agora (sem interromper partida nenhuma).
+        if (!isChangingConfigurations) com.dmwnezes.palavreiro.update.AutoUpdate.installIfPending(this)
     }
 
     override fun onResume() {
@@ -91,6 +108,8 @@ object Launch {
     var multi by mutableStateOf<String?>(null)
     /** Muda quando o app deve voltar para a sala guardada (aviso "seu amigo entrou"). */
     var resume by mutableIntStateOf(0)
+    /** Toque na notificação "Atualização pronta". */
+    var installUpdate by mutableStateOf(false)
 
     fun read(intent: Intent?) {
         intent ?: return
@@ -98,6 +117,7 @@ object Launch {
         intent.data?.getQueryParameter("d")?.let { code -> Challenge.decode(code)?.let { challenge = it } }
         intent.data?.getQueryParameter("mp")?.let { multi = it }
         if (intent.getBooleanExtra("mp_resume", false)) resume++
+        if (intent.getBooleanExtra(com.dmwnezes.palavreiro.update.AutoUpdate.EXTRA_INSTALL, false)) installUpdate = true
     }
 }
 
@@ -167,8 +187,11 @@ fun PalavreiroApp() {
         }
     }
 
-    // Checagem automática de atualização ao abrir o app.
+    // Checagem de atualização ao abrir o app: com o automático ligado, baixa em segundo plano;
+    // desligado, só mostra a janela com a versão nova.
+    val appContext = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
+        if (store.autoUpdate) { com.dmwnezes.palavreiro.update.AutoUpdate.checkNow(appContext); return@LaunchedEffect }
         val updater = Updater(AppGraph.http)
         runCatching { updater.latest() }.getOrNull()?.let { r ->
             if (updater.isNewer(r) && store.skippedUpdate != r.tag) foundUpdate = r
@@ -332,5 +355,22 @@ fun PalavreiroApp() {
         foundUpdate?.let { r ->
             UpdateDialog(initial = r, onSkip = { store.skippedUpdate = it.tag }, onDismiss = { foundUpdate = null })
         }
+        // Versão nova já baixada: pílula "Nova versão baixada · Instalar" no rodapé.
+        LaunchedEffect(Launch.installUpdate) {
+            if (Launch.installUpdate) { Launch.installUpdate = false; com.dmwnezes.palavreiro.update.AutoUpdate.installFromUser(ctx) }
+        }
+        var hiddenUpdate by remember { mutableStateOf<String?>(null) }
+        com.dmwnezes.palavreiro.update.AutoUpdate.ready?.takeIf { it.tag != hiddenUpdate && !showUpdate && foundUpdate == null }?.let { r ->
+            com.dmwnezes.palavreiro.update.UpdateReadyPill(
+                r,
+                onInstall = { com.dmwnezes.palavreiro.update.AutoUpdate.installFromUser(ctx, r) },
+                onDismiss = { hiddenUpdate = r.tag },
+                modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 72.dp),
+            )
+        }
+        // Conquista nova: pílula no topo, por cima de qualquer tela (inclusive no meio da partida).
+        com.dmwnezes.palavreiro.ui.AchievementNotifier(store) { AppGraph.feedback.achievement() }
+        // Easter egg dos créditos (segurar "criado por").
+        com.dmwnezes.palavreiro.ui.CreditsEggOverlay()
     }
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sequência (pequeno): chama, dias seguidos -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+    <TextView android:id="@+id/w_flame" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="🔥" android:textSize="20sp" />
+    <TextView android:id="@+id/w_days" style="@style/WTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="12" android:textSize="30sp" android:includeFontPadding="false" />
+    <TextView android:id="@+id/w_label" style="@style/WMuted" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="dias seguidos" android:textSize="11sp" android:maxLines="1" />
+</LinearLayout>

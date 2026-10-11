@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hoje (pequeno): quantos desafios do dia foram feitos e a sequência -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView android:id="@+id/w_streak" style="@style/WPill" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="🔥 4" android:textSize="12sp" />
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" android:gravity="bottom" android:orientation="horizontal">
+        <TextView android:id="@+id/w_count" style="@style/WTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="3" android:textSize="34sp" />
+        <TextView android:id="@+id/w_total" style="@style/WMuted" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp" android:text=" de 5 hoje" android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" android:orientation="horizontal">
+        <TextView android:id="@+id/w_d1" style="@style/WSquare" android:background="@drawable/wsq_green" />
+        <TextView android:id="@+id/w_d2" style="@style/WSquare" android:background="@drawable/wsq_green" />
+        <TextView android:id="@+id/w_d3" style="@style/WSquare" android:background="@drawable/wsq_green" />
+        <TextView android:id="@+id/w_d4" style="@style/WSquare" android:background="@drawable/wday_none" />
+        <TextView android:id="@+id/w_d5" style="@style/WSquare" android:layout_marginEnd="0dp" android:background="@drawable/wday_none" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -79,6 +79,30 @@ class Feedback(context: Context, private val store: Store) {
         vibrate(longArrayOf(0, 22))
     }
 
+    /** Conquista desbloqueada: dois toques curtos. */
+    fun achievement() {
+        vibrate(longArrayOf(0, 25, 60, 45))
+    }
+
+    /**
+     * Segurar os créditos: um pulso curto cuja força cresce com [level] (0–1).
+     * Em aparelhos sem controle de intensidade, o pulso fica mais longo.
+     */
+    fun holdPulse(level: Float) {
+        if (!store.vibration) return
+        val l = level.coerceIn(0f, 1f)
+        runCatching {
+            val v = vibrator ?: return
+            if (v.hasAmplitudeControl()) v.vibrate(VibrationEffect.createOneShot(70, (25 + 230 * l).toInt().coerceIn(1, 255)))
+            else v.vibrate(VibrationEffect.createOneShot((15 + 55 * l).toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
+        }
+    }
+
+    /** Explosão das letras dos créditos. */
+    fun burst() {
+        vibrate(longArrayOf(0, 120, 40, 60))
+    }
+
     private fun vibrate(pattern: LongArray) {
         if (!store.vibration) return
         runCatching { vibrator?.vibrate(VibrationEffect.createWaveform(pattern, -1)) }

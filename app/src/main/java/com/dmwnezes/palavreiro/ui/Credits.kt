@@ -53,7 +53,31 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dmwnezes.palavreiro.AppGraph
 import com.dmwnezes.palavreiro.R
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.sin
@@ -70,15 +94,57 @@ fun openCreatorInstagram(context: Context) {
     }
 }
 
-/** Foto redonda pequena + "criado por: @dmwnezes", tocável, que leva ao Instagram (igual ao Sintonia). */
+/**
+ * Foto redonda pequena + "criado por: @dmwnezes".
+ * Toque: abre o Instagram. Segurar ~1,5 s: o celular vibra cada vez mais forte e as letras explodem (easter egg);
+ * soltar antes cancela. [easterEgg] = false deixa só o toque (abertura).
+ */
 @Composable
-fun CreatorCredit(modifier: Modifier = Modifier) {
+fun CreatorCredit(modifier: Modifier = Modifier, easterEgg: Boolean = true) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var level by remember { mutableFloatStateOf(0f) }
+    var center by remember { mutableStateOf(Offset.Zero) }
+    val press = if (!easterEgg) Modifier.clickable { openCreatorInstagram(context) } else Modifier
+        .semantics(mergeDescendants = true) {
+            role = Role.Button
+            onClick("Abrir Instagram") { openCreatorInstagram(context); true }
+        }
+        .pointerInput(Unit) {
+            awaitEachGesture {
+                val down = awaitFirstDown()
+                var fired = false
+                val hold = scope.launch {
+                    var held = 0f
+                    while (held < CreditsEgg.HOLD_MS) {
+                        level = held / CreditsEgg.HOLD_MS
+                        AppGraph.feedbackOrNull?.holdPulse(level)
+                        delay(75)
+                        held += 75f
+                    }
+                    fired = true
+                    level = 0f
+                    AppGraph.feedbackOrNull?.burst()
+                    CreditsEgg.fire(center)
+                }
+                val up = waitForUpOrCancellation()
+                hold.cancel()
+                level = 0f
+                if (!fired && up != null && up.uptimeMillis - down.uptimeMillis < CreditsEgg.TAP_MS) {
+                    up.consume()
+                    openCreatorInstagram(context)
+                }
+            }
+        }
+    // Enquanto segura: o selo cresce, clareia e treme cada vez mais.
+    val shake = if (level > 0f) sin(level * 90f) * level * 3f else 0f
     Row(
         modifier
+            .onGloballyPositioned { c -> center = c.positionInRoot() + Offset(c.size.width / 2f, c.size.height / 2f) }
+            .graphicsLayer { scaleX = 1f + level * 0.08f; scaleY = 1f + level * 0.08f; translationX = shake * density }
             .clip(RoundedCornerShape(50))
-            .background(Color.White.copy(alpha = 0.08f))
-            .clickable { openCreatorInstagram(context) }
+            .background(Color.White.copy(alpha = 0.08f + level * 0.14f))
+            .then(press)
             .padding(start = 6.dp, end = 16.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -97,6 +163,146 @@ fun CreatorCredit(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             textDecoration = TextDecoration.Underline,
         )
+    }
+}
+
+/** Estado do easter egg dos créditos: cada [fire] gera uma explosão nova a partir de [Burst.origin]. */
+object CreditsEgg {
+    const val HOLD_MS = 1500f
+    /** Até quanto tempo segurando ainda conta como toque (abre o Instagram). */
+    const val TAP_MS = 400L
+    /** Duração total: letras voando, mensagem e o sumiço. */
+    const val TOTAL_S = 4.6f
+
+    data class Burst(val id: Int, val origin: Offset)
+
+    var burst by mutableStateOf<Burst?>(null)
+        private set
+    private var count = 0
+
+    fun fire(origin: Offset) { burst = Burst(++count, origin) }
+    fun clear() { burst = null }
+}
+
+/**
+ * Letras A–Z (verde, amarelo e azul) que saem dos créditos com gravidade e quicam nas bordas e no chão.
+ * Simulação em passos fixos (determinística para a mesma semente).
+ */
+class LetterBurst(seed: Int, val originX: Float, val originY: Float, val width: Float, val height: Float, val tile: Float, count: Int = 44) {
+    val letters = CharArray(count) { 'A' + it % 26 }
+    val colors = IntArray(count) { it % 3 }
+    val x = FloatArray(count) { originX }
+    val y = FloatArray(count) { originY }
+    val vx = FloatArray(count)
+    val vy = FloatArray(count)
+    val angle = FloatArray(count)
+    val spin = FloatArray(count)
+    val scale = FloatArray(count)
+    private val gravity = 1.7f * height
+
+    init {
+        val r = kotlin.random.Random(seed)
+        for (i in 0 until count) {
+            // Leque para cima (de -165° a -15°), cada letra com força diferente.
+            val a = Math.toRadians(-165.0 + r.nextDouble() * 150.0)
+            val speed = height * (0.75f + r.nextFloat() * 1.15f)
+            vx[i] = (kotlin.math.cos(a) * speed).toFloat()
+            vy[i] = (kotlin.math.sin(a) * speed).toFloat()
+            spin[i] = (r.nextFloat() * 2f - 1f) * 540f
+            angle[i] = (r.nextFloat() * 2f - 1f) * 30f
+            scale[i] = 0.75f + r.nextFloat() * 0.5f
+        }
+    }
+
+    /** Avança [dt] segundos (em passos de no máximo 1/120 s). */
+    fun advance(dt: Float) {
+        var left = dt
+        while (left > 0f) {
+            val h = minOf(left, 1f / 120f)
+            step(h)
+            left -= h
+        }
+    }
+
+    private fun step(h: Float) {
+        val half = tile / 2
+        for (i in x.indices) {
+            vy[i] += gravity * h
+            x[i] += vx[i] * h
+            y[i] += vy[i] * h
+            angle[i] += spin[i] * h
+            if (x[i] < half) { x[i] = half; vx[i] = -vx[i] * 0.7f }
+            if (x[i] > width - half) { x[i] = width - half; vx[i] = -vx[i] * 0.7f }
+            if (y[i] < half) { y[i] = half; vy[i] = -vy[i] * 0.5f }
+            val floor = height - half
+            if (y[i] > floor) {
+                y[i] = floor
+                if (vy[i] > 0) vy[i] = -vy[i] * 0.5f
+                vx[i] *= 0.86f
+                spin[i] *= 0.7f
+            }
+        }
+    }
+}
+
+/** Camada da tela inteira com a explosão de letras e "Obrigado por jogar! 💚". Some sozinha. */
+@Composable
+fun CreditsEggOverlay(burst: CreditsEgg.Burst? = CreditsEgg.burst, onEnd: () -> Unit = { CreditsEgg.clear() }) {
+    burst ?: return
+    val textMeasurer = rememberTextMeasurer()
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val density = LocalDensity.current
+        val w = constraints.maxWidth.toFloat(); val h = constraints.maxHeight.toFloat()
+        val tile = with(density) { 34.dp.toPx() }
+        val origin = if (burst.origin == Offset.Zero) Offset(w / 2, h - tile * 2) else burst.origin
+        val sim = remember(burst.id, w, h) { LetterBurst(burst.id * 7919, origin.x, origin.y, w, h, tile) }
+        var time by remember(burst.id) { mutableFloatStateOf(0f) }
+        LaunchedEffect(burst.id) {
+            var last = withFrameNanos { it }
+            val start = last
+            while (time < CreditsEgg.TOTAL_S) {
+                withFrameNanos { now ->
+                    sim.advance(((now - last) / 1e9f).coerceAtMost(0.05f))
+                    last = now
+                    time = (now - start) / 1e9f
+                }
+            }
+            onEnd()
+        }
+        val fade = (1f - (time - 3.7f) / 0.9f).coerceIn(0f, 1f)
+        val palette = listOf(Night.correct, Night.present, Night.flagBlue)
+        val style = TextStyle(fontFamily = Outfit, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1438))
+        Canvas(Modifier.fillMaxSize()) {
+            // Escurece o fundo um pouco para a mensagem aparecer.
+            drawRect(Color.Black.copy(alpha = 0.35f * fade * (time / 0.3f).coerceIn(0f, 1f)))
+            for (i in sim.x.indices) {
+                val s = tile * sim.scale[i]
+                rotate(sim.angle[i], pivot = Offset(sim.x[i], sim.y[i])) {
+                    drawRoundRect(
+                        palette[sim.colors[i]].copy(alpha = fade), Offset(sim.x[i] - s / 2, sim.y[i] - s / 2), Size(s, s), CornerRadius(s * 0.28f),
+                    )
+                    val m = textMeasurer.measure(sim.letters[i].toString(), style.copy(fontSize = 18.sp * sim.scale[i]))
+                    drawText(m, topLeft = Offset(sim.x[i] - m.size.width / 2f, sim.y[i] - m.size.height / 2f), alpha = fade)
+                }
+            }
+        }
+        // Mensagem no centro: entra crescendo com um pulinho e fica alguns segundos.
+        val appear = ((time - 0.35f) / 0.45f).coerceIn(0f, 1f)
+        if (appear > 0f) {
+            val pop = 1f + sin(appear * PI.toFloat()) * 0.12f
+            Column(
+                Modifier.align(Alignment.Center).padding(horizontal = 24.dp)
+                    .graphicsLayer { alpha = appear * fade; scaleX = appear * pop; scaleY = appear * pop }
+                    .clip(RoundedCornerShape(32.dp)).background(Night.surface.copy(alpha = 0.94f))
+                    .border(1.5.dp, Night.correct.copy(alpha = 0.6f), RoundedCornerShape(32.dp))
+                    .padding(horizontal = 20.dp, vertical = 22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text("Obrigado por jogar! 💚", color = Night.text, fontSize = 23.sp, maxLines = 1, fontWeight = FontWeight.ExtraBold, fontFamily = Outfit, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(10.dp))
+                FiveSquares(square = 12.dp, gap = 4.dp)
+            }
+        }
     }
 }
 
@@ -210,7 +416,8 @@ fun SplashCredits(onDone: () -> Unit) {
             )
         }
         CreatorCredit(
-            Modifier
+            easterEgg = false,
+            modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
                 .padding(bottom = 48.dp)

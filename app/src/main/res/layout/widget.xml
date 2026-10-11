@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget do Palavreiro: fundo Noite suave, cantos arredondados -->
+<!-- Hoje (médio): sequência e lista dos desafios do dia -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/w_root"
     android:layout_width="match_parent"
@@ -14,42 +14,34 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <TextView style="@style/WTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="@font/outfit_extrabold"
             android:text="Palavreiro"
-            android:textColor="#FFF4F1FF"
             android:textSize="17sp" />
 
         <TextView
             android:id="@+id/w_streak"
+            style="@style/WPill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/widget_pill"
-            android:fontFamily="@font/outfit_semibold"
-            android:paddingStart="10dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="3dp"
-            android:textColor="#FFF4F1FF"
-            android:textSize="13sp" />
+            android:text="🔥 4" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/w_progress"
+        style="@style/WMuted"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="6dp"
-        android:fontFamily="@font/outfit_regular"
-        android:textColor="#FFA9A2D0"
+        android:text="3 de 5 hoje"
         android:textSize="12sp" />
 
-    <TextView android:id="@+id/w_termo" style="@style/WidgetRow" />
-    <TextView android:id="@+id/w_dueto" style="@style/WidgetRow" />
-    <TextView android:id="@+id/w_quarteto" style="@style/WidgetRow" />
-    <TextView android:id="@+id/w_conexoes" style="@style/WidgetRow" />
-    <TextView android:id="@+id/w_caca" style="@style/WidgetRow" />
+    <TextView android:id="@+id/w_termo" style="@style/WidgetRow" android:text="✓  Termo" />
+    <TextView android:id="@+id/w_dueto" style="@style/WidgetRow" android:text="✓  Dueto" />
+    <TextView android:id="@+id/w_quarteto" style="@style/WidgetRow" android:text="○  Quarteto" />
+    <TextView android:id="@+id/w_conexoes" style="@style/WidgetRow" android:text="✓  Conexões" />
+    <TextView android:id="@+id/w_caca" style="@style/WidgetRow" android:text="○  Caça-Palavras" />
 </LinearLayout>

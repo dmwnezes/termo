@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Instalar atualizações baixadas pelo próprio app -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Android 12+: depois da primeira instalação feita pelo app, as atualizações entram sem confirmação -->
+    <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Lembrete diário -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -62,7 +65,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".system.Widget" android:exported="true" android:label="Palavreiro">
+        <receiver android:name=".system.Widget" android:exported="true" android:label="Palavreiro · Hoje">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -70,6 +73,28 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+        <receiver android:name=".system.StreakWidget" android:exported="true" android:label="Sequência">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_streak_info" />
+        </receiver>
+        <receiver android:name=".system.NextWordWidget" android:exported="true" android:label="Próxima palavra">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_next_info" />
+        </receiver>
+        <!-- Widget jogável: as respostas chegam por broadcast explícito (RELAMPAGO_RESPONDER / RELAMPAGO_PROXIMA) -->
+        <receiver android:name=".system.FlashWidget" android:exported="true" android:label="Palavra Relâmpago">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_flash_info" />
+        </receiver>
+
+        <!-- Resultado da instalação das atualizações (PackageInstaller) -->
+        <receiver android:name=".update.InstallReceiver" android:exported="false" />
 
         <!-- Entrega o APK baixado ao instalador do Android -->
         <provider

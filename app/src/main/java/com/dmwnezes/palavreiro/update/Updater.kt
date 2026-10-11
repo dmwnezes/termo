@@ -39,6 +39,9 @@ class Updater(private val http: OkHttpClient) {
         /** Número da versão a partir da tag: "v1.0.12" → 12. */
         fun numberFromTag(tag: String): Int = tag.substringAfterLast('.').filter(Char::isDigit).toIntOrNull() ?: 0
 
+        /** A versão da tag é mais nova que a instalada ([current] = versionCode)? */
+        fun isNewer(tag: String, current: Int): Boolean = numberFromTag(tag) > current
+
         /** Tira linhas técnicas do texto da versão (assinaturas de commit etc.). */
         fun cleanNotes(body: String): String = body.lines()
             .filterNot { it.startsWith("Co-Authored-By") || it.startsWith("Claude-Session") || it.contains("Palavreiro.apk") }
