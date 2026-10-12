@@ -71,6 +71,12 @@
       const best = g("ws-best") || 0, pl = (v, one, many) => `${v} ${v === 1 ? one : many}`;
       const chain = Math.max(g("sa-best") || 0, g("syn-best") || 0, g("ant-best") || 0);
       const tricks = Math.max(g("sa-tricks") || 0, g("ant-best") || 0);
+      // Memória: melhor tempo do nível mais difícil já terminado; embaixo, os três níveis.
+      const memRec = () => {
+        const lv = [["dificil", "Difícil", "D"], ["medio", "Médio", "M"], ["facil", "Fácil", "F"]], top = lv.find(([k]) => g("mem-best-" + k) > 0);
+        const sub = lv.slice().reverse().map(([k, , a]) => `${a} ${g("mem-best-" + k) ? P.fmtTime(g("mem-best-" + k)) : "—"}`).join(" · ");
+        return ["🃏", "Jogo da Memória", "var(--purple)", top ? P.fmtTime(g("mem-best-" + top[0])) : "—", top ? `no ${top[1]}` : "melhor tempo", sub];
+      };
       const cards = [
         ["🧩", "Conexões", "var(--correct)", g("conn-won"), g("conn-won") === 1 ? "resolvido" : "resolvidos", pl(g("conn-perfect"), "sem erro", "sem erro")],
         ["🔎", "Caça-Palavras", "var(--present)", best ? P.fmtTime(best) : "—", "melhor tempo", pl(g("ws-played"), "grade", "grades")],
@@ -79,6 +85,8 @@
         ["👑", "Mestre Mandou", "var(--accent)", g("mestre-best"), "recorde", pl(g("mestre-right"), "acerto", "acertos")],
         ["📖", "Qual é a Palavra?", "var(--purple)", g("def-best"), g("def-best") === 1 ? "seguida" : "seguidas", pl(g("def-right"), "acerto", "acertos")],
         ["⛓️", "Sinônimo ou Antônimo", "var(--correct)", chain, "maior cadeia", pl(tricks, "pegadinha", "pegadinhas")],
+        ["🧠", "Trivia", "var(--present)", g("trivia-won"), g("trivia-won") === 1 ? "vitória" : "vitórias", `recorde ${pl(g("trivia-best") || 0, "acerto", "acertos")} · ${g("trivia-right") || 0} no total`],
+        memRec(),
         ["🗂️", "Arquivo", "var(--present)", g("arch-played"), g("arch-played") === 1 ? "desafio" : "desafios", pl(g("arch-won") || 0, "vencido", "vencidos")],
         ["⚔️", "Com amigos", "var(--blue)", g("mp-won"), g("mp-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("mp-played"), "partida", "partidas")}`],
       ];

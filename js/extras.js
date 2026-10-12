@@ -13,15 +13,16 @@
   ];
   P.todayStatus = () => { const t = P.dayKey(); return TODAY_GAMES.map(([k, name, f]) => ({ k, name, done: f() === t })); };
 
+  // Compacto: "Hoje" + 5 bolinhas (verde = feito; toque abre o jogo) + "3/5" + botão do Arquivo, numa linha só.
+  const TODAY_MARK = { termo: "T", dueto: "D", quarteto: "Q", conexoes: "C", caca: "CP" };
   P.todayPanel = () => {
     const st = P.todayStatus(), done = st.filter((x) => x.done).length, all = done === st.length;
     return `<div class="today${all ? " all" : ""}">
-      <div class="today-head"><b>Hoje</b><span>${done} de ${st.length}</span></div>
-      <div class="today-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${st.length}" aria-valuenow="${done}"><i style="width:${(done / st.length) * 100}%"></i></div>
-      <div class="today-chips">${st.map((x) => `<button class="tchip${x.done ? " done" : ""}" data-go="${x.k}">${x.done ? "✓ " : ""}${x.name}</button>`).join("")}</div>
-      ${all ? `<p class="today-msg">Tudo feito hoje! 🎉</p>` : ""}
-    </div>
-    <button class="arch-link" data-go="arquivo"><span>🗂️ Arquivo de desafios</span><span aria-hidden="true">›</span></button>`;
+      <b class="today-title">Hoje</b>
+      <div class="today-dots">${st.map((x) => `<button class="tdot${x.done ? " done" : ""}" data-go="${x.k}" title="${x.name}${x.done ? " (feito)" : ""}" aria-label="${x.name}: ${x.done ? "feito" : "a fazer"}">${TODAY_MARK[x.k]}</button>`).join("")}</div>
+      <span class="today-count" role="progressbar" aria-label="Desafios do dia" aria-valuemin="0" aria-valuemax="${st.length}" aria-valuenow="${done}">${all ? "Tudo feito hoje 🎉" : `${done}/${st.length}`}</span>
+      <button class="today-arch" data-go="arquivo" aria-label="Arquivo de desafios">🗂️<span> Arquivo</span></button>
+    </div>`;
   };
   /** Confete e contador uma vez por dia quando os 5 desafios estão feitos. */
   P.checkAllDone = () => {
@@ -58,6 +59,9 @@
       ["🕵️", "Detetive", "Faça 10 pontos no Intruso", n("intr-best"), 10],
       ["✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", n("ort-best"), 20],
       ["👑", "Obediente", "Faça 15 pontos no Mestre Mandou", n("mestre-best"), 15],
+      ["🧠", "Sabichão", "Ganhe 1 partida de Trivia (as 6 medalhas)", n("trivia-won"), 1],
+      ["📚", "Enciclopédia", "Acerte 100 perguntas na Trivia", n("trivia-right"), 100],
+      ["🃏", "Memória de elefante", "Termine a Memória no Difícil", n("mem-best-dificil") > 0 ? 1 : 0, 1],
       ["⚔️", "Duelista", "Vença 5 partidas com amigos", n("mp-won"), 5],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
       ["🌟", "Dia completo", "Faça os 5 desafios do dia", n("alldone-days"), 1],
@@ -92,7 +96,11 @@
   const COUNTERS = ["conn_won", "conn_perfect", "conn_played", "conn_inf_played", "conn_inf_won", "ws_played", "ws_best", "ws_inf_played", "ws_inf_best",
     "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best", "intr_played", "intr_best", "intr_right",
     "ort_played", "ort_best", "ort_right", "mestre_played", "mestre_best", "mestre_right", "ant_best", "arch_played", "arch_won", "alldone_days",
-    "mp_played", "mp_won", "sa_best", "sa_tricks"];
+    "mp_played", "mp_won", "sa_best", "sa_tricks",
+    "trivia_won", "trivia_best", "trivia_right",
+    "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil"];
+  // Contadores em que menor é melhor (tempo e jogadas): 0 = ainda não jogou.
+  const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));
   const MODES = ["termo", "infinito", "dueto", "quarteto"];
   const toB64 = (str) => { let bin = ""; new TextEncoder().encode(str).forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
@@ -140,7 +148,7 @@
     Object.entries(obj(d.n)).forEach(([c, v]) => {
       if (!COUNTERS.includes(c)) return;
       const k = siteKey(c), cur = int(P.store.get(k, 0)), inc = int(v);
-      if (c === "ws_best" || c === "ws_inf_best") { if (inc > 0 && (cur <= 0 || inc < cur)) P.store.set(k, inc); }
+      if (LOWER.includes(c)) { if (inc > 0 && (cur <= 0 || inc < cur)) P.store.set(k, inc); }
       else if (inc > cur) P.store.set(k, inc);
     });
     const act = P.store.get("activity", {});
