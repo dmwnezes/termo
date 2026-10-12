@@ -1,0 +1,21 @@
+# Adedonha (Stop): uma categoria por linha. A sala sorteia algumas para cada partida.
+Nome
+Cidade, estado ou país
+Animal
+Fruta
+Cor
+Objeto
+Profissão
+Comida
+Marca
+Filme ou série
+Parte do corpo
+Esporte
+Verbo
+Time de futebol
+Coisa que tem na cozinha
+Instrumento musical
+Meio de transporte
+Flor ou planta
+Personagem
+Música ou cantor

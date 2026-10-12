@@ -1,0 +1,15 @@
+# Trivia (estilo Perguntados): CATEGORIA|pergunta|resposta certa|errada 1|errada 2|errada 3
+# Categorias (exatamente estes nomes): Ciência, História, Geografia, Esportes, Arte, Entretenimento
+# Perguntas de conhecimento geral, com foco no Brasil quando possível; respostas curtas; uma única resposta certa.
+Ciência|Qual é o planeta mais próximo do Sol?|Mercúrio|Vênus|Marte|Terra
+Ciência|Quantos ossos tem o corpo humano adulto?|206|186|226|256
+História|Em que ano o Brasil se tornou independente de Portugal?|1822|1808|1889|1500
+História|Quem assinou a Lei Áurea?|Princesa Isabel|Dom Pedro I|Getúlio Vargas|Tiradentes
+Geografia|Qual é a capital do Brasil?|Brasília|Rio de Janeiro|São Paulo|Salvador
+Geografia|Qual é o maior rio do mundo em volume de água?|Amazonas|Nilo|São Francisco|Mississippi
+Esportes|Quantas Copas do Mundo o Brasil já ganhou?|5|4|3|6
+Esportes|Quantos jogadores um time de futebol tem em campo?|11|10|9|12
+Arte|Quem pintou a Mona Lisa?|Leonardo da Vinci|Michelangelo|Van Gogh|Picasso
+Arte|Quem escreveu "Dom Casmurro"?|Machado de Assis|José de Alencar|Jorge Amado|Clarice Lispector
+Entretenimento|Qual instrumento tem teclas brancas e pretas?|Piano|Violão|Flauta|Bateria
+Entretenimento|Em qual cidade acontece o Festival de Parintins?|Parintins|Manaus|Belém|São Luís
