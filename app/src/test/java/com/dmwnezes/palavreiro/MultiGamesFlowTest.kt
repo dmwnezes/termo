@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.dmwnezes.palavreiro.game.Anagram
 import com.dmwnezes.palavreiro.game.Multi
@@ -59,9 +60,9 @@ class MultiGamesFlowTest {
         assumeTrue(System.getenv("PV_LIVE") == "1")
         val ntfy = ntfy()
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
-        rule.onNodeWithText("Anagrama").performClick()
+        rule.onNodeWithText("Anagrama").performScrollTo().performClick()
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
-        rule.onNodeWithText("Criar partida").performClick()
+        rule.onNodeWithText("Criar partida").performScrollTo().performClick()
         rule.waitUntil(15_000) { shown("https://dmwnezes.github.io", substring = true) }
         val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }

@@ -336,14 +336,25 @@ internal fun PointsEndSheet(
     mode: Char, oppName: String, me: Int, opp: Int, rows: List<Pair<String, Boolean?>>, isHost: Boolean,
     onAgain: () -> Unit, onLeave: () -> Unit, onClose: () -> Unit,
     myName: String? = null, next: NextGame? = null,
+    /** Resultado quando não sai só dos pontos (Trivia: empate nos acertos decidido pelo tempo). */
+    outcome: String? = null,
+    /** Linha embaixo do placar (ex.: o desempate). */
+    note: String? = null,
+    /** Tabela própria do modo no lugar da lista de palavras. */
+    table: (@Composable () -> Unit)? = null,
+    /** Detalhe do cartão dos Stories ("Pontos 230 × 180"). */
+    storyDetail: String? = null,
 ) {
     val context = LocalContext.current
+    val res = outcome ?: when { me > opp -> "me"; opp > me -> "opp"; else -> "draw" }
     BottomSheet(onClose) {
-        val title = when { me > opp -> "Você venceu! 🏆"; opp > me -> "$oppName venceu"; else -> "Empate" }
+        SuggestBanner(isHost, next)
+        val title = when (res) { "me" -> "Você venceu! 🏆"; "opp" -> "$oppName venceu"; else -> "Empate" }
         Text(title, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = Night.text, textAlign = TextAlign.Center)
-        Text("$me × $opp", fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, color = if (me > opp) Color(0xFFF5C84C) else Night.accent)
+        Text("$me × $opp", fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, color = if (res == "me") Color(0xFFF5C84C) else Night.accent)
+        if (note != null) Text(note, fontSize = 13.sp, color = Night.muted, textAlign = TextAlign.Center)
         Spacer(Modifier.height(12.dp))
-        Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surfaceHigh).padding(horizontal = 16.dp, vertical = 8.dp)) {
+        if (table != null) table() else Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surfaceHigh).padding(horizontal = 16.dp, vertical = 8.dp)) {
             rows.forEachIndexed { i, (w, who) ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("${i + 1}.", color = Night.muted, fontSize = 13.sp, modifier = Modifier.size(width = 26.dp, height = 18.dp))
@@ -362,10 +373,10 @@ internal fun PointsEndSheet(
             isHost = isHost, next = next, sameLabel = "Revanche", seriesOver = false,
             onAgain = onAgain, onLeave = onLeave,
             onShare = {
-                val res = when { me > opp -> "Venci por $me × $opp"; opp > me -> "Perdi por $me × $opp"; else -> "Empate $me × $opp" }
-                share(context, "Palavreiro · ${Multi.modeName(mode)} com $oppName\n$res ${Multi.modeEmoji(mode)}")
+                val line = when (res) { "me" -> "Venci por $me × $opp"; "opp" -> "Perdi por $me × $opp"; else -> "Empate $me × $opp" }
+                share(context, "Palavreiro · ${Multi.modeName(mode)} com $oppName\n$line ${Multi.modeEmoji(mode)}")
             },
-            onStory = { StoryCard.shareMatch(context, MatchStory.points(mode, myName, oppName, me, opp, rows.size)) },
+            onStory = { StoryCard.shareMatch(context, MatchStory.points(mode, myName, oppName, me, opp, rows.size, storyDetail, outcome)) },
         )
     }
 }
@@ -379,6 +390,7 @@ internal fun SeriesEndSheet(
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
+        SuggestBanner(isHost, next)
         val champ = series.winner
         val best = series.label.ifEmpty { "1 partida" }.replaceFirstChar { it.uppercase() }
         if (champ != null && series.best > 1) {

@@ -59,7 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmwnezes.palavreiro.Feedback
 import com.dmwnezes.palavreiro.data.Store
+import com.dmwnezes.palavreiro.game.Adedonha
 import com.dmwnezes.palavreiro.game.DefineDuel
+import com.dmwnezes.palavreiro.game.Trivia
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import com.dmwnezes.palavreiro.game.Definition
 import com.dmwnezes.palavreiro.game.HuntDuel
 import com.dmwnezes.palavreiro.game.Multi
@@ -99,6 +104,9 @@ fun MultiScreen(
     /** Temas do Caça-Palavras (caca.txt + caca-extra.txt) e definições do Qual é a Palavra?; null = lê dos assets. */
     themes: List<SearchTheme>? = null,
     definitions: List<Definition>? = null,
+    /** Categorias da Adedonha e perguntas da Trivia; null = lê dos assets (adedonha.txt e trivia.txt). */
+    categories: List<String>? = null,
+    questions: List<Trivia.Question>? = null,
 ) {
     val context = LocalContext.current
     val themePool = remember(themes) {
@@ -109,6 +117,12 @@ fun MultiScreen(
     }
     val defs = remember(definitions) {
         definitions ?: runCatching { DefineDuel.parse(context.assets.open("definicoes.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
+    }
+    val catPool = remember(categories) {
+        categories ?: runCatching { Adedonha.parse(context.assets.open("adedonha.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
+    }
+    val triviaPool = remember(questions) {
+        questions ?: runCatching { Trivia.parse(context.assets.open("trivia.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
     }
     val scope = rememberCoroutineScope()
     val myId = remember { resume?.id ?: Multi.randomId(8) }
@@ -165,6 +179,9 @@ fun MultiScreen(
     // Revanche: modo e rodadas escolhidos pelo anfitrião para o próximo jogo (null = os mesmos).
     var nextMode by remember { mutableStateOf<Char?>(null) }
     var nextRounds by remember { mutableStateOf<Int?>(null) }
+    // Sugestão de outro jogo: a que chegou do convidado (anfitrião) e a que eu mandei (convidado).
+    var suggestion by remember { mutableStateOf<Char?>(null) }
+    var suggestSent by remember { mutableStateOf<Char?>(null) }
     val reactions = rememberReactionState()
     val toast = rememberToast()
 
@@ -211,6 +228,7 @@ fun MultiScreen(
         localStart = if (kotlin.math.abs(t - at) < 2500) at + 3000 else t + 3000
         oppRows.clear(); ends.clear(); roundMsgs.clear(); showEnd = false
         nextMode = null; nextRounds = null; reactions.open = false
+        suggestion = null; suggestSent = null
         round++
         phase = Phase.PLAYING
     }
@@ -268,6 +286,17 @@ fun MultiScreen(
                 if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
             }
             is Msg.Skip, is Msg.TimeUp -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            // Rodada 11: Adedonha, Trivia e Forca (as mensagens com "id" só valem dos dois jogadores; o stop do tempo vem com "tempo").
+            is Msg.Stop, is Msg.Ans, is Msg.Vote, is Msg.Pick, is Msg.Secret, is Msg.Guess, is Msg.Reveal, is Msg.Try -> if (phase == Phase.PLAYING) {
+                val id = when (m) {
+                    is Msg.Stop -> m.id; is Msg.Ans -> m.id; is Msg.Vote -> m.id; is Msg.Pick -> m.id; is Msg.Secret -> m.id
+                    is Msg.Guess -> m.id; is Msg.Reveal -> m.id; is Msg.Try -> m.id; else -> null
+                }
+                if (id == myId || id == oppId || (m is Msg.Stop && id == Adedonha.TEMPO)) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            }
+            is Msg.SRound, is Msg.TryRes, is Msg.Word -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            // Convidado sugeriu outro jogo: aviso no topo da folha de fim do anfitrião.
+            is Msg.Suggest -> if (phase == Phase.PLAYING && isHost && m.id == oppId) suggestion = m.mode
             // Grade do Caça-Palavras: guardada pela RODADA (pode chegar logo depois do start/again).
             is Msg.Grid -> if (HuntDuel.valid(m) && m.n !in grids) grids[m.n] = m
             // Reações: só as frescas e do amigo (a minha já apareceu na hora).
@@ -314,30 +343,52 @@ fun MultiScreen(
     Box(Modifier.fillMaxSize().background(Night.background)) {
         when (phase) {
             Phase.CREATE -> Lobby("Jogar com amigo", ::leave) {
-                Text(modeRules(modeCode, pickRounds, create = true), color = Night.muted, fontSize = 15.sp)
-                Spacer(Modifier.height(18.dp))
-                NameField(name) { name = it }
-                Spacer(Modifier.height(16.dp))
-                Text("Modo", color = Night.muted, fontSize = 13.sp)
-                Spacer(Modifier.height(6.dp))
-                val codes = Multi.CODES
-                ChipTabs(codes.map(Multi::chipName), codes.indexOf(modeCode)) { modeCode = codes[it]; pickRounds = savedRounds(modeCode) }
-                Spacer(Modifier.height(14.dp))
-                Text("Rodadas", color = Night.muted, fontSize = 13.sp)
-                Spacer(Modifier.height(6.dp))
-                val opts = Multi.roundOptions(modeCode)
-                ChipTabs(opts.map { Multi.roundsLabel(modeCode, it) }, opts.indexOf(pickRounds)) { pickRounds = opts[it] }
-                Spacer(Modifier.height(22.dp))
-                PillButton("Criar partida", Night.correct, modifier = Modifier.fillMaxWidth(), enabled = Multi.validName(name)) {
-                    val n = name.trim(); store?.setText("mp_name", n); store?.setText("mp_mode", modeCode.toString())
-                    store?.setInt("mp_rounds_$modeCode", pickRounds)
-                    room = Multi.newRoom(modeCode); isHost = true; phase = Phase.WAITING; expired = false; keptAt = 0L
-                    rounds = pickRounds; series = Multi.Series(best = rounds)
-                    send(Msg.Hello(myId, n, host = true, rounds = pickRounds))
-                    keep()
+                Text("Escolha o jogo, mande o link e joguem ao vivo.", color = Night.muted, fontSize = 15.sp)
+                for ((title, codes) in Multi.SECTIONS) {
+                    Spacer(Modifier.height(18.dp))
+                    SectionLabel(title)
+                    Spacer(Modifier.height(8.dp))
+                    for (line in codes.chunked(2)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            for (code in line) GameCard(code, code == modeCode, Modifier.weight(1f)) { modeCode = code; pickRounds = savedRounds(code) }
+                            if (line.size == 1) Spacer(Modifier.weight(1f))
+                        }
+                        Spacer(Modifier.height(10.dp))
+                    }
                 }
-                if (name.isNotEmpty() && !Multi.validName(name)) {
-                    Spacer(Modifier.height(8.dp)); Text("O nome precisa ter de 2 a 16 letras.", color = Night.red, fontSize = 13.sp)
+                Spacer(Modifier.height(12.dp))
+                // Nome, rodadas, regra curta e o botão, num cartão só.
+                Column(
+                    Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).border(1.dp, Night.outline.copy(alpha = 0.35f), Shapes.card).padding(16.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Night.surfaceHigh), contentAlignment = Alignment.Center) { GameIcon(modeCode, 30.dp) }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(Multi.modeName(modeCode), color = Night.text, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                            Text(Multi.roundsLabel(modeCode, pickRounds), color = Night.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                    Spacer(Modifier.height(14.dp))
+                    NameField(name) { name = it }
+                    Spacer(Modifier.height(14.dp))
+                    Text("Rodadas", color = Night.muted, fontSize = 13.sp)
+                    Spacer(Modifier.height(6.dp))
+                    RoundsSegmented(modeCode, pickRounds, small = false) { pickRounds = it }
+                    Spacer(Modifier.height(14.dp))
+                    Text(shortRules(modeCode, pickRounds), color = Night.muted, fontSize = 14.sp, lineHeight = 19.sp)
+                    Spacer(Modifier.height(12.dp))
+                    PillButton("Criar partida", Night.correct, modifier = Modifier.fillMaxWidth(), enabled = Multi.validName(name)) {
+                        val n = name.trim(); store?.setText("mp_name", n); store?.setText("mp_mode", modeCode.toString())
+                        store?.setInt("mp_rounds_$modeCode", pickRounds)
+                        room = Multi.newRoom(modeCode); isHost = true; phase = Phase.WAITING; expired = false; keptAt = 0L
+                        rounds = pickRounds; series = Multi.Series(best = rounds)
+                        send(Msg.Hello(myId, n, host = true, rounds = pickRounds))
+                        keep()
+                    }
+                    if (name.isNotEmpty() && !Multi.validName(name)) {
+                        Spacer(Modifier.height(8.dp)); Text("O nome precisa ter de 2 a 16 letras.", color = Night.red, fontSize = 13.sp)
+                    }
                 }
                 // Entrar numa partida que alguém criou: cola o link (ou o código) e entra na sala.
                 Spacer(Modifier.height(28.dp))
@@ -494,8 +545,14 @@ fun MultiScreen(
                         cur, sel, { nextMode = it; nextRounds = if (it == cur) null else savedRounds(it) },
                         currentRounds = rounds, rounds = nextRounds ?: if (sel == cur) rounds else savedRounds(sel),
                         pickRounds = { nextRounds = it; store?.setInt("mp_rounds_$sel", it) },
+                        suggestion = suggestion, suggestFrom = oppName ?: "Seu amigo",
+                        onAccept = { suggestion?.let { m -> nextMode = m; nextRounds = if (m == cur) rounds else savedRounds(m); suggestion = null; again() } },
+                        onDismiss = { suggestion = null },
                     )
-                } else null
+                } else NextGame(
+                    cur, cur, {}, currentRounds = rounds, rounds = rounds,
+                    suggest = { m -> suggestSent = m; send(Msg.Suggest(myId, m)) }, sent = suggestSent,
+                )
                 val me = name.trim()
                 if (!Multi.isTermo(room!!.mode)) {
                     val r = room!!
@@ -525,6 +582,9 @@ fun MultiScreen(
                             Multi.HUNT -> HuntPlay(grids[round - 1], roundMsgs.map { it.msg }, duel)
                             Multi.TICTAC -> TicTacPlay(roundMsgs.map { it.msg }, duel)
                             Multi.CHECKERS -> CheckersPlay(roundMsgs.map { it.msg }, duel)
+                            Multi.ADEDONHA -> AdedonhaPlay(catPool, rounds, roundMsgs, duel)
+                            Multi.TRIVIA -> TriviaPlay(triviaPool, r.seed, rounds, roundMsgs, duel)
+                            Multi.FORCA -> ForcaPlay(roundMsgs.map { it.msg }, duel)
                         }
                         if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
                     }
@@ -591,7 +651,7 @@ fun MultiScreen(
                     }
                 }
                 // Reações (por cima da contagem e da folha de fim) e o aviso de jogo novo.
-                val gap = when (room!!.mode) { Multi.ANAGRAM, Multi.DEFINE, Multi.HUNT, Multi.TICTAC, Multi.CHECKERS -> 84.dp; else -> 112.dp }
+                val gap = if (Multi.isTermo(room!!.mode)) 112.dp else 84.dp
                 ReactionOverlay(reactions, gap)
                 ToastView(toast, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 96.dp))
             }
@@ -614,9 +674,33 @@ private fun modeRules(code: Char, rounds: Int, create: Boolean): String {
         Multi.HUNT -> "A mesma grade para os dois: cada palavra é de quem achar primeiro. 5 minutos por rodada; vence a rodada quem pegar mais palavras." + series
         Multi.TICTAC -> "Jogo da Velha ao vivo: X sempre começa e os símbolos trocam a cada rodada. Velha não conta." + series
         Multi.CHECKERS -> "Damas com as regras brasileiras: captura obrigatória, lei da maioria e dama voadora. Brancas começam e as cores trocam a cada rodada." + series
+        Multi.ADEDONHA -> "$rounds rodadas de Adedonha: 6 categorias e uma letra sorteada por rodada. Preencha tudo e dê STOP! Depois cada um valida as respostas do outro: resposta válida vale 10 (5 se for igual à do amigo). Vence quem fizer mais pontos 🏆"
+        Multi.TRIVIA -> "$rounds perguntas de 6 temas, as mesmas para os dois: 15 s para responder cada uma. Vence quem acertar mais; no empate, quem respondeu mais rápido 🏆"
+        Multi.FORCA -> "Um escolhe a palavra e o tema, o outro adivinha letra por letra (ou chuta a palavra). 6 erros e quem escolheu vence. Os papéis trocam a cada rodada." + series
         else -> (if (create) "Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras."
         else "Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras.") + series
     }
+}
+
+/** Regra do jogo escolhido numa linha curta (acima do "Criar partida"). */
+internal fun shortRules(code: Char, rounds: Int): String {
+    val rule = when (code) {
+        Multi.ANAGRAM -> "Mesmas letras embaralhadas; quem achar a palavra primeiro leva o ponto."
+        Multi.HUNT -> "Mesma grade; cada palavra é de quem achar primeiro. 5 min por rodada."
+        Multi.DEFINE -> "Mesma definição; quem acertar primeiro leva o ponto."
+        Multi.FORCA -> "Os papéis trocam a cada rodada; 6 erros e quem escolheu vence."
+        Multi.ADEDONHA -> "Uma letra, 6 categorias: 10 pontos por resposta, 5 se for igual."
+        Multi.TRIVIA -> "15 s por pergunta; empate nos acertos, vence o mais rápido."
+        Multi.TICTAC -> "X começa e os símbolos trocam a cada rodada."
+        Multi.CHECKERS -> "Captura obrigatória, lei da maioria e dama voadora."
+        else -> "Quem acertar primeiro ganha; vocês veem só as cores um do outro."
+    }
+    val n = when {
+        Multi.pointsMode(code) -> " $rounds rodadas: vence quem fizer mais pontos."
+        rounds == 1 -> " Uma partida só."
+        else -> " Melhor de $rounds: leva quem vencer ${(rounds + 1) / 2}."
+    }
+    return rule + n
 }
 
 private fun oppStatus(rows: Int, max: Int, end: Msg.End?, left: Boolean): String = when {
@@ -627,10 +711,10 @@ private fun oppStatus(rows: Int, max: Int, end: Msg.End?, left: Boolean): String
 }
 
 @Composable
-private fun Lobby(title: String, onBack: () -> Unit, content: @Composable () -> Unit) {
+private fun Lobby(title: String, onBack: () -> Unit, scroll: androidx.compose.foundation.ScrollState? = null, content: @Composable () -> Unit) {
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         TopBar(title, onBack)
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
+        Column(Modifier.weight(1f).verticalScroll(scroll ?: rememberScrollState()).padding(horizontal = 20.dp)) {
             Spacer(Modifier.height(8.dp))
             content()
             Spacer(Modifier.height(20.dp))
@@ -718,6 +802,7 @@ internal fun EndSheet(
 ) {
     val context = LocalContext.current
     BottomSheet(onClose) {
+        SuggestBanner(isHost, next)
         val words = (if (game.boards > 1) "As palavras eram " else "A palavra era ") + game.answerDisplay()
         val champ = series.winner
         if (champ != null) {
@@ -771,58 +856,151 @@ internal fun EndSheet(
 }
 
 /**
- * Escolha do próximo jogo na folha de fim (só o anfitrião): [current] = modo de agora, [selected] = escolhido;
+ * Escolha do próximo jogo na folha de fim: [current] = modo de agora, [selected] = escolhido;
  * [currentRounds]/[rounds] = rodadas de agora e as escolhidas para o próximo jogo.
+ * Anfitrião: [suggestion] = jogo que o convidado sugeriu ([onAccept] escolhe e começa, [onDismiss] fecha o aviso).
+ * Convidado: [suggest] manda a sugestão; [sent] = a que já foi mandada.
  */
 class NextGame(
     val current: Char, val selected: Char, val pick: (Char) -> Unit,
     val currentRounds: Int = Multi.defaultRounds(current), val rounds: Int = Multi.defaultRounds(selected), val pickRounds: (Int) -> Unit = {},
+    val suggestion: Char? = null, val suggestFrom: String = "", val onAccept: () -> Unit = {}, val onDismiss: () -> Unit = {},
+    val suggest: ((Char) -> Unit)? = null, val sent: Char? = null,
 ) {
     /** Muda alguma coisa em relação à partida de agora? */
     val changed: Boolean get() = selected != current || rounds != currentRounds
 }
 
-/** "Próximo jogo" + pílulas dos 8 modos (duas linhas) e, pequeno, o seletor de rodadas. */
+/** Título pequeno de seção ("Palavras", "Conhecimento", "Tabuleiro"). */
 @Composable
-internal fun NextGamePicker(n: NextGame) {
-    Text("Próximo jogo", color = Night.muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
-    Spacer(Modifier.height(6.dp))
-    Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surfaceHigh).padding(3.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        for (line in Multi.CODES.chunked(4)) {
-            Row(Modifier.fillMaxWidth()) {
-                for (code in line) {
-                    val sel = code == n.selected
-                    Text(
-                        Multi.chipName(code), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1,
-                        color = if (sel) Ink else Night.muted,
-                        // Nomes mais longos (Quarteto, Anagrama) ganham mais espaço.
-                        modifier = Modifier.weight(Multi.chipName(code).length + 3f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
-                            .clickable { n.pick(code) }.padding(vertical = 8.dp),
-                    )
-                }
-            }
+private fun SectionLabel(text: String) {
+    Text(text.uppercase(), color = Night.muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.4.sp)
+}
+
+/** Cartão de um jogo na tela de criar: ilustração, nome e uma linha de descrição; o escolhido ganha borda, fundo e check. */
+@Composable
+private fun GameCard(code: Char, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(24.dp)
+    Box(
+        modifier.height(146.dp).clip(shape)
+            .background(if (selected) Night.accent.copy(alpha = 0.18f) else Night.surface)
+            .border(if (selected) 2.dp else 1.dp, if (selected) Night.accent else Night.outline.copy(alpha = 0.35f), shape)
+            .clickable(onClick = onClick)
+            .semantics { this.selected = selected },
+    ) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Box(
+                Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(if (selected) Night.surface.copy(alpha = 0.6f) else Night.surfaceHigh.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center,
+            ) { GameIcon(code, 38.dp) }
+            Spacer(Modifier.height(9.dp))
+            // Nome longo ("Qual é a Palavra?") diminui um pouco em vez de cortar.
+            var nameSize by remember(code) { mutableStateOf(15f) }
+            Text(
+                Multi.modeName(code), color = Night.text, fontSize = nameSize.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false,
+                lineHeight = 18.sp, onTextLayout = { if (it.hasVisualOverflow && nameSize > 11f) nameSize -= 0.5f },
+            )
+            Text(Multi.blurb(code), color = Night.muted, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        }
+        if (selected) {
+            Box(
+                Modifier.align(Alignment.TopEnd).padding(10.dp).size(24.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Night.accent),
+                contentAlignment = Alignment.Center,
+            ) { Text("✓", color = Ink, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 14.sp) }
         }
     }
-    Spacer(Modifier.height(8.dp))
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text("Rodadas", color = Night.muted, fontSize = 12.sp, modifier = Modifier.padding(end = 8.dp))
-        Row(Modifier.weight(1f).clip(Shapes.pill).background(Night.surfaceHigh).padding(3.dp)) {
-            for (r in Multi.roundOptions(n.selected)) {
-                val sel = r == n.rounds
-                Text(
-                    Multi.roundsLabel(n.selected, r), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, textAlign = TextAlign.Center,
-                    color = if (sel) Ink else Night.muted,
-                    modifier = Modifier.weight(1f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
-                        .clickable { n.pickRounds(r) }.padding(vertical = 5.dp),
-                )
+}
+
+/** Seletor segmentado das rodadas do jogo [code]. */
+@Composable
+internal fun RoundsSegmented(code: Char, value: Int, small: Boolean, onPick: (Int) -> Unit) {
+    Row(Modifier.fillMaxWidth().clip(Shapes.pill).background(Night.surfaceHigh).padding(3.dp)) {
+        for (r in Multi.roundOptions(code)) {
+            val sel = r == value
+            Text(
+                Multi.roundsLabel(code, r), fontSize = if (small) 12.sp else 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, textAlign = TextAlign.Center,
+                color = if (sel) Ink else Night.muted,
+                modifier = Modifier.weight(1f).clip(Shapes.pill).background(if (sel) Night.accent else Color.Transparent)
+                    .clickable { onPick(r) }.padding(vertical = if (small) 6.dp else 9.dp),
+            )
+        }
+    }
+}
+
+/** Grade compacta dos 11 jogos (ícone + nome, 4 por linha): "Próximo jogo" e "Sugerir outro jogo". */
+@Composable
+internal fun CompactGameGrid(selected: Char?, onPick: (Char) -> Unit) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (line in Multi.CODES.chunked(4)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                for (code in line) {
+                    val sel = code == selected
+                    val shape = RoundedCornerShape(16.dp)
+                    Column(
+                        Modifier.weight(1f).clip(shape).background(if (sel) Night.accent.copy(alpha = 0.2f) else Night.surfaceHigh)
+                            .border(if (sel) 1.5.dp else 0.dp, if (sel) Night.accent else Color.Transparent, shape)
+                            .clickable { onPick(code) }.padding(vertical = 7.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        GameIcon(code, 26.dp)
+                        Spacer(Modifier.height(3.dp))
+                        Text(
+                            Multi.chipName(code), color = if (sel) Night.text else Night.muted, fontSize = 11.sp, lineHeight = 13.sp,
+                            fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false, overflow = TextOverflow.Clip,
+                        )
+                    }
+                }
+                repeat(4 - line.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
 }
 
+/** "Próximo jogo" + grade compacta dos jogos e, pequeno, o seletor de rodadas (anfitrião). */
+@Composable
+internal fun NextGamePicker(n: NextGame) {
+    Text("Próximo jogo", color = Night.muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+    Spacer(Modifier.height(6.dp))
+    CompactGameGrid(n.selected) { n.pick(it) }
+    Spacer(Modifier.height(8.dp))
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Rodadas", color = Night.muted, fontSize = 12.sp, modifier = Modifier.padding(end = 8.dp))
+        Box(Modifier.weight(1f)) { RoundsSegmented(n.selected, n.rounds, small = true) { n.pickRounds(it) } }
+    }
+}
+
+/** Aviso no topo da folha de fim do anfitrião: "Ana quer jogar Damas" com "Aceitar" e "✕". */
+@Composable
+internal fun SuggestBanner(isHost: Boolean, next: NextGame?) {
+    val m = next?.suggestion ?: return
+    if (!isHost) return
+    Row(
+        Modifier.fillMaxWidth().clip(Shapes.card).background(Night.accent.copy(alpha = 0.16f)).border(1.dp, Night.accent.copy(alpha = 0.6f), Shapes.card)
+            .padding(start = 12.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        GameIcon(m, 30.dp)
+        Spacer(Modifier.width(10.dp))
+        Text(
+            "${next.suggestFrom} quer jogar ${Multi.modeName(m)}", color = Night.text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f), maxLines = 2, lineHeight = 18.sp,
+        )
+        Text(
+            "Aceitar", color = Ink, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.clip(Shapes.pill).background(Night.correct).clickable(onClick = next.onAccept).padding(horizontal = 14.dp, vertical = 8.dp),
+        )
+        Text(
+            "✕", color = Night.muted, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.clip(Shapes.pill).clickable(onClick = next.onDismiss).padding(horizontal = 10.dp, vertical = 6.dp)
+                .semantics { contentDescription = "Dispensar sugestão" },
+        )
+    }
+    Spacer(Modifier.height(14.dp))
+}
+
 /**
- * Botões da folha de fim (todos os modos): próximo jogo (anfitrião), revanche/sair,
- * Stories/Compartilhar e, no Termo, o replay.
+ * Botões da folha de fim (todos os modos): próximo jogo (anfitrião) ou sugerir outro jogo (convidado),
+ * revanche/sair, Stories/Compartilhar e, no Termo, o replay.
  */
 @Composable
 internal fun EndButtons(
@@ -831,6 +1009,27 @@ internal fun EndButtons(
 ) {
     if (isHost && next != null) {
         NextGamePicker(next)
+        Spacer(Modifier.height(12.dp))
+    } else if (!isHost && next?.suggest != null) {
+        var open by remember { mutableStateOf(false) }
+        val sent = next.sent
+        when {
+            open -> {
+                Text("Sugerir outro jogo", color = Night.muted, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(6.dp))
+                CompactGameGrid(sent) { m -> open = false; next.suggest.invoke(m) }
+            }
+            sent != null -> Row(
+                Modifier.fillMaxWidth().clip(Shapes.pill).background(Night.surfaceHigh).clickable { open = true }.padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                GameIcon(sent, 22.dp)
+                Spacer(Modifier.width(8.dp))
+                Text("Sugestão enviada", color = Night.correct, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(" · ${Multi.modeName(sent)}", color = Night.muted, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            }
+            else -> PillButton("Sugerir outro jogo", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth()) { open = true }
+        }
         Spacer(Modifier.height(12.dp))
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {

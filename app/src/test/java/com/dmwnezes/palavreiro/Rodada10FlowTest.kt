@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToString
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import com.dmwnezes.palavreiro.game.HuntDuel
@@ -75,9 +76,9 @@ class Rodada10FlowTest {
 
     /** O app cria a sala do modo [label] e devolve a sala lida do link. */
     private fun createRoom(label: String): Multi.Room {
-        rule.onNodeWithText(label).performClick()
+        rule.onNodeWithText(label).performScrollTo().performClick()
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
-        rule.onNodeWithText("Criar partida").performClick()
+        rule.onNodeWithText("Criar partida").performScrollTo().performClick()
         rule.waitUntil(15_000) { shown("https://dmwnezes.github.io", true) }
         val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }
@@ -92,7 +93,7 @@ class Rodada10FlowTest {
     fun velhaAteAVitoria() {
         val ntfy = ntfy()
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
-        val room = createRoom("Velha")
+        val room = createRoom("Jogo da Velha")
         assertEquals('v', room.mode)
         val guestId = "guest001"
         val got = Collections.synchronizedList(mutableListOf<Msg>())

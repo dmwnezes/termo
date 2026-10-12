@@ -19,29 +19,60 @@ object Multi {
     const val DEFINE = 'p'
     const val TICTAC = 'v'
     const val CHECKERS = 'x'
+    const val ADEDONHA = 's'
+    const val TRIVIA = 'g'
+    const val FORCA = 'f'
     /** Bomba-Relógio: saiu do Palavreiro (link antigo com "b" → aviso). */
     const val REMOVED = 'b'
-    /** Todas as letras de modo aceitas no link, na ordem das pílulas da tela de criar. */
-    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, TICTAC, CHECKERS)
+    /** Todas as letras de modo aceitas no link, na ordem dos cartões da tela de criar. */
+    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA, TRIVIA, TICTAC, CHECKERS)
+    /** Seções da tela de criar: título → modos. */
+    val SECTIONS = listOf(
+        "Palavras" to listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA),
+        "Conhecimento" to listOf(TRIVIA),
+        "Tabuleiro" to listOf(TICTAC, CHECKERS),
+    )
     fun modeName(code: Char): String = when (code) {
         'd' -> "Dueto"; 'q' -> "Quarteto"; ANAGRAM -> "Anagrama"; HUNT -> "Caça-Palavras"
-        DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"; else -> "Termo"
+        DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"
+        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; else -> "Termo"
     }
-    /** Nome curto da pílula na tela de criar. */
+    /** Nome curto (grade compacta do "Próximo jogo"). */
     fun chipName(code: Char): String = when (code) {
         HUNT -> "Caça"; DEFINE -> "Palavra?"; TICTAC -> "Velha"; else -> modeName(code)
     }
-    /** "um Termo", "uma partida de Damas", "um Qual é a Palavra?". */
-    fun withArticle(code: Char): String = if (code == CHECKERS) "uma partida de Damas" else "um " + modeName(code)
+    /** Linha curta de descrição do cartão do jogo. */
+    fun blurb(code: Char): String = when (code) {
+        'd' -> "Duas palavras ao mesmo tempo"; 'q' -> "Quatro palavras de uma vez"
+        ANAGRAM -> "Desembaralhe antes do amigo"; HUNT -> "A mesma grade para os dois"
+        DEFINE -> "Adivinhe a palavra pela definição"; FORCA -> "Um escolhe a palavra, o outro adivinha"
+        ADEDONHA -> "Uma letra, várias categorias"; TRIVIA -> "Perguntas de 6 temas"
+        TICTAC -> "Três em linha, ao vivo"; CHECKERS -> "Regras brasileiras"
+        else -> "Uma palavra, quem acertar primeiro"
+    }
+    /** "um Termo", "uma partida de Damas", "uma Adedonha", "um Qual é a Palavra?". */
+    fun withArticle(code: Char): String = when (code) {
+        CHECKERS -> "uma partida de Damas"
+        ADEDONHA, TRIVIA, FORCA -> "uma " + modeName(code)
+        else -> "um " + modeName(code)
+    }
     /** Modos que seguem o fluxo do Termo (Termo, Dueto, Quarteto); os outros têm jogo próprio. */
     fun isTermo(code: Char): Boolean = code in MODES
     fun boards(code: Char): Int = MODES[code]?.boards ?: 1
 
     // ---------- rodadas (melhor de N ou N rodadas) ----------
-    /** Modos de pontos (Anagrama e Qual é a Palavra?): N rodadas; os outros jogam uma série melhor de N. */
-    fun pointsMode(code: Char): Boolean = code == ANAGRAM || code == DEFINE
-    fun roundOptions(code: Char): List<Int> = if (pointsMode(code)) listOf(5, 10, 15) else listOf(1, 3, 5)
-    fun defaultRounds(code: Char): Int = if (pointsMode(code)) 10 else 3
+    /** Modos de pontos (Anagrama, Qual é a Palavra?, Adedonha e Trivia): N rodadas; os outros jogam uma série melhor de N. */
+    fun pointsMode(code: Char): Boolean = code == ANAGRAM || code == DEFINE || code == ADEDONHA || code == TRIVIA
+    fun roundOptions(code: Char): List<Int> = when {
+        code == ADEDONHA -> listOf(3, 5, 7)
+        pointsMode(code) -> listOf(5, 10, 15)
+        else -> listOf(1, 3, 5)
+    }
+    fun defaultRounds(code: Char): Int = when {
+        code == ADEDONHA -> 5
+        pointsMode(code) -> 10
+        else -> 3
+    }
     /** Valor do "r" válido para o modo; qualquer outro (ou nenhum) vira o padrão. */
     fun rounds(code: Char, r: Int?): Int = r?.takeIf { it in roundOptions(code) } ?: defaultRounds(code)
     fun roundsLabel(code: Char, n: Int): String = when {
@@ -76,7 +107,7 @@ object Multi {
     fun fromPasted(text: String?): Room? {
         val t = text?.trim().orEmpty()
         Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
-        Regex("\\b([a-z0-9]{12}-[tdqacpvx]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        Regex("\\b([a-z0-9]{12}-[tdqacpvxsgf]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
         return null
     }
 
@@ -150,6 +181,32 @@ object Multi {
         data class Move(val id: String, val n: Int, val path: List<Int>) : Msg
         /** Damas: [id] desistiu da rodada. */
         data class Resign(val id: String) : Msg
+
+        // ---------- Rodada 11 ----------
+        /** Convidado: sugere o modo [mode] para o próximo jogo. */
+        data class Suggest(val id: String, val mode: Char) : Msg
+        /** Adedonha: o anfitrião sorteou a letra [letter] da rodada [k] (partida [n]) com as categorias [cats]. */
+        data class SRound(val n: Int, val k: Int, val letter: Char, val cats: List<String>) : Msg
+        /** Adedonha: [id] deu STOP ("tempo" = acabou o tempo). */
+        data class Stop(val id: String, val n: Int, val k: Int) : Msg
+        /** Adedonha: respostas de [id] na ordem das categorias. */
+        data class Ans(val id: String, val n: Int, val k: Int, val answers: List<String>) : Msg
+        /** Adedonha: votos de [id] (1 = vale, 0 = não vale) sobre as respostas do AMIGO. */
+        data class Vote(val id: String, val n: Int, val k: Int, val votes: List<Int>) : Msg
+        /** Trivia: [id] escolheu a opção [option] (0..3, -1 = não respondeu) da pergunta [round] em [ms]. */
+        data class Pick(val id: String, val round: Int, val option: Int, val ms: Long) : Msg
+        /** Forca: quem escolheu ([id]) mandou o tema e a máscara (nunca a palavra). */
+        data class Secret(val id: String, val n: Int, val theme: String, val mask: String) : Msg
+        /** Forca: quem adivinha tocou a letra [letter] (A–Z). */
+        data class Guess(val id: String, val n: Int, val letter: Char) : Msg
+        /** Forca: resposta automática de quem escolheu: posições da letra na máscara (vazio = erro). */
+        data class Reveal(val id: String, val n: Int, val letter: Char, val pos: List<Int>) : Msg
+        /** Forca: chute da palavra inteira. */
+        data class Try(val id: String, val n: Int, val word: String) : Msg
+        /** Forca: resultado do chute. */
+        data class TryRes(val n: Int, val ok: Boolean) : Msg
+        /** Forca: a palavra original, no fim da rodada. */
+        data class Word(val n: Int, val word: String) : Msg
     }
 
     // ---------- reações rápidas ----------
@@ -166,7 +223,8 @@ object Multi {
     // ---------- revanche (trocando de modo) ----------
     /** Emoji do modo no cartão dos Stories. */
     fun modeEmoji(code: Char): String = when (code) {
-        ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"; else -> "⚔️"
+        ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"
+        ADEDONHA -> "✋"; TRIVIA -> "🧠"; FORCA -> "🎯"; else -> "⚔️"
     }
 
     /** Modos que contam série (melhor de N). */
@@ -227,7 +285,24 @@ object Multi {
         is Msg.Cell -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("c", m.cell)
         is Msg.Move -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("p", org.json.JSONArray().apply { m.path.forEach { put(it) } })
         is Msg.Resign -> JSONObject().put("t", "resign").put("id", m.id)
+        is Msg.Suggest -> JSONObject().put("t", "suggest").put("id", m.id).put("m", m.mode.toString())
+        is Msg.SRound -> JSONObject().put("t", "sround").put("n", m.n).put("k", m.k).put("l", m.letter.toString()).put("c", jarr(m.cats))
+        is Msg.Stop -> JSONObject().put("t", "stop").put("id", m.id).put("n", m.n).put("k", m.k)
+        is Msg.Ans -> JSONObject().put("t", "ans").put("id", m.id).put("n", m.n).put("k", m.k).put("a", jarr(m.answers))
+        is Msg.Vote -> JSONObject().put("t", "vote").put("id", m.id).put("n", m.n).put("k", m.k).put("v", jarr(m.votes))
+        is Msg.Pick -> JSONObject().put("t", "pick").put("id", m.id).put("r", m.round).put("o", m.option).put("ms", m.ms)
+        is Msg.Secret -> JSONObject().put("t", "secret").put("id", m.id).put("n", m.n).put("th", m.theme).put("m", m.mask)
+        is Msg.Guess -> JSONObject().put("t", "guess").put("id", m.id).put("n", m.n).put("l", m.letter.toString())
+        is Msg.Reveal -> JSONObject().put("t", "reveal").put("id", m.id).put("n", m.n).put("l", m.letter.toString()).put("p", jarr(m.pos))
+        is Msg.Try -> JSONObject().put("t", "try").put("id", m.id).put("n", m.n).put("w", m.word)
+        is Msg.TryRes -> JSONObject().put("t", "tryres").put("n", m.n).put("ok", m.ok)
+        is Msg.Word -> JSONObject().put("t", "word").put("n", m.n).put("w", m.word)
     }.toString()
+
+    private fun jarr(items: List<Any>) = org.json.JSONArray().apply { items.forEach { put(it) } }
+    private fun strings(o: JSONObject, key: String): List<String> = o.getJSONArray(key).let { a -> (0 until a.length()).map { a.optString(it) } }
+    private fun ints(o: JSONObject, key: String): List<Int> = o.getJSONArray(key).let { a -> (0 until a.length()).map { a.getInt(it) } }
+    private fun letter(o: JSONObject): Char = o.getString("l").trim().uppercase().single().also { require(it in 'A'..'Z') }
 
     private fun optRounds(o: JSONObject): Int? = if (o.has("r")) o.optInt("r", -1).takeIf { it > 0 } else null
 
@@ -257,6 +332,18 @@ object Multi {
                 Msg.Move(o.getString("id"), o.getInt("n"), (0 until p.length()).map { p.getInt(it) })
             } else Msg.Cell(o.getString("id"), o.getInt("n"), o.getInt("c"))
             "resign" -> Msg.Resign(o.getString("id"))
+            "suggest" -> o.getString("m").singleOrNull()?.takeIf { it in CODES }?.let { Msg.Suggest(o.getString("id"), it) }
+            "sround" -> Msg.SRound(o.getInt("n"), o.getInt("k"), letter(o), if (o.has("c")) strings(o, "c") else emptyList())
+            "stop" -> Msg.Stop(o.getString("id"), o.getInt("n"), o.getInt("k"))
+            "ans" -> Msg.Ans(o.getString("id"), o.getInt("n"), o.getInt("k"), strings(o, "a"))
+            "vote" -> Msg.Vote(o.getString("id"), o.getInt("n"), o.getInt("k"), ints(o, "v"))
+            "pick" -> Msg.Pick(o.getString("id"), o.getInt("r"), o.optInt("o", -1).takeIf { it in 0..3 } ?: -1, o.optLong("ms"))
+            "secret" -> Msg.Secret(o.getString("id"), o.getInt("n"), o.optString("th").take(24), o.getString("m"))
+            "guess" -> Msg.Guess(o.getString("id"), o.getInt("n"), letter(o))
+            "reveal" -> Msg.Reveal(o.getString("id"), o.getInt("n"), letter(o), ints(o, "p"))
+            "try" -> Msg.Try(o.getString("id"), o.getInt("n"), o.getString("w"))
+            "tryres" -> Msg.TryRes(o.getInt("n"), o.getBoolean("ok"))
+            "word" -> Msg.Word(o.getInt("n"), o.getString("w"))
             else -> null
         }
     }.getOrNull()

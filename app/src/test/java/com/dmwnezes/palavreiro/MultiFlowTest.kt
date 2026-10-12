@@ -5,6 +5,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.semantics.SemanticsProperties
 import com.dmwnezes.palavreiro.game.Multi
@@ -38,7 +39,7 @@ class MultiFlowTest {
         val ntfy = Ntfy(OkHttpClient(), System.getenv("PV_NTFY") ?: "https://ntfy.sh")
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
-        rule.onNodeWithText("Criar partida").performClick()
+        rule.onNodeWithText("Criar partida").performScrollTo().performClick()
         rule.waitUntil(15_000) { rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().isNotEmpty() }
         val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }

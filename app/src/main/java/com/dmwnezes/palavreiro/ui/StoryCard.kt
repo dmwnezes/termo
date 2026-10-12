@@ -33,7 +33,7 @@ data class StoryData(
 
 /**
  * Cartão dos Stories da partida com amigo (todos os modos).
- * [me]/[opp] = nomes; placar = série (Termo, Dueto, Quarteto, Caça, Velha, Damas) ou pontos (Anagrama, Qual é a Palavra?).
+ * [me]/[opp] = nomes; placar = série (Termo, Dueto, Quarteto, Caça, Velha, Damas, Forca) ou pontos (Anagrama, Qual é a Palavra?, Adedonha, Trivia).
  * [winner]: "me", "opp" ou null (destaca o nome de quem venceu).
  */
 data class MatchStory(
@@ -90,14 +90,21 @@ data class MatchStory(
         }
 
         /** Modos de pontos (Anagrama, Qual é a Palavra?): pontos da partida. */
-        fun points(mode: Char, myName: String?, opp: String, myPts: Int, oppPts: Int, rounds: Int): MatchStory {
+        fun points(
+            mode: Char, myName: String?, opp: String, myPts: Int, oppPts: Int, rounds: Int,
+            /** Detalhe próprio do modo (Adedonha "Pontos 230 × 180", Trivia "8 × 6 acertos"); null = "N rodadas · A × B". */
+            detail: String? = null,
+            /** Resultado quando não sai só do placar (Trivia: desempate pelo tempo). */
+            outcome: String? = null,
+        ): MatchStory {
             val me = myName(myName)
-            val (res, w) = when {
-                myPts > oppPts -> "🏆 $me venceu!" to "me"
-                oppPts > myPts -> "🏆 $opp venceu!" to "opp"
+            val o = outcome ?: when { myPts > oppPts -> "me"; oppPts > myPts -> "opp"; else -> "draw" }
+            val (res, w) = when (o) {
+                "me" -> "🏆 $me venceu!" to "me"
+                "opp" -> "🏆 $opp venceu!" to "opp"
                 else -> "Empate" to null
             }
-            return MatchStory(mode, me, opp, myPts, oppPts, res, "$rounds rodadas · $myPts × $oppPts", w)
+            return MatchStory(mode, me, opp, myPts, oppPts, res, detail ?: "$rounds rodadas · $myPts × $oppPts", w)
         }
 
         /** Anagrama: pontos da partida. */

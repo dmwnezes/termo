@@ -25,6 +25,7 @@ import com.dmwnezes.palavreiro.game.QuizData
 import org.junit.Rule
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -219,8 +220,8 @@ class ScreensRenderTest {
     fun amigoSalaComQr() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
-        rule.onNode(androidx.compose.ui.test.hasText("Seu nome")).performTextInput("Daniel")
-        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Seu nome")).performScrollTo().performTextInput("Daniel")
+        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performScrollTo().performClick()
         save("31-amigo-sala-qr")
     }
 
@@ -433,7 +434,7 @@ class ScreensRenderTest {
     fun amigoModos() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
-        rule.onNode(androidx.compose.ui.test.hasText("Velha")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Jogo da Velha")).performScrollTo().performClick()
         save("36-amigo-modos")
     }
 
@@ -441,9 +442,9 @@ class ScreensRenderTest {
     fun amigoModosPontos() {
         rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
-        rule.onNode(androidx.compose.ui.test.hasText("Palavra?")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Qual é a Palavra?")).performScrollTo().performClick()
         rule.mainClock.advanceTimeBy(200)
-        rule.onNode(androidx.compose.ui.test.hasText("15 rodadas")).performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("15 rodadas")).performScrollTo().performClick()
         save("36b-amigo-modos-pontos")
     }
 
