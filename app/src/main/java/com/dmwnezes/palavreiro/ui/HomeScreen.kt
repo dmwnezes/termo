@@ -41,9 +41,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -75,6 +77,8 @@ fun HomeScreen(
     val more = listOf(
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
+        GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
+        GameCardInfo(Dest.MEMORIA, "Jogo da Memória", "Ache os pares de sinônimos", null),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
@@ -122,52 +126,68 @@ fun HomeScreen(
     }
 }
 
-/** Painel "Hoje": quantos desafios do dia já foram feitos, com atalho para cada um e para o Arquivo. */
-@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+/**
+ * Painel "Hoje" compacto: uma linha com os 5 desafios do dia em bolinhas (verde = feito; toque abre o jogo),
+ * a contagem à direita ("Tudo feito hoje 🎉" quando completa) e o atalho para o Arquivo.
+ */
 @Composable
 private fun TodayPanel(status: com.dmwnezes.palavreiro.system.DailyStatus, onOpen: (Dest) -> Unit) {
     val items = listOf(
-        Triple(Dest.TERMO, "Termo", status.termo), Triple(Dest.DUETO, "Dueto", status.dueto),
-        Triple(Dest.QUARTETO, "Quarteto", status.quarteto), Triple(Dest.CONEXOES, "Conexões", status.conexoes),
-        Triple(Dest.CACA, "Caça", status.caca),
+        TodayItem(Dest.TERMO, "Termo", "T", status.termo), TodayItem(Dest.DUETO, "Dueto", "D", status.dueto),
+        TodayItem(Dest.QUARTETO, "Quarteto", "Q", status.quarteto), TodayItem(Dest.CONEXOES, "Conexões", "C", status.conexoes),
+        TodayItem(Dest.CACA, "Caça-Palavras", "CP", status.caca),
     )
-    val done = status.doneCount
+    val done = items.count { it.done }
+    val all = done == items.size
     Column(
-        Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface)
-            .border(1.dp, Night.outline.copy(alpha = 0.45f), Shapes.card).padding(16.dp),
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Night.surface)
+            .border(1.dp, Night.outline.copy(alpha = 0.45f), RoundedCornerShape(22.dp))
+            .padding(start = 14.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Hoje", fontSize = 21.sp, fontWeight = FontWeight.SemiBold, color = Night.text, modifier = Modifier.weight(1f))
-            Text("$done de ${items.size}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (done == items.size) Night.correct else Night.muted)
-        }
-        Spacer(Modifier.height(10.dp))
-        Box(Modifier.fillMaxWidth().height(8.dp).clip(Shapes.pill).background(Night.bgBottom)) {
-            Box(Modifier.fillMaxWidth(done / items.size.toFloat()).height(8.dp).clip(Shapes.pill).background(Night.correct))
-        }
-        Spacer(Modifier.height(12.dp))
-        androidx.compose.foundation.layout.FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            items.forEach { (dest, label, ok) ->
-                Text(
-                    if (ok) "✓ $label" else label,
-                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-                    color = if (ok) Color(0xFF1A1438) else Night.text,
-                    modifier = Modifier.clip(Shapes.pill).background(if (ok) Night.correct else Night.surfaceHigh)
-                        .clickable { onOpen(dest) }.padding(horizontal = 12.dp, vertical = 7.dp),
-                )
+            if (!all) {
+                Text("Hoje", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
+                Spacer(Modifier.width(10.dp))
+            }
+            items.forEach { TodayDot(it) { onOpen(it.dest) } }
+            Spacer(Modifier.weight(1f))
+            Text(
+                if (all) "Tudo feito hoje 🎉" else "$done/${items.size}",
+                fontSize = if (all) 13.sp else 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, softWrap = false,
+                color = if (all) Night.correct else Night.muted,
+                modifier = androidx.compose.ui.Modifier.semantics { contentDescription = if (all) "Tudo feito hoje" else "$done de ${items.size} desafios feitos hoje" },
+            )
+            IconButton(onClick = { onOpen(Dest.ARQUIVO) }, modifier = Modifier.size(40.dp)) {
+                Text("🗂️", fontSize = 17.sp, modifier = Modifier.semantics { contentDescription = "Arquivo de desafios" })
             }
         }
-        if (done == items.size) {
-            Spacer(Modifier.height(10.dp))
-            Text("Tudo feito hoje! 🎉", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Night.correct)
+        Box(Modifier.padding(end = 10.dp).fillMaxWidth().height(3.dp).clip(Shapes.pill).background(Night.bgBottom)) {
+            Box(Modifier.fillMaxWidth(done / items.size.toFloat()).height(3.dp).clip(Shapes.pill).background(Night.correct))
         }
-        Spacer(Modifier.height(6.dp))
-        Text(
-            "🗂️  Arquivo de desafios  ›", fontSize = 15.sp, color = Night.accent, fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.clip(Shapes.pill).clickable { onOpen(Dest.ARQUIVO) }.padding(vertical = 8.dp),
-        )
+    }
+}
+
+private data class TodayItem(val dest: Dest, val name: String, val short: String, val done: Boolean)
+
+/** Bolinha de um desafio do dia: cheia e verde com ✓ quando feito, contorno com a inicial quando não. */
+@Composable
+private fun TodayDot(item: TodayItem, onClick: () -> Unit) {
+    Box(
+        Modifier.size(28.dp).clip(CircleShape).clickable(onClick = onClick)
+            .semantics(mergeDescendants = true) { contentDescription = "${item.name}: ${if (item.done) "feito" else "falta fazer"}" },
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            Modifier.size(22.dp).clip(CircleShape)
+                .then(if (item.done) Modifier.background(Night.correct) else Modifier.border(1.5.dp, Night.outline, CircleShape)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                if (item.done) "✓" else item.short, fontSize = if (item.short.length > 1 && !item.done) 9.sp else 11.sp, lineHeight = 11.sp,
+                fontWeight = FontWeight.ExtraBold, maxLines = 1, softWrap = false,
+                color = if (item.done) Color(0xFF1A1438) else Night.muted,
+            )
+        }
     }
 }
 
@@ -291,6 +311,27 @@ internal fun CardIcon(dest: Dest) {
             Pill("TOQUE", Night.present)
         }
         Dest.SINONIMOS -> SynAntIcon()
+        Dest.TRIVIA -> TriviaWheel(0f, 50.dp, pointer = false)
+        Dest.MEMORIA -> MemoryIcon()
+    }
+}
+
+/** Jogo da Memória: duas cartas viradas (roxas) e um par achado (verde). */
+@Composable
+private fun MemoryIcon() {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        listOf(listOf(false, true), listOf(true, false)).forEach { line ->
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                line.forEach { open ->
+                    Box(
+                        Modifier.size(width = 20.dp, height = 24.dp).clip(RoundedCornerShape(6.dp)).background(if (open) Night.correct else Night.accent),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(if (open) "=" else "?", color = Color(0xFF1A1438), fontSize = 13.sp, lineHeight = 13.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, softWrap = false)
+                    }
+                }
+            }
+        }
     }
 }
 
