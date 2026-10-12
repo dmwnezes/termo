@@ -179,7 +179,7 @@ class AppMiscTest {
     fun recordesTemTodosOsJogos() {
         val cards = recordCards(Stats(won = 5), Records(mapOf("mp_won" to 1, "mp_played" to 3, "ws_best" to 75, "sa_best" to 4, "syn_best" to 9)))
         assertEquals(
-            listOf(Dest.INFINITO, Dest.CONEXOES, Dest.CACA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.MESTRE, Dest.ARQUIVO, Dest.DESAFIAR),
+            listOf(Dest.INFINITO, Dest.CONEXOES, Dest.CACA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.MESTRE, Dest.TRIVIA, Dest.MEMORIA, Dest.ARQUIVO, Dest.DESAFIAR),
             cards.map { it.dest },
         )
         val byDest = cards.associateBy { it.dest }

@@ -50,9 +50,18 @@ fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
         RecordCardInfo(Dest.INTRUSO, "Intruso", v(r["intr_best"]), "pontos", plural(r["intr_right"], "acerto", "acertos")),
         RecordCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", v(r["ort_best"]), "pontos", plural(r["ort_right"], "acerto", "acertos")),
         RecordCardInfo(Dest.MESTRE, "Mestre Mandou", v(r["mestre_best"]), "pontos", plural(r["mestre_right"], "acerto", "acertos")),
+        RecordCardInfo(Dest.TRIVIA, "Trivia", v(r["trivia_best"]), "seguidas", "${plural(r["trivia_won"], "vitória", "vitórias")} · ${r["trivia_right"]} ✓"),
+        memoryCard(r),
         RecordCardInfo(Dest.ARQUIVO, "Arquivo", v(r["arch_played"]), if (r["arch_played"] == 1) "desafio" else "desafios", plural(r["arch_won"], "vencido", "vencidos")),
         RecordCardInfo(Dest.DESAFIAR, "Com amigos", v(r["mp_won"]), if (r["mp_won"] == 1) "vitória" else "vitórias", "em ${plural(r["mp_played"], "partida", "partidas")}"),
     )
+}
+
+/** Memória: melhor tempo do nível mais difícil já terminado. */
+private fun memoryCard(r: Records): RecordCardInfo {
+    val lvl = com.dmwnezes.palavreiro.game.MemLevel.entries.lastOrNull { r[it.timeKey] > 0 }
+        ?: return RecordCardInfo(Dest.MEMORIA, "Jogo da Memória", null, "melhor tempo", "nenhum nível ainda")
+    return RecordCardInfo(Dest.MEMORIA, "Jogo da Memória", formatTime(r[lvl.timeKey]), "no ${lvl.label}", "menos jogadas: ${r[lvl.movesKey]}")
 }
 
 /** Seção "Recordes": destaque da maior sequência do Termo e uma grade de cartões por jogo. */
