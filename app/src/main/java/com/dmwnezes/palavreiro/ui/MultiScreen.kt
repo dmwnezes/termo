@@ -61,7 +61,7 @@ import com.dmwnezes.palavreiro.Feedback
 import com.dmwnezes.palavreiro.data.Store
 import com.dmwnezes.palavreiro.game.Adedonha
 import com.dmwnezes.palavreiro.game.DefineDuel
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -106,7 +106,7 @@ fun MultiScreen(
     definitions: List<Definition>? = null,
     /** Categorias da Adedonha e perguntas da Trivia; null = lê dos assets (adedonha.txt e trivia.txt). */
     categories: List<String>? = null,
-    questions: List<Trivia.Question>? = null,
+    questions: List<TriviaDuel.Question>? = null,
 ) {
     val context = LocalContext.current
     val themePool = remember(themes) {
@@ -122,7 +122,7 @@ fun MultiScreen(
         categories ?: runCatching { Adedonha.parse(context.assets.open("adedonha.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
     }
     val triviaPool = remember(questions) {
-        questions ?: runCatching { Trivia.parse(context.assets.open("trivia.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
+        questions ?: runCatching { TriviaDuel.parse(context.assets.open("trivia.txt").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
     }
     val scope = rememberCoroutineScope()
     val myId = remember { resume?.id ?: Multi.randomId(8) }

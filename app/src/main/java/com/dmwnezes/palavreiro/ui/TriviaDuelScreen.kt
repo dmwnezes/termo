@@ -46,26 +46,26 @@ import androidx.compose.ui.unit.sp
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.Timed
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 import kotlinx.coroutines.delay
 
 private fun secs(ms: Long): String = "%d,%d s".format(ms / 1000, (ms % 1000) / 100)
 
 /** Trivia com amigo (modo "g"): N perguntas, roleta, 15 s para responder, 3 s mostrando a certa. */
 @Composable
-internal fun TriviaPlay(pool: List<Trivia.Question>, seed: Long, rounds: Int, msgs: List<Timed>, d: Duel) {
+internal fun TriviaPlay(pool: List<TriviaDuel.Question>, seed: Long, rounds: Int, msgs: List<Timed>, d: Duel) {
     val now = rememberNow(d.clock, d.round, 50)
-    val items = remember(pool, seed, rounds) { Trivia.pick(pool, seed, rounds) }
+    val items = remember(pool, seed, rounds) { TriviaDuel.pick(pool, seed, rounds) }
     val total = items.size.coerceAtLeast(1)
-    val st = Trivia.state(msgs, d.myId, d.oppId, total, seed, d.localStart, now, d.oppLeft)
+    val st = TriviaDuel.state(msgs, d.myId, d.oppId, total, seed, d.localStart, now, d.oppLeft)
     val k = st.current
     val start = if (st.over) Long.MAX_VALUE else st.startOf(k, d.localStart)
     val inGap = k > 0 && (st.over || now < start)
     val shown = (if (inGap) k - 1 else k).coerceIn(0, total - 1)
-    val qStart = if (st.over) Long.MAX_VALUE else start + Trivia.WHEEL_MS
+    val qStart = if (st.over) Long.MAX_VALUE else start + TriviaDuel.WHEEL_MS
     val spinning = !inGap && !st.over && now < qStart
     val answering = !inGap && !st.over && now >= qStart
-    val elapsed = (now - qStart).coerceIn(0, Trivia.ANSWER_MS)
+    val elapsed = (now - qStart).coerceIn(0, TriviaDuel.ANSWER_MS)
     val sent = remember(d.round) { mutableSetOf<Int>() }
     var picked by remember(d.round, k) { mutableStateOf<Int?>(null) }
     var showEnd by remember(d.round) { mutableStateOf(false) }
@@ -77,8 +77,8 @@ internal fun TriviaPlay(pool: List<Trivia.Question>, seed: Long, rounds: Int, ms
         d.send(Msg.Pick(d.myId, k, o, ms))
     }
     // Acabou o tempo sem resposta: manda -1.
-    val timeUp = answering && now >= qStart + Trivia.ANSWER_MS
-    LaunchedEffect(k, timeUp) { if (timeUp) pick(-1, Trivia.ANSWER_MS) }
+    val timeUp = answering && now >= qStart + TriviaDuel.ANSWER_MS
+    LaunchedEffect(k, timeUp) { if (timeUp) pick(-1, TriviaDuel.ANSWER_MS) }
     LaunchedEffect(k, d.round) {
         if (k == 0) return@LaunchedEffect
         if (st.iHit(k - 1)) d.feedback?.win() else d.feedback?.lose()
@@ -86,7 +86,7 @@ internal fun TriviaPlay(pool: List<Trivia.Question>, seed: Long, rounds: Int, ms
     LaunchedEffect(st.over, d.round) {
         if (!st.over) return@LaunchedEffect
         d.onDecided(st.outcome() ?: "draw")
-        delay(Trivia.REVEAL_MS)
+        delay(TriviaDuel.REVEAL_MS)
         showEnd = true
     }
 
@@ -118,19 +118,19 @@ internal fun TriviaPlay(pool: List<Trivia.Question>, seed: Long, rounds: Int, ms
                     Spacer(Modifier.height(20.dp))
                     Text("Pergunta ${k + 1} de $total", color = Night.muted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.height(18.dp))
-                    val t = ((now - start).toFloat() / Trivia.WHEEL_MS).coerceIn(0f, 1f)
-                    CategoryWheel(q.category, t)
+                    val t = ((now - start).toFloat() / TriviaDuel.WHEEL_MS).coerceIn(0f, 1f)
+                    DuelCategoryWheel(q.category, t)
                     Spacer(Modifier.height(18.dp))
-                    if (t >= 1f || now >= qStart - 150) CategoryChip(q.category, big = true)
+                    if (t >= 1f || now >= qStart - 150) DuelCategoryChip(q.category, big = true)
                     else Text("Girando…", color = Night.muted, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 } else {
                     val k2 = shown
-                    val opts = remember(q, seed, k2) { Trivia.options(q, seed, k2) }
-                    val right = Trivia.correctIndex(seed, k2)
+                    val opts = remember(q, seed, k2) { TriviaDuel.options(q, seed, k2) }
+                    val right = TriviaDuel.correctIndex(seed, k2)
                     val dec = if (inGap || st.over) st.decisions.getOrNull(k2) else null
                     Spacer(Modifier.height(10.dp))
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        CategoryChip(q.category, big = false)
+                        DuelCategoryChip(q.category, big = false)
                         Spacer(Modifier.weight(1f))
                         Text("${k2 + 1}/$total", color = Night.muted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -173,12 +173,12 @@ internal fun TriviaPlay(pool: List<Trivia.Question>, seed: Long, rounds: Int, ms
                         }
                         mine != null -> Text("Esperando ${d.oppName}…", color = Night.muted, fontSize = 15.sp)
                         else -> {
-                            val left = ((Trivia.ANSWER_MS - elapsed + 999) / 1000)
+                            val left = ((TriviaDuel.ANSWER_MS - elapsed + 999) / 1000)
                             Text("$left s", color = if (left <= 5) Night.red else Night.muted, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    TimeBar(if (dec != null || mine != null) 0f else 1f - elapsed.toFloat() / Trivia.ANSWER_MS)
+                    TimeBar(if (dec != null || mine != null) 0f else 1f - elapsed.toFloat() / TriviaDuel.ANSWER_MS)
                     Spacer(Modifier.height(12.dp))
                 }
             }
@@ -249,7 +249,7 @@ private fun OptionButton(letter: Char, text: String, look: OptLook, badges: List
 
 /** Selo da categoria: cor e ícone fixos. */
 @Composable
-internal fun CategoryChip(cat: String, big: Boolean) {
+internal fun DuelCategoryChip(cat: String, big: Boolean) {
     val c = triviaColor(cat)
     Row(
         Modifier.clip(Shapes.pill).background(c.copy(alpha = 0.2f)).border(1.dp, c, Shapes.pill)
@@ -267,8 +267,8 @@ internal fun CategoryChip(cat: String, big: Boolean) {
  * [t] = progresso de 0 a 1 (desacelera no fim).
  */
 @Composable
-internal fun CategoryWheel(cat: String, t: Float) {
-    val idx = Trivia.CATEGORIES.indexOf(cat).coerceAtLeast(0)
+internal fun DuelCategoryWheel(cat: String, t: Float) {
+    val idx = TriviaDuel.CATEGORIES.indexOf(cat).coerceAtLeast(0)
     // Fatia i ocupa [-90 + 60i, -30 + 60i]; para o meio dela ficar em cima (-90°), gira -(60i + 30).
     val target = -(idx * 60f + 30f)
     val ease = 1f - (1f - t) * (1f - t) * (1f - t)
@@ -279,7 +279,7 @@ internal fun CategoryWheel(cat: String, t: Float) {
             val c = Offset(size.width / 2, size.height / 2 + 6.dp.toPx())
             drawCircle(Night.surface, r + 8.dp.toPx(), c)
             rotate(angle, c) {
-                Trivia.CATEGORIES.forEachIndexed { i, name ->
+                TriviaDuel.CATEGORIES.forEachIndexed { i, name ->
                     drawArc(triviaColor(name), -90f + i * 60f, 60f, true, Offset(c.x - r, c.y - r), Size(2 * r, 2 * r))
                 }
                 for (i in 0 until 6) {
@@ -298,7 +298,7 @@ internal fun CategoryWheel(cat: String, t: Float) {
             drawPath(p, Night.text)
         }
         // Ícones das categorias acompanham o giro.
-        Trivia.CATEGORIES.forEachIndexed { i, name ->
+        TriviaDuel.CATEGORIES.forEachIndexed { i, name ->
             val a = Math.toRadians((-60.0 + i * 60) + angle)
             val rr = 62f
             Text(

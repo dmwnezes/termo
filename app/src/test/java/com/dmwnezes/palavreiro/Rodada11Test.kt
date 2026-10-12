@@ -5,7 +5,7 @@ import com.dmwnezes.palavreiro.game.Forca
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.Timed
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -192,18 +192,18 @@ class Rodada11Test {
     // ---------- Trivia ----------
     @Test
     fun triviaSelecaoReferencia() {
-        val all = Trivia.parse(File("../shared/trivia.txt").readText())
+        val all = TriviaDuel.parse(File("../shared/trivia.txt").readText())
         assertTrue(all.isNotEmpty())
         assertTrue(all.all { it.wrong.size == 3 })
         val seed = 123456789L
         val q = all.size
-        val idx = Trivia.indices(q, seed, 10)
+        val idx = TriviaDuel.indices(q, seed, 10)
         println("TRIVIA Q=$q SEED=$seed")
         idx.forEachIndexed { k, i ->
-            val opts = Trivia.options(all[i], seed, k)
-            val right = Trivia.correctIndex(seed, k)
+            val opts = TriviaDuel.options(all[i], seed, k)
+            val right = TriviaDuel.correctIndex(seed, k)
             assertEquals(all[i].right, opts[right])
-            println("TRIVIA k=$k idx=$i giro=${Trivia.rotation(seed, k)} certa=$right ${all[i].category} | ${all[i].text} -> ${opts.joinToString(" / ")}")
+            println("TRIVIA k=$k idx=$i giro=${TriviaDuel.rotation(seed, k)} certa=$right ${all[i].category} | ${all[i].text} -> ${opts.joinToString(" / ")}")
         }
         assertEquals(minOf(10, q), idx.size)
         assertEquals(idx.size, idx.toSet().size)
@@ -213,29 +213,29 @@ class Rodada11Test {
 
     @Test
     fun triviaOpcoesGiram() {
-        val q = Trivia.Question("Arte", "?", "C", listOf("E1", "E2", "E3"))
+        val q = TriviaDuel.Question("Arte", "?", "C", listOf("E1", "E2", "E3"))
         // SEED 123456789: (SEED + k·7) mod 4 → k=0: 1, k=1: 0, k=2: 3, k=3: 2.
-        assertEquals(1, Trivia.rotation(123456789, 0))
-        assertEquals(listOf("E1", "E2", "E3", "C"), Trivia.options(q, 123456789, 0))
-        assertEquals(3, Trivia.correctIndex(123456789, 0))
-        assertEquals(listOf("C", "E1", "E2", "E3"), Trivia.options(q, 123456789, 1))
-        assertEquals(0, Trivia.correctIndex(123456789, 1))
-        assertEquals(listOf("E3", "C", "E1", "E2"), Trivia.options(q, 123456789, 2))
-        assertEquals(1, Trivia.correctIndex(123456789, 2))
-        assertEquals(listOf("E2", "E3", "C", "E1"), Trivia.options(q, 123456789, 3))
-        assertEquals(2, Trivia.correctIndex(123456789, 3))
+        assertEquals(1, TriviaDuel.rotation(123456789, 0))
+        assertEquals(listOf("E1", "E2", "E3", "C"), TriviaDuel.options(q, 123456789, 0))
+        assertEquals(3, TriviaDuel.correctIndex(123456789, 0))
+        assertEquals(listOf("C", "E1", "E2", "E3"), TriviaDuel.options(q, 123456789, 1))
+        assertEquals(0, TriviaDuel.correctIndex(123456789, 1))
+        assertEquals(listOf("E3", "C", "E1", "E2"), TriviaDuel.options(q, 123456789, 2))
+        assertEquals(1, TriviaDuel.correctIndex(123456789, 2))
+        assertEquals(listOf("E2", "E3", "C", "E1"), TriviaDuel.options(q, 123456789, 3))
+        assertEquals(2, TriviaDuel.correctIndex(123456789, 3))
         // Linhas inválidas ficam de fora.
-        val parsed = Trivia.parse("# x\nArte|P|C|1|2|3\nArte|P|C|1|2\n\nArte|P||1|2|3\n Ciência | Q | A | B | C | D ")
+        val parsed = TriviaDuel.parse("# x\nArte|P|C|1|2|3\nArte|P|C|1|2\n\nArte|P||1|2|3\n Ciência | Q | A | B | C | D ")
         assertEquals(2, parsed.size); assertEquals("Ciência", parsed[1].category); assertEquals("Q", parsed[1].text)
         // Q pequeno: nunca repete e para no tamanho.
-        assertEquals(listOf(0, 1, 2).toSet(), Trivia.indices(3, 77, 10).toSet())
+        assertEquals(listOf(0, 1, 2).toSet(), TriviaDuel.indices(3, 77, 10).toSet())
     }
 
     @Test
     fun triviaPlacarEDesempate() {
         val seed = 4L // giro (4 + 7k) mod 4: k=0 → 0 (certa 0), k=1 → 3 (certa 1), k=2 → 2 (certa 2)
         val msgs = mutableListOf<Timed>()
-        fun st(now: Long, left: Boolean = false) = Trivia.state(msgs, "me", "op", 3, seed, 0, now, left)
+        fun st(now: Long, left: Boolean = false) = TriviaDuel.state(msgs, "me", "op", 3, seed, 0, now, left)
         assertEquals(0, st(100).current)
         msgs += t(4000, Msg.Pick("me", 0, 0, 2500))
         assertEquals(0, st(5000).current)

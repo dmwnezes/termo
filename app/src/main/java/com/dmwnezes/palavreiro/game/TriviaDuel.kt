@@ -6,7 +6,7 @@ import com.dmwnezes.palavreiro.game.Multi.Msg
  * Trivia (modo "g", inspirado no Perguntados): N perguntas (5/10/15) iguais para os dois, sorteadas pela SEED.
  * Cada um responde a sua; acerto = 1 ponto; desempate pela soma dos tempos dos acertos (menor vence).
  */
-object Trivia {
+object TriviaDuel {
     val CATEGORIES = listOf("Ciência", "História", "Geografia", "Esportes", "Arte", "Entretenimento")
     /** Roleta antes da pergunta. */
     const val WHEEL_MS = 1_500L

@@ -17,7 +17,7 @@ import androidx.compose.ui.test.printToString
 import com.dmwnezes.palavreiro.game.Forca
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 import com.dmwnezes.palavreiro.game.Words
 import com.dmwnezes.palavreiro.system.Ntfy
 import com.dmwnezes.palavreiro.ui.MultiScreen
@@ -152,15 +152,15 @@ class Rodada11FlowTest {
         val ntfy = ntfy()
         val room = Multi.Room(Multi.randomId(12), 'g', 4242)
         val hostId = "host0001"
-        val pool = Trivia.parse(File("../shared/trivia.txt").readText())
-        val items = Trivia.pick(pool, room.seed, 5)
+        val pool = TriviaDuel.parse(File("../shared/trivia.txt").readText())
+        val items = TriviaDuel.pick(pool, room.seed, 5)
         pub(ntfy, room.topic, Msg.Hello(hostId, "Daniel", true, 5))
         val got = Collections.synchronizedList(mutableListOf<Msg>())
         val t = bot(ntfy, room.topic, got) { m ->
             when {
                 m is Msg.Hello && !m.host -> { ntfy.publish(room.topic, Multi.encode(Msg.Start(System.currentTimeMillis(), m.id))); false }
                 m is Msg.Pick && m.id != hostId -> {
-                    val c = Trivia.correctIndex(room.seed, m.round)
+                    val c = TriviaDuel.correctIndex(room.seed, m.round)
                     delay(300)
                     ntfy.publish(room.topic, Multi.encode(Msg.Pick(hostId, m.round, if (m.round == 2) (c + 1) % 4 else c, 3000L + m.round)))
                     m.round == 2
@@ -176,8 +176,8 @@ class Rodada11FlowTest {
         for (k in 0 until 3) {
             val q = items[k]
             waitShown(q.text, 30_000, got = got)
-            val opts = Trivia.options(q, room.seed, k)
-            val c = Trivia.correctIndex(room.seed, k)
+            val opts = TriviaDuel.options(q, room.seed, k)
+            val c = TriviaDuel.correctIndex(room.seed, k)
             val pick = if (k == 1) (c + 2) % 4 else c
             rule.waitUntil(10_000) { rule.onAllNodes(hasText(opts[pick]) and hasClickAction()).fetchSemanticsNodes().isNotEmpty() }
             rule.onAllNodes(hasText(opts[pick]) and hasClickAction()).onFirst().performClick()
@@ -188,10 +188,10 @@ class Rodada11FlowTest {
         val picks = got.filterIsInstance<Msg.Pick>().filter { it.id != hostId }
         assertEquals(listOf(0, 1, 2), picks.map { it.round })
         assertEquals(
-            listOf(Trivia.correctIndex(room.seed, 0), (Trivia.correctIndex(room.seed, 1) + 2) % 4, Trivia.correctIndex(room.seed, 2)),
+            listOf(TriviaDuel.correctIndex(room.seed, 0), (TriviaDuel.correctIndex(room.seed, 1) + 2) % 4, TriviaDuel.correctIndex(room.seed, 2)),
             picks.map { it.option },
         )
-        assertTrue(picks.all { it.ms in 0..Trivia.ANSWER_MS })
+        assertTrue(picks.all { it.ms in 0..TriviaDuel.ANSWER_MS })
     }
 
     /** Forca: o app adivinha (convidado na RODADA 0) contra o anfitrião de mentira que escolheu "Pão de queijo". */

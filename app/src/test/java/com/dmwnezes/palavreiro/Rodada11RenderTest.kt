@@ -17,7 +17,7 @@ import com.dmwnezes.palavreiro.game.Forca
 import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.Multi.Msg
 import com.dmwnezes.palavreiro.game.Timed
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 import com.dmwnezes.palavreiro.game.Words
 import com.dmwnezes.palavreiro.system.Ntfy
 import com.dmwnezes.palavreiro.ui.AdedonhaPlay
@@ -158,7 +158,7 @@ class Rodada11RenderTest {
     }
 
     // ---------- Trivia ----------
-    private val pool by lazy { Trivia.parse(File("../shared/trivia.txt").readText()) }
+    private val pool by lazy { TriviaDuel.parse(File("../shared/trivia.txt").readText()) }
 
     @Test
     fun triviaRoleta() {
@@ -177,7 +177,7 @@ class Rodada11RenderTest {
     @Test
     fun triviaRevela() {
         rule.mainClock.autoAdvance = false
-        val k0 = Trivia.correctIndex(123456789, 0)
+        val k0 = TriviaDuel.correctIndex(123456789, 0)
         val msgs = listOf(tm(T - 8_000, Msg.Pick("me", 0, (k0 + 1) % 4, 4200)), tm(T - 1_000, Msg.Pick("op", 0, k0, 6100)))
         rule.setContent { PalavreiroTheme { TriviaPlay(pool, 123456789, 10, msgs, duel(localStart = T - 15_000)) } }
         save("62c-trivia-revela")
@@ -189,7 +189,7 @@ class Rodada11RenderTest {
         val msgs = ArrayList<Timed>()
         var at = T - 100_000
         for (k in 0 until 5) {
-            val c = Trivia.correctIndex(123456789, k)
+            val c = TriviaDuel.correctIndex(123456789, k)
             msgs += tm(at, Msg.Pick("me", k, if (k == 2) (c + 1) % 4 else c, 3000L + k * 100))
             msgs += tm(at + 500, Msg.Pick("op", k, if (k % 2 == 0) c else -1, 5000))
             at += 10_000

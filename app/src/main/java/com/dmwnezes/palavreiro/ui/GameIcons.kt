@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmwnezes.palavreiro.game.Multi
-import com.dmwnezes.palavreiro.game.Trivia
+import com.dmwnezes.palavreiro.game.TriviaDuel
 
 /** Cores fixas das categorias da Trivia (Ciência verde, História amarelo, Geografia azul, Esportes laranja, Arte rosa, Entretenimento roxo). */
 internal val TriviaOrange = Color(0xFFF0A05A)
@@ -171,7 +171,7 @@ private fun DrawScope.adedonha(u: Float, tm: TextMeasurer) {
 /** Roleta das 6 categorias com o ponteiro em cima. */
 private fun DrawScope.wheel(u: Float) {
     val c = Offset(24f * u, 26f * u); val r = 19f * u
-    Trivia.CATEGORIES.forEachIndexed { i, cat ->
+    TriviaDuel.CATEGORIES.forEachIndexed { i, cat ->
         drawArc(triviaColor(cat), -90f + i * 60f, 60f, true, Offset(c.x - r, c.y - r), Size(2 * r, 2 * r))
     }
     for (i in 0 until 6) {
