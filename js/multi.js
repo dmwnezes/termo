@@ -16,11 +16,22 @@
     p: { key: "palavra", name: "Qual é a Palavra?", pill: "Palavra?", inv: "um Qual é a Palavra?", boards: 0, pts: true },
     v: { key: "velha", name: "Jogo da Velha", pill: "Velha", inv: "um Jogo da Velha", boards: 0 },
     x: { key: "damas", name: "Damas", pill: "Damas", inv: "uma partida de Damas", boards: 0 },
+    f: { key: "forca", name: "Forca", pill: "Forca", inv: "uma Forca", boards: 0 },
+    s: { key: "adedonha", name: "Adedonha", pill: "Adedonha", inv: "uma Adedonha", boards: 0, pts: true, rc: [3, 5, 7], rd: 5 },
+    g: { key: "trivia", name: "Trivia", pill: "Trivia", inv: "uma Trivia", boards: 0, pts: true },
   };
-  const ORDER = ["t", "d", "q", "a", "c", "p", "v", "x"];
-  // ---------- rodadas: série (1/3/5) ou pontos (5/10/15) ----------
-  const RCHOICES = (m) => (MODES[m].pts ? [5, 10, 15] : [1, 3, 5]);
-  const RDEF = (m) => (MODES[m].pts ? 10 : 3);
+  /** Seções da tela de criar partida (e a ordem da grade do "Próximo jogo"). */
+  const SECTIONS = [["Palavras", ["t", "d", "q", "a", "c", "p", "f", "s"]], ["Conhecimento", ["g"]], ["Tabuleiro", ["v", "x"]]];
+  const ORDER = SECTIONS.flatMap((x) => x[1]);
+  const DESC = {
+    t: "Uma palavra, quem acertar primeiro", d: "Duas palavras ao mesmo tempo", q: "Quatro palavras, 9 tentativas",
+    a: "Desembaralhe as letras antes", c: "A mesma grade para os dois", p: "Descubra a palavra pela definição",
+    f: "Um escolhe a palavra, o outro adivinha", s: "Uma letra, várias categorias", g: "Perguntas de 6 temas",
+    v: "X contra O, o clássico", x: "Regras brasileiras",
+  };
+  // ---------- rodadas: série (1/3/5) ou pontos (5/10/15; Adedonha 3/5/7) ----------
+  const RCHOICES = (m) => MODES[m].rc || (MODES[m].pts ? [5, 10, 15] : [1, 3, 5]);
+  const RDEF = (m) => MODES[m].rd || (MODES[m].pts ? 10 : 3);
   const validR = (m, r) => (RCHOICES(m).includes(Number(r)) ? Number(r) : null);
   const roundsPref = (m) => validR(m, P.store.get("mp-rounds-" + m, null)) || RDEF(m);
   const rLabel = (m, n) => (MODES[m].pts ? `${n} rodadas` : n === 1 ? "1 partida" : `Melhor de ${n}`);
@@ -35,6 +46,9 @@
     if (m === "c") return `A mesma grade para os dois, 5 minutos por rodada. Cada palavra é de quem achar primeiro. ${seriesTxt(n)}`;
     if (m === "v") return `X começa e os símbolos trocam a cada rodada. Deu velha? Não conta. ${seriesTxt(n)}`;
     if (m === "x") return `Regras brasileiras: captura obrigatória, lei da maioria e dama voadora. ${seriesTxt(n)}`;
+    if (m === "s") return `${n} rodadas: uma letra sorteada e 6 categorias. Preencha tudo e dê STOP! Resposta só sua vale 10, igual à do amigo vale 5.`;
+    if (m === "g") return `${n} perguntas de 6 temas, as mesmas para os dois, 15 segundos cada. Quem acertar mais vence.`;
+    if (m === "f") return `Um escolhe a palavra e o tema, o outro adivinha letra por letra. 6 erros e a forca vence. Os papéis trocam a cada rodada. ${seriesTxt(n)}`;
     return `${host ? "Vocês recebem as mesmas palavras. Quem acertar primeiro ganha." : "Partida ao vivo: quem acertar primeiro ganha."} ${seriesTxt(n)}`;
   }
   const ABC = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -45,12 +59,12 @@
   const GONE_TXT = "Esse jogo saiu do Palavreiro. Crie uma partida nova!";
 
   P.mp = {
-    MODES, ORDER,
+    MODES, ORDER, SECTIONS,
     kinds: {}, // jogos registrados por js/multi-games.js: {round, msg, bye, sheet, story}
     link: (room, m, seed) => location.origin + location.pathname.replace(/index\.html$/, "") + `?mp=${room}-${m}-${seed.toString(36)}`,
     /** "sala-modo-seed" → {room, m, seed} ou null. */
     parse(code) {
-      const x = /^([a-z0-9]{12})-([tdqacpvx])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
+      const x = /^([a-z0-9]{12})-([tdqacpvxsgf])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
       if (!x) return null;
       const seed = parseInt(x[3], 36);
       return seed >= 0 && seed <= 2147483646 ? { room: x[1], m: x[2], seed } : null;
@@ -215,6 +229,8 @@
   const opp = (s) => (s.me.host ? s.guestHello : s.hostHello);
 
   // ---------- mensagens ----------
+  /** Mensagens dos jogos novos → modo que as trata. */
+  const KIND_OF = { sround: "s", stop: "s", ans: "s", vote: "s", pick: "g", secret: "f", guess: "f", reveal: "f", try: "f", tryres: "f", word: "f" };
   function handle(s, m, live) {
     if (m.t === "hello" && typeof m.id === "string") {
       const who = { id: m.id, name: String(m.n || "Amigo").slice(0, 16) };
@@ -260,6 +276,17 @@
     } else if (m.t === "grid" || m.t === "found" || m.t === "timeup" || m.t === "move" || m.t === "resign") {
       const K = P.mp.kinds[m.t === "grid" || m.t === "found" || m.t === "timeup" ? "c" : s.round && s.round.kind];
       if (K && K.msg) K.msg(s, m, live);
+    } else if (KIND_OF[m.t]) {
+      // Adedonha, Trivia e Forca (js/multi-*.js): só valem na rodada do mesmo jogo.
+      const k = KIND_OF[m.t], K = P.mp.kinds[k];
+      if (s.round && s.round.kind === k && K && K.msg) K.msg(s, m, live);
+    } else if (m.t === "suggest") {
+      // Convidado sugeriu outro jogo: aviso no topo da folha de fim do anfitrião.
+      const o = opp(s);
+      if (!s.me.host || !o || m.id !== o.id || typeof m.m !== "string" || !MODES[m.m] || !s.round) return;
+      s.suggest = { m: m.m, rn: s.rn };
+      suggBanner(s);
+      if (live) { P.vibrate(30); P.tone([[660, 60], [880, 80]], 0.06); }
     } else if (m.t === "row") {
       const r = s.round, o = opp(s);
       if (!r || r.kind || !o || m.id !== o.id || typeof m.m !== "string") return;
@@ -314,41 +341,98 @@
   };
   const duoIcon = `<div class="mp-duo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>`;
 
-  /** 1. Criar partida. */
+  // ---------- mini ícones dos jogos (no estilo dos ícones da tela inicial) ----------
+  const fl = (c) => `style="fill:var(--${c})"`;
+  const sk = (c, w) => `style="stroke:var(--${c});stroke-width:${w};stroke-linecap:round;stroke-linejoin:round;fill:none"`;
+  const grid3 = (x0, y0, cell, gap, cols) => cols.map((c, i) => `<rect x="${x0 + (i % 3) * (cell + gap)}" y="${y0 + Math.floor(i / 3) * (cell + gap)}" width="${cell}" height="${cell}" rx="${cell * 0.24}" ${fl(c)}/>`).join("");
+  const T1 = ["absent", "present", "absent", "absent", "correct", "present", "correct", "correct", "correct"];
+  const T2 = ["present", "absent", "absent", "absent", "absent", "correct", "absent", "correct", "absent"];
+  const T3 = ["absent", "absent", "present", "correct", "absent", "absent", "surface-high", "surface-high", "surface-high"];
+  const T4 = ["correct", "absent", "absent", "absent", "present", "absent", "correct", "correct", "correct"];
+  const tx = (x, y, t, size, c, w = 800) => `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" style="fill:var(--${c});font:${w} ${size}px Outfit,sans-serif">${t}</text>`;
+  const wedge = (i, cx, cy, rad) => {
+    const a0 = ((i * 60 - 90) * Math.PI) / 180, a1 = (((i + 1) * 60 - 90) * Math.PI) / 180, f = (n) => n.toFixed(2);
+    return `M${cx} ${cy}L${f(cx + rad * Math.cos(a0))} ${f(cy + rad * Math.sin(a0))}A${rad} ${rad} 0 0 1 ${f(cx + rad * Math.cos(a1))} ${f(cy + rad * Math.sin(a1))}Z`;
+  };
+  const TRIVIA_COLS = ["#5FB873", "#E6C14F", "#6FA8E8", "#F0954A", "#EE7FB5", "#B48CF0"];
+  const ICON_SVG = {
+    t: grid3(5, 5, 10.5, 2.3, T1),
+    d: grid3(1, 12, 6, 1.4, T1) + grid3(23.2, 12, 6, 1.4, T2),
+    q: grid3(3, 3, 5, 1.3, T1) + grid3(24.4, 3, 5, 1.3, T2) + grid3(3, 24.4, 5, 1.3, T3) + grid3(24.4, 24.4, 5, 1.3, T4),
+    a: `<g transform="rotate(-9 11 23)"><rect x="2" y="14" width="16" height="17" rx="4.5" ${fl("surface-high")}/>${tx(10, 22.8, "M", 11, "text")}</g>
+        <rect x="15" y="9" width="16" height="17" rx="4.5" ${fl("present")}/>${tx(23, 17.8, "A", 11, "dark-text")}
+        <g transform="rotate(10 36 25)"><rect x="27" y="16" width="16" height="17" rx="4.5" ${fl("surface-high")}/>${tx(35, 24.8, "R", 11, "text")}</g>
+        <path d="M10 37 Q22 44 34 37" ${sk("accent", 2.4)}/><path d="M30 34.5 L34.5 37 L31.5 41" ${sk("accent", 2.4)}/>`,
+    c: `<rect x="3" y="15" width="40" height="11" rx="5.5" transform="rotate(38 8 20)" style="fill:var(--present);opacity:.55"/>
+        ${["CAS", "OLE", "PAJ"].map((r, y) => [...r].map((ch, x) => tx(9 + x * 13, 9 + y * 13, ch, 10.5, "text", 600)).join("")).join("")}`,
+    p: `<rect x="7" y="7" width="30" height="4.5" rx="2.25" style="fill:var(--muted);opacity:.6"/><rect x="11" y="15" width="22" height="4.5" rx="2.25" style="fill:var(--muted);opacity:.6"/>
+        ${["surface-high", "present", "surface-high", "surface-high"].map((c, i) => `<rect x="${3.5 + i * 9.6}" y="26" width="8" height="10" rx="2.4" ${fl(c)}/>`).join("")}`,
+    f: `<path d="M8 40 H26 M14 40 V5 H31 V10 M14 13 L21 5" ${sk("muted", 3)}/><circle cx="31" cy="15.5" r="5" ${fl("accent")}/>
+        <path d="M31 21 V31 M31 24 L26.5 28.5 M31 24 L35.5 28.5 M31 31 L27.5 37 M31 31 L34.5 37" ${sk("accent", 2.6)}/>`,
+    s: `<rect x="3" y="7" width="20" height="22" rx="6" ${fl("present")}/>${tx(13, 18.6, "A", 15, "dark-text")}
+        ${[0, 1, 2].map((i) => `<rect x="27" y="${8 + i * 8}" width="${[14, 10, 12][i]}" height="4.5" rx="2.25" style="fill:var(--muted);opacity:.6"/>`).join("")}
+        <rect x="7" y="33" width="32" height="8" rx="4" ${fl("red")}/>${tx(23, 37.2, "STOP", 6.5, "dark-text")}`,
+    g: TRIVIA_COLS.map((c, i) => `<path d="${wedge(i, 22, 22, 19)}" style="fill:${c}"/>`).join("") + `<circle cx="22" cy="22" r="8.5" ${fl("surface")}/>${tx(22, 22.6, "?", 12, "text")}`,
+    v: `<path d="M16 5 V39 M28 5 V39 M5 16 H39 M5 28 H39" ${sk("outline", 2.6)}/>
+        <path d="M7.5 7.5 L13.5 13.5 M13.5 7.5 L7.5 13.5 M19 19 L25 25 M25 19 L19 25" ${sk("correct", 2.8)}/>
+        <circle cx="34" cy="10.5" r="3.6" ${sk("present", 2.6)}/><circle cx="10.5" cy="34" r="3.6" ${sk("present", 2.6)}/>`,
+    x: `<rect x="3" y="3" width="19" height="19" rx="4" ${fl("surface-high")}/><rect x="22" y="22" width="19" height="19" rx="4" ${fl("surface-high")}/>
+        <rect x="22" y="3" width="19" height="19" rx="4" style="fill:var(--bg-bottom)"/><rect x="3" y="22" width="19" height="19" rx="4" style="fill:var(--bg-bottom)"/>
+        <circle cx="31.5" cy="12.5" r="7" style="fill:#F4F1FF"/><circle cx="31.5" cy="12.5" r="4.3" style="fill:none;stroke:#C9C2EA;stroke-width:1.4"/>
+        <circle cx="12.5" cy="31.5" r="7" style="fill:#14102C;stroke:var(--outline);stroke-width:1.4"/>${tx(12.5, 31.8, "♛", 8, "present", 600)}`,
+  };
+  /** Mini ícone do jogo (SVG 44×44). */
+  const gameIcon = (m) => `<svg viewBox="0 0 44 44" aria-hidden="true">${ICON_SVG[m] || ""}</svg>`;
+  P.mp.icon = gameIcon;
+  /** Grade de cartões dos jogos. compact = só ícone + nome (folhas de fim). */
+  function gameGrid(sel, attr, compact) {
+    const card = (k) => `<button class="mpc-card${k === sel ? " on" : ""}" data-${attr}="${k}" aria-pressed="${k === sel}" aria-label="${MODES[k].name}">
+        <span class="mpc-ico">${gameIcon(k)}</span>${compact ? `<b>${MODES[k].pill}</b>` : `<b>${MODES[k].name}</b><small>${DESC[k]}</small>`}<i class="mpc-check" aria-hidden="true">✓</i></button>`;
+    if (compact) return `<div class="mpc-grid compact">${ORDER.map(card).join("")}</div>`;
+    return SECTIONS.map(([t, ks]) => `<div class="mpc-sec">${t}</div><div class="mpc-grid">${ks.map(card).join("")}</div>`).join("");
+  }
+  const markGrid = (box, attr, k) => box.querySelectorAll(`[data-${attr}]`).forEach((x) => { const on = x.dataset[attr] === k; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+
+  /** 1. Criar partida: escolha visual do jogo, nome, rodadas e o botão. */
   P.games.mpCreate = function (root) {
     leave();
     let m = P.store.get("mp-mode", "d");
     if (!MODES[m]) m = "d";
     let rounds = roundsPref(m);
     const body = shell(root, "Jogar com amigo");
-    body.innerHTML = `<div class="mp-card">
-        ${duoIcon}
-        <h2>Partida ao vivo</h2>
-        <p class="muted mp-lead" data-lead>${leadOf(m, true, rounds)}</p>
-        ${nameField()}
-        <div class="mp-field"><span>Modo</span><div class="seg mp-modes">${ORDER.map((k) => `<button data-m="${k}" class="${k === m ? "on" : ""}">${MODES[k].pill}</button>`).join("")}</div></div>
-        <div class="mp-field"><span>Rodadas</span><div class="seg mp-rounds" data-rounds></div></div>
-        <button class="pill wide" data-create>Criar partida</button>
+    body.classList.add("mp-create");
+    body.innerHTML = `<div class="mpc-hero">${duoIcon}<h2>Partida ao vivo</h2><p class="muted">Escolha o jogo e chame um amigo.</p></div>
+        <div class="mpc-games">${gameGrid(m, "m", false)}</div>
+        <div class="mp-card mpc-setup">
+          ${nameField()}
+          <div class="mp-field"><span>Rodadas · <em data-gname>${MODES[m].name}</em></span><div class="seg mp-rounds" data-rounds></div></div>
+          <p class="mpc-rules" data-lead>${leadOf(m, true, rounds)}</p>
+          <button class="pill wide mpc-go" data-create>Criar partida</button>
+        </div>
         <div class="mp-or"><span>ou entre numa partida</span></div>
-        <label class="mp-field"><span>Link da partida</span>
-          <input class="mp-input" data-paste placeholder="Cole aqui o link que seu amigo mandou" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-        <p class="mp-err hidden" data-paste-err>Esse link não é de uma partida do Palavreiro.</p>
-        <div class="row-btns"><button class="pill ghost" data-paste-btn>Colar</button><button class="pill accent" data-enter>Entrar na partida</button></div>
-      </div>`;
+        <div class="mp-card">
+          <label class="mp-field"><span>Link da partida</span>
+            <input class="mp-input" data-paste placeholder="Cole aqui o link que seu amigo mandou" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+          <p class="mp-err hidden" data-paste-err>Esse link não é de uma partida do Palavreiro.</p>
+          <div class="row-btns"><button class="pill ghost" data-paste-btn>Colar</button><button class="pill accent" data-enter>Entrar na partida</button></div>
+          <p class="mpc-qrnote">No app do Palavreiro dá para entrar lendo o QR code.</p>
+        </div>`;
     const drawRounds = () => {
       const box = P.$("[data-rounds]", body);
       box.innerHTML = RCHOICES(m).map((n) => `<button data-r="${n}" class="${n === rounds ? "on" : ""}">${rLabel(m, n)}</button>`).join("");
       box.querySelectorAll("[data-r]").forEach((b) => (b.onclick = () => { rounds = +b.dataset.r; P.store.set("mp-rounds-" + m, rounds); P.fx.type(); drawRounds(); }));
       P.$("[data-lead]", body).textContent = leadOf(m, true, rounds);
+      P.$("[data-gname]", body).textContent = MODES[m].name;
+      P.$("[data-create]", body).textContent = `Criar partida de ${MODES[m].name}`;
     };
     drawRounds();
-    body.querySelectorAll("[data-m]").forEach((b) => (b.onclick = () => { m = b.dataset.m; rounds = roundsPref(m); P.store.set("mp-mode", m); P.fx.type(); body.querySelectorAll("[data-m]").forEach((x) => x.classList.toggle("on", x === b)); drawRounds(); }));
+    body.querySelectorAll("[data-m]").forEach((b) => (b.onclick = () => { m = b.dataset.m; rounds = roundsPref(m); P.store.set("mp-mode", m); P.fx.type(); markGrid(body, "m", m); drawRounds(); }));
     P.$("[data-name]", body).addEventListener("keydown", (e) => { if (e.key === "Enter") P.$("[data-create]", body).click(); });
     // Entrar numa partida colando o link (inteiro, só o código, ou no meio de uma mensagem).
     const fromPasted = (t) => {
       t = String(t || "").trim();
       const a = /[?&]mp=([A-Za-z0-9-]+)/.exec(t); if (a) return P.mp.parse(a[1]) ? a[1].toLowerCase() : null;
-      const b = /\b([a-z0-9]{12}-[tdqacpvx]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
+      const b = /\b([a-z0-9]{12}-[tdqacpvxsgf]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
     };
     const isGone = (t) => { t = String(t || "").trim().toLowerCase(); const a = /[?&]mp=([a-z0-9-]+)/.exec(t); return P.mp.gone(a ? a[1] : (/\b([a-z0-9]{12}-b-[0-9a-z]{1,7})\b/.exec(t) || [])[1]); };
     const err = P.$("[data-paste-err]", body), input = P.$("[data-paste]", body);
@@ -454,7 +538,7 @@
     s.view = "join";
     const body = shell(root, "Jogar com amigo");
     body.innerHTML = `<div class="mp-card">
-        ${duoIcon}
+        <span class="mpc-ico big" aria-hidden="true">${gameIcon(s.m)}</span>
         <h2 data-invite>Você foi chamado para ${s.mode.inv}</h2>
         <p class="muted mp-lead" data-lead>${leadOf(s.m, false)}</p>
         ${nameField()}
@@ -667,12 +751,47 @@
     bindAgain(s, ui, champ ? "Nova série" : "Próxima rodada", !!champ);
   }
 
-  // ---------- revanche trocando de modo (só o anfitrião escolhe) ----------
-  const nextBlock = (s) => (s.me.host ? `<div class="mp-next"><span>Próximo jogo</span>
-      <div class="seg mp-modes">${ORDER.map((k) => `<button data-next="${k}" class="${k === s.m ? "on" : ""}">${MODES[k].pill}</button>`).join("")}</div>
-      <div class="seg mp-rounds small" data-nextr></div></div>` : "");
+  // ---------- revanche trocando de modo (o anfitrião escolhe; o convidado sugere) ----------
+  const nextBlock = (s) => (s.me.host
+    ? `<div class="mp-next"><span>Próximo jogo</span>${gameGrid(s.m, "next", true)}<div class="seg mp-rounds small" data-nextr></div></div>`
+    : `<div class="mp-next guest">
+        <button class="pill ghost wide mp-sugg-open" data-sugg-open>Sugerir outro jogo</button>
+        <div class="mp-sugg-grid hidden" data-sugg-grid><span>Qual jogo você quer?</span>${gameGrid(null, "sugg", true)}</div>
+        <p class="mp-sugg-note hidden" data-sugg-note></p></div>`);
+  /** Aviso "Ana quer jogar Damas" no topo da folha de fim aberta (anfitrião). */
+  function suggBanner(s) {
+    const sheet = document.querySelector(".overlay .sheet");
+    const old = sheet && P.$(".mp-sugg", sheet);
+    const sg = s.suggest;
+    if (!sheet || !P.$("[data-again]", sheet) || !sg || sg.rn !== s.rn || !s.me.host) { if (old && (!sg || sg.rn !== s.rn)) old.remove(); return; }
+    const el = P.h(`<div class="mp-sugg" role="status"><span class="mpc-ico">${gameIcon(sg.m)}</span>
+        <p><b>${P.esc(oppName(s))}</b> quer jogar <b>${MODES[sg.m].name}</b></p>
+        <button class="pill" data-sugg-yes>Aceitar</button><button class="icon-btn mp-sugg-x" data-sugg-no aria-label="Dispensar">✕</button></div>`);
+    if (old) old.replaceWith(el); else P.$(".grab", sheet).after(el);
+    P.$("[data-sugg-no]", el).onclick = () => { s.suggest = null; el.remove(); };
+    P.$("[data-sugg-yes]", el).onclick = () => { if (s.pickNext) { s.suggest = null; s.pickNext(sg.m, true); } };
+  }
+  /** Convidado: "Sugerir outro jogo" abre a grade; tocar manda {"t":"suggest","id","m"}. */
+  function bindSuggest(s, ui) {
+    const open = P.$("[data-sugg-open]", ui.el); if (!open) return;
+    const grid = P.$("[data-sugg-grid]", ui.el), note = P.$("[data-sugg-note]", ui.el);
+    const sent = () => s.suggSent && s.suggSent.rn === s.rn;
+    const showNote = () => { if (!sent()) return; note.classList.remove("hidden"); note.innerHTML = `Sugestão enviada: <b>${MODES[s.suggSent.m].name}</b>`; markGrid(grid, "sugg", s.suggSent.m); };
+    showNote();
+    open.onclick = () => { grid.classList.toggle("hidden"); P.fx.type(); };
+    grid.querySelectorAll("[data-sugg]").forEach((b) => (b.onclick = () => {
+      if (S !== s || s.oppLeft) return;
+      const k = b.dataset.sugg;
+      s.suggSent = { m: k, rn: s.rn };
+      publish({ t: "suggest", id: s.me.id, m: k });
+      P.fx.type(); P.toast("Sugestão enviada");
+      grid.classList.add("hidden");
+      showNote();
+    }));
+  }
   /** Botão principal da folha de fim: mesmo modo → texto de sempre; outro modo → "Jogar MODO". */
   function bindAgain(s, ui, sameText, newSeries) {
+    bindSuggest(s, ui);
     const btn = P.$("[data-again]", ui.el); if (!btn) return;
     let next = s.m, nextR = s.rounds;
     const label = () => { btn.textContent = next !== s.m ? `Jogar ${MODES[next].name}` : nextR !== s.rounds ? (MODES[next].pts ? "Revanche" : "Nova série") : sameText; };
@@ -681,19 +800,23 @@
       box.innerHTML = RCHOICES(next).map((n) => `<button data-nr="${n}" class="${n === nextR ? "on" : ""}">${rLabel(next, n)}</button>`).join("");
       box.querySelectorAll("[data-nr]").forEach((b) => (b.onclick = () => { nextR = +b.dataset.nr; P.store.set("mp-rounds-" + next, nextR); P.fx.type(); rounds(); label(); }));
     };
-    ui.el.querySelectorAll("[data-next]").forEach((b) => (b.onclick = () => {
-      next = b.dataset.next; nextR = next === s.m ? s.rounds : roundsPref(next); P.fx.type();
-      ui.el.querySelectorAll("[data-next]").forEach((x) => x.classList.toggle("on", x === b));
+    const pick = (k) => {
+      next = k; nextR = next === s.m ? s.rounds : roundsPref(next);
+      markGrid(ui.el, "next", k);
       rounds(); label();
-    }));
+    };
+    ui.el.querySelectorAll("[data-next]").forEach((b) => (b.onclick = () => { P.fx.type(); pick(b.dataset.next); }));
     rounds(); label();
     btn.onclick = () => {
-      if (!s.me.host || s.oppLeft || S !== s) return;
+      if (!s.me.host || s.oppLeft || S !== s || btn.disabled) return;
       btn.disabled = true;
       const msg = { t: "again", seed: newSeed().toString(36), at: Date.now(), m: next, r: nextR };
       if (newSeries || next !== s.m || nextR !== s.rounds) msg.s = 1;
       publish(msg);
     };
+    // Aceitar a sugestão do convidado = escolher esse jogo e começar.
+    s.pickNext = (k, go) => { if (!document.body.contains(btn)) return; pick(k); if (go) btn.click(); };
+    suggBanner(s);
   }
 
   // ---------- cartão para Stories (todos os modos) ----------
@@ -702,23 +825,23 @@
     const nameOf = (w) => (w === "me" ? meName : oName);
     const mine = (w) => (w === "me" ? "win" : w === "opp" ? "lose" : "draw");
     let sc, result, detail, gold = false, res;
-    if (r.kind === "a" || r.kind === "p") {
+    const K = P.mp.kinds[r.kind];
+    if (MODES[r.kind] && MODES[r.kind].pts) {
       sc = `${r.pts.me} × ${r.pts.opp}`; res = mine(r.result); gold = r.result !== "draw";
       result = r.result === "draw" ? "Empate" : `🏆 ${nameOf(r.result)} venceu!`;
-      detail = `${r.n} rodadas · ${sc}`;
+      detail = K && K.story ? K.story(s, r) : `${r.n} rodadas · ${sc}`;
     } else {
       const champ = seriesWinner(s);
       sc = score(s);
       if (champ) { result = `🏆 ${nameOf(champ)} levou a série!`; gold = true; res = mine(champ); }
       else { result = r.result === "draw" ? "Empate" : `${nameOf(r.result)} venceu a rodada`; res = mine(r.result); }
-      const K = P.mp.kinds[r.kind];
       if (K && K.story) detail = K.story(s, r);
       else {
         const o = opp(s), line = (n, e, left) => `${n}: ${e ? (e.won ? `acertou em ${e.tries} · ${clockFmt(e.ms)}` : "errou") : left ? "saiu" : "não terminou"}`;
         detail = [line(meName, r.ends.find((e) => e.id === s.me.id), false), line(oName, o && r.ends.find((e) => e.id === o.id), s.oppLeft)];
       }
     }
-    const pill = `${s.mode.name} ${({ a: "🔤", p: "❓", c: "🔎", v: "⭕", x: "♛" })[r.kind] || "⚔️"}`;
+    const pill = `${s.mode.name} ${({ a: "🔤", p: "❓", c: "🔎", v: "⭕", x: "♛", s: "✋", g: "🧠", f: "🪢" })[r.kind] || "⚔️"}`;
     return P.storyVs({ pill, me: meName, opp: oName, score: sc, gold, result, detail, mine: res });
   }
   P.mp.storyCard = () => S && S.round && S.round.result ? storyCard(S, S.round) : null;
@@ -849,10 +972,52 @@
     if (r.result) { const b = P.h(`<button class="pill ghost">Ver resultado</button>`); b.onclick = open; el.appendChild(b); }
   }
 
-  // Peças internas para js/multi-games.js (Caça-Palavras, Jogo da Velha e Damas).
+  // ---------- jogos de pontos (Anagrama, Qual é a Palavra?, Adedonha, Trivia): fim e folha ----------
+  /** Fecha a partida de pontos (r.result já definido): contadores, confete e a folha depois de "wait". */
+  function ptsDone(s, r, sheet, wait) {
+    P.store.add("mp-played"); if (r.result === "me") P.store.add("mp-won");
+    P.logActivity();
+    clearTimeout(s.sheetTimer);
+    s.sheetTimer = setTimeout(() => {
+      if (S !== s || s.round !== r) return;
+      if (r.result === "me") P.confetti();
+      r.api && r.api.redraw();
+      if (!document.querySelector(".overlay")) sheet();
+    }, wait);
+  }
+  /** Placar de pontos no topo: "3 × 2" e a rodada. */
+  function ptsScore(s, r, small) {
+    const sc = P.$("[data-score]", s.root); if (!sc) return;
+    sc.classList.toggle("over", !!r.result);
+    sc.innerHTML = `<b>${r.result === "me" ? "🏆 " : ""}${r.pts.me} × ${r.pts.opp}</b><small>${small}</small>`;
+  }
+  /** Folha de fim dos jogos de pontos. */
+  function ptsSheet(s, r, { icon, extra = "", share = "", title = "" }) {
+    if (!r.result) return;
+    document.querySelectorAll(".overlay").forEach((x) => x.remove());
+    const oname = oppName(s), en = P.esc(oname), sc = `${r.pts.me} × ${r.pts.opp}`;
+    const ui = P.sheet(`<div class="mp-sheet-ico" aria-hidden="true">${icon}</div>
+      <h2>${r.result === "me" ? "Você venceu! 🏆" : r.result === "opp" ? `${en} venceu` : "Empate"}</h2>
+      <p class="mp-series gold ana-final">${sc}</p>${title ? `<p class="subtitle">${title}</p>` : ""}
+      ${extra}
+      <div class="row-btns mp-share-row" style="margin-top:14px"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>📸 Stories</button></div>
+      ${nextBlock(s)}
+      <div class="row-btns" style="margin-top:10px">${s.me.host ? `<button class="pill" data-again ${s.oppLeft ? "disabled" : ""}>Revanche</button>` : ""}<button class="pill ghost" data-exit>Sair</button></div>
+      ${s.me.host ? (s.oppLeft ? `<p class="note">${en} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
+    P.$("[data-share]", ui.el).onclick = () => {
+      const t = r.result === "me" ? `Venci por ${sc}` : r.result === "opp" ? `Perdi por ${sc}` : `Empate ${sc}`;
+      P.share(`Palavreiro · ${s.mode.name} com ${oname}\n${t} ${share || icon}`);
+    };
+    P.$("[data-story]", ui.el).onclick = () => storyCard(s, r);
+    P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
+    bindAgain(s, ui, "Revanche", false);
+    return ui;
+  }
+
+  // Peças internas para js/multi-games.js e js/multi-{adedonha,trivia,forca}.js.
   P.mp._ = {
     get S() { return S; }, publish, opp, ids, oppName, plural, debug, gameShell, shakeEl, countdown, drawScore,
-    seriesOver, seriesWinner, score, settle, seriesSheet, afterBtn, stopGame, clockFmt,
+    seriesOver, seriesWinner, score, settle, seriesSheet, afterBtn, stopGame, clockFmt, ptsDone, ptsScore, ptsSheet, gameIcon,
   };
 
   // ---------- Anagrama e Qual é a Palavra? (rodadas de pontos, mensagens solve/skip) ----------
@@ -1118,27 +1283,11 @@
     if (r.result && Date.now() >= r.start[r.n]) { const b = P.h(`<button class="pill ghost">Ver resultado</button>`); b.onclick = () => anaSheet(s, r); after.appendChild(b); }
   }
   function anaSheet(s, r) {
-    if (!r.result) return;
-    document.querySelectorAll(".overlay").forEach((x) => x.remove());
-    const oname = oppName(s), en = P.esc(oname), sc = `${r.pts.me} × ${r.pts.opp}`;
+    const en = P.esc(oppName(s));
     const rows = r.words.map((w, i) => {
       const by = r.res[i];
       return `<div class="ana-row${by === s.me.id ? " me" : by ? " opp" : ""}"><b>${P.esc(ptsWord(r, w))}</b><span>${by === s.me.id ? "✓ você" : by ? en : "—"}</span></div>`;
     }).join("");
-    const ui = P.sheet(`<div class="mp-sheet-ico" aria-hidden="true">${r.kind === "p" ? "❓" : "🔤"}</div>
-      <h2>${r.result === "me" ? "Você venceu! 🏆" : r.result === "opp" ? `${en} venceu` : "Empate"}</h2>
-      <p class="mp-series gold ana-final">${sc}</p>
-      <div class="ana-rows${r.kind === "p" ? " one" : ""}">${rows}</div>
-      <div class="row-btns mp-share-row" style="margin-top:14px"><button class="pill ghost" data-share>Compartilhar</button><button class="pill accent" data-story>📸 Stories</button></div>
-      ${nextBlock(s)}
-      <div class="row-btns" style="margin-top:10px">${s.me.host ? `<button class="pill" data-again ${s.oppLeft ? "disabled" : ""}>Revanche</button>` : ""}<button class="pill ghost" data-exit>Sair</button></div>
-      ${s.me.host ? (s.oppLeft ? `<p class="note">${en} saiu da partida.</p>` : "") : `<p class="note">Esperando o anfitrião</p>`}`);
-    P.$("[data-share]", ui.el).onclick = () => {
-      const t = r.result === "me" ? `Venci por ${sc}` : r.result === "opp" ? `Perdi por ${sc}` : `Empate ${sc}`;
-      P.share(`Palavreiro · ${s.mode.name} com ${oname}\n${t} ${r.kind === "p" ? "❓" : "🔤"}`);
-    };
-    P.$("[data-story]", ui.el).onclick = () => storyCard(s, r);
-    P.$("[data-exit]", ui.el).onclick = () => { ui.close(); leave(); P.go(""); };
-    bindAgain(s, ui, "Revanche", false);
+    ptsSheet(s, r, { icon: r.kind === "p" ? "❓" : "🔤", extra: `<div class="ana-rows${r.kind === "p" ? " one" : ""}">${rows}</div>` });
   }
 })();
