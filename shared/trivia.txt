@@ -13,3 +13,660 @@ Arte|Quem pintou a Mona Lisa?|Leonardo da Vinci|Michelangelo|Van Gogh|Picasso
 Arte|Quem escreveu "Dom Casmurro"?|Machado de Assis|José de Alencar|Jorge Amado|Clarice Lispector
 Entretenimento|Qual instrumento tem teclas brancas e pretas?|Piano|Violão|Flauta|Bateria
 Entretenimento|Em qual cidade acontece o Festival de Parintins?|Parintins|Manaus|Belém|São Luís
+Ciência|Qual é o maior planeta do Sistema Solar?|Júpiter|Saturno|Netuno|Urano
+Ciência|Qual planeta é conhecido como "planeta vermelho"?|Marte|Vênus|Júpiter|Mercúrio
+Ciência|Qual planeta é famoso pelos seus anéis bem visíveis?|Saturno|Marte|Mercúrio|Vênus
+Ciência|Qual é a fórmula química da água?|H2O|CO2|O2|NaCl
+Ciência|Qual gás as plantas absorvem do ar na fotossíntese?|Gás carbônico|Oxigênio|Nitrogênio|Hélio
+Ciência|Qual gás as plantas liberam na fotossíntese?|Oxigênio|Gás carbônico|Metano|Hidrogênio
+Ciência|Qual é o símbolo químico do ouro?|Au|Ag|Go|Or
+Ciência|Qual é o símbolo químico da prata?|Ag|Au|Pt|Pr
+Ciência|Qual é o símbolo químico do ferro?|Fe|Fr|Ir|F
+Ciência|Qual é o símbolo químico do sódio?|Na|So|Sd|S
+Ciência|Qual é o símbolo químico do potássio?|K|P|Po|Pt
+Ciência|Qual elemento químico tem o símbolo O?|Oxigênio|Ouro|Ósmio|Ozônio
+Ciência|Qual é o elemento químico mais leve?|Hidrogênio|Hélio|Lítio|Oxigênio
+Ciência|Qual gás é o mais abundante no ar que respiramos?|Nitrogênio|Oxigênio|Gás carbônico|Argônio
+Ciência|Qual é o maior órgão do corpo humano?|Pele|Fígado|Pulmão|Intestino
+Ciência|Qual órgão bombeia o sangue pelo corpo?|Coração|Pulmão|Fígado|Rim
+Ciência|Quantas câmaras tem o coração humano?|4|2|3|5
+Ciência|Qual é o maior osso do corpo humano?|Fêmur|Tíbia|Úmero|Rádio
+Ciência|Onde fica o menor osso do corpo humano?|Ouvido|Nariz|Mão|Pé
+Ciência|Quantos dentes tem um adulto com a dentição completa?|32|28|30|36
+Ciência|Qual tipo sanguíneo é chamado de doador universal?|O negativo|AB positivo|A positivo|B negativo
+Ciência|Qual tipo sanguíneo é chamado de receptor universal?|AB positivo|O negativo|A negativo|B positivo
+Ciência|Qual órgão humano produz a insulina?|Pâncreas|Fígado|Estômago|Baço
+Ciência|Qual vitamina o corpo produz com a luz do Sol?|Vitamina D|Vitamina C|Vitamina A|Vitamina K
+Ciência|A falta de qual vitamina causa o escorbuto?|Vitamina C|Vitamina D|Vitamina B12|Vitamina A
+Ciência|Quem formulou a lei da gravitação universal?|Isaac Newton|Albert Einstein|Galileu Galilei|Nicolau Copérnico
+Ciência|Quem propôs a teoria da relatividade?|Albert Einstein|Isaac Newton|Stephen Hawking|Max Planck
+Ciência|Quem propôs a teoria da evolução por seleção natural?|Charles Darwin|Gregor Mendel|Louis Pasteur|Lamarck
+Ciência|Quem é considerado o pai da genética?|Gregor Mendel|Charles Darwin|Louis Pasteur|Watson
+Ciência|Quem descobriu a penicilina?|Alexander Fleming|Louis Pasteur|Marie Curie|Robert Koch
+Ciência|Qual cientista ganhou o Nobel em Física e em Química?|Marie Curie|Albert Einstein|Niels Bohr|Linus Pauling
+Ciência|Qual brasileiro é conhecido como "pai da aviação"?|Santos Dumont|Oswaldo Cruz|Carlos Chagas|Vital Brazil
+Ciência|Como se chamava o avião de Santos Dumont que voou em Paris em 1906?|14-Bis|Demoiselle|Spirit|Flyer
+Ciência|Qual cientista brasileiro descobriu a doença de Chagas?|Carlos Chagas|Oswaldo Cruz|Vital Brazil|Adolfo Lutz
+Ciência|Qual instituição de pesquisa do Rio leva o nome de Oswaldo Cruz?|Fiocruz|Butantan|Inpe|Embrapa
+Ciência|O Instituto Butantan, em São Paulo, é famoso por produzir o quê?|Soros e vacinas|Satélites|Carros|Sementes
+Ciência|Qual brasileiro foi o primeiro astronauta do país?|Marcos Pontes|Santos Dumont|César Lattes|Ayrton Senna
+Ciência|Qual inseto transmite a dengue?|Aedes aegypti|Barbeiro|Pernilongo comum|Mosca tsé-tsé
+Ciência|Qual inseto transmite a doença de Chagas?|Barbeiro|Aedes aegypti|Mosquito-palha|Pulga
+Ciência|Qual é a velocidade aproximada da luz no vácuo?|300 mil km/s|30 mil km/s|3 mil km/s|3 milhões km/s
+Ciência|Qual é a temperatura de ebulição da água ao nível do mar?|100 °C|90 °C|120 °C|80 °C
+Ciência|A que temperatura a água congela ao nível do mar?|0 °C|-10 °C|4 °C|-4 °C
+Ciência|Qual é a estrela mais próxima da Terra?|Sol|Próxima Centauri|Sirius|Alfa Centauri A
+Ciência|Qual é o único satélite natural da Terra?|Lua|Fobos|Europa|Titã
+Ciência|Quantos planetas tem o Sistema Solar?|8|9|7|10
+Ciência|Qual corpo celeste perdeu o status de planeta em 2006?|Plutão|Ceres|Netuno|Éris
+Ciência|Qual é o planeta mais quente do Sistema Solar?|Vênus|Mercúrio|Marte|Júpiter
+Ciência|Qual é a galáxia onde fica o Sistema Solar?|Via Láctea|Andrômeda|Triângulo|Sombrero
+Ciência|Em que ano o homem pisou na Lua pela primeira vez?|1969|1961|1972|1957
+Ciência|Quem foi o primeiro homem a pisar na Lua?|Neil Armstrong|Buzz Aldrin|Iuri Gagarin|Michael Collins
+Ciência|Quem foi o primeiro ser humano a ir ao espaço?|Iuri Gagarin|Neil Armstrong|Alan Shepard|John Glenn
+Ciência|Qual era o nome da cadela soviética que orbitou a Terra em 1957?|Laika|Belka|Strelka|Lassie
+Ciência|Qual é a unidade de medida da corrente elétrica?|Ampère|Volt|Watt|Ohm
+Ciência|Qual é a unidade de medida da potência?|Watt|Joule|Newton|Pascal
+Ciência|Qual é a unidade de medida da força no SI?|Newton|Joule|Watt|Pascal
+Ciência|Qual é a unidade de medida da resistência elétrica?|Ohm|Volt|Ampère|Coulomb
+Ciência|Quantos centímetros tem um metro?|100|10|1000|50
+Ciência|Quantos gramas tem um quilograma?|1000|100|10|10000
+Ciência|Qual mamífero é capaz de voar de verdade?|Morcego|Esquilo-voador|Pinguim|Avestruz
+Ciência|Qual é o maior animal do planeta?|Baleia-azul|Elefante-africano|Tubarão-baleia|Girafa
+Ciência|Qual é o animal terrestre mais rápido?|Guepardo|Leão|Cavalo|Antílope
+Ciência|Qual é o maior felino das Américas?|Onça-pintada|Puma|Jaguatirica|Leão
+Ciência|A baleia é classificada como qual tipo de animal?|Mamífero|Peixe|Réptil|Anfíbio
+Ciência|O sapo é classificado como qual tipo de animal?|Anfíbio|Réptil|Mamífero|Peixe
+Ciência|O jacaré é classificado como qual tipo de animal?|Réptil|Anfíbio|Mamífero|Peixe
+Ciência|Quantas patas tem um inseto?|6|8|4|10
+Ciência|Quantas patas tem uma aranha?|8|6|10|4
+Ciência|Como se chama a transformação da lagarta em borboleta?|Metamorfose|Mutação|Fotossíntese|Mitose
+Ciência|Qual é a estrutura da célula que contém o DNA?|Núcleo|Membrana|Ribossomo|Vacúolo
+Ciência|Qual organela é conhecida como a "usina de energia" da célula?|Mitocôndria|Ribossomo|Cloroplasto|Lisossomo
+Ciência|Qual pigmento dá a cor verde às plantas?|Clorofila|Caroteno|Melanina|Hemoglobina
+Ciência|Qual proteína do sangue transporta oxigênio?|Hemoglobina|Insulina|Queratina|Colágeno
+Ciência|Qual é o pH da água pura a 25 °C?|7|0|14|5
+Ciência|O vinagre é uma substância de caráter...|Ácido|Básico|Neutro|Salino
+Ciência|Qual é o nome do sal de cozinha em química?|Cloreto de sódio|Bicarbonato de sódio|Nitrato de potássio|Carbonato de cálcio
+Ciência|Qual metal é líquido em temperatura ambiente?|Mercúrio|Chumbo|Alumínio|Estanho
+Ciência|Qual é o material natural mais duro que se conhece?|Diamante|Quartzo|Ferro|Granito
+Ciência|O diamante é formado por qual elemento químico?|Carbono|Silício|Cálcio|Enxofre
+Ciência|Quem criou a tabela periódica dos elementos?|Dmitri Mendeleiev|Antoine Lavoisier|John Dalton|Niels Bohr
+Ciência|"Na natureza nada se cria, nada se perde, tudo se transforma" é de quem?|Lavoisier|Newton|Darwin|Galileu
+Ciência|Qual é a camada da atmosfera que protege contra raios UV?|Camada de ozônio|Ionosfera|Troposfera|Exosfera
+Ciência|Como se chama o fenômeno de aquecimento do Pacífico que afeta o clima?|El Niño|La Niña|Monção|Furacão
+Ciência|Qual escala mede a magnitude de terremotos?|Richter|Celsius|Beaufort|Mohs
+Ciência|Qual escala mede a dureza dos minerais?|Mohs|Richter|Kelvin|Fujita
+Ciência|O que o sismógrafo registra?|Terremotos|Chuvas|Ventos|Marés
+Ciência|Qual instrumento mede a pressão atmosférica?|Barômetro|Termômetro|Higrômetro|Anemômetro
+Ciência|Qual instrumento mede a velocidade do vento?|Anemômetro|Barômetro|Pluviômetro|Higrômetro
+Ciência|Qual instrumento mede a quantidade de chuva?|Pluviômetro|Barômetro|Anemômetro|Odômetro
+Ciência|Quem inventou a lâmpada elétrica incandescente de uso comercial?|Thomas Edison|Nikola Tesla|Graham Bell|James Watt
+Ciência|A quem se atribui a patente do telefone em 1876?|Graham Bell|Thomas Edison|Marconi|Samuel Morse
+Ciência|Quem aperfeiçoou a máquina a vapor no século 18?|James Watt|Thomas Edison|Henry Ford|Isaac Newton
+Ciência|Qual padre brasileiro é apontado como pioneiro do rádio?|Landell de Moura|Padre Cícero|Bartolomeu de Gusmão|Anchieta
+Ciência|Qual padre brasileiro demonstrou um balão de ar quente em Lisboa em 1709?|Bartolomeu de Gusmão|Landell de Moura|Padre Anchieta|José de Alencar
+Ciência|Qual doença foi erradicada do mundo em 1980?|Varíola|Poliomielite|Sarampo|Tuberculose
+Ciência|A vacina oral contra a poliomielite leva o nome de qual cientista?|Albert Sabin|Jonas Salk|Louis Pasteur|Edward Jenner
+Ciência|Qual personagem é o símbolo das campanhas de vacinação no Brasil?|Zé Gotinha|Sítio do Pica-Pau|Menino Maluquinho|Cebolinha
+Ciência|Qual é o nome do processo em que a água vira vapor?|Evaporação|Condensação|Solidificação|Fusão
+Ciência|Qual é o nome da passagem do estado sólido direto para o gasoso?|Sublimação|Fusão|Condensação|Evaporação
+Ciência|Qual parte da planta normalmente fica debaixo da terra e absorve água?|Raiz|Caule|Folha|Flor
+Ciência|Qual é o osso que forma a coxa?|Fêmur|Úmero|Tíbia|Rádio
+Ciência|Qual órgão é responsável principalmente por filtrar o sangue e formar a urina?|Rim|Fígado|Baço|Pâncreas
+Ciência|Qual é o nome do líquido produzido pelo fígado que ajuda a digerir gorduras?|Bile|Saliva|Suco gástrico|Insulina
+Ciência|Quantos cromossomos tem uma célula humana comum?|46|23|44|48
+Ciência|Qual é a sigla da molécula que guarda a informação genética?|DNA|ATP|RNA mensageiro|LCD
+Ciência|Quantos minutos a luz do Sol leva, em média, para chegar à Terra?|Cerca de 8|Cerca de 1|Cerca de 30|Cerca de 60
+Ciência|Quanto tempo a Terra leva para dar uma volta em torno do Sol?|Cerca de 365 dias|30 dias|24 horas|Cerca de 12 anos
+Ciência|O movimento da Terra em torno do próprio eixo é chamado de...|Rotação|Translação|Precessão|Revolução lunar
+Ciência|O que causa as estações do ano na Terra?|Inclinação do eixo|Distância ao Sol|Fases da Lua|Ventos solares
+Ciência|Qual fase da Lua acontece quando ela fica totalmente iluminada?|Cheia|Nova|Crescente|Minguante
+Ciência|O que causa principalmente as marés nos oceanos?|Atração da Lua|Ventos|Rotação do Sol|Terremotos
+Ciência|Qual é o nome do cometa que passa perto da Terra a cada 75 anos, aproximadamente?|Halley|Hale-Bopp|Encke|Shoemaker
+Ciência|Qual é o nome do primeiro satélite artificial, lançado em 1957?|Sputnik 1|Explorer 1|Apollo 11|Vostok 1
+Ciência|Qual é o maior bioma do Brasil em área?|Amazônia|Cerrado|Caatinga|Pantanal
+Ciência|Qual bioma é exclusivamente brasileiro?|Caatinga|Amazônia|Pantanal|Pampa
+Ciência|Qual árvore deu nome ao Brasil?|Pau-brasil|Ipê|Jequitibá|Seringueira
+Ciência|De qual árvore se extrai o látex usado na borracha natural?|Seringueira|Pau-brasil|Carnaúba|Mogno
+Ciência|De qual palmeira do Nordeste se extrai uma cera muito usada?|Carnaúba|Babaçu|Açaí|Buriti
+Ciência|Qual é o processo de aquecer a borracha com enxofre para torná-la resistente?|Vulcanização|Pasteurização|Fermentação|Destilação
+Ciência|Quem desenvolveu o processo de pasteurização?|Louis Pasteur|Robert Koch|Alexander Fleming|Edward Jenner
+Ciência|Quem criou a primeira vacina, contra a varíola?|Edward Jenner|Louis Pasteur|Albert Sabin|Jonas Salk
+Ciência|Qual é a parte do olho que dá a cor a ele?|Íris|Pupila|Córnea|Retina
+Ciência|Qual sentido está ligado às papilas gustativas?|Paladar|Olfato|Tato|Audição
+Ciência|Qual é o nome do músculo que ajuda na respiração, abaixo dos pulmões?|Diafragma|Bíceps|Peitoral|Trapézio
+Ciência|A Lei de Newton "toda ação tem uma reação" é qual lei?|Terceira|Primeira|Segunda|Quarta
+História|Em que ano os portugueses chegaram ao Brasil com Cabral?|1500|1492|1530|1549
+História|Quem comandava a frota portuguesa que chegou ao Brasil em 1500?|Pedro Álvares Cabral|Vasco da Gama|Cristóvão Colombo|Américo Vespúcio
+História|Quem escreveu a carta que relatou ao rei a chegada ao Brasil?|Pero Vaz de Caminha|Pedro Álvares Cabral|Padre Anchieta|Tomé de Sousa
+História|Em que ano Cristóvão Colombo chegou à América?|1492|1500|1498|1453
+História|Qual foi a primeira capital do Brasil?|Salvador|Rio de Janeiro|São Vicente|Olinda
+História|Quem foi o primeiro governador-geral do Brasil?|Tomé de Sousa|Duarte da Costa|Mem de Sá|Martim Afonso
+História|Em que ano o Rio de Janeiro passou a ser a capital do Brasil?|1763|1808|1822|1549
+História|Em que ano a família real portuguesa chegou ao Brasil?|1808|1822|1789|1750
+História|Quem era o príncipe regente que veio ao Brasil em 1808?|Dom João|Dom Pedro I|Dom Pedro II|Dom Manuel
+História|Quem proclamou a Independência do Brasil?|Dom Pedro I|Dom Pedro II|Dom João VI|Deodoro da Fonseca
+História|Às margens de qual riacho foi proclamada a Independência?|Ipiranga|Tietê|Pinheiros|Tamanduateí
+História|Em que ano foi proclamada a República no Brasil?|1889|1888|1822|1891
+História|Quem proclamou a República no Brasil?|Deodoro da Fonseca|Floriano Peixoto|Dom Pedro II|Benjamin Constant
+História|Quem foi o primeiro presidente do Brasil?|Deodoro da Fonseca|Floriano Peixoto|Prudente de Morais|Getúlio Vargas
+História|Quem foi o último imperador do Brasil?|Dom Pedro II|Dom Pedro I|Dom João VI|Dom Luís
+História|Em que ano foi assinada a Lei Áurea?|1888|1889|1871|1850
+História|Qual lei de 1871 libertava os filhos de escravizadas nascidos a partir dali?|Lei do Ventre Livre|Lei Áurea|Lei dos Sexagenários|Lei Eusébio de Queirós
+História|Qual lei de 1885 libertava escravizados com mais de 60 anos?|Lei dos Sexagenários|Lei do Ventre Livre|Lei Áurea|Lei de Terras
+História|Qual foi o maior quilombo do Brasil colonial?|Palmares|Quariterê|Ambrósio|Buraco do Tatu
+História|Qual líder do Quilombo dos Palmares é lembrado no Dia da Consciência Negra?|Zumbi|Ganga Zumba|Dandara|Aqualtune
+História|Em que dia se comemora o Dia da Consciência Negra?|20 de novembro|13 de maio|21 de abril|7 de setembro
+História|Qual movimento de Minas Gerais teve Tiradentes como mártir?|Inconfidência Mineira|Revolta dos Alfaiates|Balaiada|Sabinada
+História|Qual era a profissão que deu o apelido a Tiradentes?|Dentista|Alfaiate|Ferreiro|Barbeiro
+História|Em que dia se lembra a morte de Tiradentes, feriado nacional?|21 de abril|7 de setembro|15 de novembro|1º de maio
+História|Qual revolta do Sul durou cerca de dez anos, de 1835 a 1845?|Farroupilha|Cabanagem|Balaiada|Sabinada
+História|Qual revolta ocorreu no Pará entre 1835 e 1840?|Cabanagem|Farroupilha|Balaiada|Canudos
+História|Quem liderou o arraial de Canudos, na Bahia?|Antônio Conselheiro|Lampião|Padre Cícero|Zumbi
+História|Qual livro de Euclides da Cunha narra a Guerra de Canudos?|Os Sertões|Vidas Secas|O Cortiço|Grande Sertão: Veredas
+História|Qual era o apelido de Virgulino Ferreira da Silva, rei do cangaço?|Lampião|Corisco|Antônio Silvino|Volta Seca
+História|Qual era o nome da companheira de Lampião?|Maria Bonita|Dadá|Anita|Dandara
+História|Qual heroína lutou ao lado de Garibaldi e é chamada "heroína de dois mundos"?|Anita Garibaldi|Maria Quitéria|Joana Angélica|Bárbara de Alencar
+História|Qual foi a guerra entre Paraguai e Tríplice Aliança no século 19?|Guerra do Paraguai|Guerra da Cisplatina|Guerra do Prata|Guerra dos Farrapos
+História|Quais países formavam a Tríplice Aliança com o Brasil?|Argentina e Uruguai|Chile e Peru|Bolívia e Peru|Argentina e Chile
+História|Em 1815, o Brasil formou um Reino Unido com Portugal e qual região?|Algarves|Galiza|Açores|Madeira
+História|Qual presidente criou a CLT, em 1943?|Getúlio Vargas|Juscelino Kubitschek|Eurico Dutra|Washington Luís
+História|Como se chamou o período ditatorial de Vargas entre 1937 e 1945?|Estado Novo|República Velha|Era JK|Regência
+História|Qual presidente tinha o lema "50 anos em 5"?|Juscelino Kubitschek|Getúlio Vargas|Jânio Quadros|João Goulart
+História|Em que ano Brasília foi inaugurada?|1960|1955|1964|1970
+História|Quem foi o urbanista do Plano Piloto de Brasília?|Lúcio Costa|Oscar Niemeyer|Burle Marx|Le Corbusier
+História|Qual presidente renunciou em 1961 após sete meses de governo?|Jânio Quadros|João Goulart|Café Filho|Juscelino Kubitschek
+História|Em que ano começou o regime militar no Brasil?|1964|1968|1961|1970
+História|Qual ato institucional de 1968 endureceu o regime militar?|AI-5|AI-1|AI-2|AI-10
+História|Qual movimento de 1984 pedia eleições diretas para presidente?|Diretas Já|Caras-Pintadas|Tenentismo|Fora Collor
+História|Em que ano foi promulgada a atual Constituição brasileira?|1988|1985|1990|1946
+História|Qual político chamou a Constituição de 1988 de "Constituição Cidadã"?|Ulysses Guimarães|Tancredo Neves|José Sarney|Leonel Brizola
+História|Qual presidente eleito em 1985 morreu antes de tomar posse?|Tancredo Neves|Ulysses Guimarães|José Sarney|Paulo Maluf
+História|Qual plano econômico lançou o real em 1994?|Plano Real|Plano Cruzado|Plano Collor|Plano Verão
+História|Qual foi a primeira mulher eleita presidente do Brasil?|Dilma Rousseff|Marina Silva|Benedita da Silva|Zélia Cardoso
+História|Qual presidente brasileiro sofreu impeachment em 1992?|Fernando Collor|José Sarney|Itamar Franco|Fernando Henrique
+História|Como ficaram conhecidos os estudantes que protestaram contra Collor em 1992?|Caras-pintadas|Diretas Já|Tenentes|Cabanos
+História|Em que ano o Brasil entrou na Segunda Guerra Mundial?|1942|1939|1944|1941
+História|Qual era o símbolo da FEB na Segunda Guerra?|Cobra fumando|Onça-pintada|Águia dourada|Leão alado
+História|Em qual país lutou a Força Expedicionária Brasileira?|Itália|França|Alemanha|Japão
+História|Em que ano começou a Primeira Guerra Mundial?|1914|1918|1905|1939
+História|Em que ano terminou a Segunda Guerra Mundial?|1945|1944|1946|1939
+História|Em que ano caiu o Muro de Berlim?|1989|1991|1985|1961
+História|Em que ano começou a Revolução Francesa?|1789|1776|1815|1848
+História|Qual prisão foi tomada pelo povo de Paris em 14 de julho de 1789?|Bastilha|Torre de Londres|Conciergerie|Alcatraz
+História|Em que ano os Estados Unidos declararam independência?|1776|1789|1812|1620
+História|Quem foi o primeiro presidente dos Estados Unidos?|George Washington|Abraham Lincoln|Thomas Jefferson|John Adams
+História|Qual presidente americano aboliu a escravidão no país?|Abraham Lincoln|George Washington|Thomas Jefferson|Ulysses Grant
+História|Qual líder sul-africano ficou 27 anos preso e virou presidente?|Nelson Mandela|Desmond Tutu|Steve Biko|Jacob Zuma
+História|Qual líder indiano pregou a resistência não violenta?|Mahatma Gandhi|Jawaharlal Nehru|Indira Gandhi|Dalai Lama
+História|Quem fez o discurso "Eu tenho um sonho" em 1963?|Martin Luther King|Malcolm X|Barack Obama|Nelson Mandela
+História|Qual imperador francês foi derrotado em Waterloo?|Napoleão Bonaparte|Luís XIV|Carlos Magno|Luís XVI
+História|Qual rainha francesa foi executada na Revolução Francesa?|Maria Antonieta|Catarina de Médici|Josefina|Leonor da Aquitânia
+História|Qual civilização construiu as pirâmides de Gizé?|Egípcia|Romana|Grega|Maia
+História|Qual civilização construiu Machu Picchu?|Inca|Asteca|Maia|Olmeca
+História|Qual era a capital do Império Asteca?|Tenochtitlán|Cusco|Chichén Itzá|Teotihuacán
+História|Quem foi o primeiro imperador de Roma?|Augusto|Júlio César|Nero|Calígula
+História|Em que ano caiu o Império Romano do Ocidente?|476|1453|410|800
+História|Em que ano Constantinopla foi tomada pelos otomanos?|1453|1492|1204|1071
+História|Qual navegador português chegou à Índia por mar em 1498?|Vasco da Gama|Pedro Álvares Cabral|Bartolomeu Dias|Fernão de Magalhães
+História|Qual expedição fez a primeira volta ao mundo, iniciada em 1519?|Fernão de Magalhães|Vasco da Gama|Cristóvão Colombo|James Cook
+História|Qual tratado de 1494 dividiu as terras entre Portugal e Espanha?|Tordesilhas|Madri|Versalhes|Utrecht
+História|Qual tratado encerrou oficialmente a Primeira Guerra Mundial?|Versalhes|Tordesilhas|Viena|Paris de 1783
+História|Que cidade japonesa sofreu o primeiro ataque com bomba atômica?|Hiroshima|Nagasaki|Tóquio|Osaka
+História|Qual ataque de 1941 levou os EUA a entrar na Segunda Guerra?|Pearl Harbor|Dia D|Hiroshima|Midway
+História|Em que dia de 1944 os Aliados desembarcaram na Normandia?|6 de junho|8 de maio|14 de julho|1º de setembro
+História|Qual ditador governou a Alemanha nazista?|Adolf Hitler|Benito Mussolini|Francisco Franco|Josef Stálin
+História|Qual ditador governou a Itália fascista?|Benito Mussolini|Adolf Hitler|Francisco Franco|Antonio Salazar
+História|Qual país se dissolveu em 1991, dando origem a 15 repúblicas?|União Soviética|Iugoslávia|Tchecoslováquia|Alemanha Oriental
+História|Qual revolução levou Fidel Castro ao poder em 1959?|Revolução Cubana|Revolução Russa|Revolução Mexicana|Revolução Sandinista
+História|Qual revolução de 1917 levou os bolcheviques ao poder?|Revolução Russa|Revolução Chinesa|Revolução Francesa|Revolução Cubana
+História|Qual revolução começou na Inglaterra no século 18 com as fábricas?|Revolução Industrial|Revolução Gloriosa|Revolução Verde|Revolução Puritana
+História|Qual filósofo grego foi condenado a beber cicuta?|Sócrates|Platão|Aristóteles|Pitágoras
+História|Quem foi o professor de Alexandre, o Grande?|Aristóteles|Platão|Sócrates|Heródoto
+História|Qual monge alemão iniciou a Reforma Protestante em 1517?|Martinho Lutero|João Calvino|Erasmo|Thomas More
+História|Quem criou a prensa de tipos móveis na Europa, por volta de 1450?|Gutenberg|Da Vinci|Galileu|Copérnico
+História|Qual muralha foi construída para proteger a China de invasões?|Grande Muralha|Muralha de Adriano|Muro de Berlim|Muralha de Ávila
+História|Qual rainha governou o Egito e se aliou a Júlio César e Marco Antônio?|Cleópatra|Nefertiti|Hatshepsut|Teodora
+História|Quem foi o líder da independência de várias nações sul-americanas, chamado "Libertador"?|Simón Bolívar|San Martín|Bernardo O'Higgins|Tupac Amaru
+História|Qual capitania hereditária foi uma das poucas a prosperar, graças ao açúcar?|Pernambuco|Maranhão|Ceará|Espírito Santo
+História|Qual foi o principal produto da economia colonial nos séculos 16 e 17?|Açúcar|Café|Borracha|Algodão
+História|Qual produto marcou a economia de Minas Gerais no século 18?|Ouro|Café|Açúcar|Cacau
+História|Qual produto foi chamado de "ouro negro" na Amazônia do fim do século 19?|Borracha|Petróleo|Cacau|Castanha
+História|Qual teatro de Manaus é símbolo do ciclo da borracha?|Teatro Amazonas|Theatro Municipal|Teatro da Paz|Teatro José de Alencar
+História|Qual conde governou o Brasil holandês entre 1637 e 1644?|Maurício de Nassau|Calabar|Van Dyck|Rembrandt
+História|Qual cidade foi sede do governo holandês no Brasil?|Recife|Salvador|Natal|São Luís
+História|Qual foi a primeira província a abolir a escravidão, em 1884?|Ceará|Rio de Janeiro|Pernambuco|Bahia
+História|Qual jangadeiro cearense ficou conhecido como "Dragão do Mar"?|Francisco José do Nascimento|Zumbi dos Palmares|André Rebouças|Luís Gama
+História|De qual país o Brasil adquiriu o Acre em 1903?|Bolívia|Peru|Paraguai|Colômbia
+História|Qual era a moeda do Brasil antes do real?|Cruzeiro real|Cruzado|Cruzeiro novo|Réis
+História|Qual revolta de 1904 no Rio foi contra a vacinação obrigatória?|Revolta da Vacina|Revolta da Chibata|Revolta da Armada|Revolta dos 18 do Forte
+História|Qual marinheiro liderou a Revolta da Chibata em 1910?|João Cândido|Zumbi|Luís Gama|Prestes
+História|Qual movimento de 1932 em São Paulo exigia uma nova Constituição?|Revolução Constitucionalista|Revolução de 1930|Intentona Comunista|Coluna Prestes
+História|Em que ano morreu Getúlio Vargas, no Palácio do Catete?|1954|1945|1950|1964
+História|Qual símbolo era usado por Jânio Quadros em sua campanha?|Vassoura|Martelo|Chave|Espada
+Geografia|Qual é a capital do Ceará?|Fortaleza|Natal|São Luís|Teresina
+Geografia|Qual é a capital da Bahia?|Salvador|Aracaju|Recife|Maceió
+Geografia|Qual é a capital de Pernambuco?|Recife|Olinda|João Pessoa|Maceió
+Geografia|Qual é a capital do Rio Grande do Norte?|Natal|Mossoró|João Pessoa|Fortaleza
+Geografia|Qual é a capital da Paraíba?|João Pessoa|Campina Grande|Natal|Recife
+Geografia|Qual é a capital de Alagoas?|Maceió|Aracaju|Arapiraca|Recife
+Geografia|Qual é a capital de Sergipe?|Aracaju|Maceió|Salvador|Itabaiana
+Geografia|Qual é a capital do Piauí?|Teresina|Parnaíba|São Luís|Picos
+Geografia|Qual é a capital do Maranhão?|São Luís|Imperatriz|Teresina|Belém
+Geografia|Qual é a capital do Pará?|Belém|Santarém|Macapá|Marabá
+Geografia|Qual é a capital do Amazonas?|Manaus|Parintins|Belém|Porto Velho
+Geografia|Qual é a capital do Amapá?|Macapá|Belém|Oiapoque|Boa Vista
+Geografia|Qual é a capital de Roraima?|Boa Vista|Macapá|Porto Velho|Rio Branco
+Geografia|Qual é a capital de Rondônia?|Porto Velho|Rio Branco|Ji-Paraná|Boa Vista
+Geografia|Qual é a capital do Acre?|Rio Branco|Porto Velho|Cruzeiro do Sul|Manaus
+Geografia|Qual é a capital do Tocantins?|Palmas|Araguaína|Goiânia|Gurupi
+Geografia|Qual é a capital de Goiás?|Goiânia|Anápolis|Brasília|Cuiabá
+Geografia|Qual é a capital de Mato Grosso?|Cuiabá|Campo Grande|Rondonópolis|Goiânia
+Geografia|Qual é a capital de Mato Grosso do Sul?|Campo Grande|Cuiabá|Dourados|Corumbá
+Geografia|Qual é a capital de Minas Gerais?|Belo Horizonte|Ouro Preto|Uberlândia|Juiz de Fora
+Geografia|Qual é a capital do Espírito Santo?|Vitória|Vila Velha|Serra|Cariacica
+Geografia|Qual é a capital do Paraná?|Curitiba|Londrina|Maringá|Foz do Iguaçu
+Geografia|Qual é a capital de Santa Catarina?|Florianópolis|Joinville|Blumenau|Chapecó
+Geografia|Qual é a capital do Rio Grande do Sul?|Porto Alegre|Pelotas|Caxias do Sul|Gramado
+Geografia|Quantos estados tem o Brasil?|26|27|25|24
+Geografia|Qual é o maior estado do Brasil em área?|Amazonas|Pará|Mato Grosso|Minas Gerais
+Geografia|Qual é o menor estado do Brasil em área?|Sergipe|Alagoas|Rio de Janeiro|Espírito Santo
+Geografia|Qual estado brasileiro tem mais municípios?|Minas Gerais|São Paulo|Bahia|Rio Grande do Sul
+Geografia|Quantas regiões oficiais tem o Brasil, segundo o IBGE?|5|4|6|7
+Geografia|Qual é a maior região do Brasil em área?|Norte|Nordeste|Centro-Oeste|Sudeste
+Geografia|Quantos estados formam a Região Nordeste?|9|7|8|10
+Geografia|Qual é o ponto mais alto do Brasil?|Pico da Neblina|Pico da Bandeira|Monte Roraima|Pico Paraná
+Geografia|Qual é a montanha mais alta do mundo?|Monte Everest|K2|Aconcágua|Kilimanjaro
+Geografia|Qual é a montanha mais alta das Américas?|Aconcágua|Everest|Denali|Chimborazo
+Geografia|Qual é o maior oceano do mundo?|Pacífico|Atlântico|Índico|Ártico
+Geografia|Qual oceano banha o litoral brasileiro?|Atlântico|Pacífico|Índico|Ártico
+Geografia|Qual é o maior país do mundo em área?|Rússia|Canadá|China|Estados Unidos
+Geografia|Qual é o menor país do mundo?|Vaticano|Mônaco|San Marino|Malta
+Geografia|Qual é o maior país da América do Sul?|Brasil|Argentina|Peru|Colômbia
+Geografia|Quais dois países sul-americanos não fazem fronteira com o Brasil?|Chile e Equador|Chile e Peru|Equador e Bolívia|Uruguai e Chile
+Geografia|Qual é o maior deserto quente do mundo?|Saara|Atacama|Kalahari|Gobi
+Geografia|Qual deserto do Chile é um dos mais secos do mundo?|Atacama|Saara|Gobi|Sonora
+Geografia|Qual é a capital da Argentina?|Buenos Aires|Montevidéu|Santiago|Córdoba
+Geografia|Qual é a capital do Uruguai?|Montevidéu|Buenos Aires|Assunção|Punta del Este
+Geografia|Qual é a capital do Paraguai?|Assunção|Ciudad del Este|La Paz|Montevidéu
+Geografia|Qual é a capital do Chile?|Santiago|Valparaíso|Lima|Buenos Aires
+Geografia|Qual é a capital do Peru?|Lima|Cusco|Quito|Bogotá
+Geografia|Qual é a capital da Colômbia?|Bogotá|Medellín|Caracas|Cartagena
+Geografia|Qual é a capital da Venezuela?|Caracas|Maracaibo|Bogotá|Quito
+Geografia|Qual é a capital do Equador?|Quito|Guayaquil|Lima|Bogotá
+Geografia|Qual é a capital do Canadá?|Ottawa|Toronto|Montreal|Vancouver
+Geografia|Qual é a capital dos Estados Unidos?|Washington|Nova York|Los Angeles|Chicago
+Geografia|Qual é a capital da Austrália?|Camberra|Sydney|Melbourne|Perth
+Geografia|Qual é a capital do Japão?|Tóquio|Quioto|Osaka|Seul
+Geografia|Qual é a capital da China?|Pequim|Xangai|Hong Kong|Cantão
+Geografia|Qual é a capital da Itália?|Roma|Milão|Veneza|Nápoles
+Geografia|Qual é a capital da Espanha?|Madri|Barcelona|Sevilha|Lisboa
+Geografia|Qual é a capital da Alemanha?|Berlim|Munique|Frankfurt|Hamburgo
+Geografia|Qual é a capital da Turquia?|Ancara|Istambul|Esmirna|Antália
+Geografia|Qual é a capital do Egito?|Cairo|Alexandria|Luxor|Gizé
+Geografia|Qual é a capital da Rússia?|Moscou|São Petersburgo|Kiev|Minsk
+Geografia|Qual é a capital da Índia?|Nova Délhi|Mumbai|Calcutá|Bangalore
+Geografia|Qual é a capital de Portugal?|Lisboa|Porto|Coimbra|Braga
+Geografia|Qual é a capital da Suíça?|Berna|Zurique|Genebra|Basileia
+Geografia|Qual é a capital da Holanda (Países Baixos)?|Amsterdã|Roterdã|Haia|Utrecht
+Geografia|Qual é a capital do México?|Cidade do México|Cancún|Guadalajara|Monterrey
+Geografia|Qual é a capital de Angola?|Luanda|Maputo|Benguela|Huambo
+Geografia|Qual é a capital de Moçambique?|Maputo|Luanda|Beira|Nampula
+Geografia|Qual é a língua oficial de Angola?|Português|Espanhol|Francês|Inglês
+Geografia|Qual é a língua oficial do México?|Espanhol|Português|Inglês|Francês
+Geografia|Qual é a língua mais falada na Suíça?|Alemão|Francês|Italiano|Inglês
+Geografia|Qual é a moeda do Japão?|Iene|Yuan|Won|Rúpia
+Geografia|Qual é a moeda do Reino Unido?|Libra esterlina|Euro|Dólar|Franco
+Geografia|Qual é a moeda da Argentina?|Peso|Real|Dólar|Guarani
+Geografia|Qual é a moeda do Paraguai?|Guarani|Peso|Bolívar|Sol
+Geografia|Qual rio brasileiro é chamado de "Velho Chico"?|São Francisco|Parnaíba|Tocantins|Paraná
+Geografia|Em qual estado nasce o Rio São Francisco?|Minas Gerais|Bahia|Goiás|Pernambuco
+Geografia|Qual usina hidrelétrica fica na fronteira entre Brasil e Paraguai?|Itaipu|Belo Monte|Tucuruí|Sobradinho
+Geografia|Em qual estado ficam as Cataratas do Iguaçu, do lado brasileiro?|Paraná|Santa Catarina|Mato Grosso do Sul|São Paulo
+Geografia|Qual é a maior planície alagável do mundo, no Centro-Oeste do Brasil?|Pantanal|Cerrado|Chaco|Llanos
+Geografia|Em qual estado fica o arquipélago de Fernando de Noronha?|Pernambuco|Rio Grande do Norte|Paraíba|Bahia
+Geografia|Em qual estado fica a praia de Jericoacoara?|Ceará|Piauí|Maranhão|Rio Grande do Norte
+Geografia|Em qual estado ficam os Lençóis Maranhenses?|Maranhão|Piauí|Ceará|Pará
+Geografia|Em qual estado fica a Chapada Diamantina?|Bahia|Minas Gerais|Goiás|Mato Grosso
+Geografia|Em qual estado fica a Chapada dos Veadeiros?|Goiás|Mato Grosso|Tocantins|Bahia
+Geografia|Em qual cidade fica o Cristo Redentor?|Rio de Janeiro|São Paulo|Salvador|Belo Horizonte
+Geografia|Em qual cidade fica o Pelourinho?|Salvador|Recife|São Luís|Olinda
+Geografia|Em qual cidade fica o Elevador Lacerda?|Salvador|Recife|Rio de Janeiro|Fortaleza
+Geografia|Em qual cidade fica a Avenida Paulista?|São Paulo|Campinas|Santos|Rio de Janeiro
+Geografia|Qual cidade mineira histórica foi capital de Minas até 1897?|Ouro Preto|Mariana|Diamantina|Tiradentes
+Geografia|Qual é a cidade mais populosa do Brasil?|São Paulo|Rio de Janeiro|Brasília|Salvador
+Geografia|Onde se encontram os rios Negro e Solimões, no "Encontro das Águas"?|Manaus|Belém|Santarém|Porto Velho
+Geografia|Qual é o ponto extremo norte do Brasil?|Monte Caburaí|Oiapoque|Ponta do Seixas|Arroio Chuí
+Geografia|Qual é o ponto mais oriental do Brasil continental?|Ponta do Seixas|Cabo Branco|Monte Caburaí|Serra do Divisor
+Geografia|Por qual linha imaginária passa a cidade de Macapá?|Linha do Equador|Trópico de Capricórnio|Trópico de Câncer|Meridiano de Greenwich
+Geografia|Qual trópico passa pela cidade de São Paulo e arredores?|Trópico de Capricórnio|Trópico de Câncer|Linha do Equador|Círculo Polar
+Geografia|Qual é o maior rio da Europa?|Volga|Danúbio|Reno|Sena
+Geografia|Qual rio atravessa Paris?|Sena|Tâmisa|Reno|Danúbio
+Geografia|Qual rio atravessa Londres?|Tâmisa|Sena|Tejo|Reno
+Geografia|Qual rio passa por Lisboa?|Tejo|Douro|Minho|Guadiana
+Geografia|Qual é o maior continente do mundo?|Ásia|África|América|Europa
+Geografia|Em qual continente fica o Egito?|África|Ásia|Europa|Oceania
+Geografia|Qual é o país mais populoso da América do Sul?|Brasil|Argentina|Colômbia|Peru
+Geografia|Qual é a maior lagoa do Brasil?|Lagoa dos Patos|Lagoa Mirim|Lagoa Rodrigo de Freitas|Lagoa da Conceição
+Geografia|Qual cordilheira atravessa a América do Sul pelo lado oeste?|Andes|Alpes|Himalaia|Rochosas
+Geografia|Em qual cordilheira fica o Monte Everest?|Himalaia|Andes|Alpes|Urais
+Geografia|Qual país tem formato de bota no mapa?|Itália|Grécia|Espanha|Chile
+Geografia|Qual país é conhecido como "terra do sol nascente"?|Japão|China|Coreia do Sul|Tailândia
+Geografia|Qual país tem a forma longa e estreita ao longo dos Andes?|Chile|Peru|Bolívia|Argentina
+Geografia|Qual é a capital da Grécia?|Atenas|Esparta|Tessalônica|Creta
+Geografia|Qual cidade é atravessada pelo Canal Grande e tem gôndolas?|Veneza|Florença|Amsterdã|Roma
+Geografia|Qual é a maior ilha do mundo?|Groenlândia|Madagascar|Bornéu|Austrália
+Esportes|Em que ano o Brasil ganhou sua primeira Copa do Mundo?|1958|1962|1950|1970
+Esportes|Em qual país o Brasil ganhou a Copa de 1958?|Suécia|Chile|México|Suíça
+Esportes|Em qual país o Brasil ganhou a Copa de 1970?|México|Itália|Alemanha|Argentina
+Esportes|Em qual país o Brasil ganhou o tetracampeonato, em 1994?|Estados Unidos|Itália|França|México
+Esportes|Em que ano o Brasil conquistou o pentacampeonato mundial?|2002|1998|1994|2006
+Esportes|Quem o Brasil venceu na final da Copa de 2002?|Alemanha|França|Itália|Argentina
+Esportes|Quem o Brasil venceu nos pênaltis na final de 1994?|Itália|Holanda|Suécia|Alemanha
+Esportes|Qual país venceu o Brasil na final da Copa de 1950, no Maracanã?|Uruguai|Argentina|Itália|Suécia
+Esportes|Como ficou conhecida a derrota do Brasil para o Uruguai em 1950?|Maracanaço|Mineiraço|Sarriá|Fiasco de Paris
+Esportes|Qual foi o placar de Brasil x Alemanha na semifinal de 2014?|1 a 7|0 a 3|2 a 5|1 a 4
+Esportes|Em qual estádio foi o 7 a 1 de 2014?|Mineirão|Maracanã|Arena Corinthians|Arena Fonte Nova
+Esportes|Qual país venceu o Brasil na final da Copa de 1998?|França|Alemanha|Holanda|Itália
+Esportes|Qual era o capitão do Brasil no pentacampeonato de 2002?|Cafu|Ronaldo|Roberto Carlos|Rivaldo
+Esportes|Quem foi o capitão do Brasil na Copa de 1970?|Carlos Alberto Torres|Pelé|Gérson|Rivellino
+Esportes|Quem ergueu a taça como capitão do Brasil em 1994?|Dunga|Romário|Bebeto|Raí
+Esportes|Qual camisa o Pelé eternizou na Seleção?|10|9|11|7
+Esportes|Qual era o nome de batismo de Pelé?|Edson Arantes do Nascimento|Manoel Francisco dos Santos|Arthur Antunes Coimbra|José Ely de Miranda
+Esportes|Qual era o apelido de Manoel Francisco dos Santos, craque de 1958 e 1962?|Garrincha|Didi|Vavá|Zito
+Esportes|Qual é o nome de batismo do Zico?|Arthur Antunes Coimbra|Edson Arantes|José Ely de Miranda|Sócrates Brasileiro
+Esportes|Por qual clube o Pelé jogou a maior parte da carreira?|Santos|Corinthians|Palmeiras|São Paulo
+Esportes|Em qual clube dos EUA Pelé jogou no fim da carreira?|New York Cosmos|LA Galaxy|Chicago Fire|Miami FC
+Esportes|Qual jogador brasileiro era chamado de "Fenômeno"?|Ronaldo|Romário|Ronaldinho|Rivaldo
+Esportes|Qual jogador era conhecido como "Baixinho" e foi craque da Copa de 1994?|Romário|Bebeto|Zinho|Mazinho
+Esportes|Qual brasileiro foi eleito melhor do mundo pela FIFA em 2007?|Kaká|Ronaldinho|Ronaldo|Rivaldo
+Esportes|Qual brasileiro foi eleito melhor do mundo pela FIFA em 1999?|Rivaldo|Ronaldo|Romário|Kaká
+Esportes|Qual jogadora brasileira foi eleita seis vezes a melhor do mundo pela FIFA?|Marta|Formiga|Cristiane|Sissi
+Esportes|Como se chama o estádio Jornalista Mário Filho, no Rio?|Maracanã|Engenhão|São Januário|Morumbi
+Esportes|Qual é o nome oficial do estádio Castelão, em Fortaleza?|Governador Plácido Castelo|Presidente Vargas|Alcides Santos|Mané Garrincha
+Esportes|Qual é o mascote do Fortaleza Esporte Clube?|Leão|Vovô|Tubarão|Galo
+Esportes|Qual é o mascote do Ceará Sporting Club?|Vovô|Leão|Urubu|Porco
+Esportes|Qual clube brasileiro tem o urubu como mascote?|Flamengo|Vasco|Botafogo|Fluminense
+Esportes|Qual clube tem o porco como mascote?|Palmeiras|Corinthians|Santos|Grêmio
+Esportes|Qual clube é conhecido como "Timão"?|Corinthians|Palmeiras|São Paulo|Santos
+Esportes|Qual clube é conhecido como "Galo" em Belo Horizonte?|Atlético Mineiro|Cruzeiro|América Mineiro|Villa Nova
+Esportes|Qual é o clássico entre Grêmio e Internacional?|Gre-Nal|Fla-Flu|Ba-Vi|Clássico-Rei
+Esportes|Qual clássico é disputado entre Bahia e Vitória?|Ba-Vi|Gre-Nal|Clássico-Rei|Fla-Flu
+Esportes|Como é chamado o clássico entre Fortaleza e Ceará?|Clássico-Rei|Majestoso|Clássico das Multidões|Choque-Rei
+Esportes|Como é chamado o clássico entre Flamengo e Fluminense?|Fla-Flu|Clássico dos Milhões|Clássico-Rei|Derby
+Esportes|Qual piloto brasileiro foi tricampeão de Fórmula 1?|Ayrton Senna|Emerson Fittipaldi|Rubens Barrichello|Felipe Massa
+Esportes|Além de Senna, qual brasileiro foi tricampeão de Fórmula 1?|Nelson Piquet|Emerson Fittipaldi|Rubens Barrichello|Felipe Massa
+Esportes|Quem foi o primeiro brasileiro campeão mundial de Fórmula 1?|Emerson Fittipaldi|Nelson Piquet|Ayrton Senna|José Carlos Pace
+Esportes|Em que ano Ayrton Senna morreu, no GP de San Marino?|1994|1993|1995|1991
+Esportes|Qual é o nome do autódromo de Interlagos?|José Carlos Pace|Ayrton Senna|Nelson Piquet|Emerson Fittipaldi
+Esportes|Em qual cidade foram os Jogos Olímpicos de 2016?|Rio de Janeiro|Londres|Tóquio|São Paulo
+Esportes|De quantos em quantos anos acontecem os Jogos Olímpicos de verão?|4|2|3|5
+Esportes|Quantos anéis tem o símbolo olímpico?|5|4|6|7
+Esportes|Em que país nasceram os Jogos Olímpicos da Antiguidade?|Grécia|Itália|Egito|Turquia
+Esportes|Qual atleta brasileiro ganhou ouro no salto com vara em 2016?|Thiago Braz|Fabiana Murer|Arthur Zanetti|Isaquias Queiroz
+Esportes|Qual ginasta brasileiro foi ouro nas argolas em Londres 2012?|Arthur Zanetti|Diego Hypólito|Arthur Nory|Caio Souza
+Esportes|Qual atleta brasileiro ganhou dois ouros no salto triplo, em 1952 e 1956?|Adhemar Ferreira da Silva|João do Pulo|Nelson Prudêncio|Joaquim Cruz
+Esportes|Qual brasileiro ganhou ouro nos 800 m em Los Angeles 1984?|Joaquim Cruz|Adhemar F. da Silva|Robson Caetano|Vanderlei Cordeiro
+Esportes|Qual maratonista brasileiro foi agarrado por um espectador em Atenas 2004?|Vanderlei Cordeiro de Lima|Joaquim Cruz|Marílson Gomes|Ronaldo da Costa
+Esportes|Qual tenista brasileiro foi três vezes campeão de Roland Garros?|Gustavo Kuerten|Fernando Meligeni|Thomaz Bellucci|Marcelo Melo
+Esportes|Qual era o apelido do tenista Gustavo Kuerten?|Guga|Gugu|Kuka|Tuta
+Esportes|Qual tenista brasileira venceu Wimbledon três vezes em simples?|Maria Esther Bueno|Beatriz Haddad|Gisele Miró|Teliana Pereira
+Esportes|Qual lutador brasileiro foi campeão dos pesos-médios do UFC entre 2006 e 2013?|Anderson Silva|José Aldo|Vitor Belfort|Lyoto Machida
+Esportes|Qual família brasileira é famosa por criar o jiu-jítsu brasileiro?|Gracie|Machida|Nogueira|Belfort
+Esportes|Qual esporte é jogado com raquete e peteca de penas?|Badminton|Tênis|Squash|Pingue-pongue
+Esportes|Em qual esporte se faz um "touchdown"?|Futebol americano|Rúgbi|Beisebol|Hóquei
+Esportes|Em qual esporte se faz um "home run"?|Beisebol|Críquete|Basquete|Golfe
+Esportes|Em qual esporte se usa o termo "strike"?|Boliche|Golfe|Tênis|Vôlei
+Esportes|Em qual esporte existe a jogada chamada "cesta de três pontos"?|Basquete|Handebol|Vôlei|Polo aquático
+Esportes|Quantos jogadores de cada time ficam em quadra no vôlei?|6|5|7|4
+Esportes|Quantos jogadores de cada time ficam em quadra no basquete?|5|6|7|4
+Esportes|Quantos jogadores de cada time ficam em quadra no futsal?|5|6|7|4
+Esportes|Quantos jogadores de cada time ficam em quadra no handebol?|7|6|5|8
+Esportes|Quanto tempo dura uma partida de futebol, sem acréscimos?|90 minutos|80 minutos|100 minutos|60 minutos
+Esportes|Qual a distância de uma maratona?|42,195 km|40 km|21,097 km|50 km
+Esportes|Quantos pontos vale um "try" no rúgbi union?|5|3|6|7
+Esportes|Qual país criou o futebol moderno?|Inglaterra|Brasil|Itália|Escócia
+Esportes|Quem é considerado o pai do futebol no Brasil?|Charles Miller|Oscar Cox|Arthur Friedenreich|Pelé
+Esportes|Em qual país nasceu o vôlei?|Estados Unidos|Japão|Brasil|Rússia
+Esportes|Em qual país nasceu o judô?|Japão|China|Coreia do Sul|Brasil
+Esportes|Em qual país nasceu o taekwondo?|Coreia do Sul|Japão|China|Tailândia
+Esportes|Qual luta brasileira mistura golpes, dança e música?|Capoeira|Jiu-jítsu|Kung fu|Caratê
+Esportes|Qual instrumento comanda a roda de capoeira?|Berimbau|Atabaque|Pandeiro|Agogô
+Esportes|Qual país sediou a Copa do Mundo de 2014?|Brasil|África do Sul|Rússia|Alemanha
+Esportes|Qual país sediou a primeira Copa do Mundo, em 1930?|Uruguai|Brasil|Itália|França
+Esportes|Qual país venceu a primeira Copa do Mundo, em 1930?|Uruguai|Argentina|Brasil|Itália
+Esportes|Qual seleção venceu a Copa do Mundo de 2010?|Espanha|Holanda|Alemanha|Itália
+Esportes|Qual seleção venceu a Copa do Mundo de 2014?|Alemanha|Argentina|Holanda|Brasil
+Esportes|Qual seleção venceu a Copa do Mundo de 2018?|França|Croácia|Bélgica|Inglaterra
+Esportes|Qual seleção venceu a Copa do Mundo de 2022?|Argentina|França|Croácia|Marrocos
+Esportes|Em qual país foi disputada a Copa do Mundo de 2022?|Catar|Rússia|Emirados Árabes|Arábia Saudita
+Esportes|Qual jogador argentino fez o gol com "a mão de Deus" em 1986?|Maradona|Messi|Batistuta|Kempes
+Esportes|Qual seleção tem o apelido de "Azzurra"?|Itália|França|Uruguai|Argentina
+Esportes|Qual seleção é conhecida como "Celeste"?|Uruguai|Argentina|Itália|Grécia
+Esportes|Qual país europeu é chamado de "Laranja Mecânica" no futebol?|Holanda|Bélgica|Dinamarca|Portugal
+Esportes|Qual é o principal torneio de clubes da América do Sul?|Libertadores|Sul-Americana|Recopa|Copa América
+Esportes|Qual é o torneio de seleções da América do Sul?|Copa América|Libertadores|Eurocopa|Copa Ouro
+Esportes|Qual clube brasileiro venceu a primeira Libertadores de um time do país, em 1962?|Santos|Cruzeiro|Flamengo|São Paulo
+Esportes|Qual piloto venceu as 500 Milhas de Indianápolis duas vezes, em 1989 e 1993?|Emerson Fittipaldi|Hélio Castroneves|Gil de Ferran|Tony Kanaan
+Esportes|Qual nadador brasileiro foi ouro nos 50 m livre em Pequim 2008?|César Cielo|Gustavo Borges|Thiago Pereira|Bruno Fratus
+Esportes|Qual canoísta baiano ganhou três medalhas no Rio 2016?|Isaquias Queiroz|Erlon Silva|Arthur Zanetti|Thiago Braz
+Esportes|Qual skatista brasileira ganhou prata em Tóquio aos 13 anos?|Rayssa Leal|Letícia Bufoni|Pamela Rosa|Dora Varella
+Esportes|Qual surfista brasileiro foi o primeiro campeão olímpico do surfe, em 2021?|Italo Ferreira|Gabriel Medina|Filipe Toledo|Adriano de Souza
+Esportes|Qual surfista brasileiro foi o primeiro campeão mundial do país, em 2014?|Gabriel Medina|Italo Ferreira|Adriano de Souza|Filipe Toledo
+Esportes|Qual ginasta brasileira ganhou ouro no salto em Tóquio 2020?|Rebeca Andrade|Daiane dos Santos|Flávia Saraiva|Jade Barbosa
+Esportes|Qual ginasta brasileira ficou famosa pelo salto "Dos Santos"?|Daiane dos Santos|Rebeca Andrade|Daniele Hypólito|Jade Barbosa
+Esportes|Em qual esporte se usa um taco para acertar a bola num buraco?|Golfe|Críquete|Hóquei|Polo
+Esportes|No xadrez, qual peça só anda na diagonal?|Bispo|Torre|Cavalo|Rei
+Esportes|No xadrez, qual peça se move em "L"?|Cavalo|Bispo|Torre|Dama
+Esportes|No tênis, como se chama o ponto zero?|Love|Deuce|Ace|Set
+Esportes|Qual o nome do saque que o adversário não consegue tocar, no tênis?|Ace|Lob|Smash|Voleio
+Esportes|Qual brasileiro é o "Rei do Futebol"?|Pelé|Garrincha|Zico|Romário
+Esportes|Quantos gols oficiais o Pelé marcou em Copas do Mundo?|12|8|15|10
+Arte|Quem pintou o quadro "Abaporu"?|Tarsila do Amaral|Anita Malfatti|Di Cavalcanti|Candido Portinari
+Arte|Quem pintou "Operários", de 1933?|Tarsila do Amaral|Portinari|Di Cavalcanti|Lasar Segall
+Arte|Quem pintou a série "Retirantes", de 1944?|Candido Portinari|Tarsila do Amaral|Di Cavalcanti|Anita Malfatti
+Arte|Quem pintou os painéis "Guerra e Paz" da sede da ONU?|Candido Portinari|Di Cavalcanti|Tarsila do Amaral|Romero Britto
+Arte|Em que ano aconteceu a Semana de Arte Moderna em São Paulo?|1922|1930|1912|1945
+Arte|Em qual teatro aconteceu a Semana de Arte Moderna de 1922?|Theatro Municipal de SP|Teatro Amazonas|Teatro da Paz|Theatro Municipal do RJ
+Arte|Qual escultor barroco mineiro era conhecido como Aleijadinho?|Antônio Francisco Lisboa|Mestre Valentim|Manuel da Costa Ataíde|Victor Brecheret
+Arte|Em qual cidade estão os 12 profetas esculpidos por Aleijadinho?|Congonhas|Ouro Preto|Mariana|Sabará
+Arte|Quem projetou o Congresso Nacional e a Catedral de Brasília?|Oscar Niemeyer|Lúcio Costa|Burle Marx|Lina Bo Bardi
+Arte|Qual arquiteta projetou o prédio do MASP?|Lina Bo Bardi|Tomie Ohtake|Zaha Hadid|Lygia Clark
+Arte|Qual paisagista criou o calçadão de ondas de Copacabana?|Burle Marx|Oscar Niemeyer|Lúcio Costa|Glaziou
+Arte|Quem pintou "A Noite Estrelada"?|Vincent van Gogh|Claude Monet|Pablo Picasso|Salvador Dalí
+Arte|Quem pintou "Guernica"?|Pablo Picasso|Salvador Dalí|Joan Miró|Diego Velázquez
+Arte|Quem pintou "A Persistência da Memória", com relógios derretidos?|Salvador Dalí|René Magritte|Pablo Picasso|Joan Miró
+Arte|Quem pintou o teto da Capela Sistina?|Michelangelo|Leonardo da Vinci|Rafael|Botticelli
+Arte|Quem pintou "O Nascimento de Vênus"?|Botticelli|Michelangelo|Rafael|Ticiano
+Arte|Quem pintou "A Última Ceia" em Milão?|Leonardo da Vinci|Michelangelo|Rafael|Caravaggio
+Arte|Quem pintou "O Grito"?|Edvard Munch|Van Gogh|Gustav Klimt|Paul Cézanne
+Arte|Quem pintou "O Beijo", com muito dourado?|Gustav Klimt|Edvard Munch|Auguste Rodin|Egon Schiele
+Arte|Quem pintou a série "Ninfeias"?|Claude Monet|Édouard Manet|Renoir|Degas
+Arte|Quem pintou "Moça com Brinco de Pérola"?|Johannes Vermeer|Rembrandt|Rubens|Van Eyck
+Arte|Quem esculpiu "O Pensador"?|Auguste Rodin|Michelangelo|Bernini|Donatello
+Arte|Quem esculpiu a estátua de "Davi" em Florença, em mármore, entre 1501 e 1504?|Michelangelo|Donatello|Bernini|Rodin
+Arte|Em qual museu fica a Mona Lisa?|Louvre|Prado|Uffizi|Museu Britânico
+Arte|Qual movimento artístico teve Monet como um dos fundadores?|Impressionismo|Cubismo|Surrealismo|Barroco
+Arte|Qual movimento artístico é associado a Picasso e Braque?|Cubismo|Impressionismo|Surrealismo|Expressionismo
+Arte|Qual movimento artístico é associado a Salvador Dalí?|Surrealismo|Cubismo|Impressionismo|Renascimento
+Arte|Qual artista pop pintou as latas de sopa Campbell?|Andy Warhol|Roy Lichtenstein|Keith Haring|Jackson Pollock
+Arte|Quem escreveu "Memórias Póstumas de Brás Cubas"?|Machado de Assis|Aluísio Azevedo|José de Alencar|Lima Barreto
+Arte|Qual personagem de Machado de Assis tem "olhos de ressaca"?|Capitu|Iracema|Lucíola|Aurélia
+Arte|Quem escreveu "Iracema"?|José de Alencar|Machado de Assis|Gonçalves Dias|Castro Alves
+Arte|"Iracema" é um anagrama de qual palavra?|América|Ceará|Maria|Tapera
+Arte|Quem escreveu "O Guarani"?|José de Alencar|Bernardo Guimarães|Machado de Assis|Gonçalves Dias
+Arte|Quem escreveu "O Cortiço"?|Aluísio Azevedo|Machado de Assis|Raul Pompeia|Lima Barreto
+Arte|Quem escreveu "Vidas Secas"?|Graciliano Ramos|Rachel de Queiroz|Jorge Amado|José Lins do Rego
+Arte|Qual é o nome da cachorra de "Vidas Secas"?|Baleia|Pipoca|Lassie|Pituca
+Arte|Quem escreveu "O Quinze", sobre a seca de 1915 no Ceará?|Rachel de Queiroz|Graciliano Ramos|José de Alencar|Jorge Amado
+Arte|Qual foi a primeira mulher eleita para a Academia Brasileira de Letras?|Rachel de Queiroz|Clarice Lispector|Cecília Meireles|Lygia Fagundes Telles
+Arte|Quem escreveu "Grande Sertão: Veredas"?|Guimarães Rosa|Graciliano Ramos|Euclides da Cunha|Jorge Amado
+Arte|Quem escreveu "A Hora da Estrela"?|Clarice Lispector|Rachel de Queiroz|Cecília Meireles|Lygia Fagundes Telles
+Arte|Quem escreveu "Capitães da Areia"?|Jorge Amado|Graciliano Ramos|Érico Veríssimo|José Lins do Rego
+Arte|Quem escreveu "Gabriela, Cravo e Canela"?|Jorge Amado|Érico Veríssimo|Nelson Rodrigues|Dias Gomes
+Arte|Quem escreveu "Macunaíma"?|Mário de Andrade|Oswald de Andrade|Monteiro Lobato|Manuel Bandeira
+Arte|Como Macunaíma é descrito no livro de Mário de Andrade?|Herói sem caráter|Rei do sertão|Guerreiro do sol|Filho da mata
+Arte|Quem escreveu o "Manifesto Antropófago"?|Oswald de Andrade|Mário de Andrade|Tarsila do Amaral|Menotti del Picchia
+Arte|Quem escreveu o poema "No Meio do Caminho" (tinha uma pedra)?|Carlos Drummond de Andrade|Manuel Bandeira|Vinicius de Moraes|Mario Quintana
+Arte|Quem escreveu "Vou-me Embora pra Pasárgada"?|Manuel Bandeira|Carlos Drummond|Cecília Meireles|Olavo Bilac
+Arte|Quem escreveu "Canção do Exílio" ("Minha terra tem palmeiras")?|Gonçalves Dias|Castro Alves|Olavo Bilac|Álvares de Azevedo
+Arte|Qual poeta é conhecido como "o poeta dos escravos"?|Castro Alves|Gonçalves Dias|Álvares de Azevedo|Cruz e Sousa
+Arte|Quem escreveu "O Navio Negreiro"?|Castro Alves|Gonçalves Dias|Olavo Bilac|Fagundes Varela
+Arte|Quem escreveu "Morte e Vida Severina"?|João Cabral de Melo Neto|Ariano Suassuna|Manuel Bandeira|Ferreira Gullar
+Arte|Quem escreveu "O Auto da Compadecida"?|Ariano Suassuna|João Cabral|Nelson Rodrigues|Dias Gomes
+Arte|Quem escreveu "O Sítio do Picapau Amarelo"?|Monteiro Lobato|Ziraldo|Ruth Rocha|Maurício de Sousa
+Arte|Quem criou "O Menino Maluquinho"?|Ziraldo|Maurício de Sousa|Monteiro Lobato|Ruth Rocha
+Arte|Quem escreveu "Meu Pé de Laranja Lima"?|José Mauro de Vasconcelos|Monteiro Lobato|Érico Veríssimo|Ziraldo
+Arte|Quem escreveu "O Alquimista"?|Paulo Coelho|Jorge Amado|Fernando Sabino|Luis Fernando Verissimo
+Arte|Quem escreveu "O Tempo e o Vento"?|Érico Veríssimo|Jorge Amado|Machado de Assis|Graciliano Ramos
+Arte|Qual autor brasileiro escreveu a peça "Vestido de Noiva"?|Nelson Rodrigues|Ariano Suassuna|Dias Gomes|Plínio Marcos
+Arte|Qual escritor português ganhou o Nobel de Literatura em 1998?|José Saramago|Fernando Pessoa|Eça de Queirós|Camões
+Arte|Quem escreveu "Os Lusíadas"?|Luís de Camões|Fernando Pessoa|Eça de Queirós|José Saramago
+Arte|Qual poeta português criou heterônimos como Alberto Caeiro?|Fernando Pessoa|Luís de Camões|José Saramago|Florbela Espanca
+Arte|Quem escreveu "Dom Quixote"?|Miguel de Cervantes|Gabriel García Márquez|Lope de Vega|Jorge Luis Borges
+Arte|Quem escreveu "Romeu e Julieta"?|William Shakespeare|Charles Dickens|Molière|Oscar Wilde
+Arte|Quem escreveu "Cem Anos de Solidão"?|Gabriel García Márquez|Jorge Luis Borges|Pablo Neruda|Mario Vargas Llosa
+Arte|Quem escreveu "O Pequeno Príncipe"?|Antoine de Saint-Exupéry|Victor Hugo|Júlio Verne|Alexandre Dumas
+Arte|Quem escreveu "Os Miseráveis"?|Victor Hugo|Alexandre Dumas|Balzac|Gustave Flaubert
+Arte|Quem escreveu "Vinte Mil Léguas Submarinas"?|Júlio Verne|H. G. Wells|Victor Hugo|Arthur Conan Doyle
+Arte|Quem criou o detetive Sherlock Holmes?|Arthur Conan Doyle|Agatha Christie|Edgar Allan Poe|Charles Dickens
+Arte|Quem escreveu "Harry Potter"?|J. K. Rowling|J. R. R. Tolkien|C. S. Lewis|Rick Riordan
+Arte|Quem escreveu "O Senhor dos Anéis"?|J. R. R. Tolkien|C. S. Lewis|J. K. Rowling|George R. R. Martin
+Arte|Quem escreveu "A Divina Comédia"?|Dante Alighieri|Petrarca|Boccaccio|Maquiavel
+Arte|Quem compôs "Bachianas Brasileiras"?|Heitor Villa-Lobos|Carlos Gomes|Chiquinha Gonzaga|Tom Jobim
+Arte|Qual compositor brasileiro escreveu a ópera "O Guarani"?|Carlos Gomes|Villa-Lobos|Chiquinha Gonzaga|Ernesto Nazareth
+Arte|Qual compositora fez a marchinha "Ó Abre Alas", de 1899?|Chiquinha Gonzaga|Dolores Duran|Carmen Miranda|Dona Ivone Lara
+Arte|Quem compôs a "Nona Sinfonia" com a "Ode à Alegria"?|Beethoven|Mozart|Bach|Tchaikovsky
+Arte|Quem compôs o balé "O Lago dos Cisnes"?|Tchaikovsky|Stravinsky|Chopin|Vivaldi
+Arte|Quem compôs "As Quatro Estações"?|Vivaldi|Bach|Haendel|Mozart
+Arte|Qual compositor austríaco escreveu "A Flauta Mágica"?|Mozart|Beethoven|Haydn|Schubert
+Arte|Quantas cordas tem um violão comum?|6|4|5|7
+Arte|Quantas cordas tem um cavaquinho?|4|5|6|3
+Arte|Qual viola brasileira costuma ter dez cordas em cinco pares?|Viola caipira|Cavaquinho|Bandolim|Rabeca
+Arte|Qual dança pernambucana usa sombrinhas coloridas?|Frevo|Samba|Forró|Axé
+Arte|Qual ritmo nordestino é tocado com sanfona, zabumba e triângulo?|Forró|Frevo|Samba|Bossa nova
+Arte|Qual festa folclórica do Maranhão tem um boi como personagem central?|Bumba-meu-boi|Frevo|Ciranda|Maracatu
+Arte|Quais são as cores dos bois-bumbás de Parintins?|Azul e vermelho|Verde e amarelo|Preto e branco|Azul e branco
+Arte|Quais são os dois bois do Festival de Parintins?|Garantido e Caprichoso|Estrela e Brilhante|Azul e Encarnado|Mimoso e Bonito
+Arte|Qual arte popular nordestina é feita em xilogravura e vendida em folhetos?|Literatura de cordel|Repente|Mamulengo|Renda de bilro
+Arte|Qual artista pernambucano é famoso pelos bonecos de barro de Caruaru?|Mestre Vitalino|J. Borges|Mestre Salu|Mestre Galdino
+Arte|Qual é o nome do teatro de bonecos típico de Pernambuco?|Mamulengo|Fantoche|Marionete|Ventríloquo
+Arte|Qual renda artesanal é feita com bilros e almofada no Nordeste?|Renda de bilro|Crochê|Tricô|Bordado
+Arte|Qual fotógrafo brasileiro é famoso pela série "Gênesis" e "Êxodos"?|Sebastião Salgado|Vik Muniz|Pierre Verger|Araquém Alcântara
+Arte|Qual artista brasileiro protagoniza o documentário "Lixo Extraordinário"?|Vik Muniz|Romero Britto|Os Gêmeos|Sebastião Salgado
+Arte|Como são conhecidos os irmãos grafiteiros paulistanos Otavio e Gustavo Pandolfo?|Os Gêmeos|Os Irmãos Grafite|Dupla Paulista|Os Pandolfos
+Arte|Qual artista modernista pintou "A Boba"?|Anita Malfatti|Tarsila do Amaral|Di Cavalcanti|Lasar Segall
+Arte|Qual pintor é famoso por mulatas e cenas de samba no modernismo?|Di Cavalcanti|Portinari|Volpi|Guignard
+Arte|Qual pintor ficou famoso pelas "bandeirinhas" de festa junina?|Alfredo Volpi|Di Cavalcanti|Portinari|Tarsila do Amaral
+Arte|Quem pintou o quadro "Independência ou Morte!"?|Pedro Américo|Victor Meirelles|Almeida Júnior|Portinari
+Arte|Quem pintou "A Primeira Missa no Brasil"?|Victor Meirelles|Pedro Américo|Debret|Almeida Júnior
+Arte|Qual pintor francês retratou o cotidiano do Rio no século 19?|Jean-Baptiste Debret|Claude Monet|Paul Gauguin|Eugène Delacroix
+Arte|Quem pintou "Caipira Picando Fumo"?|Almeida Júnior|Pedro Américo|Victor Meirelles|Portinari
+Arte|Quem pintou "Os Girassóis"?|Van Gogh|Monet|Gauguin|Cézanne
+Arte|Qual pintor holandês pintou "A Ronda Noturna"?|Rembrandt|Vermeer|Van Gogh|Rubens
+Arte|Qual pintora mexicana é famosa pelos autorretratos com flores?|Frida Kahlo|Tarsila do Amaral|Georgia O'Keeffe|Remedios Varo
+Entretenimento|Quem é conhecido como o "Rei do Baião"?|Luiz Gonzaga|Dominguinhos|Jackson do Pandeiro|Elba Ramalho
+Entretenimento|Qual é a música mais famosa de Luiz Gonzaga, sobre a seca?|Asa Branca|Xote das Meninas|Assum Preto|Olha pro Céu
+Entretenimento|Quem é conhecido como o "Rei" da música brasileira, da Jovem Guarda?|Roberto Carlos|Erasmo Carlos|Wanderléa|Jerry Adriani
+Entretenimento|Quem era chamado de "Tremendão" na Jovem Guarda?|Erasmo Carlos|Roberto Carlos|Ronnie Von|Wanderley Cardoso
+Entretenimento|Qual cantora era chamada de "Ternurinha" na Jovem Guarda?|Wanderléa|Rita Lee|Elis Regina|Celly Campello
+Entretenimento|Quem compôs "Garota de Ipanema" com Vinicius de Moraes?|Tom Jobim|João Gilberto|Chico Buarque|Toquinho
+Entretenimento|Qual gênero musical surgiu no Rio no fim dos anos 1950 com João Gilberto?|Bossa nova|Samba-enredo|MPB|Tropicália
+Entretenimento|Qual movimento musical teve Caetano Veloso e Gilberto Gil à frente?|Tropicália|Jovem Guarda|Bossa nova|Mangue beat
+Entretenimento|Qual movimento musical do Recife teve Chico Science à frente?|Manguebeat|Tropicália|Axé|Brega funk
+Entretenimento|Qual cantora gaúcha era chamada de "Pimentinha"?|Elis Regina|Gal Costa|Maria Bethânia|Clara Nunes
+Entretenimento|Qual cantora ficou famosa como "a pequena notável" e foi para Hollywood?|Carmen Miranda|Elis Regina|Dalva de Oliveira|Ângela Maria
+Entretenimento|Qual era o apelido de Raul Seixas?|Maluco Beleza|Rei do Rock|Tremendão|Poeta
+Entretenimento|Qual banda gravou "Pais e Filhos" e "Faroeste Caboclo"?|Legião Urbana|Titãs|Paralamas do Sucesso|Barão Vermelho
+Entretenimento|Quem era o vocalista da Legião Urbana?|Renato Russo|Cazuza|Herbert Vianna|Dinho Ouro Preto
+Entretenimento|Qual cantor foi vocalista do Barão Vermelho no início?|Cazuza|Frejat|Renato Russo|Lobão
+Entretenimento|Qual banda cantava "Pelados em Santos"?|Mamonas Assassinas|Raimundos|Ultraje a Rigor|Os Paralamas
+Entretenimento|Qual banda de Brasília cantava "Mulher de Fases"?|Raimundos|Capital Inicial|Legião Urbana|Charlie Brown Jr.
+Entretenimento|Qual era o vocalista do Charlie Brown Jr.?|Chorão|Champignon|Marcelo D2|Dinho
+Entretenimento|Qual cantor cearense compôs "Como Nossos Pais"?|Belchior|Fagner|Ednardo|Amelinha
+Entretenimento|Qual cantor cearense gravou "Mucuripe" e "Borbulhas de Amor"?|Fagner|Belchior|Ednardo|Waldonys
+Entretenimento|Quem compôs "Pavão Mysteriozo", tema da novela "Saramandaia"?|Ednardo|Belchior|Fagner|Alceu Valença
+Entretenimento|Qual cantor pernambucano gravou "Anunciação" e "Morena Tropicana"?|Alceu Valença|Geraldo Azevedo|Lenine|Zé Ramalho
+Entretenimento|Qual cantor paraibano gravou "Admirável Gado Novo"?|Zé Ramalho|Alceu Valença|Geraldo Azevedo|Chico César
+Entretenimento|Qual cantora baiana gravou "Sorte Grande", a do "Poeira"?|Ivete Sangalo|Daniela Mercury|Claudia Leitte|Margareth Menezes
+Entretenimento|Qual cantora baiana lançou "O Canto da Cidade" em 1992?|Daniela Mercury|Ivete Sangalo|Margareth Menezes|Sarajane
+Entretenimento|Qual banda baiana Ivete Sangalo liderava antes da carreira solo?|Banda Eva|Chiclete com Banana|Asa de Águia|Timbalada
+Entretenimento|Qual grupo baiano é famoso pelos tambores e por Michael Jackson em 1996?|Olodum|Ilê Aiyê|Timbalada|Filhos de Gandhy
+Entretenimento|Qual dupla sertaneja gravou "É o Amor"?|Zezé Di Camargo e Luciano|Chitãozinho e Xororó|Leandro e Leonardo|Bruno e Marrone
+Entretenimento|Qual dupla sertaneja gravou "Evidências" em 1990?|Chitãozinho e Xororó|Zezé Di Camargo e Luciano|Leandro e Leonardo|João Paulo e Daniel
+Entretenimento|Qual cantora ficou conhecida como "Rainha da Sofrência"?|Marília Mendonça|Maiara e Maraisa|Naiara Azevedo|Paula Fernandes
+Entretenimento|Qual é a festa popular em que escolas de samba desfilam no Sambódromo?|Carnaval|Festa junina|Réveillon|Círio de Nazaré
+Entretenimento|Quem projetou o Sambódromo do Rio de Janeiro?|Oscar Niemeyer|Lúcio Costa|Burle Marx|Lina Bo Bardi
+Entretenimento|Quais são as cores da Estação Primeira de Mangueira?|Verde e rosa|Azul e branco|Vermelho e branco|Verde e branco
+Entretenimento|Qual festa religiosa reúne milhões de pessoas em Belém em outubro?|Círio de Nazaré|Lavagem do Bonfim|Festa do Divino|Romaria de Juazeiro
+Entretenimento|Quem criou a Turma da Mônica?|Maurício de Sousa|Ziraldo|Monteiro Lobato|Henfil
+Entretenimento|Qual personagem da Turma da Mônica troca o "r" pelo "l"?|Cebolinha|Cascão|Chico Bento|Magali
+Entretenimento|Qual personagem da Turma da Mônica tem medo de água?|Cascão|Cebolinha|Franjinha|Chico Bento
+Entretenimento|Qual personagem da Turma da Mônica é comilona e adora melancia?|Magali|Mônica|Marina|Rosinha
+Entretenimento|Como se chama o coelho de pelúcia da Mônica?|Sansão|Mingau|Bidu|Floquinho
+Entretenimento|Qual é o nome do cachorro do Cebolinha?|Floquinho|Bidu|Mingau|Sansão
+Entretenimento|Como se chama a boneca de pano falante do Sítio do Picapau Amarelo?|Emília|Narizinho|Cuca|Dona Benta
+Entretenimento|Qual personagem do Sítio é um sabugo de milho?|Visconde de Sabugosa|Rabicó|Pedrinho|Saci
+Entretenimento|Qual vilã do Sítio do Picapau Amarelo tem cabeça de jacaré?|Cuca|Iara|Emília|Tia Nastácia
+Entretenimento|Qual apresentadora comandava o "Xou da Xuxa"?|Xuxa|Angélica|Eliana|Mara Maravilha
+Entretenimento|Qual era o nome das assistentes de palco da Xuxa?|Paquitas|Chacretes|Bonecas|Garotas Xuxa
+Entretenimento|Qual apresentador era conhecido como "Velho Guerreiro"?|Chacrinha|Silvio Santos|Faustão|Raul Gil
+Entretenimento|Qual apresentador fundou o SBT?|Silvio Santos|Chacrinha|Gugu Liberato|Fausto Silva
+Entretenimento|Qual programa de Fausto Silva ficou décadas nas tardes de domingo da Globo?|Domingão do Faustão|Domingo Legal|Caldeirão|Fantástico
+Entretenimento|Qual programa da Globo é chamado de "o show da vida"?|Fantástico|Jornal Nacional|Globo Repórter|Mais Você
+Entretenimento|Qual telejornal brasileiro estreou em 1969 e é o mais antigo em rede?|Jornal Nacional|Jornal da Globo|Jornal Hoje|SBT Brasil
+Entretenimento|Qual foi a primeira emissora de TV do Brasil, inaugurada em 1950?|TV Tupi|TV Globo|TV Record|TV Excelsior
+Entretenimento|Qual reality show da Globo tem uma casa vigiada por câmeras?|Big Brother Brasil|No Limite|A Fazenda|Casa dos Artistas
+Entretenimento|Qual programa infantil da TV Cultura tinha o Nino e um castelo?|Castelo Rá-Tim-Bum|Cocoricó|X-Tudo|Glub Glub
+Entretenimento|Qual programa da TV Cultura se passava numa fazenda com o boneco Júlio?|Cocoricó|Castelo Rá-Tim-Bum|Rá-Tim-Bum|Sítio do Picapau
+Entretenimento|Qual seriado mexicano tem um menino que mora num barril?|Chaves|Chapolin|Carrossel|Chiquititas
+Entretenimento|Quem cobra o aluguel na vila do Chaves?|Seu Barriga|Seu Madruga|Professor Girafales|Nhonho
+Entretenimento|Qual herói de Roberto Bolaños usa uma marreta biônica?|Chapolin Colorado|Chaves|Super Sam|Homem-Aranha
+Entretenimento|Qual novela tem os personagens Sinhozinho Malta e Viúva Porcina?|Roque Santeiro|Tieta|Saramandaia|O Bem-Amado
+Entretenimento|Em qual novela Odete Roitman foi assassinada?|Vale Tudo|Roque Santeiro|Tieta|Avenida Brasil
+Entretenimento|Qual novela de 2012 tinha a vilã Carminha?|Avenida Brasil|Fina Estampa|Cheias de Charme|Amor à Vida
+Entretenimento|Qual novela tem a personagem Odorico Paraguaçu, prefeito de Sucupira?|O Bem-Amado|Roque Santeiro|Saramandaia|Tieta
+Entretenimento|Qual novela de 1990 se passava no Pantanal com Juma Marruá?|Pantanal|Renascer|O Rei do Gado|Terra Nostra
+Entretenimento|Qual novela tinha a escrava Isaura como protagonista?|A Escrava Isaura|Sinhá Moça|Xica da Silva|Terra Nostra
+Entretenimento|Qual atriz interpretou Tieta na novela de 1989?|Betty Faria|Regina Duarte|Sônia Braga|Glória Pires
+Entretenimento|Qual escritor criou "Tieta do Agreste", que virou novela?|Jorge Amado|Dias Gomes|Aguinaldo Silva|Janete Clair
+Entretenimento|Qual filme brasileiro de 2002 se passa numa favela carioca e tem Zé Pequeno?|Cidade de Deus|Tropa de Elite|Carandiru|Central do Brasil
+Entretenimento|Qual filme brasileiro tem o capitão Nascimento como protagonista?|Tropa de Elite|Cidade de Deus|Bacurau|Carandiru
+Entretenimento|Qual atriz brasileira foi indicada ao Oscar por "Central do Brasil"?|Fernanda Montenegro|Fernanda Torres|Glória Pires|Marília Pêra
+Entretenimento|Qual filme brasileiro ganhou o Oscar de filme internacional em 2025?|Ainda Estou Aqui|Central do Brasil|Cidade de Deus|O Pagador de Promessas
+Entretenimento|Qual filme brasileiro ganhou a Palma de Ouro em Cannes em 1962?|O Pagador de Promessas|Vidas Secas|Deus e o Diabo|Central do Brasil
+Entretenimento|Qual personagem é o amigo inseparável de João Grilo no "O Auto da Compadecida"?|Chicó|Zé Pequeno|Tonho|Severino
+Entretenimento|Qual grupo humorístico tinha Didi, Dedé, Mussum e Zacarias?|Os Trapalhões|Casseta & Planeta|Porta dos Fundos|Hermes e Renato
+Entretenimento|Qual é o sobrenome mais famoso do personagem Didi, de Renato Aragão?|Mocó|Pereira|Silva|Santos
+Entretenimento|Qual humorístico da Globo tinha os personagens Caco Antibes e Magda?|Sai de Baixo|Zorra Total|Os Trapalhões|A Grande Família
+Entretenimento|Qual humorista cearense criou o personagem Professor Raimundo?|Chico Anysio|Renato Aragão|Tom Cavalcante|Falcão
+Entretenimento|Qual humorista cearense é conhecido como Didi?|Renato Aragão|Chico Anysio|Tom Cavalcante|Tiririca
+Entretenimento|Qual é o nome do camundongo mais famoso da Disney?|Mickey|Jerry|Pateta|Speedy
+Entretenimento|Qual é o nome do papagaio brasileiro criado pela Disney nos anos 1940?|Zé Carioca|Louro José|Pena Branca|Panchito
+Entretenimento|Qual era o nome do papagaio que acompanhava Ana Maria Braga?|Louro José|Zé Carioca|Blu|Loro
+Entretenimento|Qual animação de 2011 tem a ararinha-azul Blu no Rio?|Rio|Madagascar|Zootopia|Procurando Nemo
+Entretenimento|Em "Procurando Nemo", qual é a espécie do Nemo?|Peixe-palhaço|Peixe-cirurgião|Baiacu|Tubarão
+Entretenimento|Qual é o nome da peixinha esquecida de "Procurando Nemo"?|Dory|Ariel|Marlin|Nala
+Entretenimento|Qual é o nome do leão protagonista de "O Rei Leão"?|Simba|Mufasa|Scar|Nala
+Entretenimento|Qual é o nome do boneco cowboy de "Toy Story"?|Woody|Buzz|Jessie|Rex
+Entretenimento|Qual personagem de "Toy Story" diz "Ao infinito e além"?|Buzz Lightyear|Woody|Rex|Slinky
+Entretenimento|Qual é o nome do ogro verde de um famoso filme de 2001?|Shrek|Hulk|Fiona|Burro
+Entretenimento|Em "Frozen", qual é o nome da irmã de Anna com poderes de gelo?|Elsa|Olaf|Ariel|Moana
+Entretenimento|Qual é o nome do boneco de neve de "Frozen"?|Olaf|Sven|Kristoff|Hans
+Entretenimento|Qual super-herói é conhecido como "Homem de Aço"?|Super-Homem|Batman|Homem de Ferro|Flash
+Entretenimento|Qual é a identidade secreta do Batman?|Bruce Wayne|Clark Kent|Peter Parker|Tony Stark
+Entretenimento|Qual é a identidade secreta do Homem-Aranha?|Peter Parker|Bruce Wayne|Clark Kent|Steve Rogers
+Entretenimento|Qual herói usa um martelo chamado Mjölnir?|Thor|Hulk|Capitão América|Homem de Ferro
+Entretenimento|Qual é o nome do encanador de boné vermelho da Nintendo?|Mario|Luigi|Wario|Sonic
+Entretenimento|Qual é o nome do ouriço azul da Sega?|Sonic|Tails|Knuckles|Mario
+Entretenimento|Qual é o Pokémon amarelo e elétrico do Ash?|Pikachu|Charmander|Bulbasaur|Squirtle
+Entretenimento|Em qual jogo se constroem mundos com blocos quadrados?|Minecraft|Roblox|Fortnite|Tetris
+Entretenimento|Qual famoso jogo russo tem peças que caem e formam linhas?|Tetris|Pac-Man|Snake|Arkanoid
+Entretenimento|Qual jogo dos anos 1980 tem um personagem amarelo que come pastilhas?|Pac-Man|Space Invaders|Donkey Kong|Frogger
+Entretenimento|Em "Harry Potter", qual é o nome da escola de magia?|Hogwarts|Nárnia|Beauxbatons|Durmstrang
+Entretenimento|Qual banda inglesa tinha John, Paul, George e Ringo?|The Beatles|Rolling Stones|Queen|The Who
+Entretenimento|Quem é conhecido como o "Rei do Pop"?|Michael Jackson|Elvis Presley|Prince|Freddie Mercury
+Entretenimento|Quem é conhecido como o "Rei do Rock"?|Elvis Presley|Michael Jackson|Chuck Berry|Mick Jagger
+Entretenimento|Qual era o vocalista da banda Queen?|Freddie Mercury|Mick Jagger|Bono|Axl Rose
+Entretenimento|Qual festival de música começou no Rio de Janeiro em 1985?|Rock in Rio|Lollapalooza|Woodstock|Hollywood Rock

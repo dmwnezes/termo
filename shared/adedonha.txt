@@ -19,3 +19,25 @@ Meio de transporte
 Flor ou planta
 Personagem
 Música ou cantor
+Doce ou sobremesa
+Bebida
+Peça de roupa
+Material escolar
+Brinquedo
+Super-herói
+Novela
+Programa de TV
+Desenho animado
+Adjetivo
+Coisa que tem no banheiro
+Ferramenta
+País
+Capital
+Inseto
+Ave
+Peixe
+Comida típica brasileira
+Apelido
+Mascote
+Sobrenome
+Coisa que tem no quarto
