@@ -32,9 +32,14 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "rev_appwins", "rev_userwins", "rev_played", "def_best", "def_right", "syn_best",
             "intr_played", "intr_best", "intr_right", "ort_played", "ort_best", "ort_right", "ant_best", "mestre_played", "mestre_best", "mestre_right", "mp_played", "mp_won", "sa_best", "sa_tricks",
             "arch_played", "arch_won", "alldone_days",
+            "trivia_won", "trivia_best", "trivia_right",
+            "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
-        val LOWER_IS_BETTER = setOf("ws_best", "ws_inf_best")
+        val LOWER_IS_BETTER = setOf(
+            "ws_best", "ws_inf_best",
+            "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
+        )
     }
 }
 
@@ -68,6 +73,9 @@ object Achievements {
             a("🕵️", "Detetive", "Faça 10 pontos no Intruso", r["intr_best"], 10),
             a("✍️", "Escrita impecável", "Faça 20 pontos no Certo ou Errado", r["ort_best"], 20),
             a("👑", "Obediente", "Faça 15 pontos no Mestre Mandou", r["mestre_best"], 15),
+            a("🧠", "Sabichão", "Ganhe 1 partida de Trivia (as 6 medalhas)", r["trivia_won"], 1),
+            a("📚", "Enciclopédia", "Acerte 100 perguntas na Trivia", r["trivia_right"], 100),
+            a("🃏", "Memória de elefante", "Termine a Memória no Difícil", if (r["mem_best_dificil"] > 0) 1 else 0, 1),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
             a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),

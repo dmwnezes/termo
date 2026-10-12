@@ -57,6 +57,9 @@ object AppGraph {
     /** Temas do Caça-Palavras Infinito: os do dia + os extras. */
     lateinit var themesInfinite: List<SearchTheme>
         private set
+    /** Perguntas da Trivia (shared/trivia.txt). */
+    lateinit var trivia: List<com.dmwnezes.palavreiro.game.TriviaQ>
+        private set
     /** Significado de cada palavra do Termo (chave sem acento). */
     lateinit var meanings: Map<String, String>
         private set
@@ -89,6 +92,7 @@ object AppGraph {
         QuizData.synonyms(asset("sinonimos.txt")).let { (p, f) -> synonyms = p; families = f }
         QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
+        trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
         mestre = com.dmwnezes.palavreiro.game.MestreData(connections, connFamilies, synonyms, families, antonyms, antonymFamilies)
         ready = true
     }

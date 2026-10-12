@@ -262,6 +262,8 @@ fun PalavreiroApp() {
                         Dest.INTRUSO -> IntruderScreen(AppGraph.connections, AppGraph.connFamilies, store, AppGraph.feedback, back)
                         Dest.ORTOGRAFIA -> SpellingScreen(AppGraph.spelling, store, AppGraph.feedback, back)
                         Dest.MESTRE -> com.dmwnezes.palavreiro.ui.MestreScreen(AppGraph.mestre, store, AppGraph.feedback, back)
+                        Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
+                        Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }
