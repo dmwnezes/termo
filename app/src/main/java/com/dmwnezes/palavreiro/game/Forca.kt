@@ -17,16 +17,17 @@ object Forca {
     /** Na RODADA da sala par o anfitrião escolhe; ímpar, o convidado. */
     fun chooserIsHost(n: Int): Boolean = n % 2 == 0
 
-    /** Palavra arrumada: sem espaços nas pontas, espaço repetido vira um, sem espaço em volta do hífen. */
-    fun clean(w: String): String = w.trim().replace(Regex("\\s+"), " ").replace(Regex(" ?- ?"), "-")
+    /** Palavra arrumada (NFC): sem espaços nas pontas, espaço repetido vira um, sem espaço em volta do hífen. */
+    fun clean(w: String): String = java.text.Normalizer.normalize(w, java.text.Normalizer.Form.NFC)
+        .trim().replace(Regex("\\s+"), " ").replace(Regex(" ?- ?"), "-")
 
-    /** 2 a 20 letras (com acento valem), palavras separadas por espaço ou hífen. */
+    /** Letras (latinas, com acento valem) separadas por um espaço ou hífen; até 20 caracteres no total e pelo menos 2 letras. */
     fun validWord(w: String): Boolean {
         val c = clean(w)
         if (!c.matches(Regex("\\p{L}+([ -]\\p{L}+)*"))) return false
         val base = Words.normalize(c)
         if (base.length != c.length || base.any { it !in 'A'..'Z' && it != ' ' && it != '-' }) return false
-        return c.count { it.isLetter() } in MIN_LETTERS..MAX_LETTERS
+        return c.length <= MAX_LETTERS && c.count { it.isLetter() } >= MIN_LETTERS
     }
 
     fun validTheme(t: String): Boolean = t.trim().length in 1..THEME_MAX

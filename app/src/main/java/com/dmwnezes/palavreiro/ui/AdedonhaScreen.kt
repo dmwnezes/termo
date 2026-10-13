@@ -94,12 +94,12 @@ internal fun AdedonhaPlay(pool: List<String>, rounds: Int, msgs: List<Timed>, d:
     // Primeiro STOP da rodada: trava e manda as respostas.
     val stopped = cur?.stop != null
     LaunchedEffect(cur?.k, stopped) {
-        if (stopped && cur != null && ansSent.add(cur.k)) d.send(Msg.Ans(d.myId, d.n, cur.k, List(catCount) { fields.getOrElse(it) { "" }.trim() }))
+        if (stopped && cur != null && ansSent.add(cur.k)) d.send(Msg.Ans(d.myId, d.n, cur.k, Adedonha.answers(fields, catCount)))
     }
     fun sendVote() {
         val c = cur ?: return
         val theirs = c.theirs ?: return
-        if (voteSent.add(c.k)) d.send(Msg.Vote(d.myId, d.n, c.k, Adedonha.votesFor(theirs, c.letter, marks)))
+        if (voteSent.add(c.k)) d.send(Msg.Vote(d.myId, d.n, c.k, Adedonha.votesFor(theirs, c.letter, marks, c.cats.size)))
     }
     // Limite da validação (ou o amigo não mandou respostas): vota sozinho.
     val voteDue = cur != null && stage == Stage.VOTE && cur.myVote == null && (cur.oppGone || now >= cur.voteStart + Adedonha.VOTE_MS)

@@ -25,11 +25,9 @@ import com.dmwnezes.palavreiro.game.Multi
 import com.dmwnezes.palavreiro.game.TriviaDuel
 
 /** Cores fixas das categorias da Trivia (Ciência verde, História amarelo, Geografia azul, Esportes laranja, Arte rosa, Entretenimento roxo). */
-internal val TriviaOrange = Color(0xFFF0A05A)
-internal val TriviaPink = Color(0xFFF08CC0)
 internal fun triviaColor(cat: String): Color = when (cat) {
-    "Ciência" -> Night.correct; "História" -> Night.present; "Geografia" -> Night.blue
-    "Esportes" -> TriviaOrange; "Arte" -> TriviaPink; "Entretenimento" -> Night.purple
+    "Ciência" -> Color(0xFF5FB873); "História" -> Color(0xFFE6C14F); "Geografia" -> Color(0xFF6FA8E8)
+    "Esportes" -> Color(0xFFF0954A); "Arte" -> Color(0xFFEE7FB5); "Entretenimento" -> Color(0xFFB48CF0)
     else -> Night.accent
 }
 internal fun triviaEmoji(cat: String): String = when (cat) {

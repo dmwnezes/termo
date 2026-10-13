@@ -337,7 +337,7 @@ object Multi {
             "stop" -> Msg.Stop(o.getString("id"), o.getInt("n"), o.getInt("k"))
             "ans" -> Msg.Ans(o.getString("id"), o.getInt("n"), o.getInt("k"), strings(o, "a"))
             "vote" -> Msg.Vote(o.getString("id"), o.getInt("n"), o.getInt("k"), ints(o, "v"))
-            "pick" -> Msg.Pick(o.getString("id"), o.getInt("r"), o.optInt("o", -1).takeIf { it in 0..3 } ?: -1, o.optLong("ms"))
+            "pick" -> Msg.Pick(o.getString("id"), o.getInt("r"), o.optInt("o", -1).takeIf { it in 0..3 } ?: -1, o.optLong("ms").coerceIn(0L, 15_000L))
             "secret" -> Msg.Secret(o.getString("id"), o.getInt("n"), o.optString("th").take(24), o.getString("m"))
             "guess" -> Msg.Guess(o.getString("id"), o.getInt("n"), letter(o))
             "reveal" -> Msg.Reveal(o.getString("id"), o.getInt("n"), letter(o), ints(o, "p"))

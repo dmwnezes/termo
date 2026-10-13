@@ -19,20 +19,26 @@ object TriviaDuel {
 
     data class Question(val category: String, val text: String, val right: String, val wrong: List<String>)
 
-    /** Linhas válidas: CATEGORIA|pergunta|certa|e1|e2|e3 (6 campos não vazios), sem "#", na ordem do arquivo. */
+    /**
+     * Linhas válidas: CATEGORIA|pergunta|certa|e1|e2|e3 (exatamente 6 campos, todos não vazios depois do trim,
+     * categoria uma das 6), sem "#", na ordem do arquivo — igual ao site.
+     */
     fun parse(text: String): List<Question> = text.lines().map { it.trim() }
         .filter { it.isNotEmpty() && !it.startsWith("#") }
         .map { l -> l.split('|').map { it.trim() } }
-        .filter { p -> p.size == 6 && p.all { it.isNotEmpty() } }
+        .filter { p -> p.size == 6 && p.all { it.isNotEmpty() } && p[0] in CATEGORIES }
         .map { p -> Question(p[0], p[1], p[2], p.subList(3, 6)) }
 
-    /** idx = ((SEED mod Q)·7919 mod Q + 104729 + k·577) mod Q, para k = 0, 1, 2…, pulando repetidos, até [count]. */
+    /**
+     * idx = ((SEED mod Q)·7919 mod Q + 104729 + k·577) mod Q, para k = 0, 1, 2…, pulando repetidos,
+     * até min([count], Q) perguntas; desiste depois de Q·4 tentativas (igual ao site).
+     */
     fun indices(q: Int, seed: Long, count: Int): List<Int> {
         if (q <= 0) return emptyList()
         val n = q.toLong()
         val out = LinkedHashSet<Int>()
         var k = 0L
-        while (out.size < minOf(count, q) && k < n * 4 + 2000) {
+        while (out.size < minOf(count, q) && k < n * 4) {
             out += (((seed % n) * 7919 % n + 104729 + k * 577) % n).toInt()
             k++
         }
