@@ -108,7 +108,8 @@ class MultiGamesTest {
         assertEquals(Msg.Skip(2), Multi.decode("""{"t":"skip","r":2}"""))
         assertEquals(2, org.json.JSONObject(Multi.encode(Msg.Skip(2))).getInt("r"))
         // Mensagens da Bomba-Relógio (que saiu) são ignoradas.
-        assertNull(Multi.decode("""{"t":"word","id":"q1","w":"CARRO","n":0,"ms":1500}"""))
+        // ("word" voltou na Rodada 11 como a palavra final da Forca; só vale dentro de uma rodada de Forca.)
+        assertEquals(Msg.Word(0, "CARRO"), Multi.decode("""{"t":"word","id":"q1","w":"CARRO","n":0,"ms":1500}"""))
         assertNull(Multi.decode("""{"t":"boom","id":"q1"}"""))
         for (m in listOf('a', 'c', 'p', 'v', 'x')) {
             val r = Multi.Room("abc123xyz789", m, 123456789)

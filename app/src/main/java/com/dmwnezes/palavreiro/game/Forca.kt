@@ -91,7 +91,9 @@ object Forca {
                 is Msg.Try -> if (m.n == n && m.id == guesser && secret != null && !over()) tries += m.word to null
                 is Msg.TryRes -> if (m.n == n && !over()) {
                     val i = tries.indexOfFirst { it.second == null }
-                    if (i >= 0) { tries[i] = tries[i].first to m.ok; if (m.ok) solved = true }
+                    // Resposta sem chute pendente também conta (igual ao site): entra como chute sem texto.
+                    if (i >= 0) tries[i] = tries[i].first to m.ok else tries += "" to m.ok
+                    if (m.ok) solved = true
                 }
                 is Msg.Word -> if (m.n == n && word == null) word = m.word
                 else -> {}

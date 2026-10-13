@@ -218,10 +218,12 @@ class ScreensRenderTest {
 
     @Test
     fun amigoSalaComQr() {
-        rule.mainClock.autoAdvance = false
+        // Rolagem longa precisa do relógio andando; a sala de espera, não (contagem dos 10 minutos).
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
         rule.onNode(androidx.compose.ui.test.hasText("Seu nome")).performScrollTo().performTextInput("Daniel")
-        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performScrollTo().performClick()
+        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performScrollTo()
+        rule.mainClock.autoAdvance = false
+        rule.onNode(androidx.compose.ui.test.hasText("Criar partida")).performClick()
         save("31-amigo-sala-qr")
     }
 
@@ -432,7 +434,6 @@ class ScreensRenderTest {
 
     @Test
     fun amigoModos() {
-        rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
         rule.onNode(androidx.compose.ui.test.hasText("Jogo da Velha")).performScrollTo().performClick()
         save("36-amigo-modos")
@@ -440,10 +441,8 @@ class ScreensRenderTest {
 
     @Test
     fun amigoModosPontos() {
-        rule.mainClock.autoAdvance = false
         rule.setContent { PalavreiroTheme { com.dmwnezes.palavreiro.ui.MultiScreen(words, null, offline, null, {}) } }
         rule.onNode(androidx.compose.ui.test.hasText("Qual é a Palavra?")).performScrollTo().performClick()
-        rule.mainClock.advanceTimeBy(200)
         rule.onNode(androidx.compose.ui.test.hasText("15 rodadas")).performScrollTo().performClick()
         save("36b-amigo-modos-pontos")
     }

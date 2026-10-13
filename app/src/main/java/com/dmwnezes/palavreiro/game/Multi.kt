@@ -242,8 +242,9 @@ object Multi {
      * "again" que o anfitrião manda: sempre com o modo da próxima partida; trocar de modo (ou de rodadas) zera a série.
      * [rounds]/[nextRounds] = rodadas de agora e as escolhidas para a próxima; "r" vai quando muda o modo ou as rodadas.
      */
-    fun againFor(current: Char, next: Char, seriesOver: Boolean, seed: Long, at: Long, rounds: Int? = null, nextRounds: Int? = null): Msg.Again {
-        val changed = nextRounds != null && nextRounds != rounds
+    fun againFor(current: Char, next: Char, seriesOver: Boolean, seed: Long, at: Long, rounds: Int? = null, nextRounds: Int? = null, force: Boolean = false): Msg.Again {
+        // force: sugestão aceita — sempre série nova e com "r" (igual ao site).
+        val changed = nextRounds != null && (force || nextRounds != rounds)
         return Msg.Again(
             seed, at, newSeries = next != current || changed || (hasSeries(current) && seriesOver), mode = next,
             rounds = if (next != current || changed) nextRounds else null,

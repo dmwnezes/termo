@@ -83,6 +83,14 @@ class Rodada11Test {
         assertEquals(Msg.Guess("g1", 0, 'C'), Multi.decode("""{"t":"guess","id":"g1","n":0,"l":"c"}"""))
         // "pick" com opção fora de 0..3 conta como -1.
         assertEquals(Msg.Pick("a", 0, -1, 0), Multi.decode("""{"t":"pick","id":"a","r":0,"o":7}"""))
+        // ms fora de 0..15000 é cortado.
+        assertEquals(Msg.Pick("a", 0, 1, 15_000), Multi.decode("""{"t":"pick","id":"a","r":0,"o":1,"ms":99999}"""))
+        assertEquals(Msg.Pick("a", 0, 1, 0), Multi.decode("""{"t":"pick","id":"a","r":0,"o":1,"ms":-5}"""))
+        // Sugestão aceita: sempre série nova e com as rodadas guardadas do modo, mesmo sem mudar nada.
+        val acc = Multi.againFor('x', 'x', false, 5, 6, 3, 3, force = true)
+        assertTrue(acc.newSeries); assertEquals('x', acc.mode); assertEquals(3, acc.rounds)
+        val acc2 = Multi.againFor('t', 'g', false, 5, 6, 3, 10, force = true)
+        assertTrue(acc2.newSeries); assertEquals('g', acc2.mode); assertEquals(10, acc2.rounds)
     }
 
     // ---------- Adedonha ----------
@@ -124,6 +132,13 @@ class Rodada11Test {
         // Voto 1 não salva resposta automática ✗; votos que eu mando já vêm 0 nelas.
         assertEquals(listOf(1, 0, 0, 1), Adedonha.votesFor(listOf("Mesa", "Gato", "", "Mala"), 'M', listOf(true, true, true, true)))
         assertEquals(listOf(1, 0, 0, 0), Adedonha.votesFor(listOf("Mesa", "Gato", "", "Mala"), 'M', listOf(true, true, true, false)))
+        // Voto sempre do tamanho das categorias; qualquer voto diferente de 0 vale 1.
+        assertEquals(listOf(1, 0, 0), Adedonha.votesFor(listOf("Mesa"), 'M', emptyList(), 3))
+        assertEquals(listOf(10, 0), Adedonha.score(listOf("Mesa", "Mala"), listOf("", ""), 'M', listOf(2, 0), null, 2).first)
+        // "ans": completa até as categorias, arruma espaços e corta em 40.
+        assertEquals(listOf("Pão de queijo", "", ""), Adedonha.answers(listOf("  Pão   de  queijo "), 3))
+        assertEquals(40, Adedonha.answers(listOf("M".repeat(60)), 1)[0].length)
+        assertEquals(listOf("a", "b"), Adedonha.answers(listOf("a", "b", "c"), 2))
     }
 
     private fun t(at: Long, m: Msg) = Timed(at, m)
@@ -209,6 +224,11 @@ class Rodada11Test {
         assertEquals(idx.size, idx.toSet().size)
         // Fórmula conferida à mão: k=0 → ((SEED mod Q)·7919 mod Q + 104729) mod Q.
         assertEquals((((seed % q) * 7919 % q + 104729) % q).toInt(), idx[0])
+        // Conferido com o js/multi-trivia.js do site sobre o mesmo shared/trivia.txt (Q = 669).
+        if (q == 669) {
+            assertEquals(listOf(191, 99, 7, 584, 492, 400, 308, 216, 124, 32), idx)
+            assertEquals(listOf(3, 0, 1, 2, 3, 0, 1, 2, 3, 0), idx.indices.map { TriviaDuel.correctIndex(seed, it) })
+        }
     }
 
     @Test
@@ -268,7 +288,12 @@ class Rodada11Test {
         assertFalse(Forca.validWord("abc1"))
         assertFalse(Forca.validWord("-casa"))
         assertFalse(Forca.validWord("abcdefghijklmnopqrstu")) // 21 letras
-        assertTrue(Forca.validWord("abcdefghij klmnopqrst")) // 20 letras
+        assertFalse(Forca.validWord("abcdefghij klmnopqrst")) // 21 caracteres contando o espaço
+        assertTrue(Forca.validWord("abcdefghi klmnopqrst")) // 20 caracteres
+        assertTrue(Forca.validWord("guarda - chuva")) // espaço em volta do hífen sai
+        assertEquals("guarda-chuva", Forca.clean("guarda - chuva"))
+        // NFC: "a" + acento combinante vira "á".
+        assertEquals("pá", Forca.clean("pa\u0301"))
         assertEquals("pão de queijo", Forca.clean("  pão   de queijo "))
         assertEquals("... .. ......", Forca.mask("Pão de queijo"))
         assertEquals("......-.....", Forca.mask("guarda-chuva"))
@@ -330,5 +355,32 @@ class Rodada11Test {
         val m3 = mutableListOf<Msg>(Msg.Secret("h", 0, "X", "..-.."), Msg.Reveal("h", 0, 'A', listOf(2, 9)), Msg.Reveal("h", 0, 'A', listOf()))
         val s3 = Forca.state(m3, 0, "h", "g")
         assertEquals(1, s3.errors); assertEquals("..-..", s3.shown)
+    }
+
+    @Test
+    fun interopComOSite() {
+        val c = listOf("Cor", "Comida")
+        // O amigo saiu entre rodadas: a partida acaba com o placar de agora; no meio da rodada, só depois dela fechar.
+        val r1 = listOf(
+            t(0, Msg.SRound(0, 0, 'C', c)), t(5000, Msg.Stop("me", 0, 0)),
+            t(5100, Msg.Ans("me", 0, 0, listOf("Cinza", "Cuscuz"))), t(5200, Msg.Ans("op", 0, 0, listOf("Cobre", "Caju"))),
+            t(6000, Msg.Vote("me", 0, 0, listOf(1, 1))), t(6100, Msg.Vote("op", 0, 0, listOf(1, 1))),
+        )
+        // sround: só k = anterior + 1 e k < N; repetido, pulando ou além de N é ignorado.
+        val seq = listOf(t(1, Msg.SRound(0, 1, 'B', c))) + r1 + listOf(
+            t(6200, Msg.SRound(0, 0, 'D', c)), t(6300, Msg.SRound(0, 2, 'E', c)), t(6400, Msg.SRound(0, 1, 'F', c)),
+            t(6500, Msg.SRound(0, 1, 'G', c)), t(6600, Msg.SRound(0, 2, 'H', c)),
+        )
+        assertEquals(listOf('C', 'F'), Adedonha.state(seq, 0, "me", "op", 2, 7000, false).usedLetters)
+        val between = Adedonha.state(r1, 0, "me", "op", 5, 7000, true)
+        assertTrue(between.over); assertEquals(20, between.me)
+        val mid = Adedonha.state(r1.take(2), 0, "me", "op", 5, 5050, true)
+        assertFalse(mid.over)
+        // Forca: "tryres" ok:false sem chute pendente também é erro.
+        val f = listOf<Msg>(Msg.Secret("h", 0, "X", "...."), Msg.TryRes(0, false))
+        assertEquals(1, Forca.state(f, 0, "h", "g").errors)
+        // Chute: sem acento, maiúsculo, só A–Z dos dois lados.
+        assertTrue(Forca.tryOk("GUARDACHUVA", "guarda-chuva"))
+        assertTrue(Forca.tryOk("pao de  queijo!", "Pão de queijo"))
     }
 }

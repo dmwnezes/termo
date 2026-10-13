@@ -194,11 +194,11 @@ fun MultiScreen(
         HuntDuel.build(themePool, usedThemes.toSet(), n).also { usedThemes += it.theme }
     }.getOrNull()
     /** Anfitrião: revanche no modo escolhido (trocar de modo ou de rodadas zera a série). */
-    fun again() {
+    fun again(force: Boolean = false) {
         val r = room ?: return
         val next = nextMode ?: r.mode
         val nr = nextRounds ?: if (next == r.mode) rounds else savedRounds(next)
-        val m = Multi.againFor(r.mode, next, series.over, Multi.newSeed(), System.currentTimeMillis(), rounds, nr)
+        val m = Multi.againFor(r.mode, next, series.over, Multi.newSeed(), System.currentTimeMillis(), rounds, nr, force)
         // RODADA do próximo jogo = quantos start/again a sala já teve.
         val g = if (next == Multi.HUNT) gridFor(round) else null
         if (g != null) sendAll(m, g) else send(m)
@@ -546,7 +546,7 @@ fun MultiScreen(
                         currentRounds = rounds, rounds = nextRounds ?: if (sel == cur) rounds else savedRounds(sel),
                         pickRounds = { nextRounds = it; store?.setInt("mp_rounds_$sel", it) },
                         suggestion = suggestion, suggestFrom = oppName ?: "Seu amigo",
-                        onAccept = { suggestion?.let { m -> nextMode = m; nextRounds = if (m == cur) rounds else savedRounds(m); suggestion = null; again() } },
+                        onAccept = { suggestion?.let { m -> nextMode = m; nextRounds = savedRounds(m); suggestion = null; again(true) } },
                         onDismiss = { suggestion = null },
                     )
                 } else NextGame(
@@ -882,7 +882,7 @@ private fun SectionLabel(text: String) {
 private fun GameCard(code: Char, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val shape = RoundedCornerShape(24.dp)
     Box(
-        modifier.height(146.dp).clip(shape)
+        modifier.height(156.dp).clip(shape)
             .background(if (selected) Night.accent.copy(alpha = 0.18f) else Night.surface)
             .border(if (selected) 2.dp else 1.dp, if (selected) Night.accent else Night.outline.copy(alpha = 0.35f), shape)
             .clickable(onClick = onClick)

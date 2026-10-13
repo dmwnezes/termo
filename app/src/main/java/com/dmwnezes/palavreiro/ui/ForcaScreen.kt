@@ -306,7 +306,7 @@ private fun GuessedLetters(st: Forca.State) {
             }
         }
     }
-    st.tries.forEach { (w, ok) ->
+    st.tries.filter { it.first.isNotEmpty() }.forEach { (w, ok) ->
         Spacer(Modifier.height(6.dp))
         Text("Chute: $w " + when (ok) { true -> "✓"; false -> "✗"; null -> "…" }, color = if (ok == false) Night.red else Night.text, fontSize = 14.sp)
     }

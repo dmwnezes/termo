@@ -274,7 +274,7 @@ class Rodada11RenderTest {
             PalavreiroTheme {
                 var s by remember { mutableStateOf<Char?>(null) }
                 PointsEndSheet(
-                    's', "Ana", 230, 180, List(5) { "Letra" to null }, false, {}, {}, {}, myName = "Daniel",
+                    's', "Ana", 230, 180, List(5) { "Letra ${"MPCAR"[it]}" to null }, false, {}, {}, {}, myName = "Daniel",
                     next = NextGame('s', 's', {}, 5, 5, suggest = { sent += it; s = it }, sent = s),
                     storyDetail = "Pontos 230 × 180",
                 )
