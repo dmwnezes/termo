@@ -27,7 +27,7 @@ import java.io.File
 
 /** App (convidado) contra o site (anfitrião): rode com PV_INTEROP=<arquivo com o link> e PV_NTFY. */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [34])
+@Config(sdk = [34], qualifiers = "w360dp-h780dp")
 @LooperMode(LooperMode.Mode.PAUSED)
 class InteropTest {
     @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
@@ -58,6 +58,18 @@ class InteropTest {
         rule.onNodeWithText("Entrar").performClick()
         rule.waitUntil(30_000) { shown("Você × Site") }
         log("partida começou")
+        if (room.mode == 'f') {
+            rule.waitUntil(60_000) { shown("Comida", true) }
+            pause(5000)
+            for (l in "XPAODEQUIJ") {
+                pause(400)
+                rule.onNode(androidx.compose.ui.test.hasContentDescription("Letra $l")).performClick()
+                log("app chutou $l")
+            }
+            pause(3000)
+            log("fim no app: " + listOf("Você venceu a rodada!", "Site venceu a rodada", "PÃO DE QUEIJO", "Pão de queijo").filter { shown(it, true) })
+            return
+        }
         if (room.mode == 'v') {
             for (cell in listOf(3, 4)) {
                 rule.waitUntil(60_000) { shown("Sua vez", true) }
