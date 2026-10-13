@@ -5,7 +5,7 @@ package com.dmwnezes.palavreiro.game
  * O mesmo cálculo existe no site (game.js), então o link abre igual no app e no navegador.
  */
 object Challenge {
-    const val BASE = "https://dmwnezes.github.io/termo/"
+    const val BASE = "https://dmwnezes.com/termo/"
 
     fun encode(word: String): String {
         val w = Words.normalize(word)

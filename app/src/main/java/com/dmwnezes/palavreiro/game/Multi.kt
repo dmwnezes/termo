@@ -9,7 +9,7 @@ import kotlin.random.Random
  * Só trafegam o nome, as CORES de cada tentativa e o resultado — nunca as letras.
  */
 object Multi {
-    const val SITE = "https://dmwnezes.github.io/termo/"
+    const val SITE = "https://dmwnezes.com/termo/"
     const val TOPIC_PREFIX = "palavreiro-mp-"
 
     /** Modos da partida no estilo Termo: letra do link → modo do jogo. */

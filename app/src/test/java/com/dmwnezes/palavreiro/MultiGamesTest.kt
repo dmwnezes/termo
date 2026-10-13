@@ -113,7 +113,7 @@ class MultiGamesTest {
         assertNull(Multi.decode("""{"t":"boom","id":"q1"}"""))
         for (m in listOf('a', 'c', 'p', 'v', 'x')) {
             val r = Multi.Room("abc123xyz789", m, 123456789)
-            assertEquals("https://dmwnezes.github.io/termo/?mp=abc123xyz789-$m-21i3v9", r.link)
+            assertEquals("https://dmwnezes.com/termo/?mp=abc123xyz789-$m-21i3v9", r.link)
             assertEquals(r, Multi.parse(r.code))
             assertEquals(r, Multi.fromPasted(r.link))
             assertEquals(r, Multi.fromPasted("Bora jogar ${Multi.modeName(m)} no Palavreiro? ${r.code}"))

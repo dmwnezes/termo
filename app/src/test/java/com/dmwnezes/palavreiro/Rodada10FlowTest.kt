@@ -79,8 +79,8 @@ class Rodada10FlowTest {
         rule.onNodeWithText(label).performScrollTo().performClick()
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
         rule.onNodeWithText("Criar partida").performScrollTo().performClick()
-        rule.waitUntil(15_000) { shown("https://dmwnezes.github.io", true) }
-        val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
+        rule.waitUntil(15_000) { shown("https://dmwnezes.com", true) }
+        val link = rule.onAllNodes(hasText("https://dmwnezes.com", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }
         return Multi.fromPasted(link)!!
     }

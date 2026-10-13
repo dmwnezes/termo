@@ -23,7 +23,7 @@ class Rodada11Test {
         for (c in listOf('s', 'g', 'f')) {
             val r = Multi.parse("abc123xyz789-$c-21i3v9")!!
             assertEquals(c, r.mode)
-            assertEquals(r, Multi.fromPasted("Bora? https://dmwnezes.github.io/termo/?mp=abc123xyz789-$c-21i3v9"))
+            assertEquals(r, Multi.fromPasted("Bora? https://dmwnezes.com/termo/?mp=abc123xyz789-$c-21i3v9"))
             assertEquals(r, Multi.fromPasted("joga comigo abc123xyz789-$c-21i3v9 valeu"))
         }
         assertEquals("uma Adedonha", Multi.withArticle('s'))

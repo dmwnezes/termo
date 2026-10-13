@@ -43,12 +43,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Links de desafio: https://dmwnezes.github.io/termo/?d=... -->
+            <!-- Links de desafio/partida: https://dmwnezes.com/termo/?d=... (e os antigos em dmwnezes.github.io/termo) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="dmwnezes.github.io" android:pathPrefix="/termo" />
+                <data android:host="dmwnezes.com" />
+                <data android:host="www.dmwnezes.com" />
             </intent-filter>
             <!-- Atalhos ao segurar o ícone -->
             <meta-data

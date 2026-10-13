@@ -135,8 +135,8 @@ class Rodada8FlowTest {
         rule.onNodeWithText("Termo").performClick()
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
         rule.onNodeWithText("Criar partida").performScrollTo().performClick()
-        rule.waitUntil(15_000) { rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().isNotEmpty() }
-        val link = rule.onAllNodes(hasText("https://dmwnezes.github.io", substring = true)).fetchSemanticsNodes().first()
+        rule.waitUntil(15_000) { rule.onAllNodes(hasText("https://dmwnezes.com", substring = true)).fetchSemanticsNodes().isNotEmpty() }
+        val link = rule.onAllNodes(hasText("https://dmwnezes.com", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }
         val room = Multi.fromPasted(link)!!
         assertEquals('t', room.mode)

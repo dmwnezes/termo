@@ -35,7 +35,7 @@ class MultiTest {
     @Test
     fun linkEMensagens() {
         val r = Multi.Room("abc123xyz789", 'd', 123456789)
-        assertEquals("https://dmwnezes.github.io/termo/?mp=abc123xyz789-d-21i3v9", r.link)
+        assertEquals("https://dmwnezes.com/termo/?mp=abc123xyz789-d-21i3v9", r.link)
         assertEquals(r, Multi.parse(r.code))
         assertNull(Multi.parse("x-d-1")); assertNull(Multi.parse("abc123xyz789-z-1")); assertNull(Multi.parse(null))
         val all = listOf(
@@ -50,8 +50,8 @@ class MultiTest {
         assertEquals(r, Multi.fromPasted(r.link))
         assertEquals(r, Multi.fromPasted(r.code))
         assertEquals(r, Multi.fromPasted("Bora jogar Dueto no Palavreiro? ${r.link} vem!"))
-        assertEquals(r, Multi.fromPasted("https://dmwnezes.github.io/termo/index.html?mp=ABC123XYZ789-D-21I3V9&x=1"))
-        assertNull(Multi.fromPasted("https://dmwnezes.github.io/termo/")); assertNull(Multi.fromPasted("")); assertNull(Multi.fromPasted(null))
+        assertEquals(r, Multi.fromPasted("https://dmwnezes.com/termo/index.html?mp=ABC123XYZ789-D-21I3V9&x=1"))
+        assertNull(Multi.fromPasted("https://dmwnezes.com/termo/")); assertNull(Multi.fromPasted("")); assertNull(Multi.fromPasted(null))
         assertNull(Multi.decode("oi")); assertNull(Multi.decode("""{"t":"outro"}"""))
         assertTrue(Multi.validName("Ana")); assertFalse(Multi.validName("A")); assertFalse(Multi.validName("x".repeat(17)))
     }

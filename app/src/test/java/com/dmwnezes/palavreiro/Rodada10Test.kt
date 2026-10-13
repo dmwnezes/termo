@@ -231,8 +231,8 @@ class Rodada10Test {
         assertEquals("2 × 1", five.score); assertFalse(five.over); assertEquals("melhor de 5", five.label)
         assertEquals("me", five.plus("me").winner)
         // Link da Bomba-Relógio: inválido, com aviso próprio.
-        assertNull(Multi.parse("abc123xyz789-b-21i3v9")); assertNull(Multi.fromPasted("https://dmwnezes.github.io/termo/?mp=abc123xyz789-b-21i3v9"))
-        assertTrue(Multi.removedGame("https://dmwnezes.github.io/termo/?mp=abc123xyz789-b-21i3v9"))
+        assertNull(Multi.parse("abc123xyz789-b-21i3v9")); assertNull(Multi.fromPasted("https://dmwnezes.com/termo/?mp=abc123xyz789-b-21i3v9"))
+        assertTrue(Multi.removedGame("https://dmwnezes.com/termo/?mp=abc123xyz789-b-21i3v9"))
         assertTrue(Multi.removedGame("Bora? abc123xyz789-b-21i3v9"))
         assertFalse(Multi.removedGame("abc123xyz789-t-21i3v9")); assertFalse(Multi.removedGame("oi"))
         for (m in "cpvx") assertNotNull(Multi.fromPasted("entra aí: abc123xyz789-$m-21i3v9"))

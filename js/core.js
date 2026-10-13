@@ -381,7 +381,7 @@
     else lines.forEach((l, i) => txt(l, top + ch + 110 + i * 60, 40, 500, "#A9A2D0", null, W - 160));
     // rodapé
     rr(120, H - 330, W - 240, 120, 60, "rgba(95,184,115,.16)");
-    txt("Jogue comigo: dmwnezes.github.io/termo", H - 255, 42, 700, "#F4F1FF", null, W - 300);
+    txt("Jogue comigo: dmwnezes.com/termo", H - 255, 42, 700, "#F4F1FF", null, W - 300);
     txt("criado por: @dmwnezes", H - 140, 38, 600, "rgba(244,241,255,.75)");
     await storyOut(c);
   };

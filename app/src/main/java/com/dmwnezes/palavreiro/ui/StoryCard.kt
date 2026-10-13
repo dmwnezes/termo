@@ -272,7 +272,7 @@ object StoryCard {
         text(c, s.detail, W / 2f, 1450f, 40f, regular, Night.muted)
 
         // Rodapé.
-        text(c, "Jogue comigo: dmwnezes.github.io/termo", W / 2f, H - 230f, 42f, semi, Night.accent)
+        text(c, "Jogue comigo: dmwnezes.com/termo", W / 2f, H - 230f, 42f, semi, Night.accent)
         text(c, "criado por: @dmwnezes", W / 2f, H - 160f, 38f, semi, Night.text.copy(alpha = 0.85f))
         return bmp
     }
