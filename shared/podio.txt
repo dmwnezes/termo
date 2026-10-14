@@ -3,3 +3,150 @@
 Os 5 maiores países do mundo em área|Rússia|Canadá|China|Estados Unidos|Brasil|Austrália|Índia|Argentina|Cazaquistão|Argélia
 Os 5 maiores estados do Brasil em área|Amazonas|Pará|Mato Grosso|Minas Gerais|Bahia|Mato Grosso do Sul|Goiás|Maranhão|Rio Grande do Sul|Tocantins
 Os 5 maiores planetas do Sistema Solar|Júpiter|Saturno|Urano|Netuno|Terra|Vênus|Marte|Mercúrio|Plutão|Lua
+Os 5 menores estados do Brasil em área (sem o DF), do menor ao maior|Sergipe|Alagoas|Rio de Janeiro|Espírito Santo|Rio Grande do Norte|Paraíba|Pernambuco|Santa Catarina|Ceará|Acre
+Os 5 maiores países da América do Sul em área|Brasil|Argentina|Peru|Colômbia|Bolívia|Venezuela|Chile|Paraguai|Equador|Uruguai
+Os 5 menores países da América do Sul em área, do menor ao maior|Suriname|Uruguai|Guiana|Equador|Paraguai|Chile|Venezuela|Bolívia|Colômbia|Peru
+Os 5 maiores países da África em área|Argélia|República Democrática do Congo|Sudão|Líbia|Chade|Níger|Angola|Mali|África do Sul|Etiópia
+Os 5 maiores países das Américas em área|Canadá|Estados Unidos|Brasil|Argentina|México|Peru|Colômbia|Bolívia|Venezuela|Chile
+Os 5 maiores países da América Latina em área|Brasil|Argentina|México|Peru|Colômbia|Bolívia|Venezuela|Chile|Paraguai|Cuba
+Do 6º ao 10º maior país do mundo em área, em ordem|Austrália|Índia|Argentina|Cazaquistão|Argélia|República Democrática do Congo|Arábia Saudita|México|Indonésia|Sudão
+Os 5 maiores países sem saída para o mar, em área|Cazaquistão|Mongólia|Chade|Níger|Mali|Etiópia|Bolívia|Zâmbia|Afeganistão|Paraguai
+Os 5 maiores países da Oceania em área|Austrália|Papua-Nova Guiné|Nova Zelândia|Ilhas Salomão|Fiji|Vanuatu|Samoa|Kiribati|Tonga|Tuvalu
+Os 5 menores países do mundo em área, do menor ao maior|Vaticano|Mônaco|Nauru|Tuvalu|San Marino|Liechtenstein|Ilhas Marshall|São Cristóvão e Névis|Maldivas|Malta
+Os 5 maiores países de língua oficial portuguesa em área|Brasil|Angola|Moçambique|Portugal|Guiné-Bissau|Timor-Leste|Cabo Verde|São Tomé e Príncipe|Guiné Equatorial|Macau
+Os 5 oceanos, do maior para o menor|Pacífico|Atlântico|Índico|Antártico|Ártico|Mar Mediterrâneo|Mar do Caribe|Mar Vermelho|Mar Báltico|Mar Cáspio
+As 5 montanhas mais altas do mundo|Everest|K2|Kangchenjunga|Lhotse|Makalu|Cho Oyu|Dhaulagiri|Manaslu|Nanga Parbat|Annapurna
+Os 5 pontos mais altos do Brasil (medição do IBGE)|Pico da Neblina|Pico 31 de Março|Pico da Bandeira|Pedra da Mina|Pico das Agulhas Negras|Pico do Cristal|Monte Roraima|Pico Paraná|Pedra Azul|Pico do Jabre
+Os 5 mais altos entre os pontos culminantes dos continentes|Everest|Aconcágua|Denali|Kilimanjaro|Elbrus|Maciço Vinson|Mont Blanc|Kosciuszko|Monte Fuji|Mauna Kea
+Os 5 maiores lagos do mundo em área|Mar Cáspio|Lago Superior|Lago Vitória|Lago Huron|Lago Michigan|Lago Tanganica|Lago Baikal|Lago Malawi|Lago Titicaca|Lago Ladoga
+As 5 maiores ilhas do mundo em área (sem a Austrália)|Groenlândia|Nova Guiné|Bornéu|Madagascar|Ilha de Baffin|Sumatra|Honshu|Grã-Bretanha|Ilha Vitória|Islândia
+As 5 maiores ilhas do Mar Mediterrâneo em área|Sicília|Sardenha|Chipre|Córsega|Creta|Maiorca|Malta|Rodes|Ibiza|Capri
+Os 5 estados do Brasil com mais municípios|Minas Gerais|São Paulo|Rio Grande do Sul|Bahia|Paraná|Santa Catarina|Goiás|Piauí|Paraíba|Maranhão
+Os 5 países com a maior fronteira terrestre com o Brasil|Bolívia|Peru|Venezuela|Colômbia|Guiana|Paraguai|Argentina|Uruguai|Suriname|França (Guiana Francesa)
+Os 5 maiores estados dos EUA em área|Alasca|Texas|Califórnia|Montana|Novo México|Arizona|Nevada|Colorado|Flórida|Nova York
+Os 5 menores estados dos EUA em área, do menor ao maior|Rhode Island|Delaware|Connecticut|Nova Jersey|New Hampshire|Vermont|Massachusetts|Havaí|Maryland|Virgínia Ocidental
+As 5 maiores províncias e territórios do Canadá em área|Nunavut|Quebec|Territórios do Noroeste|Ontário|Colúmbia Britânica|Yukon|Alberta|Saskatchewan|Manitoba|Terra Nova e Labrador
+Os 5 primeiros presidentes do Brasil, em ordem|Deodoro da Fonseca|Floriano Peixoto|Prudente de Morais|Campos Sales|Rodrigues Alves|Afonso Pena|Hermes da Fonseca|Getúlio Vargas|Washington Luís|Epitácio Pessoa
+Os 5 primeiros presidentes a tomar posse na Nova República (desde 1985)|José Sarney|Fernando Collor|Itamar Franco|Fernando Henrique Cardoso|Lula|Tancredo Neves|Dilma Rousseff|Michel Temer|Jair Bolsonaro|Ernesto Geisel
+Os 5 primeiros presidentes eleitos pelo voto direto após a ditadura, em ordem|Fernando Collor|Fernando Henrique Cardoso|Lula|Dilma Rousseff|Jair Bolsonaro|Itamar Franco|Michel Temer|José Sarney|Tancredo Neves|Ciro Gomes
+Os 5 presidentes do regime militar, em ordem|Castelo Branco|Costa e Silva|Médici|Geisel|Figueiredo|Juscelino Kubitschek|João Goulart|Jânio Quadros|José Sarney|Eurico Gaspar Dutra
+Os 5 primeiros presidentes dos Estados Unidos, em ordem|George Washington|John Adams|Thomas Jefferson|James Madison|James Monroe|John Quincy Adams|Andrew Jackson|Abraham Lincoln|Benjamin Franklin|Alexander Hamilton
+Os 5 presidentes dos EUA a partir de Franklin Roosevelt, em ordem|Franklin Roosevelt|Harry Truman|Dwight Eisenhower|John Kennedy|Lyndon Johnson|Richard Nixon|Gerald Ford|Jimmy Carter|Ronald Reagan|Herbert Hoover
+Os 5 primeiros imperadores romanos, em ordem|Augusto|Tibério|Calígula|Cláudio|Nero|Galba|Vespasiano|Trajano|Adriano|Marco Aurélio
+Os 5 primeiros reis de Roma, segundo a tradição|Rômulo|Numa Pompílio|Túlio Hostílio|Anco Márcio|Tarquínio Prisco|Sérvio Túlio|Tarquínio, o Soberbo|Júlio César|Augusto|Remo
+Os "cinco bons imperadores" de Roma, em ordem|Nerva|Trajano|Adriano|Antonino Pio|Marco Aurélio|Cômodo|Nero|Calígula|Vespasiano|Domiciano
+Os 5 primeiros reis de Portugal, em ordem|Afonso Henriques|Sancho I|Afonso II|Sancho II|Afonso III|Dinis I|Afonso IV|Pedro I|João I|Manuel I
+Os 5 primeiros reis da Dinastia de Avis, em ordem|João I|Duarte I|Afonso V|João II|Manuel I|João III|Sebastião|Dinis I|Pedro I|Afonso Henriques
+Os 5 monarcas britânicos a partir da rainha Vitória, em ordem|Vitória|Eduardo VII|Jorge V|Eduardo VIII|Jorge VI|Elizabeth II|Carlos III|Guilherme IV|Jorge III|Henrique VIII
+As 5 primeiras esposas de Henrique VIII, em ordem|Catarina de Aragão|Ana Bolena|Joana Seymour|Ana de Cleves|Catarina Howard|Catarina Parr|Maria Tudor|Elizabeth I|Maria Stuart|Isabel de Castela
+Os 5 primeiros secretários-gerais da ONU, em ordem|Trygve Lie|Dag Hammarskjöld|U Thant|Kurt Waldheim|Javier Pérez de Cuéllar|Boutros Boutros-Ghali|Kofi Annan|Ban Ki-moon|António Guterres|Sérgio Vieira de Mello
+Os 5 papas a partir de 1958, em ordem|João XXIII|Paulo VI|João Paulo I|João Paulo II|Bento XVI|Francisco|Leão XIV|Pio XII|Pio XI|Bento XV
+As 5 primeiras Constituições do Brasil, pelo ano|1824|1891|1934|1937|1946|1967|1988|1822|1889|1930
+Os períodos da história republicana do Brasil, em ordem|República Velha|Era Vargas|República Populista|Ditadura Militar|Nova República|Período Regencial|Primeiro Reinado|Segundo Reinado|Brasil Colônia|União Ibérica
+As 5 idades da história, em ordem|Pré-História|Idade Antiga|Idade Média|Idade Moderna|Idade Contemporânea|Renascimento|Iluminismo|Idade do Bronze|Idade do Ferro|Era Vitoriana
+Os 5 primeiros países-sede da Copa do Mundo, em ordem|Uruguai|Itália|França|Brasil|Suíça|Suécia|Chile|Inglaterra|México|Alemanha
+Os países-sede das Copas do Mundo de 1958 a 1974, em ordem|Suécia|Chile|Inglaterra|México|Alemanha Ocidental|Argentina|Espanha|Itália|Brasil|Uruguai
+Os países-sede das Copas do Mundo de 1978 a 1994, em ordem|Argentina|Espanha|México|Itália|Estados Unidos|França|Alemanha|Brasil|Coreia do Sul|Colômbia
+Os 5 países-sede das Copas a partir de 1994, em ordem|Estados Unidos|França|Coreia do Sul e Japão|Alemanha|África do Sul|Brasil|Rússia|Catar|Itália|México
+Os 5 primeiros países a ganhar a Copa do Mundo, pela 1ª conquista|Uruguai|Itália|Alemanha|Brasil|Inglaterra|Argentina|França|Espanha|Holanda|Suécia
+Os países-sede das 5 primeiras Copas vencidas pelo Brasil, em ordem|Suécia|Chile|México|Estados Unidos|Coreia do Sul e Japão|Alemanha|França|Itália|Inglaterra|Argentina
+Os anos das 5 primeiras Copas vencidas pelo Brasil|1958|1962|1970|1994|2002|1950|1998|2014|1982|2006
+Os capitães que ergueram as 5 primeiras Copas do Brasil, em ordem|Bellini|Mauro Ramos|Carlos Alberto Torres|Dunga|Cafu|Pelé|Ronaldo|Zico|Sócrates|Thiago Silva
+Os técnicos das 5 primeiras Copas vencidas pelo Brasil, em ordem|Vicente Feola|Aymoré Moreira|Zagallo|Carlos Alberto Parreira|Luiz Felipe Scolari|Telê Santana|Tite|Dunga|Mano Menezes|Sebastião Lazaroni
+Os 5 primeiros vencedores da Bola de Ouro da Copa do Mundo (desde 1982)|Paolo Rossi|Diego Maradona|Salvatore Schillaci|Romário|Ronaldo|Oliver Kahn|Zinedine Zidane|Diego Forlán|Lionel Messi|Luka Modrić
+Os 5 primeiros eleitos Melhor Jogador do Mundo da FIFA, em ordem|Lothar Matthäus|Marco van Basten|Roberto Baggio|Romário|George Weah|Ronaldo|Zinedine Zidane|Rivaldo|Diego Maradona|Luís Figo
+Os 5 primeiros campeões mundiais de Fórmula 1, pelo 1º título|Nino Farina|Juan Manuel Fangio|Alberto Ascari|Mike Hawthorn|Jack Brabham|Phil Hill|Graham Hill|Jim Clark|Stirling Moss|Emerson Fittipaldi
+As 5 primeiras sedes das Olimpíadas modernas, em ordem|Atenas|Paris|St. Louis|Londres|Estocolmo|Antuérpia|Amsterdã|Berlim|Los Angeles|Roma
+As sedes das Olimpíadas de Verão de 1920 a 1936, em ordem|Antuérpia|Paris|Amsterdã|Los Angeles|Berlim|Londres|Estocolmo|Helsinque|Roma|Atenas
+As sedes das Olimpíadas de Verão de 1948 a 1964, em ordem|Londres|Helsinque|Melbourne|Roma|Tóquio|Cidade do México|Munique|Montreal|Moscou|Berlim
+As sedes das Olimpíadas de Verão de 1968 a 1984, em ordem|Cidade do México|Munique|Montreal|Moscou|Los Angeles|Seul|Barcelona|Atlanta|Tóquio|Roma
+As sedes das Olimpíadas de Verão de 1988 a 2004, em ordem|Seul|Barcelona|Atlanta|Sydney|Atenas|Pequim|Londres|Los Angeles|Moscou|Rio de Janeiro
+As 5 sedes das Olimpíadas de Verão a partir de 2000, em ordem|Sydney|Atenas|Pequim|Londres|Rio de Janeiro|Tóquio|Paris|Barcelona|Atlanta|Los Angeles
+Os 5 primeiros seres humanos a ir ao espaço, em ordem|Yuri Gagarin|Alan Shepard|Gus Grissom|Guerman Titov|John Glenn|Valentina Tereshkova|Neil Armstrong|Scott Carpenter|Marcos Pontes|Buzz Aldrin
+Os 5 primeiros homens a pisar na Lua, em ordem|Neil Armstrong|Buzz Aldrin|Pete Conrad|Alan Bean|Alan Shepard|Edgar Mitchell|David Scott|John Young|Michael Collins|Yuri Gagarin
+Os 5 primeiros países a pôr um satélite em órbita com foguete próprio|União Soviética|Estados Unidos|França|Japão|China|Reino Unido|Índia|Israel|Brasil|Alemanha
+Os 5 robôs-jipes da NASA em Marte, em ordem de chegada|Sojourner|Spirit|Opportunity|Curiosity|Perseverance|Zhurong|Viking 1|InSight|Phoenix|Lunokhod 1
+Os 5 primeiros planetas a partir do Sol|Mercúrio|Vênus|Terra|Marte|Júpiter|Saturno|Urano|Netuno|Plutão|Lua
+Os 5 planetas de maior massa do Sistema Solar|Júpiter|Saturno|Netuno|Urano|Terra|Vênus|Marte|Mercúrio|Plutão|Lua
+As 5 maiores luas do Sistema Solar em diâmetro|Ganimedes|Titã|Calisto|Io|Lua|Europa|Tritão|Titânia|Fobos|Encélado
+As 5 maiores luas de Saturno em diâmetro|Titã|Reia|Jápeto|Dione|Tétis|Encélado|Mimas|Hipérion|Febe|Ganimedes
+As 5 maiores luas de Urano em diâmetro|Titânia|Oberon|Umbriel|Ariel|Miranda|Puck|Tritão|Calisto|Europa|Fobos
+As 5 estrelas mais brilhantes do céu noturno|Sirius|Canopus|Alfa Centauri|Arcturus|Vega|Capela|Rigel|Prócion|Betelgeuse|Polaris
+As 5 maiores constelações do céu em área|Hidra|Virgem|Ursa Maior|Baleia|Hércules|Erídano|Pégaso|Órion|Cruzeiro do Sul|Escorpião
+Os 5 elementos mais abundantes na crosta terrestre (em massa)|Oxigênio|Silício|Alumínio|Ferro|Cálcio|Sódio|Potássio|Magnésio|Carbono|Hidrogênio
+Os 5 gases mais abundantes no ar seco|Nitrogênio|Oxigênio|Argônio|Dióxido de carbono|Neônio|Hélio|Metano|Hidrogênio|Criptônio|Ozônio
+Os 5 elementos mais abundantes no corpo humano (em massa)|Oxigênio|Carbono|Hidrogênio|Nitrogênio|Cálcio|Fósforo|Potássio|Enxofre|Sódio|Ferro
+Os 5 primeiros elementos da tabela periódica|Hidrogênio|Hélio|Lítio|Berílio|Boro|Carbono|Nitrogênio|Oxigênio|Flúor|Neônio
+Os elementos de número atômico 6 a 10, em ordem|Carbono|Nitrogênio|Oxigênio|Flúor|Neônio|Boro|Sódio|Hélio|Enxofre|Cloro
+Os elementos de número atômico 11 a 15, em ordem|Sódio|Magnésio|Alumínio|Silício|Fósforo|Enxofre|Cloro|Argônio|Neônio|Potássio
+Os 5 primeiros gases nobres pelo número atômico|Hélio|Neônio|Argônio|Criptônio|Xenônio|Radônio|Hidrogênio|Nitrogênio|Flúor|Cloro
+Os 5 primeiros metais alcalinos pelo número atômico|Lítio|Sódio|Potássio|Rubídio|Césio|Frâncio|Hidrogênio|Magnésio|Cálcio|Berílio
+Os 5 primeiros metais alcalino-terrosos pelo número atômico|Berílio|Magnésio|Cálcio|Estrôncio|Bário|Rádio|Sódio|Potássio|Alumínio|Lítio
+Os 5 halogênios pelo número atômico|Flúor|Cloro|Bromo|Iodo|Astato|Oxigênio|Enxofre|Nitrogênio|Neônio|Hélio
+Os 5 primeiros alcanos, do menor ao maior|Metano|Etano|Propano|Butano|Pentano|Hexano|Heptano|Octano|Eteno|Etino
+As camadas eletrônicas, da mais interna para a mais externa|K|L|M|N|O|P|Q|S|X|Z
+Os 5 minerais mais duros da escala de Mohs|Diamante|Coríndon|Topázio|Quartzo|Ortoclásio|Apatita|Fluorita|Calcita|Gipsita|Talco
+Os 5 minerais mais moles da escala de Mohs, do mais mole|Talco|Gipsita|Calcita|Fluorita|Apatita|Ortoclásio|Quartzo|Topázio|Coríndon|Diamante
+Os 5 primeiros períodos da Era Paleozoica, em ordem|Cambriano|Ordoviciano|Siluriano|Devoniano|Carbonífero|Permiano|Triássico|Jurássico|Cretáceo|Quaternário
+As 5 primeiras épocas da Era Cenozoica, em ordem|Paleoceno|Eoceno|Oligoceno|Mioceno|Plioceno|Pleistoceno|Holoceno|Jurássico|Triássico|Cretáceo
+As camadas da atmosfera, da superfície para o espaço|Troposfera|Estratosfera|Mesosfera|Termosfera|Exosfera|Litosfera|Hidrosfera|Biosfera|Astenosfera|Manto
+O espectro eletromagnético, da maior para a menor onda (até o ultravioleta)|Ondas de rádio|Micro-ondas|Infravermelho|Luz visível|Ultravioleta|Raios X|Raios gama|Ultrassom|Infrassom|Ondas sonoras
+As 5 primeiras cores do arco-íris, de fora para dentro|Vermelho|Laranja|Amarelo|Verde|Azul|Anil|Violeta|Rosa|Marrom|Branco
+Os 5 ossos mais longos do corpo humano|Fêmur|Tíbia|Fíbula|Úmero|Ulna|Rádio|Clavícula|Esterno|Patela|Estribo
+Categorias taxonômicas a partir de Reino, da mais ampla para a mais restrita|Reino|Filo|Classe|Ordem|Família|Gênero|Espécie|Subespécie|Variedade|Raça
+Níveis de organização do corpo a partir da célula, do menor ao maior|Célula|Tecido|Órgão|Sistema|Organismo|Átomo|Molécula|População|Comunidade|Ecossistema
+Níveis de organização ecológica a partir do organismo, do menor ao maior|Organismo|População|Comunidade|Ecossistema|Biosfera|Célula|Tecido|Órgão|Molécula|Átomo
+O caminho do alimento no sistema digestório, a partir da boca|Boca|Faringe|Esôfago|Estômago|Intestino delgado|Intestino grosso|Reto|Ânus|Fígado|Pâncreas
+O caminho do ar no sistema respiratório, a partir das fossas nasais|Fossas nasais|Faringe|Laringe|Traqueia|Brônquios|Bronquíolos|Alvéolos|Esôfago|Diafragma|Estômago
+O caminho do sangue a partir do átrio direito, em ordem|Átrio direito|Ventrículo direito|Artéria pulmonar|Pulmões|Veias pulmonares|Átrio esquerdo|Ventrículo esquerdo|Aorta|Veia cava|Fígado
+O caminho do som na orelha, a partir do canal auditivo|Canal auditivo|Tímpano|Martelo|Bigorna|Estribo|Cóclea|Nervo auditivo|Retina|Córnea|Laringe
+O caminho da luz no olho, a partir da córnea|Córnea|Humor aquoso|Pupila|Cristalino|Humor vítreo|Retina|Nervo óptico|Tímpano|Esclera|Cóclea
+Os 5 primeiros livros da Bíblia, em ordem|Gênesis|Êxodo|Levítico|Números|Deuteronômio|Josué|Juízes|Rute|Salmos|Isaías
+Os 5 livros da Bíblia que vêm logo depois de Deuteronômio|Josué|Juízes|Rute|1 Samuel|2 Samuel|1 Reis|Esdras|Neemias|Ester|Jó
+Os 5 livros poéticos do Antigo Testamento, em ordem|Jó|Salmos|Provérbios|Eclesiastes|Cânticos|Lamentações|Rute|Ester|Isaías|Daniel
+Os 5 livros da Bíblia protestante a partir de Isaías, em ordem|Isaías|Jeremias|Lamentações|Ezequiel|Daniel|Oseias|Joel|Amós|Malaquias|Jonas
+Os 5 primeiros profetas menores da Bíblia, em ordem|Oseias|Joel|Amós|Obadias|Jonas|Miqueias|Naum|Habacuque|Ageu|Malaquias
+Os 5 últimos livros do Antigo Testamento, do último para trás|Malaquias|Zacarias|Ageu|Sofonias|Habacuque|Naum|Miqueias|Jonas|Obadias|Amós
+Os 5 primeiros livros do Novo Testamento, em ordem|Mateus|Marcos|Lucas|João|Atos|Romanos|Gálatas|Hebreus|Apocalipse|Tiago
+As 5 primeiras cartas de Paulo no Novo Testamento, em ordem|Romanos|1 Coríntios|2 Coríntios|Gálatas|Efésios|Filipenses|Colossenses|Hebreus|Tiago|1 Tessalonicenses
+Os 5 últimos livros da Bíblia, do último para trás|Apocalipse|Judas|3 João|2 João|1 João|Tiago|1 Pedro|2 Pedro|Hebreus|Filemom
+Os 5 livros da Bíblia com mais capítulos|Salmos|Isaías|Jeremias|Gênesis|Ezequiel|Jó|Êxodo|Números|Atos|Lucas
+As 5 primeiras pragas do Egito, em ordem|Água em sangue|Rãs|Piolhos|Moscas|Peste nos animais|Úlceras|Granizo|Gafanhotos|Trevas|Morte dos primogênitos
+Os 5 primeiros signos do zodíaco, a partir de Áries|Áries|Touro|Gêmeos|Câncer|Leão|Virgem|Libra|Escorpião|Sagitário|Capricórnio
+Os 5 primeiros animais do horóscopo chinês, em ordem|Rato|Boi|Tigre|Coelho|Dragão|Serpente|Cavalo|Cabra|Macaco|Galo
+As 5 primeiras letras do alfabeto grego, em ordem|Alfa|Beta|Gama|Delta|Épsilon|Zeta|Eta|Teta|Lambda|Ômega
+As 5 primeiras letras da fileira de cima do teclado QWERTY|Q|W|E|R|T|Y|U|A|S|Z
+Prefixos do SI a partir de quilo, do menor para o maior|Quilo|Mega|Giga|Tera|Peta|Exa|Zetta|Hecto|Deca|Mili
+Prefixos do SI a partir de mili, do maior para o menor|Mili|Micro|Nano|Pico|Femto|Ato|Zepto|Centi|Deci|Quilo
+Unidades de armazenamento a partir do byte, da menor para a maior|Byte|Kilobyte|Megabyte|Gigabyte|Terabyte|Petabyte|Exabyte|Zettabyte|Yottabyte|Nibble
+Unidades de tempo a partir do segundo, da menor para a maior|Segundo|Minuto|Hora|Dia|Semana|Mês|Ano|Década|Século|Milênio
+Unidades de comprimento a partir do milímetro, da menor para a maior|Milímetro|Centímetro|Decímetro|Metro|Decâmetro|Hectômetro|Quilômetro|Micrômetro|Nanômetro|Ano-luz
+Polígonos a partir do triângulo, do que tem menos lados ao que tem mais|Triângulo|Quadrilátero|Pentágono|Hexágono|Heptágono|Octógono|Eneágono|Decágono|Dodecágono|Icoságono
+Os 5 sólidos de Platão, do que tem menos faces ao que tem mais|Tetraedro|Cubo|Octaedro|Dodecaedro|Icosaedro|Prisma|Pirâmide|Cone|Cilindro|Esfera
+Figuras musicais a partir da semibreve, da mais longa para a mais curta|Semibreve|Mínima|Semínima|Colcheia|Semicolcheia|Fusa|Semifusa|Quiáltera|Fermata|Ligadura
+As 5 primeiras notas do ciclo das quintas, a partir de Dó|Dó|Sol|Ré|Lá|Mi|Si|Fá|Si bemol|Mi bemol|Lá bemol
+Os 5 primeiros álbuns de estúdio dos Beatles, em ordem|Please Please Me|With the Beatles|A Hard Day's Night|Beatles for Sale|Help!|Rubber Soul|Revolver|Abbey Road|Let It Be|Yellow Submarine
+Os 5 primeiros álbuns de estúdio da Legião Urbana, em ordem|Legião Urbana|Dois|Que País É Este|As Quatro Estações|V|O Descobrimento do Brasil|A Tempestade|Uma Outra Estação|Acústico MTV|Música para Acampamentos
+Os 5 primeiros álbuns de estúdio de Michael Jackson pela Epic, em ordem|Off the Wall|Thriller|Bad|Dangerous|HIStory|Invincible|Ben|Got to Be There|Forever, Michael|Music & Me
+Os 5 primeiros livros de Harry Potter, em ordem|A Pedra Filosofal|A Câmara Secreta|O Prisioneiro de Azkaban|O Cálice de Fogo|A Ordem da Fênix|O Enigma do Príncipe|As Relíquias da Morte|A Criança Amaldiçoada|Animais Fantásticos|O Hobbit
+Os 5 primeiros filmes de Star Wars, por ordem de lançamento|Uma Nova Esperança|O Império Contra-Ataca|O Retorno de Jedi|A Ameaça Fantasma|Ataque dos Clones|A Vingança dos Sith|O Despertar da Força|Os Últimos Jedi|Rogue One|A Ascensão Skywalker
+Os 5 primeiros longas da Pixar, em ordem|Toy Story|Vida de Inseto|Toy Story 2|Monstros S.A.|Procurando Nemo|Os Incríveis|Carros|Ratatouille|WALL·E|Up
+Os 5 primeiros longas clássicos da Disney, em ordem|Branca de Neve|Pinóquio|Fantasia|Dumbo|Bambi|Cinderela|Peter Pan|A Bela Adormecida|Alice no País das Maravilhas|A Dama e o Vagabundo
+Os 5 primeiros filmes do Universo Marvel no cinema, em ordem|Homem de Ferro|O Incrível Hulk|Homem de Ferro 2|Thor|Capitão América: O Primeiro Vingador|Os Vingadores|Guardiões da Galáxia|Pantera Negra|Doutor Estranho|Homem-Formiga
+Os 5 primeiros atores de James Bond na série oficial, em ordem|Sean Connery|George Lazenby|Roger Moore|Timothy Dalton|Pierce Brosnan|Daniel Craig|Henry Cavill|Idris Elba|Hugh Jackman|Clive Owen
+Os 5 primeiros Pokémon da Pokédex, em ordem|Bulbasaur|Ivysaur|Venusaur|Charmander|Charmeleon|Charizard|Squirtle|Pikachu|Wartortle|Blastoise
+Os 5 primeiros modelos de iPhone, em ordem|iPhone|iPhone 3G|iPhone 3GS|iPhone 4|iPhone 4S|iPhone 5|iPhone 5C|iPhone 6|iPhone SE|iPhone X
+As 5 primeiras versões do Android com nome de doce, em ordem|Cupcake|Donut|Eclair|Froyo|Gingerbread|Honeycomb|Ice Cream Sandwich|Jelly Bean|KitKat|Lollipop
+Os 5 primeiros consoles de mesa da Nintendo, em ordem|NES|Super Nintendo|Nintendo 64|GameCube|Wii|Wii U|Switch|Game Boy|Nintendo DS|Nintendo 3DS
+As 5 primeiras versões do Mac OS X, em ordem|Cheetah|Puma|Jaguar|Panther|Tiger|Leopard|Snow Leopard|Lion|Mountain Lion|Mavericks
+As versões do Windows a partir do XP, em ordem|Windows XP|Windows Vista|Windows 7|Windows 8|Windows 10|Windows 11|Windows 98|Windows ME|Windows 2000|Windows 95
+Os países do BRICS original, na ordem da sigla|Brasil|Rússia|Índia|China|África do Sul|Irã|Egito|Etiópia|Emirados Árabes Unidos|Indonésia
+Os 5 primeiros feriados nacionais de data fixa do ano no Brasil|Confraternização Universal|Tiradentes|Dia do Trabalho|Independência do Brasil|Nossa Senhora Aparecida|Finados|Proclamação da República|Consciência Negra|Natal|São João
+Os animais das cédulas do Real, da menor para a maior nota|Tartaruga-marinha|Garça|Arara|Mico-leão-dourado|Onça-pintada|Garoupa|Lobo-guará|Tucano|Capivara|Tamanduá
+Postos de oficial do Exército Brasileiro a partir de segundo-tenente, em ordem|Segundo-tenente|Primeiro-tenente|Capitão|Major|Tenente-coronel|Coronel|General de brigada|Sargento|Cabo|Marechal
+As 5 melhores mãos do pôquer, da mais forte|Royal Straight Flush|Straight Flush|Quadra|Full House|Flush|Sequência|Trinca|Dois pares|Par|Carta alta
+As etapas do DMAIC (Seis Sigma), em ordem|Definir|Medir|Analisar|Melhorar|Controlar|Planejar|Executar|Verificar|Agir|Padronizar
+Os sensos do 5S, em ordem|Seiri|Seiton|Seiso|Seiketsu|Shitsuke|Kaizen|Kanban|Poka-yoke|Jidoka|Heijunka
+Os níveis da pirâmide de Maslow, da base para o topo|Fisiológicas|Segurança|Sociais|Estima|Autorrealização|Lazer|Espiritualidade|Financeiras|Profissionais|Familiares
+As 5 fases do luto de Kübler-Ross, em ordem|Negação|Raiva|Barganha|Depressão|Aceitação|Culpa|Medo|Choque|Esperança|Saudade
+As 5 fases psicossexuais de Freud, em ordem|Oral|Anal|Fálica|Latência|Genital|Visual|Tátil|Auditiva|Motora|Verbal
