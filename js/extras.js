@@ -65,6 +65,8 @@
       ["🎨", "Olho clínico", "Faça 95 pontos numa cor no Matiz", n("matiz-top"), 95],
       ["🏆", "Pódio perfeito", "Acerte um Pódio de primeira", n("podio-first"), 1],
       ["⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", n("amp-day-best"), 10],
+      ["🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", n("sudoku-perfect"), 1],
+      ["♟️", "Xeque-mate", "Vença o computador no Xeque (Difícil)", n("xadrez-won-dificil"), 1],
       ["⚔️", "Duelista", "Vença 5 partidas com amigos", n("mp-won"), 5],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
       ["🌟", "Dia completo", "Faça os 5 desafios do dia", n("alldone-days"), 1],
@@ -102,9 +104,12 @@
     "mp_played", "mp_won", "sa_best", "sa_tricks",
     "trivia_won", "trivia_best", "trivia_right",
     "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
-    "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played"];
+    "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played",
+    "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil", "sudoku_won", "sudoku_perfect",
+    "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil"];
   // Contadores em que menor é melhor (tempo e jogadas): 0 = ainda não jogou.
-  const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil"];
+  const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
+    "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));
   const MODES = ["termo", "infinito", "dueto", "quarteto"];
   const toB64 = (str) => { let bin = ""; new TextEncoder().encode(str).forEach((b) => (bin += String.fromCharCode(b))); return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };

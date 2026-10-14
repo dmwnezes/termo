@@ -90,6 +90,11 @@
         ["🎨", "Matiz", "var(--blue)", g("matiz-best"), "melhor dia", `${pl(g("matiz-played"), "partida", "partidas")} · melhor cor ${g("matiz-top") || 0}`],
         ["🏆", "Pódio", "var(--present)", g("podio-won"), g("podio-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("podio-played"), "partida", "partidas")} · sequência ${g("podio-streak") || 0}`],
         ["⏳", "Ampulheta", "var(--accent)", g("amp-best"), "recorde no Infinito", `do dia ${g("amp-day-best") || 0}/10 · ${pl(g("amp-played"), "partida", "partidas")}`],
+        (() => { const lv = [["dificil", "D"], ["medio", "M"], ["facil", "F"]], top = lv.find(([k]) => g("sudoku-best-" + k) > 0);
+          return ["🔢", "Quadrante", "var(--blue)", top ? P.fmtTime(g("sudoku-best-" + top[0])) : "—", top ? `no ${{ dificil: "Difícil", medio: "Médio", facil: "Fácil" }[top[0]]}` : "melhor tempo",
+            `${lv.slice().reverse().map(([k, a]) => `${a} ${g("sudoku-best-" + k) ? P.fmtTime(g("sudoku-best-" + k)) : "—"}`).join(" · ")} · ${pl(g("sudoku-won") || 0, "vitória", "vitórias")}`]; })(),
+        (() => { const w = ["facil", "medio", "dificil"].map((k) => g("xadrez-won-" + k) || 0), t = w[0] + w[1] + w[2];
+          return ["♟️", "Xeque", "var(--accent)", t, t === 1 ? "vitória" : "vitórias", `F ${w[0]} · M ${w[1]} · D ${w[2]}`]; })(),
         ["🗂️", "Arquivo", "var(--present)", g("arch-played"), g("arch-played") === 1 ? "desafio" : "desafios", pl(g("arch-won") || 0, "vencido", "vencidos")],
         ["⚔️", "Com amigos", "var(--blue)", g("mp-won"), g("mp-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("mp-played"), "partida", "partidas")}`],
       ];
