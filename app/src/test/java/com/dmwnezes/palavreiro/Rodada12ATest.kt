@@ -184,4 +184,22 @@ class Rodada12ATest {
         assertTrue(all.getValue("Historiador").unlocked)
         assertEquals("⏳", all.getValue("Historiador").emoji)
     }
+
+    // ---------- Conferência com o site (dia 300) ----------
+    /** Mesmo formato do script node que roda js/matiz.js, podio.js e ampulheta.js do site: o texto tem de ser idêntico. */
+    @Test
+    fun conferenciaDia300() {
+        val podio = PodioData.parse(File("../shared/podio.txt").readText())
+        val amp = AmpulhetaData.parse(File("../shared/ampulheta.txt").readText())
+        val pq = podio[PodioData.dailyIndex(dia, podio.size)]
+        val out = buildString {
+            appendLine("MATIZ " + MatizColor.daily(dia).joinToString(" ") { MatizColor.hex(it) })
+            appendLine("PODIO " + pq.title)
+            appendLine("OPCOES " + PodioData.dailyOptions(pq, dia).joinToString(" / "))
+            AmpulhetaData.dailyIndices(amp, dia).forEach { appendLine("AMP ${amp[it].year}|${amp[it].text}") }
+        }
+        print(out)
+        File("build/conferencia-dia300.txt").writeText(out)
+        assertEquals(11, out.lines().count { it.startsWith("AMP ") })
+    }
 }
