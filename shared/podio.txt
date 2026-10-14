@@ -1,6 +1,5 @@
 # Pódio (inspirado no Factle): TÍTULO|1º|2º|3º|4º|5º|errada1|errada2|errada3|errada4|errada5
 # Rankings estáveis (que não mudam com o tempo), com fonte confiável. As 5 erradas são plausíveis, do mesmo tipo, e ficam FORA do top 5.
-Os 5 maiores países do mundo em área|Rússia|Canadá|China|Estados Unidos|Brasil|Austrália|Índia|Argentina|Cazaquistão|Argélia
 Os 5 maiores estados do Brasil em área|Amazonas|Pará|Mato Grosso|Minas Gerais|Bahia|Mato Grosso do Sul|Goiás|Maranhão|Rio Grande do Sul|Tocantins
 Os 5 maiores planetas do Sistema Solar|Júpiter|Saturno|Urano|Netuno|Terra|Vênus|Marte|Mercúrio|Plutão|Lua
 Os 5 menores estados do Brasil em área (sem o DF), do menor ao maior|Sergipe|Alagoas|Rio de Janeiro|Espírito Santo|Rio Grande do Norte|Paraíba|Pernambuco|Santa Catarina|Ceará|Acre
@@ -17,14 +16,14 @@ Os 5 maiores países de língua oficial portuguesa em área|Brasil|Angola|Moçam
 Os 5 oceanos, do maior para o menor|Pacífico|Atlântico|Índico|Antártico|Ártico|Mar Mediterrâneo|Mar do Caribe|Mar Vermelho|Mar Báltico|Mar Cáspio
 As 5 montanhas mais altas do mundo|Everest|K2|Kangchenjunga|Lhotse|Makalu|Cho Oyu|Dhaulagiri|Manaslu|Nanga Parbat|Annapurna
 Os 5 pontos mais altos do Brasil (medição do IBGE)|Pico da Neblina|Pico 31 de Março|Pico da Bandeira|Pedra da Mina|Pico das Agulhas Negras|Pico do Cristal|Monte Roraima|Pico Paraná|Pedra Azul|Pico do Jabre
-Os 5 mais altos entre os pontos culminantes dos continentes|Everest|Aconcágua|Denali|Kilimanjaro|Elbrus|Maciço Vinson|Mont Blanc|Kosciuszko|Monte Fuji|Mauna Kea
+Os 5 mais altos entre os pontos culminantes dos continentes (Elbrus na Europa)|Everest|Aconcágua|Denali|Kilimanjaro|Elbrus|Maciço Vinson|Mont Blanc|Kosciuszko|Monte Fuji|Mauna Kea
 Os 5 maiores lagos do mundo em área|Mar Cáspio|Lago Superior|Lago Vitória|Lago Huron|Lago Michigan|Lago Tanganica|Lago Baikal|Lago Malawi|Lago Titicaca|Lago Ladoga
 As 5 maiores ilhas do mundo em área (sem a Austrália)|Groenlândia|Nova Guiné|Bornéu|Madagascar|Ilha de Baffin|Sumatra|Honshu|Grã-Bretanha|Ilha Vitória|Islândia
 As 5 maiores ilhas do Mar Mediterrâneo em área|Sicília|Sardenha|Chipre|Córsega|Creta|Maiorca|Malta|Rodes|Ibiza|Capri
 Os 5 estados do Brasil com mais municípios|Minas Gerais|São Paulo|Rio Grande do Sul|Bahia|Paraná|Santa Catarina|Goiás|Piauí|Paraíba|Maranhão
 Os 5 países com a maior fronteira terrestre com o Brasil|Bolívia|Peru|Venezuela|Colômbia|Guiana|Paraguai|Argentina|Uruguai|Suriname|França (Guiana Francesa)
 Os 5 maiores estados dos EUA em área|Alasca|Texas|Califórnia|Montana|Novo México|Arizona|Nevada|Colorado|Flórida|Nova York
-Os 5 menores estados dos EUA em área, do menor ao maior|Rhode Island|Delaware|Connecticut|Nova Jersey|New Hampshire|Vermont|Massachusetts|Havaí|Maryland|Virgínia Ocidental
+Os 5 menores estados dos EUA em área total, do menor ao maior|Rhode Island|Delaware|Connecticut|Nova Jersey|New Hampshire|Vermont|Massachusetts|Havaí|Maryland|Virgínia Ocidental
 As 5 maiores províncias e territórios do Canadá em área|Nunavut|Quebec|Territórios do Noroeste|Ontário|Colúmbia Britânica|Yukon|Alberta|Saskatchewan|Manitoba|Terra Nova e Labrador
 Os 5 primeiros presidentes do Brasil, em ordem|Deodoro da Fonseca|Floriano Peixoto|Prudente de Morais|Campos Sales|Rodrigues Alves|Afonso Pena|Hermes da Fonseca|Getúlio Vargas|Washington Luís|Epitácio Pessoa
 Os 5 primeiros presidentes a tomar posse na Nova República (desde 1985)|José Sarney|Fernando Collor|Itamar Franco|Fernando Henrique Cardoso|Lula|Tancredo Neves|Dilma Rousseff|Michel Temer|Jair Bolsonaro|Ernesto Geisel
@@ -71,7 +70,7 @@ Os 5 planetas de maior massa do Sistema Solar|Júpiter|Saturno|Netuno|Urano|Terr
 As 5 maiores luas do Sistema Solar em diâmetro|Ganimedes|Titã|Calisto|Io|Lua|Europa|Tritão|Titânia|Fobos|Encélado
 As 5 maiores luas de Saturno em diâmetro|Titã|Reia|Jápeto|Dione|Tétis|Encélado|Mimas|Hipérion|Febe|Ganimedes
 As 5 maiores luas de Urano em diâmetro|Titânia|Oberon|Umbriel|Ariel|Miranda|Puck|Tritão|Calisto|Europa|Fobos
-As 5 estrelas mais brilhantes do céu noturno|Sirius|Canopus|Alfa Centauri|Arcturus|Vega|Capela|Rigel|Prócion|Betelgeuse|Polaris
+As 5 estrelas mais brilhantes do céu noturno (Alfa Centauri como sistema)|Sirius|Canopus|Alfa Centauri|Arcturus|Vega|Capela|Rigel|Prócion|Betelgeuse|Polaris
 As 5 maiores constelações do céu em área|Hidra|Virgem|Ursa Maior|Baleia|Hércules|Erídano|Pégaso|Órion|Cruzeiro do Sul|Escorpião
 Os 5 elementos mais abundantes na crosta terrestre (em massa)|Oxigênio|Silício|Alumínio|Ferro|Cálcio|Sódio|Potássio|Magnésio|Carbono|Hidrogênio
 Os 5 gases mais abundantes no ar seco|Nitrogênio|Oxigênio|Argônio|Dióxido de carbono|Neônio|Hélio|Metano|Hidrogênio|Criptônio|Ozônio
@@ -82,9 +81,9 @@ Os elementos de número atômico 11 a 15, em ordem|Sódio|Magnésio|Alumínio|Si
 Os 5 primeiros gases nobres pelo número atômico|Hélio|Neônio|Argônio|Criptônio|Xenônio|Radônio|Hidrogênio|Nitrogênio|Flúor|Cloro
 Os 5 primeiros metais alcalinos pelo número atômico|Lítio|Sódio|Potássio|Rubídio|Césio|Frâncio|Hidrogênio|Magnésio|Cálcio|Berílio
 Os 5 primeiros metais alcalino-terrosos pelo número atômico|Berílio|Magnésio|Cálcio|Estrôncio|Bário|Rádio|Sódio|Potássio|Alumínio|Lítio
-Os 5 halogênios pelo número atômico|Flúor|Cloro|Bromo|Iodo|Astato|Oxigênio|Enxofre|Nitrogênio|Neônio|Hélio
+Os 5 primeiros halogênios pelo número atômico|Flúor|Cloro|Bromo|Iodo|Astato|Oxigênio|Enxofre|Nitrogênio|Neônio|Hélio
 Os 5 primeiros alcanos, do menor ao maior|Metano|Etano|Propano|Butano|Pentano|Hexano|Heptano|Octano|Eteno|Etino
-As camadas eletrônicas, da mais interna para a mais externa|K|L|M|N|O|P|Q|S|X|Z
+As 5 primeiras camadas eletrônicas, da mais interna para fora|K|L|M|N|O|P|Q|S|X|Z
 Os 5 minerais mais duros da escala de Mohs|Diamante|Coríndon|Topázio|Quartzo|Ortoclásio|Apatita|Fluorita|Calcita|Gipsita|Talco
 Os 5 minerais mais moles da escala de Mohs, do mais mole|Talco|Gipsita|Calcita|Fluorita|Apatita|Ortoclásio|Quartzo|Topázio|Coríndon|Diamante
 Os 5 primeiros períodos da Era Paleozoica, em ordem|Cambriano|Ordoviciano|Siluriano|Devoniano|Carbonífero|Permiano|Triássico|Jurássico|Cretáceo|Quaternário
@@ -137,9 +136,8 @@ Os 5 primeiros atores de James Bond na série oficial, em ordem|Sean Connery|Geo
 Os 5 primeiros Pokémon da Pokédex, em ordem|Bulbasaur|Ivysaur|Venusaur|Charmander|Charmeleon|Charizard|Squirtle|Pikachu|Wartortle|Blastoise
 Os 5 primeiros modelos de iPhone, em ordem|iPhone|iPhone 3G|iPhone 3GS|iPhone 4|iPhone 4S|iPhone 5|iPhone 5C|iPhone 6|iPhone SE|iPhone X
 As 5 primeiras versões do Android com nome de doce, em ordem|Cupcake|Donut|Eclair|Froyo|Gingerbread|Honeycomb|Ice Cream Sandwich|Jelly Bean|KitKat|Lollipop
-Os 5 primeiros consoles de mesa da Nintendo, em ordem|NES|Super Nintendo|Nintendo 64|GameCube|Wii|Wii U|Switch|Game Boy|Nintendo DS|Nintendo 3DS
 As 5 primeiras versões do Mac OS X, em ordem|Cheetah|Puma|Jaguar|Panther|Tiger|Leopard|Snow Leopard|Lion|Mountain Lion|Mavericks
-As versões do Windows a partir do XP, em ordem|Windows XP|Windows Vista|Windows 7|Windows 8|Windows 10|Windows 11|Windows 98|Windows ME|Windows 2000|Windows 95
+As 5 versões principais do Windows a partir do XP, em ordem|Windows XP|Windows Vista|Windows 7|Windows 8|Windows 10|Windows 11|Windows 98|Windows ME|Windows 2000|Windows 95
 Os países do BRICS original, na ordem da sigla|Brasil|Rússia|Índia|China|África do Sul|Irã|Egito|Etiópia|Emirados Árabes Unidos|Indonésia
 Os 5 primeiros feriados nacionais de data fixa do ano no Brasil|Confraternização Universal|Tiradentes|Dia do Trabalho|Independência do Brasil|Nossa Senhora Aparecida|Finados|Proclamação da República|Consciência Negra|Natal|São João
 Os animais das cédulas do Real, da menor para a maior nota|Tartaruga-marinha|Garça|Arara|Mico-leão-dourado|Onça-pintada|Garoupa|Lobo-guará|Tucano|Capivara|Tamanduá
@@ -150,3 +148,10 @@ Os sensos do 5S, em ordem|Seiri|Seiton|Seiso|Seiketsu|Shitsuke|Kaizen|Kanban|Pok
 Os níveis da pirâmide de Maslow, da base para o topo|Fisiológicas|Segurança|Sociais|Estima|Autorrealização|Lazer|Espiritualidade|Financeiras|Profissionais|Familiares
 As 5 fases do luto de Kübler-Ross, em ordem|Negação|Raiva|Barganha|Depressão|Aceitação|Culpa|Medo|Choque|Esperança|Saudade
 As 5 fases psicossexuais de Freud, em ordem|Oral|Anal|Fálica|Latência|Genital|Visual|Tátil|Auditiva|Motora|Verbal
+Os 5 maiores estados do Nordeste em área|Bahia|Maranhão|Piauí|Ceará|Pernambuco|Paraíba|Rio Grande do Norte|Alagoas|Sergipe|Tocantins
+As 5 primeiras missões Apollo tripuladas, em ordem|Apollo 7|Apollo 8|Apollo 9|Apollo 10|Apollo 11|Apollo 1|Apollo 12|Apollo 13|Apollo 17|Gemini 12
+Os 5 primeiros números primos|2|3|5|7|11|1|4|9|13|15
+Os 5 primeiros meses do ano com 31 dias|Janeiro|Março|Maio|Julho|Agosto|Fevereiro|Abril|Junho|Setembro|Novembro
+Os planetas do mais distante do Sol para dentro|Netuno|Urano|Saturno|Júpiter|Marte|Terra|Vênus|Mercúrio|Plutão|Lua
+Os 5 primeiros algarismos romanos, do menor valor ao maior|I|V|X|L|C|D|M|IV|IX|XL
+Os 5 primeiros presidentes eleitos da Quinta República francesa, em ordem|Charles de Gaulle|Georges Pompidou|Valéry Giscard d'Estaing|François Mitterrand|Jacques Chirac|Nicolas Sarkozy|François Hollande|Emmanuel Macron|Napoleão III|Philippe Pétain

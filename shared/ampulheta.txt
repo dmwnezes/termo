@@ -1,8 +1,540 @@
 # Ampulheta (inspirado no WasThatBefore): ANO|acontecimento   (ano negativo = antes de Cristo)
 # Acontecimentos bem conhecidos, com ano certo e estável; frase curta (até 90 caracteres), sem o ano no texto.
+-776|Primeiros Jogos Olímpicos da Antiguidade, segundo a tradição
+-753|Fundação de Roma, segundo a tradição
+-509|Fundação da República Romana, segundo a tradição
+-490|Batalha de Maratona
+-480|Batalha das Termópilas
+-399|Morte de Sócrates
+-336|Alexandre, o Grande, se torna rei da Macedônia
+-323|Morte de Alexandre, o Grande
+-264|Início da Primeira Guerra Púnica
+-221|Qin Shi Huang unifica a China e se torna o primeiro imperador
+-218|Aníbal atravessa os Alpes com elefantes
+-146|Destruição de Cartago pelos romanos
+-73|Início da revolta de escravos liderada por Espártaco
+-55|Júlio César invade a Britânia pela primeira vez
+-49|Júlio César atravessa o Rubicão
+-44|Assassinato de Júlio César
+-31|Batalha de Áccio
+-30|Morte de Cleópatra
+-27|Augusto se torna o primeiro imperador romano
+64|Grande incêndio de Roma, no governo de Nero
+70|Destruição do Templo de Jerusalém pelos romanos
+79|Erupção do Vesúvio destrói Pompeia
+80|Inauguração do Coliseu
+313|Édito de Milão garante liberdade aos cristãos
+325|Concílio de Niceia
+330|Constantinopla é inaugurada como nova capital do Império
+410|Saque de Roma pelos visigodos
+476|Queda do Império Romano do Ocidente
+622|Hégira: Maomé migra de Meca para Medina
+800|Carlos Magno é coroado imperador
+1054|Grande Cisma entre as Igrejas do Oriente e do Ocidente
+1066|Batalha de Hastings
+1096|Início da Primeira Cruzada
+1099|Cruzados tomam Jerusalém
+1206|Gêngis Khan unifica os povos mongóis
+1215|Assinatura da Magna Carta
+1271|Marco Polo parte em viagem para a Ásia
+1337|Início da Guerra dos Cem Anos
+1347|Peste Negra chega à Europa
+1415|Portugueses conquistam Ceuta
+1431|Joana d'Arc é queimada em Ruão
+1452|Nascimento de Leonardo da Vinci
+1453|Queda de Constantinopla
+1488|Bartolomeu Dias contorna o Cabo da Boa Esperança
+1492|Cristóvão Colombo chega à América
+1494|Assinatura do Tratado de Tordesilhas
+1498|Vasco da Gama chega à Índia por mar
 1500|Pedro Álvares Cabral chega ao Brasil
+1508|Michelangelo começa a pintar o teto da Capela Sistina
+1517|Martinho Lutero publica suas 95 teses
+1519|Morte de Leonardo da Vinci
+1521|Hernán Cortés conquista Tenochtitlán
+1522|Termina a primeira volta ao mundo, iniciada por Fernão de Magalhães
+1532|Fundação de São Vicente, primeira vila do Brasil
+1533|Pizarro executa Atahualpa, o imperador inca
+1534|Criação das capitanias hereditárias no Brasil
+1543|Copérnico publica sua teoria heliocêntrica
+1545|Início do Concílio de Trento
+1549|Tomé de Sousa funda Salvador, primeira capital do Brasil
+1554|Fundação de São Paulo pelos jesuítas
+1564|Nascimento de Galileu Galilei
+1565|Estácio de Sá funda a cidade do Rio de Janeiro
+1572|Massacre da Noite de São Bartolomeu, na França
+1572|Publicação de Os Lusíadas, de Luís de Camões
+1578|Dom Sebastião desaparece na Batalha de Alcácer-Quibir
+1580|Início da União Ibérica
+1588|Derrota da Invencível Armada espanhola
+1605|Publicação da primeira parte de Dom Quixote
+1607|Fundação de Jamestown, primeira colônia inglesa duradoura na América
+1609|Galileu começa a observar o céu com uma luneta
+1610|Galileu descobre as luas de Júpiter
+1616|Fundação de Belém, no Pará
+1616|Morte de William Shakespeare
+1618|Início da Guerra dos Trinta Anos
+1620|O navio Mayflower chega à América
+1628|William Harvey descreve a circulação do sangue
+1630|Holandeses invadem Pernambuco
+1633|Galileu é julgado pela Inquisição
+1640|Portugal restaura sua independência da Espanha
+1642|Morte de Galileu Galilei
+1648|Paz de Vestfália encerra a Guerra dos Trinta Anos
+1654|Holandeses são expulsos de Pernambuco
+1665|Robert Hooke descreve e dá nome às células
+1666|Grande Incêndio de Londres
+1687|Isaac Newton publica os Principia
+1688|Revolução Gloriosa na Inglaterra
+1695|Morte de Zumbi dos Palmares
+1707|Inglaterra e Escócia se unem e formam a Grã-Bretanha
+1715|Morte de Luís XIV, o Rei Sol
+1750|Tratado de Madri redefine as fronteiras do Brasil
+1752|Benjamin Franklin faz o experimento da pipa
+1755|Terremoto destrói Lisboa
+1756|Nascimento de Wolfgang Amadeus Mozart
+1759|Marquês de Pombal expulsa os jesuítas de Portugal e do Brasil
+1763|Capital do Brasil passa de Salvador para o Rio de Janeiro
+1769|James Watt patenteia sua máquina a vapor aperfeiçoada
+1770|Nascimento de Ludwig van Beethoven
+1773|Festa do Chá de Boston
+1776|Declaração de Independência dos Estados Unidos
+1781|William Herschel descobre o planeta Urano
+1783|Irmãos Montgolfier fazem o primeiro voo tripulado de balão
+1783|Tratado de Paris reconhece a independência dos Estados Unidos
+1789|Queda da Bastilha e início da Revolução Francesa
+1791|Morte de Wolfgang Amadeus Mozart
+1792|Execução de Tiradentes
+1793|Luís XVI é guilhotinado
+1796|Edward Jenner aplica a primeira vacina contra a varíola
+1799|Descoberta da Pedra de Roseta
+1800|Alessandro Volta inventa a pilha elétrica
+1804|Haiti declara sua independência da França
+1804|Napoleão Bonaparte é coroado imperador
+1805|Batalha de Trafalgar
+1808|Dom João abre os portos do Brasil às nações amigas
+1808|Família real portuguesa chega ao Brasil
+1809|Nascimento de Charles Darwin
+1812|Napoleão invade a Rússia
+1813|Publicação de Orgulho e Preconceito, de Jane Austen
+1815|Batalha de Waterloo
+1815|Brasil é elevado a Reino Unido a Portugal e Algarves
+1817|Revolução Pernambucana
+1818|Publicação de Frankenstein, de Mary Shelley
+1821|Dom João VI volta para Portugal
+1821|Morte de Napoleão Bonaparte
+1822|Champollion decifra os hieróglifos egípcios
 1822|Independência do Brasil
+1824|Confederação do Equador, revolta no Nordeste
+1824|Primeira Constituição do Brasil é outorgada
+1825|Inaugurada na Inglaterra a primeira ferrovia pública a vapor
+1827|Morte de Ludwig van Beethoven
+1831|Dom Pedro I abdica do trono do Brasil
+1835|Início da Cabanagem, no Pará
+1835|Início da Revolução Farroupilha
+1839|Nascimento de Machado de Assis
+1840|Golpe da Maioridade: Dom Pedro II assume o trono ainda adolescente
+1844|Samuel Morse envia a primeira mensagem por telégrafo
+1845|Fim da Revolução Farroupilha
+1846|Descoberta do planeta Netuno
+1848|Publicação do Manifesto Comunista
+1850|Lei Eusébio de Queirós proíbe o tráfico de escravos para o Brasil
+1851|Publicação de Moby Dick, de Herman Melville
+1854|Barão de Mauá inaugura a primeira ferrovia do Brasil
+1857|Publicação de O Guarani, de José de Alencar
+1859|Charles Darwin publica A Origem das Espécies
+1861|Início da Guerra Civil Americana
+1862|Publicação de Os Miseráveis, de Victor Hugo
+1863|Fundação da Football Association, na Inglaterra
+1863|Lincoln assina a Proclamação de Emancipação dos escravos
+1864|Início da Guerra do Paraguai
+1865|Assassinato de Abraham Lincoln
+1865|Lewis Carroll publica Alice no País das Maravilhas
+1865|Publicação de Iracema, de José de Alencar
+1866|Publicação de Crime e Castigo, de Dostoiévski
+1867|Estados Unidos compram o Alasca da Rússia
+1869|Dmitri Mendeleiev apresenta a tabela periódica
+1869|Inauguração do Canal de Suez
+1869|Nascimento de Mahatma Gandhi
+1870|Fim da Guerra do Paraguai
+1871|Comuna de Paris
+1871|Lei do Ventre Livre
+1871|Unificação da Alemanha
+1872|Primeiro recenseamento geral do Brasil
+1873|Nascimento de Santos Dumont
+1876|Graham Bell patenteia o telefone
+1877|Thomas Edison inventa o fonógrafo
+1879|Nascimento de Albert Einstein
+1879|Thomas Edison apresenta sua lâmpada incandescente
+1883|Erupção do vulcão Krakatoa
+1884|Ceará se torna a primeira província a abolir a escravidão
+1885|Lei dos Sexagenários
+1885|Louis Pasteur aplica a vacina contra a raiva
+1886|Inauguração da Estátua da Liberdade
+1886|Karl Benz patenteia seu automóvel a motor
 1888|Assinatura da Lei Áurea
+1889|Inauguração da Torre Eiffel
 1889|Proclamação da República no Brasil
-1969|Primeira viagem tripulada à Lua
+1890|Morte de Vincent van Gogh
+1891|Inauguração da Avenida Paulista
+1891|James Naismith inventa o basquete
+1891|Primeira Constituição republicana do Brasil
+1893|Nova Zelândia se torna o primeiro país a dar voto às mulheres
+1894|Charles Miller traz bolas e regras do futebol para o Brasil
+1895|Fundação do Clube de Regatas do Flamengo
+1895|Irmãos Lumière fazem a primeira sessão pública de cinema
+1895|Wilhelm Röntgen descobre os raios X
+1895|William Morgan inventa o vôlei
+1896|Primeiros Jogos Olímpicos da era moderna, em Atenas
+1897|Fim da Guerra de Canudos
+1897|Inauguração de Belo Horizonte, nova capital de Minas Gerais
+1897|Publicação de Drácula, de Bram Stoker
+1898|Fundação do Vasco da Gama
+1898|Marie e Pierre Curie descobrem o rádio e o polônio
+1901|Marconi transmite um sinal de rádio através do Atlântico
+1901|Primeira entrega do Prêmio Nobel
+1902|Fundação do Fluminense
+1902|Nascimento de Carlos Drummond de Andrade
+1902|Publicação de Os Sertões, de Euclides da Cunha
+1903|Fundação do Grêmio
+1903|Irmãos Wright fazem voo motorizado nos Estados Unidos
+1904|Fundação da FIFA
+1904|Revolta da Vacina no Rio de Janeiro
+1905|Einstein publica a teoria da relatividade restrita
+1906|Santos Dumont voa com o 14-Bis em Paris
+1906|Terremoto destrói San Francisco
+1908|Ford lança o Modelo T
+1908|Fundação do Atlético Mineiro
+1908|Morte de Machado de Assis
+1909|Fundação do Internacional
+1909|Inauguração do Theatro Municipal do Rio de Janeiro
+1910|Fundação do Corinthians
+1910|Inauguração do Theatro José de Alencar, em Fortaleza
+1910|Proclamação da República em Portugal
+1910|Revolta da Chibata
+1911|Inauguração do Theatro Municipal de São Paulo
+1911|Roald Amundsen chega ao Polo Sul
+1912|Fundação do Santos
+1912|Inauguração do bondinho do Pão de Açúcar
+1912|Início da Guerra do Contestado
+1912|Nascimento de Jorge Amado
+1912|Naufrágio do Titanic
+1913|Nascimento de Vinicius de Moraes
+1914|Assassinato do arquiduque Francisco Ferdinando em Sarajevo
+1914|Fundação do Ceará Sporting Club
+1914|Fundação do Palmeiras, como Palestra Itália
+1914|Inauguração do Canal do Panamá
+1914|Início da Primeira Guerra Mundial
+1915|Einstein apresenta a teoria da relatividade geral
+1917|Estados Unidos entram na Primeira Guerra Mundial
+1917|Grande greve geral operária em São Paulo
+1917|Revolução Russa
+1918|Fim da Primeira Guerra Mundial
+1918|Fundação do Fortaleza Esporte Clube
+1918|Nascimento de Nelson Mandela
+1919|Assinatura do Tratado de Versalhes
+1919|Brasil vence seu primeiro Campeonato Sul-Americano de futebol
+1920|Brasil conquista sua primeira medalha de ouro olímpica, no tiro
+1920|Nascimento de Clarice Lispector
+1921|Fundação do Cruzeiro, como Palestra Itália
+1922|Descoberta da tumba de Tutancâmon
+1922|Mussolini marcha sobre Roma
+1922|Semana de Arte Moderna em São Paulo
+1924|Morte de Lênin
+1924|Primeiros Jogos Olímpicos de Inverno, em Chamonix
+1925|Publicação de O Grande Gatsby, de F. Scott Fitzgerald
+1926|John Logie Baird faz a primeira demonstração pública da televisão
+1927|Charles Lindbergh atravessa o Atlântico sozinho de avião
+1927|Estreia de O Cantor de Jazz, primeiro longa falado
+1927|Nascimento de Tom Jobim
+1928|Alexander Fleming descobre a penicilina
+1928|Mickey Mouse estreia em Steamboat Willie
+1928|Publicação de Macunaíma, de Mário de Andrade
+1929|Nascimento de Martin Luther King
+1929|Primeira cerimônia do Oscar
+1929|Quebra da Bolsa de Nova York
+1930|Descoberta de Plutão
+1930|Primeira Copa do Mundo de futebol, no Uruguai
+1930|Publicação de O Quinze, de Rachel de Queiroz
+1931|Inauguração do Cristo Redentor
+1931|Inauguração do Empire State Building
+1932|Amelia Earhart atravessa o Atlântico sozinha de avião
+1932|Morte de Santos Dumont
+1932|Mulheres conquistam o direito ao voto no Brasil
+1932|Revolução Constitucionalista em São Paulo
+1933|Adolf Hitler se torna chanceler da Alemanha
+1936|Início da Guerra Civil Espanhola
+1936|Jesse Owens ganha quatro medalhas de ouro em Berlim
+1937|Desastre do dirigível Hindenburg
+1937|Estreia de Branca de Neve e os Sete Anões
+1937|Getúlio Vargas instaura o Estado Novo
+1937|Inauguração da ponte Golden Gate
+1937|Pablo Picasso pinta Guernica
+1937|Publicação de O Hobbit, de J. R. R. Tolkien
+1938|Leônidas da Silva é o artilheiro da Copa do Mundo
+1938|Publicação de Vidas Secas, de Graciliano Ramos
+1939|Estreia de E o Vento Levou
+1939|Início da Segunda Guerra Mundial
+1940|Nascimento de Pelé
+1941|Ataque japonês a Pearl Harbor
+1941|Criação da Companhia Siderúrgica Nacional
+1941|Estreia de Cidadão Kane
+1942|Brasil declara guerra aos países do Eixo
+1943|Criação da CLT, a Consolidação das Leis do Trabalho
+1943|Publicação de O Pequeno Príncipe
+1944|Dia D: desembarque aliado na Normandia
+1944|Força Expedicionária Brasileira embarca para lutar na Itália
+1945|Bombas atômicas sobre Hiroshima e Nagasaki
+1945|Fim da Segunda Guerra Mundial
+1945|Fim do Estado Novo e deposição de Getúlio Vargas
+1945|Fundação da ONU
+1945|Tomada de Monte Castelo pela FEB
+1946|Apresentação do ENIAC, um dos primeiros computadores eletrônicos
+1947|Independência da Índia
+1947|Invenção do transistor
+1948|Assassinato de Mahatma Gandhi
+1948|Criação do Estado de Israel
+1948|Declaração Universal dos Direitos Humanos
+1949|Criação da OTAN
+1949|Fundação da República Popular da China
+1950|Inauguração do Maracanã
+1950|Início da Guerra da Coreia
+1950|Primeira temporada do Mundial de Fórmula 1
+1950|Primeira transmissão de televisão no Brasil, pela TV Tupi
+1950|Uruguai vence o Brasil no Maracanã e conquista a Copa do Mundo
+1951|Estreia da primeira telenovela brasileira, Sua Vida Me Pertence
+1952|Adhemar Ferreira da Silva ganha o ouro no salto triplo em Helsinque
+1953|Coroação da rainha Elizabeth II
+1953|Criação da Petrobras
+1953|Edmund Hillary e Tenzing Norgay chegam ao topo do Everest
+1953|Watson e Crick descrevem a estrutura em dupla hélice do DNA
+1954|Publicação de A Sociedade do Anel, de Tolkien
+1954|Roger Bannister corre a milha em menos de quatro minutos
+1954|Suicídio de Getúlio Vargas
+1955|Aprovada a vacina de Jonas Salk contra a poliomielite
+1955|Inauguração da Disneylândia, na Califórnia
+1955|Morte de Albert Einstein
+1955|Rosa Parks se recusa a ceder seu lugar no ônibus
+1956|Juscelino Kubitschek toma posse como presidente
+1956|Publicação de Grande Sertão: Veredas, de Guimarães Rosa
+1957|A cadela Laika se torna o primeiro animal a orbitar a Terra
+1957|União Soviética lança o Sputnik, o primeiro satélite artificial
+1958|Brasil conquista sua primeira Copa do Mundo, na Suécia
+1958|João Gilberto grava Chega de Saudade e marca o início da bossa nova
+1959|Maria Esther Bueno vence Wimbledon pela primeira vez
+1959|Vitória da Revolução Cubana
 1960|Inauguração de Brasília
+1960|Nascimento de Ayrton Senna
+1960|Nascimento de Diego Maradona
+1961|Construção do Muro de Berlim
+1961|Renúncia de Jânio Quadros
+1961|Yuri Gagarin se torna o primeiro ser humano no espaço
+1962|Brasil conquista o bicampeonato mundial no Chile
+1962|Crise dos Mísseis de Cuba
+1962|O Pagador de Promessas ganha a Palma de Ouro em Cannes
+1962|Os Beatles lançam seu primeiro single, Love Me Do
+1963|Assassinato de John F. Kennedy
+1963|Valentina Tereshkova se torna a primeira mulher no espaço
+1964|Golpe militar no Brasil
+1964|Os Beatles se apresentam no programa de Ed Sullivan
+1965|Alexei Leonov faz a primeira caminhada espacial
+1965|Criação da TV Globo
+1966|Inglaterra conquista a Copa do Mundo em casa
+1967|Caetano e Gil apresentam Alegria, Alegria e Domingo no Parque em festival
+1967|Primeiro transplante de coração, na África do Sul
+1967|Publicação de Cem Anos de Solidão, de Gabriel García Márquez
+1968|Assassinato de Martin Luther King
+1968|Decretação do AI-5
+1968|Inauguração do MASP na Avenida Paulista
+1969|Estreia do Jornal Nacional
+1969|Festival de Woodstock
+1969|Pelé marca o milésimo gol
+1969|Primeira viagem tripulada à Lua
+1970|Acidente na missão Apollo 13
+1970|Brasil conquista o tricampeonato mundial no México
+1970|Fim dos Beatles
+1971|Inauguração do Walt Disney World, na Flórida
+1971|Lançamento do Intel 4004, o primeiro microprocessador comercial
+1972|Emerson Fittipaldi conquista seu primeiro título na Fórmula 1
+1972|Estreia de O Poderoso Chefão
+1972|Lançamento do videogame Pong
+1972|Primeira transmissão de televisão em cores no Brasil
+1973|Golpe militar no Chile derruba Salvador Allende
+1973|Inauguração da Ópera de Sydney
+1973|Primeira ligação feita de um telefone celular
+1974|Inauguração da Ponte Rio-Niterói
+1974|Metrô de São Paulo começa a operar
+1974|Revolução dos Cravos em Portugal
+1975|Estreia de Tubarão, de Steven Spielberg
+1975|Fundação da Microsoft
+1975|Lançamento de Bohemian Rhapsody, do Queen
+1975|Queda de Saigon encerra a Guerra do Vietnã
+1976|Concorde começa a fazer voos comerciais
+1976|Fundação da Apple
+1976|Morte de Mao Tsé-Tung
+1976|Nadia Comăneci tira a primeira nota 10 da ginástica olímpica
+1977|Aprovada a Lei do Divórcio no Brasil
+1977|Estreia de Star Wars nos cinemas
+1977|Lançamento das sondas Voyager
+1977|Morte de Elvis Presley
+1977|Publicação de A Hora da Estrela, de Clarice Lispector
+1978|Karol Wojtyła é eleito papa e escolhe o nome João Paulo II
+1978|Nascimento do primeiro bebê de proveta, na Inglaterra
+1979|Lei da Anistia no Brasil
+1979|Metrô do Rio de Janeiro começa a operar
+1979|Revolução Islâmica no Irã
+1980|Assassinato de John Lennon
+1980|Lançamento do jogo Pac-Man
+1981|Flamengo vence o Liverpool e conquista o Mundial Interclubes
+1981|IBM lança seu computador pessoal, o IBM PC
+1981|Nelson Piquet conquista seu primeiro título na Fórmula 1
+1981|Primeiro voo do ônibus espacial Columbia
+1982|Estreia de E.T. – O Extraterrestre
+1982|Guerra das Malvinas
+1982|Lançamento de Thriller, de Michael Jackson
+1982|Morte de Elis Regina
+1983|Grêmio vence o Mundial Interclubes
+1984|Emenda das Diretas Já é derrotada na Câmara
+1984|Lançamento do primeiro Macintosh
+1984|Usina de Itaipu começa a gerar energia
+1985|Estreia de De Volta para o Futuro
+1985|Lançamento de Super Mario Bros.
+1985|Microsoft lança a primeira versão do Windows
+1985|Nascimento de Cristiano Ronaldo
+1985|Primeira edição do Rock in Rio
+1985|Show beneficente Live Aid
+1985|Tancredo Neves é eleito presidente pelo Colégio Eleitoral
+1986|Acidente nuclear de Chernobyl
+1986|Estreia do Xou da Xuxa
+1986|Explosão do ônibus espacial Challenger
+1986|Gol de mão de Maradona contra a Inglaterra na Copa
+1986|Lançamento do Plano Cruzado
+1987|Nascimento de Lionel Messi
+1988|Assassinato de Chico Mendes
+1988|Ayrton Senna conquista seu primeiro título na Fórmula 1
+1988|Promulgação da Constituição Cidadã
+1989|Estreia da série Os Simpsons
+1989|Lançamento do Game Boy
+1989|Primeira eleição direta para presidente após a ditadura militar
+1989|Queda do Muro de Berlim
+1989|Tim Berners-Lee propõe a World Wide Web
+1990|Lançamento do telescópio espacial Hubble
+1990|Morte de Cazuza
+1990|Nelson Mandela é libertado da prisão
+1990|Plano Collor confisca a poupança dos brasileiros
+1990|Reunificação da Alemanha
+1991|Assinatura do tratado que cria o Mercosul
+1991|Fim da União Soviética
+1991|Morte de Freddie Mercury
+1991|Primeiro site da internet entra no ar
+1992|Impeachment de Fernando Collor
+1992|Nascimento de Neymar
+1992|Rio de Janeiro sedia a Cúpula da Terra, conferência da ONU sobre meio ambiente
+1992|São Paulo vence o Barcelona e conquista o Mundial Interclubes
+1993|Estreia de Jurassic Park
+1993|Tratado de Maastricht entra em vigor e cria a União Europeia
+1994|Brasil conquista o tetracampeonato mundial nos Estados Unidos
+1994|Estreia da série Friends
+1994|Estreia de O Rei Leão
+1994|Fundação da Amazon
+1994|Lançamento do Plano Real
+1994|Lançamento do PlayStation no Japão
+1994|Morte de Ayrton Senna
+1994|Morte de Kurt Cobain
+1994|Nelson Mandela é eleito presidente da África do Sul
+1995|Criação da Organização Mundial do Comércio
+1995|Estreia de Toy Story, primeiro longa todo feito por computador
+1996|Lançamento de Pokémon Red e Green no Japão
+1996|Morte de Renato Russo
+1996|Morte dos integrantes dos Mamonas Assassinas em acidente aéreo
+1996|Nascimento da ovelha Dolly, primeiro mamífero clonado de célula adulta
+1997|Estreia de Titanic nos cinemas
+1997|Gustavo Kuerten vence Roland Garros pela primeira vez
+1997|Hong Kong volta a ser território chinês
+1997|Morte da princesa Diana
+1997|Publicação do primeiro livro de Harry Potter
+1997|Robô Sojourner pousa em Marte
+1998|Central do Brasil ganha o Urso de Ouro em Berlim
+1998|França vence o Brasil na final da Copa do Mundo
+1998|Fundação do Google
+1998|Início da montagem da Estação Espacial Internacional
+1999|Estreia de Matrix
+1999|Macau é devolvido à China
+2001|Atentados de 11 de Setembro nos Estados Unidos
+2001|Estreia do primeiro filme de Harry Potter
+2002|Brasil conquista o pentacampeonato mundial de futebol
+2002|Estreia do Big Brother Brasil
+2002|Notas e moedas de euro começam a circular
+2003|Conclusão do Projeto Genoma Humano
+2003|Início da Guerra do Iraque
+2003|Lula toma posse como presidente pela primeira vez
+2003|Último voo comercial do Concorde
+2004|Fundação do Facebook
+2004|Lançamento do Orkut
+2004|Tsunami no Oceano Índico
+2005|Furacão Katrina devasta Nova Orleans
+2005|Morte do papa João Paulo II
+2005|Publicação do primeiro vídeo no YouTube
+2005|São Paulo vence o Liverpool e conquista o Mundial de Clubes
+2006|Internacional vence o Barcelona e conquista o Mundial de Clubes
+2006|Lançamento do Nintendo Wii
+2006|Marcos Pontes se torna o primeiro astronauta brasileiro
+2006|Plutão deixa de ser considerado planeta
+2007|Steve Jobs apresenta o primeiro iPhone
+2008|Barack Obama é eleito presidente dos Estados Unidos
+2008|Estreia da série Breaking Bad
+2008|Falência do banco Lehman Brothers
+2008|Michael Phelps ganha oito medalhas de ouro em uma só Olimpíada
+2008|Usain Bolt vence os 100 metros nas Olimpíadas de Pequim
+2009|Criação do bitcoin, com a mineração do primeiro bloco
+2009|Morte de Michael Jackson
+2009|Rio de Janeiro é escolhido sede dos Jogos Olímpicos
+2009|Usain Bolt corre os 100 metros em 9s58
+2010|Apple lança o primeiro iPad
+2010|Espanha conquista sua primeira Copa do Mundo
+2010|Lançamento do Instagram
+2010|Terremoto devastador no Haiti
+2011|Dilma Rousseff toma posse como a primeira mulher presidente do Brasil
+2011|Estreia da série Game of Thrones
+2011|Morte de Osama bin Laden
+2011|Terremoto e tsunami no Japão causam o acidente nuclear de Fukushima
+2012|Corinthians vence o Chelsea e conquista o Mundial de Clubes
+2012|Descoberta do bóson de Higgs
+2012|Robô Curiosity pousa em Marte
+2013|Incêndio na boate Kiss, em Santa Maria
+2013|Jorge Mario Bergoglio é eleito papa e escolhe o nome Francisco
+2013|Jornadas de Junho: onda de protestos pelo Brasil
+2013|Morte de Nelson Mandela
+2014|Brasil perde de 7 a 1 para a Alemanha na Copa disputada em casa
+2014|Orkut é desativado
+2014|Rússia anexa a Crimeia
+2015|Assinatura do Acordo de Paris sobre o clima
+2015|Rompimento da barragem de Fundão, em Mariana
+2016|Brasil ganha o primeiro ouro olímpico no futebol masculino
+2016|Impeachment de Dilma Rousseff
+2016|Lançamento de Pokémon GO
+2016|Reino Unido vota pela saída da União Europeia
+2016|Rio de Janeiro sedia os Jogos Olímpicos
+2017|Lançamento do Nintendo Switch
+2018|França conquista o bicampeonato mundial na Rússia
+2018|Incêndio destrói o Museu Nacional, no Rio de Janeiro
+2019|Divulgada a primeira imagem de um buraco negro
+2019|Incêndio atinge a Catedral de Notre-Dame, em Paris
+2019|Rompimento da barragem de Brumadinho
+2020|Morte de Diego Maradona
+2020|OMS declara a pandemia de covid-19
+2020|Parasita se torna o primeiro filme não falado em inglês a vencer o Oscar principal
+2020|Primeiro caso de covid-19 confirmado no Brasil
+2021|Invasão do Capitólio, nos Estados Unidos
+2021|Lançamento do telescópio espacial James Webb
+2021|Rebeca Andrade ganha o primeiro ouro olímpico da ginástica feminina do Brasil
+2022|Argentina de Messi conquista a Copa do Mundo no Catar
+2022|Lançamento do ChatGPT
+2022|Morte da rainha Elizabeth II
+2022|Morte de Pelé
+2022|Rússia invade a Ucrânia
+2024|Enchentes históricas atingem o Rio Grande do Sul
+2024|Paris sedia os Jogos Olímpicos
+2025|Ainda Estou Aqui ganha o Oscar de melhor filme internacional
+2025|Morte do papa Francisco
+2025|Robert Prevost é eleito papa e escolhe o nome Leão XIV
