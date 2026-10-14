@@ -34,6 +34,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "arch_played", "arch_won", "alldone_days",
             "trivia_won", "trivia_best", "trivia_right",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
+            "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
@@ -76,6 +77,9 @@ object Achievements {
             a("🧠", "Sabichão", "Ganhe 1 partida de Trivia (as 6 medalhas)", r["trivia_won"], 1),
             a("📚", "Enciclopédia", "Acerte 100 perguntas na Trivia", r["trivia_right"], 100),
             a("🃏", "Memória de elefante", "Termine a Memória no Difícil", if (r["mem_best_dificil"] > 0) 1 else 0, 1),
+            a("🎨", "Olho clínico", "Faça 95 pontos numa cor", r["matiz_top"], 95),
+            a("🏆", "Pódio perfeito", "Acerte um Pódio de primeira", r["podio_first"], 1),
+            a("⏳", "Historiador", "Acerte as 10 cartas do dia", r["amp_day_best"], 10),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
             a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),

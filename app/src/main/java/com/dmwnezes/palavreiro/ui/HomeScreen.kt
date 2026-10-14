@@ -45,7 +45,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
+    MATIZ, PODIO, AMPULHETA }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -79,6 +80,9 @@ fun HomeScreen(
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
         GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
         GameCardInfo(Dest.MEMORIA, "Jogo da Memória", "Ache os pares de sinônimos", null),
+        GameCardInfo(Dest.MATIZ, "Matiz", "Memorize a cor e recrie com R, G e B", badges[Dest.MATIZ]),
+        GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
+        GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
@@ -313,6 +317,9 @@ internal fun CardIcon(dest: Dest) {
         Dest.SINONIMOS -> SynAntIcon()
         Dest.TRIVIA -> TriviaWheel(0f, 50.dp, pointer = false)
         Dest.MEMORIA -> MemoryIcon()
+        Dest.MATIZ -> MatizIcon()
+        Dest.PODIO -> PodioIcon()
+        Dest.AMPULHETA -> AmpulhetaIcon()
     }
 }
 
