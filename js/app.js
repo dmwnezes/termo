@@ -32,6 +32,10 @@
     trivia: `<div class="tv-ico" aria-hidden="true"><i></i><b>?</b></div>`,
     // Memória: duas cartas viradas e um par verde.
     memoria: `<div class="mem-ico" aria-hidden="true"><i></i><i class="ok">AB</i><i class="ok">AB</i><i></i></div>`,
+    // Matiz: três bolhas de cor sobrepostas; Pódio: degraus 2-1-3; Ampulheta: ampulheta em CSS.
+    matiz: `<div class="mz-ico" aria-hidden="true"><i></i><i></i><i></i></div>`,
+    podio: `<div class="pd-ico" aria-hidden="true"><i>2</i><i>1</i><i>3</i></div>`,
+    ampulheta: `<div class="amp-ico" aria-hidden="true"><i></i><i></i></div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
 
@@ -54,6 +58,9 @@
       ["sinonimos", "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", ""],
       ["trivia", "Trivia", "Gire a roleta e junte as 6 medalhas", ""],
       ["memoria", "Jogo da Memória", "Ache os pares de sinônimos", ""],
+      ["matiz", "Matiz", "Memorize a cor e recrie-a", badge(dd("matiz"))],
+      ["podio", "Pódio", "Monte o top 5 do ranking", badge(dd("podio"))],
+      ["ampulheta", "Ampulheta", "O que veio antes? Monte a linha do tempo", badge(dd("ampulheta"))],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
@@ -95,6 +102,9 @@
       ortografia: () => P.games.ortografia(app),
       trivia: () => P.games.trivia(app),
       memoria: () => P.games.memoria(app),
+      matiz: () => P.games.matiz(app),
+      podio: () => P.games.podio(app),
+      ampulheta: () => P.games.ampulheta(app),
       arquivo: () => (parts[1] && P.games.arquivoGame(app, parts[1], parts[2])) || P.games.arquivo(app),
     };
     if (r === "desafio") {

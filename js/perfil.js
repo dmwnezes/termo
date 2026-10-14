@@ -87,6 +87,9 @@
         ["⛓️", "Sinônimo ou Antônimo", "var(--correct)", chain, "maior cadeia", pl(tricks, "pegadinha", "pegadinhas")],
         ["🧠", "Trivia", "var(--present)", g("trivia-won"), g("trivia-won") === 1 ? "vitória" : "vitórias", `recorde ${pl(g("trivia-best") || 0, "acerto", "acertos")} · ${g("trivia-right") || 0} no total`],
         memRec(),
+        ["🎨", "Matiz", "var(--blue)", g("matiz-best"), "melhor dia", `${pl(g("matiz-played"), "partida", "partidas")} · melhor cor ${g("matiz-top") || 0}`],
+        ["🏆", "Pódio", "var(--present)", g("podio-won"), g("podio-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("podio-played"), "partida", "partidas")} · sequência ${g("podio-streak") || 0}`],
+        ["⏳", "Ampulheta", "var(--accent)", g("amp-best"), "recorde no Infinito", `do dia ${g("amp-day-best") || 0}/10 · ${pl(g("amp-played"), "partida", "partidas")}`],
         ["🗂️", "Arquivo", "var(--present)", g("arch-played"), g("arch-played") === 1 ? "desafio" : "desafios", pl(g("arch-won") || 0, "vencido", "vencidos")],
         ["⚔️", "Com amigos", "var(--blue)", g("mp-won"), g("mp-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("mp-played"), "partida", "partidas")}`],
       ];
