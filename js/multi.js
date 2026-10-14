@@ -1,7 +1,7 @@
 // Jogar com amigo (site): partida ao vivo pelo ntfy.sh, compatível com o app Android.
 // Link: ?mp=SALA-MODO-SEED · tópico "palavreiro-mp-" + SALA · mensagens JSON (hello, start, row, end, again, bye;
 // Anagrama e Qual é a Palavra?: solve, skip; Caça-Palavras: grid, found, timeup; Velha e Damas: move, resign; reações: react).
-// Caça-Palavras, Jogo da Velha e Damas ficam em js/multi-games.js (registrados em P.mp.kinds).
+// Caça-Palavras, Jogo da Velha e Damas ficam em js/multi-games.js; Xeque/Xadrez (k) em js/multi-xadrez.js (registrados em P.mp.kinds).
 (function () {
   "use strict";
   // Testes: localStorage "pv-ntfy" (ex.: "http://127.0.0.1:8799/") troca o servidor do ntfy.sh.
@@ -16,18 +16,19 @@
     p: { key: "palavra", name: "Qual é a Palavra?", pill: "Palavra?", inv: "um Qual é a Palavra?", boards: 0, pts: true },
     v: { key: "velha", name: "Jogo da Velha", pill: "Velha", inv: "um Jogo da Velha", boards: 0 },
     x: { key: "damas", name: "Damas", pill: "Damas", inv: "uma partida de Damas", boards: 0 },
+    k: { key: "xadrez", name: "Xeque", pill: "Xeque", inv: "uma partida de Xeque", boards: 0, rd: 1 },
     f: { key: "forca", name: "Forca", pill: "Forca", inv: "uma Forca", boards: 0 },
     s: { key: "adedonha", name: "Adedonha", pill: "Adedonha", inv: "uma Adedonha", boards: 0, pts: true, rc: [3, 5, 7], rd: 5 },
     g: { key: "trivia", name: "Trivia", pill: "Trivia", inv: "uma Trivia", boards: 0, pts: true },
   };
   /** Seções da tela de criar partida (e a ordem da grade do "Próximo jogo"). */
-  const SECTIONS = [["Palavras", ["t", "d", "q", "a", "c", "p", "f", "s"]], ["Conhecimento", ["g"]], ["Tabuleiro", ["v", "x"]]];
+  const SECTIONS = [["Palavras", ["t", "d", "q", "a", "c", "p", "f", "s"]], ["Conhecimento", ["g"]], ["Tabuleiro", ["v", "x", "k"]]];
   const ORDER = SECTIONS.flatMap((x) => x[1]);
   const DESC = {
     t: "Uma palavra, quem acertar primeiro", d: "Duas palavras ao mesmo tempo", q: "Quatro palavras, 9 tentativas",
     a: "Desembaralhe as letras antes", c: "A mesma grade para os dois", p: "Descubra a palavra pela definição",
     f: "Um escolhe a palavra, o outro adivinha", s: "Uma letra, várias categorias", g: "Perguntas de 6 temas",
-    v: "X contra O, o clássico", x: "Regras brasileiras",
+    v: "X contra O, o clássico", x: "Regras brasileiras", k: "Xadrez com regras completas",
   };
   // ---------- rodadas: série (1/3/5) ou pontos (5/10/15; Adedonha 3/5/7) ----------
   const RCHOICES = (m) => MODES[m].rc || (MODES[m].pts ? [5, 10, 15] : [1, 3, 5]);
@@ -46,6 +47,7 @@
     if (m === "c") return `A mesma grade para os dois, 5 minutos por rodada. Cada palavra é de quem achar primeiro. ${seriesTxt(n)}`;
     if (m === "v") return `X começa e os símbolos trocam a cada rodada. Deu velha? Não conta. ${seriesTxt(n)}`;
     if (m === "x") return `Regras brasileiras: captura obrigatória, lei da maioria e dama voadora. ${seriesTxt(n)}`;
+    if (m === "k") return `Regras completas: roque, en passant e promoção. Brancas começam e as cores trocam a cada rodada. Empate não conta. ${seriesTxt(n)}`;
     if (m === "s") return `${n} rodadas: uma letra sorteada e 6 categorias. Preencha tudo e dê STOP! Resposta só sua vale 10, igual à do amigo vale 5.`;
     if (m === "g") return `${n} perguntas de 6 temas, as mesmas para os dois, 15 segundos cada. Quem acertar mais vence.`;
     if (m === "f") return `Um escolhe a palavra e o tema, o outro adivinha letra por letra. 6 erros e a forca vence. Os papéis trocam a cada rodada. ${seriesTxt(n)}`;
@@ -64,7 +66,7 @@
     link: (room, m, seed) => location.origin + location.pathname.replace(/index\.html$/, "") + `?mp=${room}-${m}-${seed.toString(36)}`,
     /** "sala-modo-seed" → {room, m, seed} ou null. */
     parse(code) {
-      const x = /^([a-z0-9]{12})-([tdqacpvxsgf])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
+      const x = /^([a-z0-9]{12})-([tdqacpvxsgfk])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
       if (!x) return null;
       const seed = parseInt(x[3], 36);
       return seed >= 0 && seed <= 2147483646 ? { room: x[1], m: x[2], seed } : null;
@@ -380,6 +382,8 @@
         <rect x="22" y="3" width="19" height="19" rx="4" style="fill:var(--bg-bottom)"/><rect x="3" y="22" width="19" height="19" rx="4" style="fill:var(--bg-bottom)"/>
         <circle cx="31.5" cy="12.5" r="7" style="fill:#F4F1FF"/><circle cx="31.5" cy="12.5" r="4.3" style="fill:none;stroke:#C9C2EA;stroke-width:1.4"/>
         <circle cx="12.5" cy="31.5" r="7" style="fill:#14102C;stroke:var(--outline);stroke-width:1.4"/>${tx(12.5, 31.8, "♛", 8, "present", 600)}`,
+    k: `<rect x="3" y="3" width="38" height="38" rx="9" ${fl("surface-high")}/><rect x="3" y="3" width="19" height="19" rx="9" style="fill:var(--bg-bottom)"/><rect x="22" y="22" width="19" height="19" rx="9" style="fill:var(--bg-bottom)"/>
+        <text x="22" y="24" text-anchor="middle" dominant-baseline="central" style="fill:#F4F1FF;stroke:#14102C;stroke-width:1.2;paint-order:stroke;font:400 30px 'DejaVu Sans',sans-serif">♞&#xFE0E;</text>`,
   };
   /** Mini ícone do jogo (SVG 44×44). */
   const gameIcon = (m) => `<svg viewBox="0 0 44 44" aria-hidden="true">${ICON_SVG[m] || ""}</svg>`;
@@ -432,7 +436,7 @@
     const fromPasted = (t) => {
       t = String(t || "").trim();
       const a = /[?&]mp=([A-Za-z0-9-]+)/.exec(t); if (a) return P.mp.parse(a[1]) ? a[1].toLowerCase() : null;
-      const b = /\b([a-z0-9]{12}-[tdqacpvxsgf]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
+      const b = /\b([a-z0-9]{12}-[tdqacpvxsgfk]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
     };
     const isGone = (t) => { t = String(t || "").trim().toLowerCase(); const a = /[?&]mp=([a-z0-9-]+)/.exec(t); return P.mp.gone(a ? a[1] : (/\b([a-z0-9]{12}-b-[0-9a-z]{1,7})\b/.exec(t) || [])[1]); };
     const err = P.$("[data-paste-err]", body), input = P.$("[data-paste]", body);
@@ -841,7 +845,7 @@
         detail = [line(meName, r.ends.find((e) => e.id === s.me.id), false), line(oName, o && r.ends.find((e) => e.id === o.id), s.oppLeft)];
       }
     }
-    const pill = `${s.mode.name} ${({ a: "🔤", p: "❓", c: "🔎", v: "⭕", x: "♛", s: "✋", g: "🧠", f: "🪢" })[r.kind] || "⚔️"}`;
+    const pill = `${s.mode.name} ${({ a: "🔤", p: "❓", c: "🔎", v: "⭕", x: "♛", k: "♞", s: "✋", g: "🧠", f: "🪢" })[r.kind] || "⚔️"}`;
     return P.storyVs({ pill, me: meName, opp: oName, score: sc, gold, result, detail, mine: res });
   }
   P.mp.storyCard = () => S && S.round && S.round.result ? storyCard(S, S.round) : null;

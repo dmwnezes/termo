@@ -32,6 +32,9 @@
     trivia: `<div class="tv-ico" aria-hidden="true"><i></i><b>?</b></div>`,
     // Memória: duas cartas viradas e um par verde.
     memoria: `<div class="mem-ico" aria-hidden="true"><i></i><i class="ok">AB</i><i class="ok">AB</i><i></i></div>`,
+    // Quadrante (Sudoku): pedaço de grade com números; Xeque (Xadrez): o cavalo num tabuleiro.
+    quadrante: `<div class="sdk-ico" aria-hidden="true">${[5, 3, "", "", 7, "", 6, "", 9].map((d, i) => `<i class="${i === 4 ? "on" : ""}">${d}</i>`).join("")}</div>`,
+    xeque: `<div class="xz-ico" aria-hidden="true"><i></i><i></i><i></i><i></i><b>♞&#xFE0E;</b></div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
 
@@ -54,6 +57,8 @@
       ["sinonimos", "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", ""],
       ["trivia", "Trivia", "Gire a roleta e junte as 6 medalhas", ""],
       ["memoria", "Jogo da Memória", "Ache os pares de sinônimos", ""],
+      ["quadrante", "Quadrante", "Sudoku: um por nível todo dia, ou sem fim", ""],
+      ["xeque", "Xeque", "Xadrez contra o computador", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
@@ -95,6 +100,10 @@
       ortografia: () => P.games.ortografia(app),
       trivia: () => P.games.trivia(app),
       memoria: () => P.games.memoria(app),
+      quadrante: () => P.games.sudoku(app),
+      sudoku: () => P.games.sudoku(app),
+      xeque: () => P.games.xadrez(app),
+      xadrez: () => P.games.xadrez(app),
       arquivo: () => (parts[1] && P.games.arquivoGame(app, parts[1], parts[2])) || P.games.arquivo(app),
     };
     if (r === "desafio") {
