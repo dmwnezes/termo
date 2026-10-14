@@ -47,7 +47,7 @@ object MatizColor {
         val x = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047
         val y = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b
         val z = (0.0193339 * r + 0.1191920 * g + 0.9503041 * b) / 1.08883
-        fun f(t: Double) = if (t > 216.0 / 24389) cbrt(t) else (24389.0 / 27 * t + 16) / 116
+        fun f(t: Double) = if (t > 0.008856) cbrt(t) else 7.787 * t + 16.0 / 116
         return doubleArrayOf(116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z)))
     }
 
@@ -92,7 +92,7 @@ class MatizGame(val colors: List<Int>) {
         return s
     }
 
-    fun share(daily: Boolean) = "Matiz${if (daily) "" else " Infinito"} $total/${colors.size * 100} 🎨\n" + scores.joinToString("") { MatizColor.emoji(it) }
+    fun share() = "Matiz $total/${colors.size * 100} 🎨\n" + scores.joinToString("") { MatizColor.emoji(it) }
 
     companion object { const val ROUNDS = 5 }
 }

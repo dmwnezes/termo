@@ -13,12 +13,12 @@ data class PodioQ(val title: String, val top: List<String>, val wrong: List<Stri
 }
 
 object PodioData {
-    /** Linhas TÍTULO|1º|2º|3º|4º|5º|errada1..errada5 (comentários com #). Linhas inválidas são ignoradas. */
+    /** Linhas TÍTULO|1º|2º|3º|4º|5º|errada1..errada5 (comentários com #). Como no site: campos além do 11º são ignorados; linhas curtas ou com campo vazio também. */
     fun parse(text: String): List<PodioQ> = text.lines().mapNotNull { raw ->
         val line = raw.trim()
         if (line.isEmpty() || line.startsWith("#")) return@mapNotNull null
         val p = line.split('|').map { it.trim() }
-        if (p.size != 11 || p.any { it.isEmpty() } || p.drop(1).toSet().size != 10) null else PodioQ(p[0], p.subList(1, 6), p.subList(6, 11))
+        if (p.size < 11 || p.take(11).any { it.isEmpty() }) null else PodioQ(p[0], p.subList(1, 6), p.subList(6, 11))
     }
 
     /** Índice do dia: (dia * 7919 + 104729) mod N. */
@@ -32,7 +32,7 @@ enum class PodioMark { GREEN, YELLOW, GRAY }
 
 /**
  * Pódio: monte o top 5 com as 10 opções em até 5 tentativas.
- * Cada opção conta uma vez (verde primeiro, depois amarelo), como no Termo.
+ * Cores como no site: verde = posição certa, amarelo = está no top 5 em outra posição, cinza = fora do top 5.
  */
 class PodioGame(val q: PodioQ, val options: List<String>) {
     constructor(q: PodioQ, rnd: Random) : this(q, q.all.shuffled(rnd))
@@ -72,20 +72,16 @@ class PodioGame(val q: PodioQ, val options: List<String>) {
         return true
     }
 
-    fun share(daily: Boolean): String {
-        val head = "Pódio${if (daily) "" else " Infinito"} ${if (won) tries.size else "X"}/$MAX 🏆"
+    fun share(): String {
+        val head = "Pódio ${if (won) tries.size else "X"}/$MAX 🏆"
         return head + "\n" + tries.joinToString("\n") { t -> marks(t).joinToString("") { when (it) { PodioMark.GREEN -> "🟩"; PodioMark.YELLOW -> "🟨"; PodioMark.GRAY -> "⬛" } } }
     }
 
     companion object {
         const val MAX = 5
 
-        fun feedback(top: List<String>, t: List<String>): List<PodioMark> {
-            val out = MutableList(t.size) { PodioMark.GRAY }
-            val left = top.toMutableList()
-            t.forEachIndexed { i, o -> if (top.getOrNull(i) == o) { out[i] = PodioMark.GREEN; left.remove(o) } }
-            t.forEachIndexed { i, o -> if (out[i] != PodioMark.GREEN && left.remove(o)) out[i] = PodioMark.YELLOW }
-            return out
+        fun feedback(top: List<String>, t: List<String>): List<PodioMark> = t.mapIndexed { i, o ->
+            when { top.getOrNull(i) == o -> PodioMark.GREEN; o in top -> PodioMark.YELLOW; else -> PodioMark.GRAY }
         }
     }
 }

@@ -165,7 +165,7 @@ fun AmpulhetaScreen(
                         if (ok) feedback?.reveal(2, com.dmwnezes.palavreiro.game.Mark.CORRECT) else feedback?.invalid()
                         if (game.over) finish(game)
                     }
-                    game.line.getOrNull(i)?.let { e -> EventRow(e, if (e == game.last) lastOk else null) }
+                    game.line.getOrNull(i)?.let { e -> EventRow(e, if (e == game.last) game.results.lastOrNull() else null) }
                 }
                 Spacer(Modifier.height(16.dp))
             }

@@ -52,9 +52,9 @@ fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
         RecordCardInfo(Dest.MESTRE, "Mestre Mandou", v(r["mestre_best"]), "pontos", plural(r["mestre_right"], "acerto", "acertos")),
         RecordCardInfo(Dest.TRIVIA, "Trivia", v(r["trivia_best"]), "seguidas", "${plural(r["trivia_won"], "vitória", "vitórias")} · ${r["trivia_right"]} ✓"),
         memoryCard(r),
-        RecordCardInfo(Dest.MATIZ, "Matiz", v(r["matiz_best"]), "de 500 no dia", plural(r["matiz_played"], "partida", "partidas")),
-        RecordCardInfo(Dest.PODIO, "Pódio", v(r["podio_won"]), if (r["podio_won"] == 1) "vitória" else "vitórias", "sequência ${r["podio_streak"]} · ${plural(r["podio_played"], "jogo", "jogos")}"),
-        RecordCardInfo(Dest.AMPULHETA, "Ampulheta", v(r["amp_best"]), "no infinito", "dia ${r["amp_day_best"]}/10 · ${plural(r["amp_played"], "partida", "partidas")}"),
+        RecordCardInfo(Dest.MATIZ, "Matiz", v(r["matiz_best"]), "melhor dia", "${plural(r["matiz_played"], "partida", "partidas")} · melhor cor ${r["matiz_top"]}"),
+        RecordCardInfo(Dest.PODIO, "Pódio", v(r["podio_won"]), if (r["podio_won"] == 1) "vitória" else "vitórias", "em ${plural(r["podio_played"], "partida", "partidas")} · sequência ${r["podio_streak"]}"),
+        RecordCardInfo(Dest.AMPULHETA, "Ampulheta", v(r["amp_best"]), "recorde no Infinito", "do dia ${r["amp_day_best"]}/10 · ${plural(r["amp_played"], "partida", "partidas")}"),
         RecordCardInfo(Dest.ARQUIVO, "Arquivo", v(r["arch_played"]), if (r["arch_played"] == 1) "desafio" else "desafios", plural(r["arch_won"], "vencido", "vencidos")),
         RecordCardInfo(Dest.DESAFIAR, "Com amigos", v(r["mp_won"]), if (r["mp_won"] == 1) "vitória" else "vitórias", "em ${plural(r["mp_played"], "partida", "partidas")}"),
     )

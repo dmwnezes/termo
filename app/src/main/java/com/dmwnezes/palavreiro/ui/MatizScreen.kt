@@ -193,7 +193,7 @@ fun MatizScreen(
                     StatItem("${store?.int("matiz_played") ?: 0}", "Partidas")
                 }
                 Spacer(Modifier.height(20.dp))
-                PillButton("Compartilhar", Night.correct, modifier = Modifier.fillMaxWidth()) { share(context, game.share(!infinite)) }
+                PillButton("Compartilhar", Night.correct, modifier = Modifier.fillMaxWidth()) { share(context, game.share()) }
                 Spacer(Modifier.height(10.dp))
                 if (infinite) PillButton("Jogar de novo", Night.accent, modifier = Modifier.fillMaxWidth()) { round++ }
                 else PillButton("Jogar o Infinito", Night.accent, modifier = Modifier.fillMaxWidth()) { infinite = true }

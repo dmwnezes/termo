@@ -42,11 +42,18 @@ class Rodada12ATest {
         assertEquals(2.6485, MatizColor.deltaE(MatizColor.rgb(100, 150, 200), MatizColor.rgb(110, 150, 200)), 1e-3)
         assertEquals(96, MatizColor.score(MatizColor.rgb(100, 150, 200), MatizColor.rgb(110, 150, 200)))
         assertEquals(87, MatizColor.score(MatizColor.rgb(100, 150, 200), MatizColor.rgb(120, 140, 190)))
+        // Cores escuras (ramo linear do Lab), notas iguais às do site: 82 e 98.
+        assertEquals(82, MatizColor.score(MatizColor.rgb(10, 10, 10), MatizColor.rgb(20, 25, 5)))
+        assertEquals(98, MatizColor.score(MatizColor.rgb(2, 2, 2), MatizColor.rgb(5, 1, 3)))
         assertEquals("🟩", MatizColor.emoji(90)); assertEquals("🟨", MatizColor.emoji(70)); assertEquals("⬛", MatizColor.emoji(69))
     }
 
     @Test
     fun matizDoDia() {
+        // Dia 0 (conferido com P.matizDaily(0) do site): #819FF4 #47F08B #8D662E #9072F6 #A7ED16.
+        val zero = MatizColor.daily(0).map(MatizColor::hex)
+        println("MATIZ dia=0: ${zero.joinToString(" ")}")
+        assertEquals(listOf("#819FF4", "#47F08B", "#8D662E", "#9072F6", "#A7ED16"), zero)
         val hex = MatizColor.daily(dia).map(MatizColor::hex)
         println("MATIZ dia=$dia: ${hex.joinToString(" ")}")
         assertEquals(listOf("#E26205", "#44789D", "#E5E735", "#573019", "#26C957"), hex)
@@ -56,7 +63,7 @@ class Rodada12ATest {
         g.colors.forEach { g.guess(it) }
         assertTrue(g.over)
         assertEquals(500, g.total)
-        assertEquals("Matiz 500/500 🎨\n🟩🟩🟩🟩🟩", g.share(true))
+        assertEquals("Matiz 500/500 🎨\n🟩🟩🟩🟩🟩", g.share())
         assertEquals(0, g.guess(0)) // depois do fim não conta
         assertEquals(5, g.scores.size)
     }
@@ -74,19 +81,21 @@ class Rodada12ATest {
         val list = PodioData.parse(File("../shared/podio.txt").readText())
         assertTrue(list.isNotEmpty())
         val i = PodioData.dailyIndex(dia, list.size)
+        // Com os 3 rankings atuais o site dá, no dia 0, o índice 2 e esta ordem.
+        if (list.size == 3) assertEquals("Marte / Plutão / Júpiter / Saturno / Netuno / Urano / Mercúrio / Terra / Vênus / Lua",
+            PodioData.dailyOptions(list[PodioData.dailyIndex(0, 3)], 0).joinToString(" / "))
         println("PODIO dia=$dia N=${list.size} idx=$i: ${list[i].title} -> ${PodioData.dailyOptions(list[i], dia).joinToString(" / ")}")
         assertTrue(list.all { it.top.size == 5 && it.wrong.size == 5 })
-        assertEquals(emptyList<PodioQ>(), PodioData.parse("T|A|B|C|D|E|F|G|H|I|A")) // opção repetida: inválida
+        // Como no site: campo vazio invalida a linha; campos além do 11º são ignorados.
+        assertEquals(emptyList<PodioQ>(), PodioData.parse("T|A|B||D|E|F|G|H|I|J\nT|A|B|C"))
+        assertEquals(q.copy(title = "T"), PodioData.parse("T|A|B|C|D|E|F|G|H|I|J|extra")[0])
     }
 
     @Test
     fun podioCores() {
         assertEquals(listOf(GREEN, GREEN, GREEN, GREEN, GREEN), PodioGame.feedback(q.top, q.top))
         assertEquals(listOf(YELLOW, YELLOW, GREEN, GRAY, GRAY), PodioGame.feedback(q.top, listOf("B", "A", "C", "F", "G")))
-        // Repetida: "A" verde na 1ª vaga e de novo na 2ª → a 2ª fica cinza (cada opção conta uma vez).
-        assertEquals(listOf(GREEN, GRAY, GREEN, GRAY, GRAY), PodioGame.feedback(q.top, listOf("A", "A", "C", "F", "G")))
-        // Repetida amarela: só a primeira vira amarela.
-        assertEquals(listOf(GRAY, YELLOW, GRAY, GRAY, GRAY), PodioGame.feedback(q.top, listOf("F", "E", "E", "G", "H")))
+        assertEquals(listOf(GRAY, YELLOW, GREEN, YELLOW, GREEN), PodioGame.feedback(q.top, listOf("F", "D", "C", "A", "E")))
 
         val g = PodioGame(q, q.all)
         assertFalse(g.submit())
@@ -100,7 +109,7 @@ class Rodada12ATest {
         assertEquals(listOf("A", "B", "C", "D", "E"), g.slots.toList())
         assertTrue(g.submit())
         assertTrue(g.won && g.over)
-        assertEquals("Pódio 2/5 🏆\n🟨🟨🟩⬛⬛\n🟩🟩🟩🟩🟩", g.share(true))
+        assertEquals("Pódio 2/5 🏆\n🟨🟨🟩⬛⬛\n🟩🟩🟩🟩🟩", g.share())
 
         val lose = PodioGame(q, q.all)
         repeat(5) { "FGHIJ".forEach { lose.put("$it") }; lose.submit() }
@@ -120,6 +129,7 @@ class Rodada12ATest {
         val list = AmpulhetaData.parse(File("../shared/ampulheta.txt").readText())
         val real = AmpulhetaData.dailyIndices(list, dia)
         println("AMPULHETA dia=$dia N=${list.size} indices=$real")
+        if (list.size == 6) { assertEquals(listOf(5, 2, 1, 3, 0, 4), AmpulhetaData.dailyIndices(list, 0)); assertEquals(listOf(0, 2, 5, 4, 1, 3), real) } // = site
         assertEquals(real.size, real.map { list[it].year }.toSet().size)
         assertEquals(AmpEvent(-753, "Roma"), AmpulhetaData.parse("-753|Roma\n# x\nlixo")[0])
         assertEquals("753 a.C.", AmpEvent(-753, "Roma").yearLabel)

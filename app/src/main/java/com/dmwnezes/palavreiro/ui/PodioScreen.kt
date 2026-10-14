@@ -78,14 +78,15 @@ fun PodioScreen(
     val dayIdx = Words.dayIndex(date)
     var infinite by remember { mutableStateOf(startInfinite) }
     var round by remember { mutableIntStateOf(0) }
-    // Infinito: sorteia sem repetir até passar por todos.
-    val seen = remember { mutableListOf<Int>() }
     val game = remember(infinite, round) {
         if (list.isEmpty()) return@remember null
         if (infinite) {
+            // Sorteia sem repetir até passar por todos (lista guardada, como no site).
             val rnd = Random(seed + round)
-            if (seen.size >= list.size) seen.clear()
-            val i = list.indices.filter { it !in seen }.random(rnd).also { seen += it }
+            val seen = store?.text("podio_seen")?.split(',')?.mapNotNull { it.toIntOrNull() }?.filter { it < list.size }.orEmpty()
+                .let { if (it.size >= list.size) emptyList() else it }
+            val i = list.indices.filter { it !in seen }.random(rnd)
+            store?.setText("podio_seen", (seen + i).joinToString(","))
             PodioGame(list[i], rnd)
         } else {
             val q = list[PodioData.dailyIndex(dayIdx, list.size)]
@@ -111,10 +112,8 @@ fun PodioScreen(
         if (!infinite) {
             st.setText("podio_done", day)
             val yesterday = date.minusDays(1).toString()
-            val cur = if (!g.won) 0 else if (st.text("podio_last") == yesterday) st.int("podio_cur") + 1 else 1
-            st.setInt("podio_cur", cur)
+            st.setInt("podio_streak", if (!g.won) 0 else if (st.text("podio_last") == yesterday) st.int("podio_streak") + 1 else 1)
             if (g.won) st.setText("podio_last", day)
-            st.max("podio_streak", cur)
         }
     }
 
@@ -208,10 +207,10 @@ fun PodioScreen(
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     StatItem("${store?.int("podio_played") ?: 0}", "Jogos")
                     StatItem("${store?.int("podio_won") ?: 0}", "Vitórias")
-                    StatItem("${store?.int("podio_cur") ?: 0}", "Sequência")
+                    StatItem("${store?.int("podio_streak") ?: 0}", "Sequência")
                 }
                 Spacer(Modifier.height(20.dp))
-                PillButton("Compartilhar", Night.correct, modifier = Modifier.fillMaxWidth()) { share(context, game.share(!infinite)) }
+                PillButton("Compartilhar", Night.correct, modifier = Modifier.fillMaxWidth()) { share(context, game.share()) }
                 Spacer(Modifier.height(10.dp))
                 if (infinite) PillButton("Próximo ranking", Night.accent, modifier = Modifier.fillMaxWidth()) { round++ }
                 else PillButton("Jogar o Infinito", Night.accent, modifier = Modifier.fillMaxWidth()) { infinite = true }

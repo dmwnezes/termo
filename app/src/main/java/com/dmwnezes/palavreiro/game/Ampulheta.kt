@@ -82,7 +82,7 @@ class AmpulhetaGame(first: AmpEvent, private val deck: MutableList<AmpEvent>, va
         return ok
     }
 
-    fun share(): String = "Ampulheta${if (daily) "" else " Infinito"} $right/${results.size} ⏳\n" +
+    fun share(): String = "Ampulheta $right/${results.size} ⏳\n" +
         results.joinToString("") { if (it) "🟩" else "🟥" }
 
     companion object {
