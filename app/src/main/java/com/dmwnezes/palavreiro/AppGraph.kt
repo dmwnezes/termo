@@ -60,6 +60,9 @@ object AppGraph {
     /** Perguntas da Trivia (shared/trivia.txt). */
     lateinit var trivia: List<com.dmwnezes.palavreiro.game.TriviaQ>
         private set
+    /** Sudokus por nível (shared/sudoku.txt). */
+    lateinit var sudoku: Map<com.dmwnezes.palavreiro.game.SudokuLevel, List<com.dmwnezes.palavreiro.game.SudokuPuzzle>>
+        private set
     /** Significado de cada palavra do Termo (chave sem acento). */
     lateinit var meanings: Map<String, String>
         private set
@@ -93,6 +96,7 @@ object AppGraph {
         QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
         trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
+        sudoku = runCatching { com.dmwnezes.palavreiro.game.SudokuData.parse(asset("sudoku.txt")) }.getOrDefault(emptyMap())
         mestre = com.dmwnezes.palavreiro.game.MestreData(connections, connFamilies, synonyms, families, antonyms, antonymFamilies)
         ready = true
     }

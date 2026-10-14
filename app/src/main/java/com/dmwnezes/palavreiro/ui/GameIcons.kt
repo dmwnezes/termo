@@ -63,6 +63,7 @@ internal fun GameIcon(code: Char, size: Dp) {
             Multi.TRIVIA -> wheel(u)
             Multi.TICTAC -> tictac(u)
             Multi.CHECKERS -> checkers(u)
+            Multi.CHESS -> chess(u, tm)
         }
     }
 }
@@ -213,4 +214,17 @@ private fun DrawScope.checkers(u: Float) {
         if (king) drawCircle(Night.present, 1.8f * u, o)
     }
     piece(0, 1, white = false); piece(1, 0, white = false, king = true); piece(2, 1, white = true); piece(1, 2, white = true)
+}
+
+/** Xadrez: 2×2 casas do tabuleiro com um cavalo branco contornado por cima. */
+private fun DrawScope.chess(u: Float, tm: TextMeasurer) {
+    val s = 19.5f * u; val x0 = 4.5f * u
+    for (r in 0 until 2) for (c in 0 until 2) {
+        drawRoundRect(if ((r + c) % 2 == 0) CheckLight else CheckDark, Offset(x0 + c * s, x0 + r * s), Size(s, s), CornerRadius(5f * u))
+    }
+    val style = TextStyle(fontSize = (32f * u / density / fontScale).sp)
+    val l = tm.measure("♞", style)
+    val o = Offset(24f * u - l.size.width / 2f, 24f * u - l.size.height / 2f)
+    drawText(l, color = Color(0xFF14102C), topLeft = o, drawStyle = Stroke(3.2f * u))
+    drawText(l, color = Color(0xFFF7F4FF), topLeft = o)
 }

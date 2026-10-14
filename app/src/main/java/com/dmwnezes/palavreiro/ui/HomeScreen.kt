@@ -45,7 +45,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 
 /** Destinos da tela inicial. */
-enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA }
+enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA, SUDOKU, XADREZ }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -79,6 +79,8 @@ fun HomeScreen(
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
         GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
         GameCardInfo(Dest.MEMORIA, "Jogo da Memória", "Ache os pares de sinônimos", null),
+        GameCardInfo(Dest.SUDOKU, "Sudoku", "Um por nível todo dia, ou infinitos", null),
+        GameCardInfo(Dest.XADREZ, "Xadrez", "Jogue contra o computador", null),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
@@ -313,6 +315,24 @@ internal fun CardIcon(dest: Dest) {
         Dest.SINONIMOS -> SynAntIcon()
         Dest.TRIVIA -> TriviaWheel(0f, 50.dp, pointer = false)
         Dest.MEMORIA -> MemoryIcon()
+        Dest.SUDOKU -> SudokuIcon()
+        Dest.XADREZ -> ChessHomeIcon(44.dp)
+    }
+}
+
+/** Sudoku: bloco 3×3 com alguns números (um lilás, escrito pelo jogador). */
+@Composable
+private fun SudokuIcon() {
+    val digits = listOf("5", "", "3", "", "7", "", "1", "", "9")
+    Column(Modifier.clip(RoundedCornerShape(8.dp)).background(Night.surfaceHigh).padding(3.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        for (r in 0 until 3) Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            for (c in 0 until 3) {
+                val d = digits[r * 3 + c]
+                Box(Modifier.size(13.dp).clip(RoundedCornerShape(3.dp)).background(if (r * 3 + c == 4) Night.accent else Night.surface), contentAlignment = Alignment.Center) {
+                    Text(d, color = if (r * 3 + c == 4) Color(0xFF1A1438) else Night.text, fontSize = 9.sp, lineHeight = 9.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, softWrap = false)
+                }
+            }
+        }
     }
 }
 
