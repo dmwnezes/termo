@@ -62,6 +62,9 @@
       ["🧠", "Sabichão", "Ganhe 1 partida de Trivia (as 6 medalhas)", n("trivia-won"), 1],
       ["📚", "Enciclopédia", "Acerte 100 perguntas na Trivia", n("trivia-right"), 100],
       ["🃏", "Memória de elefante", "Termine a Memória no Difícil", n("mem-best-dificil") > 0 ? 1 : 0, 1],
+      ["🎨", "Olho clínico", "Faça 95 pontos numa cor no Matiz", n("matiz-top"), 95],
+      ["🏆", "Pódio perfeito", "Acerte um Pódio de primeira", n("podio-first"), 1],
+      ["⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", n("amp-day-best"), 10],
       ["⚔️", "Duelista", "Vença 5 partidas com amigos", n("mp-won"), 5],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
       ["🌟", "Dia completo", "Faça os 5 desafios do dia", n("alldone-days"), 1],
@@ -98,7 +101,8 @@
     "ort_played", "ort_best", "ort_right", "mestre_played", "mestre_best", "mestre_right", "ant_best", "arch_played", "arch_won", "alldone_days",
     "mp_played", "mp_won", "sa_best", "sa_tricks",
     "trivia_won", "trivia_best", "trivia_right",
-    "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil"];
+    "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
+    "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played"];
   // Contadores em que menor é melhor (tempo e jogadas): 0 = ainda não jogou.
   const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil"];
   const siteKey = (c) => (c === "rev_appwins" ? "rev-app" : c === "rev_userwins" ? "rev-user" : c.replace(/_/g, "-"));

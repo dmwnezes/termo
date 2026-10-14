@@ -1048,3 +1048,74 @@ button { font-family: inherit; color: inherit; }
 .fc-sheetword b { font-size: 1.5rem; font-weight: 800; letter-spacing: .05em; text-align: center; }
 .fc-sheetword .note { margin: 4px 0 0; }
 @media (prefers-reduced-motion: reduce) { .mtv-wheel { transition: none; } .ad-spin p, .ad-banner small, .mp-sugg { animation: none; } }
+
+/* ---------- Rodada 12: Matiz, Pódio e Ampulheta ---------- */
+.mz-ico { position: relative; width: 50px; height: 46px; }
+.mz-ico i { position: absolute; width: 26px; height: 26px; border-radius: 50%; mix-blend-mode: screen; opacity: .9; }
+.mz-ico i:nth-child(1) { left: 12px; top: 0; background: #E5737A; }
+.mz-ico i:nth-child(2) { left: 2px; top: 18px; background: #5FB873; }
+.mz-ico i:nth-child(3) { left: 22px; top: 18px; background: #6FA8E8; }
+.pd-ico { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+.pd-ico i { width: 14px; border-radius: 5px 5px 2px 2px; display: grid; place-items: start center; padding-top: 2px; font: 800 9px Outfit, sans-serif; font-style: normal; color: var(--dark-text); }
+.pd-ico i:nth-child(1) { height: 26px; background: #C9C3E8; }
+.pd-ico i:nth-child(2) { height: 38px; background: var(--present); }
+.pd-ico i:nth-child(3) { height: 18px; background: #E09A63; }
+.amp-ico { display: grid; justify-items: center; }
+.amp-ico i { width: 26px; height: 20px; background: var(--present); clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%); border-top: 3px solid var(--text); }
+.amp-ico i:last-child { transform: rotate(180deg); background: linear-gradient(0deg, var(--surface-high) 45%, var(--present) 45%); }
+
+.mz .score-row, .amp .score-row { margin: 0 0 14px; }
+.mz-stage, .amp > [data-stage] { display: flex; flex-direction: column; gap: 14px; padding-bottom: 16px; }
+.mz .hint, .pd .hint, .amp .hint { text-align: center; color: var(--muted); margin: 0; }
+.mz-swatch { width: 100%; max-width: 360px; aspect-ratio: 2.2; margin: 0 auto; border-radius: var(--r-card); box-shadow: 0 0 0 3px var(--surface-high); display: grid; place-items: center; }
+.mz-swatch.big { aspect-ratio: 1; max-width: 320px; }
+.mz-swatch.half { aspect-ratio: 1; border-radius: 22px; }
+.mz-swatch b { font-size: 3rem; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.45); }
+.mz-sliders { display: grid; gap: 10px; background: var(--surface); border-radius: var(--r-card); padding: 14px 18px; }
+.mz-row { display: grid; grid-template-columns: 22px 1fr 40px; align-items: center; gap: 10px; }
+.mz-row span { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.mz-row input { width: 100%; height: 28px; accent-color: var(--c); }
+.mz-R { --c: #E5737A; } .mz-G { --c: #5FB873; } .mz-B { --c: #6FA8E8; }
+.mz-row b { color: var(--c); }
+.mz-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 360px; width: 100%; margin: 0 auto; text-align: center; }
+.mz-pair small { display: block; color: var(--muted); margin-top: 8px; }
+.mz-pair code { font: 600 .95rem ui-monospace, monospace; }
+.mz-score { display: flex; flex-direction: column; align-items: center; }
+.mz-score b { font-size: 3.2rem; font-weight: 800; line-height: 1; color: var(--accent); }
+.mz-score small { color: var(--muted); }
+.mz-sum { display: flex; flex-direction: column; gap: 16px; }
+.mz-minis { display: flex; justify-content: center; gap: 8px; }
+.mz-mini { display: grid; grid-template-columns: 1fr 1fr; width: 56px; border-radius: 14px; overflow: hidden; background: var(--surface); text-align: center; }
+.mz-mini i { height: 40px; }
+.mz-mini small { grid-column: 1 / 3; padding: 4px 0; font-weight: 600; }
+
+.pd { gap: 12px; padding-bottom: 16px; }
+.pd-title { font-size: 1.1rem; padding: 16px; }
+.pd-slots { display: grid; gap: 6px; }
+.pd-slot { display: flex; align-items: center; gap: 12px; min-height: 44px; border: 1.5px dashed var(--outline); border-radius: 16px; padding: 8px 14px; background: transparent; color: var(--text); font: 600 1rem Outfit, sans-serif; text-align: left; cursor: pointer; }
+.pd-slot b { color: var(--muted); width: 26px; }
+.pd-slot.full { border-style: solid; background: var(--surface-high); }
+.pd-slot.c { border-color: transparent; background: var(--correct); color: var(--dark-text); cursor: default; }
+.pd-slot.c b { color: var(--dark-text); }
+.pd-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pd-opt { border: none; border-radius: 14px; padding: 10px 8px; background: var(--key); color: var(--text); font: 600 .95rem Outfit, sans-serif; cursor: pointer; }
+.pd-opt.used { opacity: .3; cursor: default; }
+.pd-opt.out { background: var(--key-absent); color: var(--muted); text-decoration: line-through; }
+.pd .pill:disabled { opacity: .45; cursor: default; }
+.pd-hist { display: grid; gap: 6px; }
+.pd-try { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.pd-chip { border-radius: 10px; padding: 6px 3px; font-size: .68rem; font-weight: 600; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-chip.c { background: var(--correct); color: var(--dark-text); }
+.pd-chip.p { background: var(--present); color: var(--dark-text); }
+.pd-chip.a { background: var(--absent); color: var(--muted); }
+
+.amp-card { display: flex; align-items: center; gap: 14px; border-radius: 20px; padding: 12px 16px; background: var(--surface); }
+.amp-card b { min-width: 64px; font-size: 1.15rem; font-weight: 800; color: var(--accent); }
+.amp-card.new { position: sticky; top: 8px; z-index: 2; background: var(--surface-high); box-shadow: 0 0 0 2px var(--accent), 0 8px 22px rgba(0,0,0,.35); }
+.amp-card.ok { box-shadow: 0 0 0 2px var(--correct); }
+.amp-card.bad { box-shadow: 0 0 0 2px var(--red); }
+.amp-card.ok b { color: var(--correct); } .amp-card.bad b { color: var(--red); }
+.amp-line { display: flex; flex-direction: column; gap: 6px; }
+.amp-gap { height: 30px; border: 1.5px dashed var(--outline); border-radius: 99px; background: transparent; color: var(--muted); font: 700 1rem Outfit, sans-serif; cursor: pointer; }
+.amp-gap:hover, .amp-gap:focus-visible { border-color: var(--accent); color: var(--accent); }
+.amp-end { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
