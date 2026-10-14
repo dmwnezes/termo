@@ -56,14 +56,23 @@ class Rodada12FlowTest {
      * O app cria a sala de Xeque (1 partida) e joga de brancas (rodada 0, anfitrião); o convidado de mentira responde
      * pelo tópico com {"t":"move","u":…} e o app dá o mate do pastor.
      */
+
+    /** Rola com o relógio livre só durante a rolagem: com ele parado, performScrollTo espera um quadro que nunca vem e trava. */
+    private fun androidx.compose.ui.test.SemanticsNodeInteraction.scrollFree() = apply {
+        val auto = rule.mainClock.autoAdvance
+        rule.mainClock.autoAdvance = true
+        performScrollTo()
+        rule.mainClock.autoAdvance = auto
+    }
+
     @Test
     fun xequeMateDoPastor() {
         val ntfy = ntfy()
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, ntfy, null, {}) } }
-        rule.onNodeWithText("Xeque").performScrollTo().performClick()
-        rule.onNodeWithText("1 partida").performScrollTo().performClick()
+        rule.onNodeWithText("Xeque").scrollFree().performClick()
+        rule.onNodeWithText("1 partida").scrollFree().performClick()
         rule.onNodeWithText("Seu nome").performTextInput("Teste")
-        rule.onNodeWithText("Criar partida").performScrollTo().performClick()
+        rule.onNodeWithText("Criar partida").scrollFree().performClick()
         rule.waitUntil(15_000) { shown("https://dmwnezes.com", true) }
         val link = rule.onAllNodes(hasText("https://dmwnezes.com", substring = true)).fetchSemanticsNodes().first()
             .config[SemanticsProperties.Text].joinToString("") { it.text }

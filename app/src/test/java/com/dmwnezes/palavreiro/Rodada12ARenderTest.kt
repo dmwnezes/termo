@@ -55,8 +55,17 @@ class Rodada12ARenderTest {
         }
     }
 
-    private fun click(t: String) = rule.onAllNodes(hasText(t)).onFirst().performScrollTo().performClick()
+    private fun click(t: String) = rule.onAllNodes(hasText(t)).onFirst().scrollFree().performClick()
     private fun shown(t: String) = rule.onAllNodes(hasText(t, substring = true)).fetchSemanticsNodes().isNotEmpty()
+
+
+    /** Rola com o relógio livre só durante a rolagem: com ele parado, performScrollTo espera um quadro que nunca vem e trava. */
+    private fun androidx.compose.ui.test.SemanticsNodeInteraction.scrollFree() = apply {
+        val auto = rule.mainClock.autoAdvance
+        rule.mainClock.autoAdvance = true
+        performScrollTo()
+        rule.mainClock.autoAdvance = auto
+    }
 
     @Test
     fun inicioCartoes() {
@@ -66,7 +75,7 @@ class Rodada12ARenderTest {
                 HomeScreen(mapOf(Dest.MATIZ to "Novo", Dest.PODIO to "Feito hoje ✓", Dest.AMPULHETA to "Novo"), {}, {})
             }
         }
-        rule.onAllNodes(hasText("Ampulheta")).onFirst().performScrollTo()
+        rule.onAllNodes(hasText("Ampulheta")).onFirst().scrollFree()
         save("r12a-inicio-cartoes")
     }
 
@@ -103,7 +112,7 @@ class Rodada12ARenderTest {
 
     @Test
     fun podio() {
-        rule.mainClock.autoAdvance = false
+        // Relógio livre: com ele parado, performScrollTo espera um quadro que nunca vem e o teste trava.
         rule.setContent { PalavreiroTheme { PodioScreen(podio, null, null, {}, date = day) } }
         save("r12a-podio-1-inicio")
         val q = podio[PodioData.dailyIndex(300, podio.size)]
@@ -127,7 +136,8 @@ class Rodada12ARenderTest {
         click("＋ Encaixar aqui")
         save("r12a-amp-2-jogada")
         assertTrue(shown("Certo!") || shown("Errou!"))
-        while (shown("Encaixar aqui")) click("＋ Encaixar aqui")
+        // Avança o relógio antes de olhar: a carta da jogada anterior precisa assentar (no fim os espaços somem).
+        while (rule.mainClock.advanceTimeBy(1500).let { shown("Encaixar aqui") }) click("＋ Encaixar aqui")
         save("r12a-amp-3-fim", 2000)
         assertTrue(shown("Ampulheta do dia"))
     }

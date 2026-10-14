@@ -98,6 +98,15 @@ class Rodada12RenderTest {
         return g
     }
 
+
+    /** Rola com o relógio livre só durante a rolagem: com ele parado, performScrollTo espera um quadro que nunca vem e trava. */
+    private fun androidx.compose.ui.test.SemanticsNodeInteraction.scrollFree() = apply {
+        val auto = rule.mainClock.autoAdvance
+        rule.mainClock.autoAdvance = true
+        performScrollTo()
+        rule.mainClock.autoAdvance = auto
+    }
+
     @Test
     fun quadranteMeioComAnotacoes() {
         rule.mainClock.autoAdvance = false
@@ -211,10 +220,10 @@ class Rodada12RenderTest {
         rule.mainClock.autoAdvance = false
         val opened = mutableListOf<Dest>()
         rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), { opened += it }, {}, scroll = androidx.compose.foundation.ScrollState(1400)) } }
-        rule.onNode(hasText("Quadrante")).performScrollTo()
+        rule.onNode(hasText("Quadrante")).scrollFree()
         save("73a-inicio-quadrante-xeque")
         rule.onNode(hasText("Quadrante")).performClick()
-        rule.onNode(hasText("Xeque")).performScrollTo().performClick()
+        rule.onNode(hasText("Xeque")).scrollFree().performClick()
         assertEquals(listOf(Dest.SUDOKU, Dest.XADREZ), opened)
     }
 
@@ -239,7 +248,7 @@ class Rodada12RenderTest {
     fun criarComXeque() {
         val words = Words(File("../shared/words.js").readText())
         rule.setContent { PalavreiroTheme { MultiScreen(words, null, Ntfy(OkHttpClient(), "http://127.0.0.1:9"), null, {}) } }
-        rule.onNode(hasText("Xeque")).performScrollTo().performClick()
+        rule.onNode(hasText("Xeque")).scrollFree().performClick()
         assertTrue(shown("1 partida"))
         save("73c-criar-xeque")
     }
