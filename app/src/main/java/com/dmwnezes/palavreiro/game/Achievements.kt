@@ -35,11 +35,14 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "trivia_won", "trivia_best", "trivia_right",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
             "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played",
+            "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil", "sudoku_won", "sudoku_perfect",
+            "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
             "ws_best", "ws_inf_best",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
+            "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil",
         )
     }
 }
@@ -80,6 +83,8 @@ object Achievements {
             a("🎨", "Olho clínico", "Faça 95 pontos numa cor no Matiz", r["matiz_top"], 95),
             a("🏆", "Pódio perfeito", "Acerte um Pódio de primeira", r["podio_first"], 1),
             a("⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", r["amp_day_best"], 10),
+            a("🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", r["sudoku_perfect"], 1),
+            a("♟️", "Xeque-mate", "Vença o computador no Difícil do Xeque", r["xadrez_won_dificil"], 1),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
             a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),

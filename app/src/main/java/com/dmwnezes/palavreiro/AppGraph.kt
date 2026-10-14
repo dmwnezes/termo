@@ -65,6 +65,9 @@ object AppGraph {
         private set
     var ampulheta: List<com.dmwnezes.palavreiro.game.AmpEvent> = emptyList()
         private set
+    /** Sudokus por nível (shared/sudoku.txt). */
+    lateinit var sudoku: Map<com.dmwnezes.palavreiro.game.SudokuLevel, List<com.dmwnezes.palavreiro.game.SudokuPuzzle>>
+        private set
     /** Significado de cada palavra do Termo (chave sem acento). */
     lateinit var meanings: Map<String, String>
         private set
@@ -100,6 +103,7 @@ object AppGraph {
         trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
         podio = runCatching { com.dmwnezes.palavreiro.game.PodioData.parse(asset("podio.txt")) }.getOrDefault(emptyList())
         ampulheta = runCatching { com.dmwnezes.palavreiro.game.AmpulhetaData.parse(asset("ampulheta.txt")) }.getOrDefault(emptyList())
+        sudoku = runCatching { com.dmwnezes.palavreiro.game.SudokuData.parse(asset("sudoku.txt")) }.getOrDefault(emptyMap())
         mestre = com.dmwnezes.palavreiro.game.MestreData(connections, connFamilies, synonyms, families, antonyms, antonymFamilies)
         ready = true
     }

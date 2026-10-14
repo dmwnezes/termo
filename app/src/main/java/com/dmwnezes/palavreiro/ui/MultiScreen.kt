@@ -281,8 +281,8 @@ fun MultiScreen(
                 beginRound(m.at, fresh)
             }
             is Msg.Bye -> if (m.id == oppId) oppLeft = true
-            is Msg.Solve, is Msg.Found, is Msg.Cell, is Msg.Move, is Msg.Resign -> if (phase == Phase.PLAYING) {
-                val id = when (m) { is Msg.Solve -> m.id; is Msg.Found -> m.id; is Msg.Cell -> m.id; is Msg.Move -> m.id; is Msg.Resign -> m.id; else -> null }
+            is Msg.Solve, is Msg.Found, is Msg.Cell, is Msg.Move, is Msg.UMove, is Msg.Resign -> if (phase == Phase.PLAYING) {
+                val id = when (m) { is Msg.Solve -> m.id; is Msg.Found -> m.id; is Msg.Cell -> m.id; is Msg.Move -> m.id; is Msg.UMove -> m.id; is Msg.Resign -> m.id; else -> null }
                 if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
             }
             is Msg.Skip, is Msg.TimeUp -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
@@ -582,6 +582,7 @@ fun MultiScreen(
                             Multi.HUNT -> HuntPlay(grids[round - 1], roundMsgs.map { it.msg }, duel)
                             Multi.TICTAC -> TicTacPlay(roundMsgs.map { it.msg }, duel)
                             Multi.CHECKERS -> CheckersPlay(roundMsgs.map { it.msg }, duel)
+                            Multi.CHESS -> ChessPlay(roundMsgs.map { it.msg }, duel)
                             Multi.ADEDONHA -> AdedonhaPlay(catPool, rounds, roundMsgs, duel)
                             Multi.TRIVIA -> TriviaPlay(triviaPool, r.seed, rounds, roundMsgs, duel)
                             Multi.FORCA -> ForcaPlay(roundMsgs.map { it.msg }, duel)
@@ -674,6 +675,7 @@ private fun modeRules(code: Char, rounds: Int, create: Boolean): String {
         Multi.HUNT -> "A mesma grade para os dois: cada palavra é de quem achar primeiro. 5 minutos por rodada; vence a rodada quem pegar mais palavras." + series
         Multi.TICTAC -> "Jogo da Velha ao vivo: X sempre começa e os símbolos trocam a cada rodada. Velha não conta." + series
         Multi.CHECKERS -> "Damas com as regras brasileiras: captura obrigatória, lei da maioria e dama voadora. Brancas começam e as cores trocam a cada rodada." + series
+        Multi.CHESS -> "Xeque: xadrez ao vivo com as regras completas: roque, en passant e promoção. Brancas começam e as cores trocam a cada rodada. Empate não conta." + series
         Multi.ADEDONHA -> "$rounds rodadas de Adedonha: 6 categorias e uma letra sorteada por rodada. Preencha tudo e dê STOP! Depois cada um valida as respostas do outro: resposta válida vale 10 (5 se for igual à do amigo). Vence quem fizer mais pontos 🏆"
         Multi.TRIVIA -> "$rounds perguntas de 6 temas, as mesmas para os dois: 15 s para responder cada uma. Vence quem acertar mais; no empate, quem respondeu mais rápido 🏆"
         Multi.FORCA -> "Um escolhe a palavra e o tema, o outro adivinha letra por letra (ou chuta a palavra). 6 erros e quem escolheu vence. Os papéis trocam a cada rodada." + series
@@ -693,6 +695,7 @@ internal fun shortRules(code: Char, rounds: Int): String {
         Multi.TRIVIA -> "15 s por pergunta; empate nos acertos, vence o mais rápido."
         Multi.TICTAC -> "X começa e os símbolos trocam a cada rodada."
         Multi.CHECKERS -> "Captura obrigatória, lei da maioria e dama voadora."
+        Multi.CHESS -> "Regras completas; as cores trocam a cada rodada."
         else -> "Quem acertar primeiro ganha; vocês veem só as cores um do outro."
     }
     val n = when {

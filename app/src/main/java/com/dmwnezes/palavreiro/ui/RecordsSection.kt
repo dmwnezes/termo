@@ -55,6 +55,10 @@ fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
         RecordCardInfo(Dest.MATIZ, "Matiz", v(r["matiz_best"]), "melhor dia", "${plural(r["matiz_played"], "partida", "partidas")} · melhor cor ${r["matiz_top"]}"),
         RecordCardInfo(Dest.PODIO, "Pódio", v(r["podio_won"]), if (r["podio_won"] == 1) "vitória" else "vitórias", "em ${plural(r["podio_played"], "partida", "partidas")} · sequência ${r["podio_streak"]}"),
         RecordCardInfo(Dest.AMPULHETA, "Ampulheta", v(r["amp_best"]), "recorde no Infinito", "do dia ${r["amp_day_best"]}/10 · ${plural(r["amp_played"], "partida", "partidas")}"),
+        sudokuCard(r),
+        (r["xadrez_won_facil"] + r["xadrez_won_medio"] + r["xadrez_won_dificil"]).let { w ->
+            RecordCardInfo(Dest.XADREZ, "Xeque", v(w), if (w == 1) "vitória" else "vitórias", "${r["xadrez_won_dificil"]} no Difícil")
+        },
         RecordCardInfo(Dest.ARQUIVO, "Arquivo", v(r["arch_played"]), if (r["arch_played"] == 1) "desafio" else "desafios", plural(r["arch_won"], "vencido", "vencidos")),
         RecordCardInfo(Dest.DESAFIAR, "Com amigos", v(r["mp_won"]), if (r["mp_won"] == 1) "vitória" else "vitórias", "em ${plural(r["mp_played"], "partida", "partidas")}"),
     )
@@ -65,6 +69,13 @@ private fun memoryCard(r: Records): RecordCardInfo {
     val lvl = com.dmwnezes.palavreiro.game.MemLevel.entries.lastOrNull { r[it.timeKey] > 0 }
         ?: return RecordCardInfo(Dest.MEMORIA, "Jogo da Memória", null, "melhor tempo", "nenhum nível ainda")
     return RecordCardInfo(Dest.MEMORIA, "Jogo da Memória", formatTime(r[lvl.timeKey]), "no ${lvl.label}", "menos jogadas: ${r[lvl.movesKey]}")
+}
+
+/** Quadrante: melhor tempo do nível mais difícil já terminado. */
+private fun sudokuCard(r: Records): RecordCardInfo {
+    val lvl = com.dmwnezes.palavreiro.game.SudokuLevel.entries.lastOrNull { r[it.bestKey] > 0 }
+        ?: return RecordCardInfo(Dest.SUDOKU, "Quadrante", null, "melhor tempo", "nenhum nível ainda")
+    return RecordCardInfo(Dest.SUDOKU, "Quadrante", formatTime(r[lvl.bestKey]), "no ${lvl.label}", plural(r["sudoku_won"], "resolvido", "resolvidos"))
 }
 
 /** Seção "Recordes": destaque da maior sequência do Termo e uma grade de cartões por jogo. */

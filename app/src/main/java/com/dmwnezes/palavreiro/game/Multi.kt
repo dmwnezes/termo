@@ -22,20 +22,21 @@ object Multi {
     const val ADEDONHA = 's'
     const val TRIVIA = 'g'
     const val FORCA = 'f'
+    const val CHESS = 'k'
     /** Bomba-Relógio: saiu do Palavreiro (link antigo com "b" → aviso). */
     const val REMOVED = 'b'
     /** Todas as letras de modo aceitas no link, na ordem dos cartões da tela de criar. */
-    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA, TRIVIA, TICTAC, CHECKERS)
+    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA, TRIVIA, TICTAC, CHECKERS, CHESS)
     /** Seções da tela de criar: título → modos. */
     val SECTIONS = listOf(
         "Palavras" to listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA),
         "Conhecimento" to listOf(TRIVIA),
-        "Tabuleiro" to listOf(TICTAC, CHECKERS),
+        "Tabuleiro" to listOf(TICTAC, CHECKERS, CHESS),
     )
     fun modeName(code: Char): String = when (code) {
         'd' -> "Dueto"; 'q' -> "Quarteto"; ANAGRAM -> "Anagrama"; HUNT -> "Caça-Palavras"
         DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"
-        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; else -> "Termo"
+        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; CHESS -> "Xeque"; else -> "Termo"
     }
     /** Nome curto (grade compacta do "Próximo jogo"). */
     fun chipName(code: Char): String = when (code) {
@@ -48,11 +49,13 @@ object Multi {
         DEFINE -> "Adivinhe a palavra pela definição"; FORCA -> "Um escolhe a palavra, o outro adivinha"
         ADEDONHA -> "Uma letra, várias categorias"; TRIVIA -> "Perguntas de 6 temas"
         TICTAC -> "Três em linha, ao vivo"; CHECKERS -> "Regras brasileiras"
+        CHESS -> "Regras completas, ao vivo"
         else -> "Uma palavra, quem acertar primeiro"
     }
     /** "um Termo", "uma partida de Damas", "uma Adedonha", "um Qual é a Palavra?". */
     fun withArticle(code: Char): String = when (code) {
         CHECKERS -> "uma partida de Damas"
+        CHESS -> "uma partida de Xeque"
         ADEDONHA, TRIVIA, FORCA -> "uma " + modeName(code)
         else -> "um " + modeName(code)
     }
@@ -70,6 +73,7 @@ object Multi {
     }
     fun defaultRounds(code: Char): Int = when {
         code == ADEDONHA -> 5
+        code == CHESS -> 1
         pointsMode(code) -> 10
         else -> 3
     }
@@ -107,7 +111,7 @@ object Multi {
     fun fromPasted(text: String?): Room? {
         val t = text?.trim().orEmpty()
         Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
-        Regex("\\b([a-z0-9]{12}-[tdqacpvxsgf]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        Regex("\\b([a-z0-9]{12}-[tdqacpvxsgfk]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
         return null
     }
 
@@ -179,7 +183,9 @@ object Multi {
         data class Cell(val id: String, val n: Int, val cell: Int) : Msg
         /** Damas: [id] fez a jogada [n] pelo caminho [path] (origem e cada casa onde a peça para). */
         data class Move(val id: String, val n: Int, val path: List<Int>) : Msg
-        /** Damas: [id] desistiu da rodada. */
+        /** Xadrez: [id] fez o lance [n] (0, 1, 2…) em UCI ([uci] = "e2e4", promoção "e7e8q"). */
+        data class UMove(val id: String, val n: Int, val uci: String) : Msg
+        /** Damas e Xadrez: [id] desistiu da rodada. */
         data class Resign(val id: String) : Msg
 
         // ---------- Rodada 11 ----------
@@ -223,7 +229,7 @@ object Multi {
     // ---------- revanche (trocando de modo) ----------
     /** Emoji do modo no cartão dos Stories. */
     fun modeEmoji(code: Char): String = when (code) {
-        ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"
+        ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"; CHESS -> "♞"
         ADEDONHA -> "✋"; TRIVIA -> "🧠"; FORCA -> "🎯"; else -> "⚔️"
     }
 
@@ -285,6 +291,7 @@ object Multi {
         is Msg.TimeUp -> JSONObject().put("t", "timeup").put("n", m.n)
         is Msg.Cell -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("c", m.cell)
         is Msg.Move -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("p", org.json.JSONArray().apply { m.path.forEach { put(it) } })
+        is Msg.UMove -> JSONObject().put("t", "move").put("id", m.id).put("n", m.n).put("u", m.uci)
         is Msg.Resign -> JSONObject().put("t", "resign").put("id", m.id)
         is Msg.Suggest -> JSONObject().put("t", "suggest").put("id", m.id).put("m", m.mode.toString())
         is Msg.SRound -> JSONObject().put("t", "sround").put("n", m.n).put("k", m.k).put("l", m.letter.toString()).put("c", jarr(m.cats))
@@ -328,7 +335,9 @@ object Multi {
             }
             "found" -> Msg.Found(o.getString("id"), o.getInt("n"), o.getString("w"))
             "timeup" -> Msg.TimeUp(o.getInt("n"))
-            "move" -> if (o.has("p")) {
+            "move" -> if (o.has("u")) {
+                o.getString("u").lowercase().takeIf { it.matches(Regex("[a-h][1-8][a-h][1-8][qrbn]?")) }?.let { Msg.UMove(o.getString("id"), o.getInt("n"), it) }
+            } else if (o.has("p")) {
                 val p = o.getJSONArray("p")
                 Msg.Move(o.getString("id"), o.getInt("n"), (0 until p.length()).map { p.getInt(it) })
             } else Msg.Cell(o.getString("id"), o.getInt("n"), o.getInt("c"))
