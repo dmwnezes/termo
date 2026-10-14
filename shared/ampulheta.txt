@@ -1,0 +1,8 @@
+# Ampulheta (inspirado no WasThatBefore): ANO|acontecimento   (ano negativo = antes de Cristo)
+# Acontecimentos bem conhecidos, com ano certo e estável; frase curta (até 90 caracteres), sem o ano no texto.
+1500|Pedro Álvares Cabral chega ao Brasil
+1822|Independência do Brasil
+1888|Assinatura da Lei Áurea
+1889|Proclamação da República no Brasil
+1969|Primeira viagem tripulada à Lua
+1960|Inauguração de Brasília
