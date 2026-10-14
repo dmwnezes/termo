@@ -264,6 +264,8 @@ fun PalavreiroApp() {
                         Dest.MESTRE -> com.dmwnezes.palavreiro.ui.MestreScreen(AppGraph.mestre, store, AppGraph.feedback, back)
                         Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
                         Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
+                        Dest.SUDOKU -> com.dmwnezes.palavreiro.ui.SudokuScreen(AppGraph.sudoku, store, AppGraph.feedback, back)
+                        Dest.XADREZ -> com.dmwnezes.palavreiro.ui.ChessScreen(store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }

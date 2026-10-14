@@ -195,7 +195,7 @@ private fun CapturedRow(state: Chess.State, side: Int, label: String) {
     }
 }
 
-private const val XADREZ_HELP = "Xadrez com as regras completas: roque, en passant e promoção (você escolhe a peça).\n\n" +
+private const val XADREZ_HELP = "Xeque é xadrez com as regras completas: roque, en passant e promoção (você escolhe a peça).\n\n" +
     "Toque numa peça sua para ver os destinos e toque no destino. O rei em xeque fica vermelho e o último lance fica dourado.\n\n" +
     "Xeque-mate vence. É empate no afogamento (sem lances e sem xeque), com material insuficiente (rei contra rei, " +
     "ou rei e bispo/cavalo contra rei), após 50 lances sem captura nem peão e na tripla repetição.\n\n" +
@@ -241,7 +241,7 @@ fun ChessScreen(
     val g = game
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Xadrez", onBack, onHelp = { showHelp = true })
+            TopBar("Xeque", onBack, onHelp = { showHelp = true })
             if (g == null) {
                 Column(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 20.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("♞", fontSize = 72.sp, color = Night.text)
@@ -358,7 +358,7 @@ fun ChessScreen(
         }
         if (showHelp) {
             BottomSheet({ showHelp = false }) {
-                SheetTitle("Como jogar Xadrez")
+                SheetTitle("Como jogar Xeque")
                 Spacer(Modifier.height(12.dp))
                 Text(XADREZ_HELP, color = Night.text, fontSize = 15.sp, lineHeight = 21.sp)
                 Spacer(Modifier.height(18.dp))

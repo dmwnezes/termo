@@ -36,7 +36,7 @@ object Multi {
     fun modeName(code: Char): String = when (code) {
         'd' -> "Dueto"; 'q' -> "Quarteto"; ANAGRAM -> "Anagrama"; HUNT -> "Caça-Palavras"
         DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"
-        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; CHESS -> "Xadrez"; else -> "Termo"
+        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; CHESS -> "Xeque"; else -> "Termo"
     }
     /** Nome curto (grade compacta do "Próximo jogo"). */
     fun chipName(code: Char): String = when (code) {
@@ -55,7 +55,7 @@ object Multi {
     /** "um Termo", "uma partida de Damas", "uma Adedonha", "um Qual é a Palavra?". */
     fun withArticle(code: Char): String = when (code) {
         CHECKERS -> "uma partida de Damas"
-        CHESS -> "uma partida de Xadrez"
+        CHESS -> "uma partida de Xeque"
         ADEDONHA, TRIVIA, FORCA -> "uma " + modeName(code)
         else -> "um " + modeName(code)
     }

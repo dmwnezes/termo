@@ -51,12 +51,12 @@ import kotlin.random.Random
 
 private val SInk = Color(0xFF14102C)
 
-private const val SUDOKU_HELP = "Preencha a grade 9×9 com os números de 1 a 9: cada linha, cada coluna e cada bloco 3×3 " +
+private const val SUDOKU_HELP = "Quadrante é um Sudoku. Preencha a grade 9×9 com os números de 1 a 9: cada linha, cada coluna e cada bloco 3×3 " +
     "tem todos os números, sem repetir.\n\n" +
     "Toque numa casa e depois num número. Os números iniciais (em negrito, brancos) não mudam; os seus ficam lilás. Número errado fica em vermelho " +
     "e conta um erro: com 3 erros a partida acaba.\n\n" +
     "Anotações: ligue o lápis para marcar números pequenos de lembrete na casa. Apagar limpa a casa escolhida.\n\n" +
-    "Do dia: um Sudoku por nível, o mesmo para todo mundo. Infinito: quantos quiser."
+    "Do dia: um Quadrante por nível, o mesmo para todo mundo. Infinito: quantos quiser."
 
 /** Sudoku: Do dia (um por nível) ou Infinito; progresso salvo ao sair. */
 @Composable
@@ -122,7 +122,7 @@ fun SudokuScreen(
 
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            TopBar("Sudoku", { save(); onBack() }, onHelp = { showHelp = true })
+            TopBar("Quadrante", { save(); onBack() }, onHelp = { showHelp = true })
             Column(Modifier.weight(1f).padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 ModeSwitch(infinite) { save(); infinite = it; round = 0 }
                 Spacer(Modifier.height(8.dp))
@@ -185,7 +185,7 @@ fun SudokuScreen(
         if (showEnd && game != null) {
             BottomSheet({ showEnd = false }) {
                 if (game.won) {
-                    SheetTitle("Sudoku resolvido! 🎉", "Nível ${level.label}" + if (infinite) " · Infinito" else " · Do dia")
+                    SheetTitle("Quadrante resolvido! 🎉", "Nível ${level.label}" + if (infinite) " · Infinito" else " · Do dia")
                     Spacer(Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         StatItem(formatTime(game.seconds), "Tempo")
@@ -198,7 +198,7 @@ fun SudokuScreen(
                         Text("Novo recorde de tempo! 🏅", color = Night.present, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     }
                     Spacer(Modifier.height(20.dp))
-                    PillButton(if (infinite) "Outro Sudoku" else "Jogar o Infinito", Night.correct, modifier = Modifier.fillMaxWidth()) {
+                    PillButton(if (infinite) "Outro Quadrante" else "Jogar o Infinito", Night.correct, modifier = Modifier.fillMaxWidth()) {
                         if (infinite) round++ else { infinite = true; round = 1 }
                     }
                 } else {
@@ -207,14 +207,14 @@ fun SudokuScreen(
                     PillButton("Tentar de novo", Night.correct, modifier = Modifier.fillMaxWidth()) { game.reset(); save(); showEnd = false }
                     if (infinite) {
                         Spacer(Modifier.height(10.dp))
-                        PillButton("Outro Sudoku", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth()) { round++ }
+                        PillButton("Outro Quadrante", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth()) { round++ }
                     }
                 }
             }
         }
         if (showHelp) {
             BottomSheet({ showHelp = false }) {
-                SheetTitle("Como jogar Sudoku")
+                SheetTitle("Como jogar Quadrante")
                 Spacer(Modifier.height(12.dp))
                 Text(SUDOKU_HELP, color = Night.text, fontSize = 15.sp, lineHeight = 21.sp)
                 Spacer(Modifier.height(18.dp))

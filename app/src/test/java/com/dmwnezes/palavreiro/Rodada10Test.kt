@@ -203,9 +203,9 @@ class Rodada10Test {
     // ---------------- Rodadas, links e mensagens ----------------
     @Test
     fun rodadasEModos() {
-        assertEquals(listOf('t', 'd', 'q', 'a', 'c', 'p', 'f', 's', 'g', 'v', 'x'), Multi.CODES)
+        assertEquals(listOf('t', 'd', 'q', 'a', 'c', 'p', 'f', 's', 'g', 'v', 'x', 'k'), Multi.CODES)
         assertEquals(
-            listOf("Termo", "Dueto", "Quarteto", "Anagrama", "Caça", "Palavra?", "Forca", "Adedonha", "Trivia", "Velha", "Damas"),
+            listOf("Termo", "Dueto", "Quarteto", "Anagrama", "Caça", "Palavra?", "Forca", "Adedonha", "Trivia", "Velha", "Damas", "Xeque"),
             Multi.CODES.map(Multi::chipName),
         )
         assertEquals("um Caça-Palavras", Multi.withArticle('c')); assertEquals("um Jogo da Velha", Multi.withArticle('v'))

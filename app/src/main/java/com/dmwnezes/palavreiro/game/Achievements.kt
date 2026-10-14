@@ -34,11 +34,14 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "arch_played", "arch_won", "alldone_days",
             "trivia_won", "trivia_best", "trivia_right",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
+            "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil", "sudoku_won", "sudoku_perfect",
+            "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
             "ws_best", "ws_inf_best",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
+            "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil",
         )
     }
 }
@@ -76,6 +79,8 @@ object Achievements {
             a("🧠", "Sabichão", "Ganhe 1 partida de Trivia (as 6 medalhas)", r["trivia_won"], 1),
             a("📚", "Enciclopédia", "Acerte 100 perguntas na Trivia", r["trivia_right"], 100),
             a("🃏", "Memória de elefante", "Termine a Memória no Difícil", if (r["mem_best_dificil"] > 0) 1 else 0, 1),
+            a("🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", r["sudoku_perfect"], 1),
+            a("♟️", "Xeque-mate", "Vença o computador no Difícil do Xeque", r["xadrez_won_dificil"], 1),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),
             a("🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", r["arch_played"], 5),
             a("🌟", "Dia completo", "Faça os 5 desafios do dia", r["alldone_days"], 1),

@@ -36,7 +36,7 @@ class Rodada11Test {
         assertEquals("3 rodadas", Multi.roundsLabel('s', 3))
         assertEquals("Melhor de 3", Multi.roundsLabel('f', 3))
         assertTrue(Multi.pointsMode('s') && Multi.pointsMode('g') && !Multi.pointsMode('f'))
-        assertEquals(11, Multi.CODES.size)
+        assertEquals(12, Multi.CODES.size)
         assertEquals(Multi.CODES.toSet(), Multi.SECTIONS.flatMap { it.second }.toSet())
         assertEquals(listOf("Palavras", "Conhecimento", "Tabuleiro"), Multi.SECTIONS.map { it.first })
         assertEquals("Uma letra, várias categorias", Multi.blurb('s'))
