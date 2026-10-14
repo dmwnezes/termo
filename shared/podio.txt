@@ -1,4 +1,5 @@
-# Pódio (inspirado no Factle): TÍTULO|detalhe curto|1º;2º;3º;4º;5º|isca 1;isca 2;isca 3;isca 4;isca 5
-# Só rankings estáveis e verificáveis (geografia, astronomia, história). Nada que muda todo ano.
-Maiores estados do Brasil em área|IBGE|Amazonas;Pará;Mato Grosso;Minas Gerais;Bahia|Mato Grosso do Sul;Goiás;Maranhão;Rio Grande do Sul;Tocantins
-Maiores planetas do Sistema Solar|pelo diâmetro|Júpiter;Saturno;Urano;Netuno;Terra|Vênus;Marte;Mercúrio;Plutão;Lua
+# Pódio (inspirado no Factle): TÍTULO|1º|2º|3º|4º|5º|errada1|errada2|errada3|errada4|errada5
+# Rankings estáveis (que não mudam com o tempo), com fonte confiável. As 5 erradas são plausíveis, do mesmo tipo, e ficam FORA do top 5.
+Os 5 maiores países do mundo em área|Rússia|Canadá|China|Estados Unidos|Brasil|Austrália|Índia|Argentina|Cazaquistão|Argélia
+Os 5 maiores estados do Brasil em área|Amazonas|Pará|Mato Grosso|Minas Gerais|Bahia|Mato Grosso do Sul|Goiás|Maranhão|Rio Grande do Sul|Tocantins
+Os 5 maiores planetas do Sistema Solar|Júpiter|Saturno|Urano|Netuno|Terra|Vênus|Marte|Mercúrio|Plutão|Lua
