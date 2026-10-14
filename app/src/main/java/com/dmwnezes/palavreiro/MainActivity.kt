@@ -233,6 +233,9 @@ fun PalavreiroApp() {
                             Dest.QUARTETO to daily(Mode.QUARTETO),
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.MATIZ to if (store.text("matiz_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.PODIO to if (store.text("podio_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.AMPULHETA to if (store.text("amp_done") == today) "Feito hoje ✓" else "Novo",
                         )
                     }
                     // Painel "Hoje" e confete uma vez por dia quando os 5 desafios estiverem feitos.
@@ -264,6 +267,9 @@ fun PalavreiroApp() {
                         Dest.MESTRE -> com.dmwnezes.palavreiro.ui.MestreScreen(AppGraph.mestre, store, AppGraph.feedback, back)
                         Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
                         Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
+                        Dest.MATIZ -> com.dmwnezes.palavreiro.ui.MatizScreen(store, AppGraph.feedback, back)
+                        Dest.PODIO -> com.dmwnezes.palavreiro.ui.PodioScreen(AppGraph.podio, store, AppGraph.feedback, back)
+                        Dest.AMPULHETA -> com.dmwnezes.palavreiro.ui.AmpulhetaScreen(AppGraph.ampulheta, store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }

@@ -60,6 +60,11 @@ object AppGraph {
     /** Perguntas da Trivia (shared/trivia.txt). */
     lateinit var trivia: List<com.dmwnezes.palavreiro.game.TriviaQ>
         private set
+    /** Rankings do Pódio e acontecimentos da Ampulheta (shared/podio.txt, shared/ampulheta.txt). */
+    var podio: List<com.dmwnezes.palavreiro.game.PodioQ> = emptyList()
+        private set
+    var ampulheta: List<com.dmwnezes.palavreiro.game.AmpEvent> = emptyList()
+        private set
     /** Significado de cada palavra do Termo (chave sem acento). */
     lateinit var meanings: Map<String, String>
         private set
@@ -93,6 +98,8 @@ object AppGraph {
         QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
         trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
+        podio = runCatching { com.dmwnezes.palavreiro.game.PodioData.parse(asset("podio.txt")) }.getOrDefault(emptyList())
+        ampulheta = runCatching { com.dmwnezes.palavreiro.game.AmpulhetaData.parse(asset("ampulheta.txt")) }.getOrDefault(emptyList())
         mestre = com.dmwnezes.palavreiro.game.MestreData(connections, connFamilies, synonyms, families, antonyms, antonymFamilies)
         ready = true
     }
