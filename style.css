@@ -1254,3 +1254,78 @@ button { font-family: inherit; color: inherit; }
   .hm-friend { width: 100%; background: var(--surface-high); color: var(--text); }
 }
 @media (prefers-reduced-motion: reduce) { .hm-cat.on, .hm-prev-in { animation: none; } }
+
+/* ---------- Batalha Naval (solo e com amigo): layout A + frotas ao lado (D) ---------- */
+.nv-status { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 4px 10px; }
+.nv-turn { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--muted); }
+.nv-turn.mine { color: var(--correct); }
+.nv-count { display: flex; gap: 14px; font-weight: 600; color: var(--muted); font-size: .9rem; white-space: nowrap; }
+.nv-count b { color: var(--text); font-variant-numeric: tabular-nums; }
+.nv-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.nv-card { background: var(--surface); border: 1px solid color-mix(in srgb, var(--outline) 45%, transparent); border-radius: var(--r-card); padding: 12px 10px; min-width: 0; }
+.nv-card h2 { margin: 0 4px 10px; font-size: 1rem; font-weight: 700; }
+.nv-foe { grid-column: 1 / -1; }
+.nv-mine h2 { font-size: .9rem; }
+.nv-board { display: grid; grid-template-columns: .65fr repeat(10, minmax(0, 1fr)); gap: 3px; }
+.nv-l { display: grid; place-items: center; font-style: normal; font-size: .7rem; font-weight: 600; color: var(--muted); aspect-ratio: 1; }
+.nv-board > .nv-l:nth-child(-n+11) { aspect-ratio: auto; padding-bottom: 2px; }
+.nv-c { aspect-ratio: 1; min-width: 0; border: none; padding: 0; border-radius: 8px; background: var(--surface-high); color: var(--dark-text); display: grid; place-items: center; font: 800 clamp(.6rem, 2.6vw, 1rem)/1 Outfit, sans-serif; transition: background-color .2s; }
+.nv-mine .nv-c { border-radius: 4px; font-size: .55rem; }
+.nv-mine .nv-board { gap: 2px; }
+.nv-mine .nv-l { font-size: .5rem; }
+.nv-board.enemy .nv-c { cursor: pointer; }
+.nv-board.enemy:not(.off) .nv-c:not(.hit):not(.miss):not(.sunk):hover { background: color-mix(in srgb, var(--accent) 35%, var(--surface-high)); }
+.nv-board.off .nv-c { cursor: default; }
+.nv-c.ship { background: var(--flag-blue); }
+.nv-c.hit { background: var(--correct); }
+.nv-c.hit.me { background: var(--red); }
+.nv-c.miss { background: var(--key-absent); color: var(--muted); }
+.nv-c.sunk { background: var(--purple); }
+.nv-c.aim { box-shadow: 0 0 0 3px var(--present); position: relative; z-index: 1; }
+.nv-c.last { animation: pop .3s ease; }
+.nv-fleets { display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+.nv-fleet h3 { margin: 0 0 8px; font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.nv-ship { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+.nv-nm { font-size: .78rem; }
+.nv-ship.gone .nv-nm { color: var(--purple); text-decoration: line-through; }
+.nv-cap { display: flex; gap: 2px; }
+.nv-cap i { width: 13px; height: 10px; background: var(--outline); }
+.nv-cap.mine i { background: var(--flag-blue); }
+.nv-cap i:first-child { border-radius: 6px 2px 2px 6px; }
+.nv-cap i:last-child { border-radius: 2px 6px 6px 2px; }
+.nv-cap i.hit { background: var(--red); }
+.nv-cap i.sunk { background: var(--purple); }
+.nv-btns { max-width: 440px; margin: 14px auto 0; width: 100%; }
+.nv-foot { display: flex; justify-content: center; margin-top: 12px; }
+.nv-setup h3 { margin: 14px 0 8px; font-size: .95rem; color: var(--muted); font-weight: 600; }
+.nv-pre { max-width: 360px; margin: 0 auto 14px; }
+.nv-pre .nv-c { border-radius: 6px; }
+.nv-wait { text-align: center; color: var(--muted); font-weight: 600; margin: 12px 0 0; }
+@media (max-width: 899px) {
+  /* celular: frotas só com as cápsulas, ao lado do meu mar */
+  .nv-fleets { padding: 10px; gap: 8px; }
+  .nv-nm { display: none; }
+  .nv-ship { margin-bottom: 4px; }
+  .nv-fleet h3 { font-size: .68rem; margin-bottom: 6px; }
+}
+@media (min-width: 900px) {
+  #app.nv-wide { max-width: 1200px; padding: 0 32px 40px; }
+  .nv-layout { grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+  .nv-fleets { grid-column: 1; grid-row: 1; }
+  .nv-foe { grid-column: 2; grid-row: 1; }
+  .nv-mine { grid-column: 3; grid-row: 1; }
+  .nv-card { padding: 20px; }
+  .nv-card h2, .nv-mine h2 { font-size: 1.1rem; }
+  .nv-mine .nv-c { border-radius: 8px; font-size: 1rem; }
+  .nv-mine .nv-board { gap: 3px; }
+  .nv-mine .nv-l { font-size: .7rem; }
+  .nv-nm { font-size: .9rem; }
+  .nv-cap i { width: 16px; height: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .nv-c.last { animation: none; } }
+.nv-ico { display: grid; grid-template-columns: repeat(3, 13px); gap: 3px; }
+.nv-ico i { height: 13px; border-radius: 4px; background: color-mix(in srgb, var(--outline) 60%, transparent); }
+.nv-ico i.s { background: var(--flag-blue); }
+.nv-ico i.s:nth-child(4) { border-radius: 7px 3px 3px 7px; } .nv-ico i.s:nth-child(6) { border-radius: 3px 7px 7px 3px; }
+.nv-ico i.h { background: var(--correct); }
+.nv-ico i.m { background: var(--key-absent); }

@@ -295,6 +295,11 @@ fun MultiScreen(
                 if (id == myId || id == oppId || (m is Msg.Stop && id == Adedonha.TEMPO)) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
             }
             is Msg.SRound, is Msg.TryRes, is Msg.Word -> if (phase == Phase.PLAYING) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            // Batalha Naval: só valem as mensagens dos dois jogadores.
+            is Msg.Ready, is Msg.Shot, is Msg.Res, is Msg.Fleet -> if (phase == Phase.PLAYING) {
+                val id = when (m) { is Msg.Ready -> m.id; is Msg.Shot -> m.id; is Msg.Res -> m.id; is Msg.Fleet -> m.id; else -> null }
+                if (id == myId || id == oppId) roundMsgs.add(com.dmwnezes.palavreiro.game.Timed(System.currentTimeMillis(), m))
+            }
             // Convidado sugeriu outro jogo: aviso no topo da folha de fim do anfitrião.
             is Msg.Suggest -> if (phase == Phase.PLAYING && isHost && m.id == oppId) suggestion = m.mode
             // Grade do Caça-Palavras: guardada pela RODADA (pode chegar logo depois do start/again).
@@ -586,6 +591,7 @@ fun MultiScreen(
                             Multi.ADEDONHA -> AdedonhaPlay(catPool, rounds, roundMsgs, duel)
                             Multi.TRIVIA -> TriviaPlay(triviaPool, r.seed, rounds, roundMsgs, duel)
                             Multi.FORCA -> ForcaPlay(roundMsgs.map { it.msg }, duel)
+                            Multi.NAVAL -> NavalPlay(roundMsgs.map { it.msg }, duel)
                         }
                         if (counting) Countdown(((localStart - now + 999) / 1000).toInt().coerceIn(1, 3))
                     }
@@ -679,6 +685,7 @@ private fun modeRules(code: Char, rounds: Int, create: Boolean): String {
         Multi.ADEDONHA -> "$rounds rodadas de Adedonha: 6 categorias e uma letra sorteada por rodada. Preencha tudo e dê STOP! Depois cada um valida as respostas do outro: resposta válida vale 10 (5 se for igual à do amigo). Vence quem fizer mais pontos 🏆"
         Multi.TRIVIA -> "$rounds perguntas de 6 temas, as mesmas para os dois: 15 s para responder cada uma. Vence quem acertar mais; no empate, quem respondeu mais rápido 🏆"
         Multi.FORCA -> "Um escolhe a palavra e o tema, o outro adivinha letra por letra (ou chuta a palavra). 6 erros e quem escolheu vence. Os papéis trocam a cada rodada." + series
+        Multi.NAVAL -> "Cada um sorteia a própria frota e vocês atiram um de cada vez. Quem afundar os 5 navios do outro primeiro vence." + series
         else -> (if (create) "Partida ao vivo: quem acertar primeiro ganha. Você vê as cores das tentativas do seu amigo, mas não as letras."
         else "Quem acertar primeiro ganha. Vocês veem as cores das tentativas um do outro, sem as letras.") + series
     }
@@ -696,6 +703,7 @@ internal fun shortRules(code: Char, rounds: Int): String {
         Multi.TICTAC -> "X começa e os símbolos trocam a cada rodada."
         Multi.CHECKERS -> "Captura obrigatória, lei da maioria e dama voadora."
         Multi.CHESS -> "Regras completas; as cores trocam a cada rodada."
+        Multi.NAVAL -> "Um tiro de cada vez; afunde os 5 navios do amigo."
         else -> "Quem acertar primeiro ganha; vocês veem só as cores um do outro."
     }
     val n = when {

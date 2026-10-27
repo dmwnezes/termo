@@ -45,10 +45,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.selected
+import com.dmwnezes.palavreiro.game.Multi
 
 /** Destinos da tela inicial. */
 enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
-    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ }
+    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -87,6 +88,7 @@ fun HomeScreen(
         GameCardInfo(Dest.MATIZ, "Matiz", "Memorize a cor e recrie com R, G e B", badges[Dest.MATIZ]),
         GameCardInfo(Dest.SUDOKU, "Quadrante", "Sudoku: um por nível todo dia, ou infinitos", null),
         GameCardInfo(Dest.XADREZ, "Xeque", "Xadrez contra o computador", null),
+        GameCardInfo(Dest.NAVAL, "Batalha Naval", "Afunde a frota do computador ou do amigo", null),
         GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
         GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
         GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
@@ -94,7 +96,7 @@ fun HomeScreen(
     // Mesmo layout do site no celular: abas por categoria, cartões em duas colunas e barra fixa embaixo.
     val cats = listOf(
         HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
-        HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ)),
+        HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ, Dest.NAVAL)),
         HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA)),
     )
     var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
@@ -359,6 +361,7 @@ internal fun CardIcon(dest: Dest) {
         Dest.AMPULHETA -> AmpulhetaIcon()
         Dest.SUDOKU -> SudokuIcon()
         Dest.XADREZ -> ChessHomeIcon(44.dp)
+        Dest.NAVAL -> GameIcon(Multi.NAVAL, 46.dp)
     }
 }
 

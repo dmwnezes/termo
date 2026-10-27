@@ -39,6 +39,8 @@
     // Quadrante (Sudoku): pedaço de grade com números; Xeque (Xadrez): o cavalo num tabuleiro.
     quadrante: `<div class="sdk-ico" aria-hidden="true">${[5, 3, "", "", 7, "", 6, "", 9].map((d, i) => `<i class="${i === 4 ? "on" : ""}">${d}</i>`).join("")}</div>`,
     xeque: `<div class="xz-ico" aria-hidden="true"><i></i><i></i><i></i><i></i><b>♞&#xFE0E;</b></div>`,
+    // Batalha Naval: pedaço do mar com um navio (cápsula) e um acerto.
+    naval: `<div class="nv-ico" aria-hidden="true"><i></i><i class="h"></i><i></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="m"></i><i></i><i></i></div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
 
@@ -66,12 +68,13 @@
       ["ampulheta", "Ampulheta", "O que veio antes? Monte a linha do tempo", badge(dd("ampulheta"))],
       ["quadrante", "Quadrante", "Sudoku: um por nível todo dia, ou sem fim", ""],
       ["xeque", "Xeque", "Xadrez contra o computador", ""],
+      ["naval", "Batalha Naval", "Afunde a frota do computador ou do amigo", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     // Celular: abas por categoria (layout B). Computador: grade de ícones + prévia ao lado (layout E).
     const CATS = [
       ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
-      ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque"]],
+      ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque", "naval"]],
       ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta"]],
     ];
     const info = {};
@@ -128,7 +131,7 @@
     const parts = (location.hash.replace(/^#\/?/, "") || "").split("/"), r = parts[0];
     if (P.mp) P.mp.leave(); // sai da partida com amigo (manda "bye")
     app.innerHTML = "";
-    app.classList.remove("home-wide");
+    app.classList.remove("home-wide", "nv-wide");
     document.querySelectorAll(".overlay").forEach((o) => o.remove());
     window.scrollTo(0, 0);
     const screens = {
@@ -156,6 +159,7 @@
       sudoku: () => P.games.sudoku(app),
       xeque: () => P.games.xadrez(app),
       xadrez: () => P.games.xadrez(app),
+      naval: () => P.games.naval(app),
       arquivo: () => (parts[1] && P.games.arquivoGame(app, parts[1], parts[2])) || P.games.arquivo(app),
     };
     if (r === "desafio") {

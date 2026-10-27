@@ -272,6 +272,7 @@ fun PalavreiroApp() {
                         Dest.AMPULHETA -> com.dmwnezes.palavreiro.ui.AmpulhetaScreen(AppGraph.ampulheta, store, AppGraph.feedback, back)
                         Dest.SUDOKU -> com.dmwnezes.palavreiro.ui.SudokuScreen(AppGraph.sudoku, store, AppGraph.feedback, back)
                         Dest.XADREZ -> com.dmwnezes.palavreiro.ui.ChessScreen(store, AppGraph.feedback, back)
+                        Dest.NAVAL -> com.dmwnezes.palavreiro.ui.NavalScreen(store, AppGraph.feedback, back)
                         else -> {}
                     }
                 }

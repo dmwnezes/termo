@@ -58,6 +58,7 @@ Em 08/10/2026 o Daniel decidiu as escolhas principais e depois passou as demais 
 | Reverso | O app tenta adivinhar a palavra que a pessoa pensou; ela marca as cores |
 | Qual é a Palavra? | Definição escrita à mão, 3 chances, cada erro revela uma letra; `definicoes.txt` |
 | Sinônimos | 4 opções e 10 s por palavra, cadeia até errar; `sinonimos.txt` (linhas com `=` evitam alternativas ambíguas) |
+| Batalha Naval | 5 navios por lado, um tiro de cada vez; contra o computador (Fácil, Médio, Difícil) ou com amigo (modo `n` da partida ao vivo). Tela: os dois mares lado a lado e as frotas com cápsulas ao lado |
 
 Para acrescentar conteúdo, basta editar os arquivos `.txt` em `shared/` (usados pelo app e pelo site).
 

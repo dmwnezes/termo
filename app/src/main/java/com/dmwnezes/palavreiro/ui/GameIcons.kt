@@ -64,6 +64,7 @@ internal fun GameIcon(code: Char, size: Dp) {
             Multi.TICTAC -> tictac(u)
             Multi.CHECKERS -> checkers(u)
             Multi.CHESS -> chess(u, tm)
+            Multi.NAVAL -> naval(u)
         }
     }
 }
@@ -227,4 +228,14 @@ private fun DrawScope.chess(u: Float, tm: TextMeasurer) {
     val o = Offset(24f * u - l.size.width / 2f, 24f * u - l.size.height / 2f)
     drawText(l, color = Color(0xFF14102C), topLeft = o, drawStyle = Stroke(3.2f * u))
     drawText(l, color = Color(0xFFF7F4FF), topLeft = o)
+}
+
+/** Batalha Naval: pedaço do mar 3×3 com um navio (cápsula azul) e um acerto verde. */
+private fun DrawScope.naval(u: Float) {
+    val c = 12.5f * u; val g = 2.5f * u; val x0 = 4.75f * u
+    for (r in 0 until 3) for (k in 0 until 3) {
+        if (r == 1) continue
+        tile(x0 + k * (c + g), x0 + r * (c + g), c, c, if (r == 0 && k == 1) Night.correct else if (r == 2 && k == 0) Night.keyAbsent else Night.surfaceHigh)
+    }
+    tile(x0, x0 + c + g, 3 * c + 2 * g, c, Night.flagBlue, c / 2)
 }

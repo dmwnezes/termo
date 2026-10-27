@@ -23,24 +23,25 @@ object Multi {
     const val TRIVIA = 'g'
     const val FORCA = 'f'
     const val CHESS = 'k'
+    const val NAVAL = 'n'
     /** Bomba-Relógio: saiu do Palavreiro (link antigo com "b" → aviso). */
     const val REMOVED = 'b'
     /** Todas as letras de modo aceitas no link, na ordem dos cartões da tela de criar. */
-    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA, TRIVIA, TICTAC, CHECKERS, CHESS)
+    val CODES = listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA, TRIVIA, TICTAC, CHECKERS, CHESS, NAVAL)
     /** Seções da tela de criar: título → modos. */
     val SECTIONS = listOf(
         "Palavras" to listOf('t', 'd', 'q', ANAGRAM, HUNT, DEFINE, FORCA, ADEDONHA),
         "Conhecimento" to listOf(TRIVIA),
-        "Tabuleiro" to listOf(TICTAC, CHECKERS, CHESS),
+        "Tabuleiro" to listOf(TICTAC, CHECKERS, CHESS, NAVAL),
     )
     fun modeName(code: Char): String = when (code) {
         'd' -> "Dueto"; 'q' -> "Quarteto"; ANAGRAM -> "Anagrama"; HUNT -> "Caça-Palavras"
         DEFINE -> "Qual é a Palavra?"; TICTAC -> "Jogo da Velha"; CHECKERS -> "Damas"
-        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; CHESS -> "Xeque"; else -> "Termo"
+        ADEDONHA -> "Adedonha"; TRIVIA -> "Trivia"; FORCA -> "Forca"; CHESS -> "Xeque"; NAVAL -> "Batalha Naval"; else -> "Termo"
     }
     /** Nome curto (grade compacta do "Próximo jogo"). */
     fun chipName(code: Char): String = when (code) {
-        HUNT -> "Caça"; DEFINE -> "Palavra?"; TICTAC -> "Velha"; else -> modeName(code)
+        HUNT -> "Caça"; DEFINE -> "Palavra?"; TICTAC -> "Velha"; NAVAL -> "Naval"; else -> modeName(code)
     }
     /** Linha curta de descrição do cartão do jogo. */
     fun blurb(code: Char): String = when (code) {
@@ -50,13 +51,14 @@ object Multi {
         ADEDONHA -> "Uma letra, várias categorias"; TRIVIA -> "Perguntas de 6 temas"
         TICTAC -> "Três em linha, ao vivo"; CHECKERS -> "Regras brasileiras"
         CHESS -> "Regras completas, ao vivo"
+        NAVAL -> "Afunde a frota do amigo"
         else -> "Uma palavra, quem acertar primeiro"
     }
     /** "um Termo", "uma partida de Damas", "uma Adedonha", "um Qual é a Palavra?". */
     fun withArticle(code: Char): String = when (code) {
         CHECKERS -> "uma partida de Damas"
         CHESS -> "uma partida de Xeque"
-        ADEDONHA, TRIVIA, FORCA -> "uma " + modeName(code)
+        ADEDONHA, TRIVIA, FORCA, NAVAL -> "uma " + modeName(code)
         else -> "um " + modeName(code)
     }
     /** Modos que seguem o fluxo do Termo (Termo, Dueto, Quarteto); os outros têm jogo próprio. */
@@ -111,7 +113,7 @@ object Multi {
     fun fromPasted(text: String?): Room? {
         val t = text?.trim().orEmpty()
         Regex("[?&]mp=([A-Za-z0-9-]+)").find(t)?.let { return parse(it.groupValues[1].lowercase()) }
-        Regex("\\b([a-z0-9]{12}-[tdqacpvxsgfk]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
+        Regex("\\b([a-z0-9]{12}-[tdqacpvxsgfkn]-[0-9a-z]{1,7})\\b").find(t.lowercase())?.let { return parse(it.groupValues[1]) }
         return null
     }
 
@@ -213,6 +215,16 @@ object Multi {
         data class TryRes(val n: Int, val ok: Boolean) : Msg
         /** Forca: a palavra original, no fim da rodada. */
         data class Word(val n: Int, val word: String) : Msg
+
+        // ---------- Batalha Naval ----------
+        /** [id] posicionou a frota. */
+        data class Ready(val id: String) : Msg
+        /** [id] deu o tiro número [n] (0, 1, 2…) na casa [c] (0..99). */
+        data class Shot(val id: String, val n: Int, val c: Int) : Msg
+        /** Resposta automática de quem levou o tiro [n]: acerto, navio [ship] (-1 = água), casas do navio afundado e se acabou a frota. */
+        data class Res(val id: String, val n: Int, val c: Int, val hit: Boolean, val ship: Int, val sunk: List<Int>, val all: Boolean) : Msg
+        /** A frota de [id], mostrada no fim da rodada. */
+        data class Fleet(val id: String, val fleet: List<List<Int>>) : Msg
     }
 
     // ---------- reações rápidas ----------
@@ -230,7 +242,7 @@ object Multi {
     /** Emoji do modo no cartão dos Stories. */
     fun modeEmoji(code: Char): String = when (code) {
         ANAGRAM -> "🔤"; HUNT -> "🔍"; DEFINE -> "💡"; TICTAC -> "⭕"; CHECKERS -> "♟️"; CHESS -> "♞"
-        ADEDONHA -> "✋"; TRIVIA -> "🧠"; FORCA -> "🎯"; else -> "⚔️"
+        ADEDONHA -> "✋"; TRIVIA -> "🧠"; FORCA -> "🎯"; NAVAL -> "⚓"; else -> "⚔️"
     }
 
     /** Modos que contam série (melhor de N). */
@@ -305,6 +317,11 @@ object Multi {
         is Msg.Try -> JSONObject().put("t", "try").put("id", m.id).put("n", m.n).put("w", m.word)
         is Msg.TryRes -> JSONObject().put("t", "tryres").put("n", m.n).put("ok", m.ok)
         is Msg.Word -> JSONObject().put("t", "word").put("n", m.n).put("w", m.word)
+        is Msg.Ready -> JSONObject().put("t", "ready").put("id", m.id)
+        is Msg.Shot -> JSONObject().put("t", "shot").put("id", m.id).put("n", m.n).put("c", m.c)
+        is Msg.Res -> JSONObject().put("t", "res").put("id", m.id).put("n", m.n).put("c", m.c).put("h", if (m.hit) 1 else 0)
+            .put("k", m.ship).put("s", jarr(m.sunk)).put("w", if (m.all) 1 else 0)
+        is Msg.Fleet -> JSONObject().put("t", "fleet").put("id", m.id).put("f", org.json.JSONArray().apply { m.fleet.forEach { put(jarr(it)) } })
     }.toString()
 
     private fun jarr(items: List<Any>) = org.json.JSONArray().apply { items.forEach { put(it) } }
@@ -354,6 +371,13 @@ object Multi {
             "try" -> Msg.Try(o.getString("id"), o.getInt("n"), o.getString("w"))
             "tryres" -> Msg.TryRes(o.getInt("n"), o.getBoolean("ok"))
             "word" -> Msg.Word(o.getInt("n"), o.getString("w"))
+            "ready" -> Msg.Ready(o.getString("id"))
+            "shot" -> Msg.Shot(o.getString("id"), o.getInt("n"), o.getInt("c"))
+            "res" -> Msg.Res(
+                o.getString("id"), o.getInt("n"), o.getInt("c"), o.optInt("h") == 1, o.optInt("k", -1),
+                if (o.has("s")) ints(o, "s").filter { it in 0..99 } else emptyList(), o.optInt("w") == 1,
+            )
+            "fleet" -> o.getJSONArray("f").let { a -> Msg.Fleet(o.getString("id"), (0 until a.length()).map { k -> a.getJSONArray(k).let { s -> (0 until s.length()).map { s.getInt(it) } } }) }
             else -> null
         }
     }.getOrNull()

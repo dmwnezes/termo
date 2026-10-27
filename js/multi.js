@@ -20,15 +20,16 @@
     f: { key: "forca", name: "Forca", pill: "Forca", inv: "uma Forca", boards: 0 },
     s: { key: "adedonha", name: "Adedonha", pill: "Adedonha", inv: "uma Adedonha", boards: 0, pts: true, rc: [3, 5, 7], rd: 5 },
     g: { key: "trivia", name: "Trivia", pill: "Trivia", inv: "uma Trivia", boards: 0, pts: true },
+    n: { key: "naval", name: "Batalha Naval", pill: "Naval", inv: "uma Batalha Naval", boards: 0 },
   };
   /** Seções da tela de criar partida (e a ordem da grade do "Próximo jogo"). */
-  const SECTIONS = [["Palavras", ["t", "d", "q", "a", "c", "p", "f", "s"]], ["Conhecimento", ["g"]], ["Tabuleiro", ["v", "x", "k"]]];
+  const SECTIONS = [["Palavras", ["t", "d", "q", "a", "c", "p", "f", "s"]], ["Conhecimento", ["g"]], ["Tabuleiro", ["v", "x", "k", "n"]]];
   const ORDER = SECTIONS.flatMap((x) => x[1]);
   const DESC = {
     t: "Uma palavra, quem acertar primeiro", d: "Duas palavras ao mesmo tempo", q: "Quatro palavras, 9 tentativas",
     a: "Desembaralhe as letras antes", c: "A mesma grade para os dois", p: "Descubra a palavra pela definição",
     f: "Um escolhe a palavra, o outro adivinha", s: "Uma letra, várias categorias", g: "Perguntas de 6 temas",
-    v: "X contra O, o clássico", x: "Regras brasileiras", k: "Xadrez com regras completas",
+    v: "X contra O, o clássico", x: "Regras brasileiras", k: "Xadrez com regras completas", n: "Afunde a frota do amigo",
   };
   // ---------- rodadas: série (1/3/5) ou pontos (5/10/15; Adedonha 3/5/7) ----------
   const RCHOICES = (m) => MODES[m].rc || (MODES[m].pts ? [5, 10, 15] : [1, 3, 5]);
@@ -48,6 +49,7 @@
     if (m === "v") return `X começa e os símbolos trocam a cada rodada. Deu velha? Não conta. ${seriesTxt(n)}`;
     if (m === "x") return `Regras brasileiras: captura obrigatória, lei da maioria e dama voadora. ${seriesTxt(n)}`;
     if (m === "k") return `Regras completas: roque, en passant e promoção. Brancas começam e as cores trocam a cada rodada. Empate não conta. ${seriesTxt(n)}`;
+    if (m === "n") return `Cada um sorteia a própria frota e vocês atiram um de cada vez. Quem afundar os 5 navios do outro primeiro vence. ${seriesTxt(n)}`;
     if (m === "s") return `${n} rodadas: uma letra sorteada e 6 categorias. Preencha tudo e dê STOP! Resposta só sua vale 10, igual à do amigo vale 5.`;
     if (m === "g") return `${n} perguntas de 6 temas, as mesmas para os dois, 15 segundos cada. Quem acertar mais vence.`;
     if (m === "f") return `Um escolhe a palavra e o tema, o outro adivinha letra por letra. 6 erros e a forca vence. Os papéis trocam a cada rodada. ${seriesTxt(n)}`;
@@ -66,7 +68,7 @@
     link: (room, m, seed) => location.origin + location.pathname.replace(/index\.html$/, "") + `?mp=${room}-${m}-${seed.toString(36)}`,
     /** "sala-modo-seed" → {room, m, seed} ou null. */
     parse(code) {
-      const x = /^([a-z0-9]{12})-([tdqacpvxsgfk])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
+      const x = /^([a-z0-9]{12})-([tdqacpvxsgfkn])-([0-9a-z]{1,7})$/.exec(String(code || "").trim().toLowerCase());
       if (!x) return null;
       const seed = parseInt(x[3], 36);
       return seed >= 0 && seed <= 2147483646 ? { room: x[1], m: x[2], seed } : null;
@@ -232,7 +234,7 @@
 
   // ---------- mensagens ----------
   /** Mensagens dos jogos novos → modo que as trata. */
-  const KIND_OF = { sround: "s", stop: "s", ans: "s", vote: "s", pick: "g", secret: "f", guess: "f", reveal: "f", try: "f", tryres: "f", word: "f" };
+  const KIND_OF = { sround: "s", stop: "s", ans: "s", vote: "s", pick: "g", secret: "f", guess: "f", reveal: "f", try: "f", tryres: "f", word: "f", ready: "n", shot: "n", res: "n", fleet: "n" };
   function handle(s, m, live) {
     if (m.t === "hello" && typeof m.id === "string") {
       const who = { id: m.id, name: String(m.n || "Amigo").slice(0, 16) };
@@ -384,6 +386,8 @@
         <circle cx="12.5" cy="31.5" r="7" style="fill:#14102C;stroke:var(--outline);stroke-width:1.4"/>${tx(12.5, 31.8, "♛", 8, "present", 600)}`,
     k: `<rect x="3" y="3" width="38" height="38" rx="9" ${fl("surface-high")}/><rect x="3" y="3" width="19" height="19" rx="9" style="fill:var(--bg-bottom)"/><rect x="22" y="22" width="19" height="19" rx="9" style="fill:var(--bg-bottom)"/>
         <text x="22" y="24" text-anchor="middle" dominant-baseline="central" style="fill:#F4F1FF;stroke:#14102C;stroke-width:1.2;paint-order:stroke;font:400 30px 'DejaVu Sans',sans-serif">♞&#xFE0E;</text>`,
+    n: `${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<rect x="${3 + c * 13.5}" y="${3 + r * 13.5}" width="11" height="11" rx="3.2" ${fl(r === 1 ? "flag-blue" : r === 0 && c === 1 ? "correct" : "surface-high")}/>`).join("")).join("")}
+        <rect x="3" y="16.5" width="38" height="11" rx="5.5" ${fl("flag-blue")}/>`,
   };
   /** Mini ícone do jogo (SVG 44×44). */
   const gameIcon = (m) => `<svg viewBox="0 0 44 44" aria-hidden="true">${ICON_SVG[m] || ""}</svg>`;
@@ -436,7 +440,7 @@
     const fromPasted = (t) => {
       t = String(t || "").trim();
       const a = /[?&]mp=([A-Za-z0-9-]+)/.exec(t); if (a) return P.mp.parse(a[1]) ? a[1].toLowerCase() : null;
-      const b = /\b([a-z0-9]{12}-[tdqacpvxsgfk]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
+      const b = /\b([a-z0-9]{12}-[tdqacpvxsgfkn]-[0-9a-z]{1,7})\b/.exec(t.toLowerCase()); return b && P.mp.parse(b[1]) ? b[1] : null;
     };
     const isGone = (t) => { t = String(t || "").trim().toLowerCase(); const a = /[?&]mp=([a-z0-9-]+)/.exec(t); return P.mp.gone(a ? a[1] : (/\b([a-z0-9]{12}-b-[0-9a-z]{1,7})\b/.exec(t) || [])[1]); };
     const err = P.$("[data-paste-err]", body), input = P.$("[data-paste]", body);
@@ -911,6 +915,7 @@
   const debug = () => { const d = P.mp.debug || window.PV_DEBUG; return d && typeof d === "object" ? d : {}; };
   /** Tela base: topo "Você × NOME" + placar, área do jogo e (se houver keys) o teclado do Termo. */
   function gameShell(s, cls, inner, keys) {
+    s.root.classList.remove("nv-wide"); // só a Batalha Naval usa a tela larga
     s.root.innerHTML = P.topbar(`<span data-title>Você × ${P.esc(oppName(s))}</span>`, { extra: reactBtn(s) + `<span class="mp-score" data-score></span>` })
       + `<div class="game mpg ${cls}">${inner}</div>`;
     const game = P.$(".game", s.root);
