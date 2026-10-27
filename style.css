@@ -1189,3 +1189,68 @@ button { font-family: inherit; color: inherit; }
 .xz-promo { display: flex; gap: 10px; justify-content: center; margin: 12px 0 4px; }
 .xz-pick { border: none; width: 64px; height: 64px; border-radius: 18px; background: var(--surface-high); cursor: pointer; display: grid; place-items: center; }
 .xz-pick .xz-p { font-size: 40px; }
+
+/* ---------- tela inicial: abas no celular (B), grade + prévia no computador (E) ---------- */
+.home-wide { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+.hm-top { display: none; }
+.hm-tabs { display: flex; gap: 4px; padding: 5px; margin: 14px 0 6px; border-radius: 28px; background: var(--surface); }
+.hm-tab { flex: 1; min-height: 46px; border: none; border-radius: 23px; background: transparent; color: var(--muted); font-size: .9rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; transition: background-color .2s, color .2s; }
+.hm-tab small { font-size: .7rem; font-weight: 600; opacity: .8; }
+.hm-tab[aria-selected="true"] { color: var(--dark-text); }
+.hm-tab.c-p[aria-selected="true"] { background: var(--correct); }
+.hm-tab.c-l[aria-selected="true"] { background: var(--blue); }
+.hm-tab.c-c[aria-selected="true"] { background: var(--present); }
+.hm-cat { display: none; }
+.hm-cat.on { display: block; animation: hmIn .35s ease both; }
+.hm-lbl { margin: 12px 6px 12px; font-size: 1.35rem; font-weight: 800; }
+.hm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.hm-card { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 168px; padding: 14px; border-radius: var(--r-card); background: var(--surface); border: 1px solid color-mix(in srgb, var(--outline) 45%, transparent); text-align: left; cursor: pointer; transition: transform .15s, background-color .15s; }
+.hm-card:hover { background: var(--surface-high); transform: translateY(-2px); }
+.hm-card:active { transform: scale(.97); }
+.hm-card .ico { width: 58px; height: 58px; display: grid; place-items: center; }
+.hm-name { font-size: 1.05rem; font-weight: 700; line-height: 1.15; }
+.hm-sub { font-size: .8rem; color: var(--muted); line-height: 1.3; }
+.hm-badge { position: absolute; top: 12px; right: 12px; }
+.hm-badge .pill-badge { font-size: 11px; padding: 3px 8px; }
+.hm-prev { display: none; }
+.hm-nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); width: calc(100% - 32px); max-width: 528px; height: 68px; border-radius: 34px; background: var(--surface-high); box-shadow: 0 10px 30px rgba(0, 0, 0, .4); display: flex; align-items: center; justify-content: space-around; z-index: 20; }
+.hm-nav button, .hm-top button { border: none; background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; font-weight: 600; }
+.hm-nav button { flex-direction: column; gap: 2px; min-width: 64px; min-height: 44px; justify-content: center; font-size: 12px; }
+.hm-nav button.on { color: var(--present); font-weight: 700; }
+.hm-nav svg { width: 22px; height: 22px; }
+@keyframes hmIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 900px) {
+  #app.home-wide { max-width: 1200px; padding: 0 32px 40px; }
+  .hm-nav, .hm-tabs { display: none; }
+  .hm-top { display: flex; gap: 6px; padding: 6px; border-radius: 30px; background: var(--surface); }
+  .hm-top button { height: 44px; padding: 0 18px; gap: 8px; border-radius: 22px; color: var(--text); }
+  .hm-top button:hover { background: var(--surface-high); }
+  .hm-top button.on { background: var(--present); color: var(--dark-text); font-weight: 700; }
+  .hm-top svg { width: 18px; height: 18px; }
+  .hm-body { display: flex; gap: 28px; align-items: flex-start; margin-top: 18px; }
+  .hm-main { flex: 1; min-width: 0; }
+  .hm-cat, .hm-cat.on { display: block; animation: none; margin-bottom: 26px; }
+  .hm-lbl { margin: 0 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .hm-cat.c-p .hm-lbl { color: var(--correct); }
+  .hm-cat.c-l .hm-lbl { color: var(--blue); }
+  .hm-cat.c-c .hm-lbl { color: var(--present); }
+  .hm-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 18px 8px; }
+  .hm-card { min-height: 0; padding: 0; gap: 8px; align-items: center; text-align: center; background: transparent; border: none; }
+  .hm-card:hover { background: transparent; transform: translateY(-3px); }
+  .hm-card .ico { width: 84px; height: 84px; border-radius: 28px; background: var(--surface); box-shadow: 0 0 0 1px color-mix(in srgb, var(--outline) 45%, transparent); transition: box-shadow .2s, background-color .2s; }
+  .hm-card[aria-pressed="true"] .ico { background: var(--surface-high); box-shadow: 0 0 0 3px var(--present); }
+  .hm-name { font-size: .82rem; font-weight: 600; }
+  .hm-sub, .hm-badge { display: none; }
+  .hm-prev { display: block; position: sticky; top: 24px; flex: 0 0 340px; padding: 28px; border-radius: 32px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--outline) 45%, transparent); }
+  .hm-prev-in { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; animation: hmIn .3s ease both; }
+  .hm-prev-ico { width: 140px; height: 140px; border-radius: 44px; background: var(--surface-high); display: grid; place-items: center; }
+  .hm-prev-ico > * { transform: scale(1.7); }
+  .hm-prev h2 { margin: 0; font-size: 2rem; font-weight: 800; }
+  .hm-prev p { margin: 0; color: var(--muted); line-height: 1.45; }
+  .hm-pill { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 99px; color: var(--dark-text); }
+  .hm-pill.c-p { background: var(--correct); } .hm-pill.c-l { background: var(--blue); } .hm-pill.c-c { background: var(--present); }
+  .hm-play { width: 100%; margin-top: 8px; font-size: 1.1rem; }
+  .hm-friend { width: 100%; background: var(--surface-high); color: var(--text); }
+}
+@media (prefers-reduced-motion: reduce) { .hm-cat.on, .hm-prev-in { animation: none; } }

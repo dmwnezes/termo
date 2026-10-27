@@ -68,14 +68,55 @@
       ["xeque", "Xeque", "Xadrez contra o computador", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
-    const card = ([k, t, s, b]) => `<button class="card" data-go="${k}"><span class="ico">${ICONS[k]}</span><span class="txt"><span class="name">${t} ${b}</span><span class="sub">${s}</span></span></button>`;
+    // Celular: abas por categoria (layout B). Computador: grade de ícones + prévia ao lado (layout E).
+    const CATS = [
+      ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
+      ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque"]],
+      ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta"]],
+    ];
+    const info = {};
+    guess.concat(more).forEach(([k, t, s, b]) => (info[k] = { t, s, b }));
+    const catOf = {};
+    CATS.forEach(([id, , , ks]) => ks.forEach((k) => (catOf[k] = id)));
+    let cat = P.store.get("home-cat", "p");
+    if (!CATS.some((c) => c[0] === cat)) cat = "p";
+    let sel = P.store.get("home-sel", "termo");
+    if (!catOf[sel]) sel = "termo";
+    const wide = () => window.matchMedia("(min-width: 900px)").matches;
+    const tile = (k) => `<button class="hm-card" data-k="${k}"><span class="ico">${ICONS[k]}</span><span class="hm-name">${info[k].t}</span><span class="hm-sub">${info[k].s}</span>${info[k].b ? `<span class="hm-badge">${info[k].b}</span>` : ""}</button>`;
+    const ICO_JOGOS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg>`;
+    const ICO_AMIGOS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14.5c2.5 0 4.5 1.5 4.5 4"/></svg>`;
+    const ICO_PERFIL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>`;
+    const navLinks = `<button class="on" data-nav="" aria-current="page">${ICO_JOGOS}<span>Jogos</span></button><button data-nav="amigo">${ICO_AMIGOS}<span>Amigos</span></button><button data-nav="perfil">${ICO_PERFIL}<span>Perfil</span></button>`;
+    app.classList.add("home-wide");
     app.innerHTML = `<div class="home-head"><div class="title"><h1>Palavreiro</h1><div class="mark small"><span></span><span></span><span></span><span></span><span></span></div></div>
-        <button class="icon-btn filled" data-go="perfil" aria-label="Perfil"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6z"/></svg></button></div>
+        <nav class="hm-top" aria-label="Navegação principal">${navLinks}</nav></div>
       ${P.todayPanel()}
-      <div class="section-label">Adivinhe a palavra</div><div class="cards">${guess.map(card).join("")}</div>
-      <div class="section-label">Mais jogos</div><div class="cards">${more.map(card).join("")}</div>
-      <div class="footer">${P.creditHTML()}</div>`;
-    app.querySelectorAll("[data-go]").forEach((b) => (b.onclick = () => P.go(b.dataset.go)));
+      <div class="hm-tabs" role="tablist" aria-label="Categorias de jogos">${CATS.map(([id, short, , ks]) => `<button role="tab" class="hm-tab c-${id}" data-cat="${id}" aria-selected="${id === cat}">${short}<small>${ks.length} jogos</small></button>`).join("")}</div>
+      <div class="hm-body"><div class="hm-main">${CATS.map(([id, , name, ks]) => `<section class="hm-cat c-${id}${id === cat ? " on" : ""}" data-cat="${id}"><h2 class="hm-lbl">${name}</h2><div class="hm-grid">${ks.map(tile).join("")}</div></section>`).join("")}</div>
+        <aside class="hm-prev" aria-live="polite"></aside></div>
+      <div class="footer">${P.creditHTML()}</div>
+      <nav class="hm-nav" aria-label="Navegação principal">${navLinks}</nav>`;
+    const prev = app.querySelector(".hm-prev");
+    const showPrev = () => {
+      const c = CATS.find((x) => x[0] === catOf[sel]);
+      prev.innerHTML = `<div class="hm-prev-in"><span class="hm-prev-ico ico">${ICONS[sel]}</span><span class="hm-pill c-${c[0]}">${c[2]}</span>
+        <h2>${info[sel].t}</h2><p>${info[sel].s}</p>${info[sel].b}
+        <button class="pill hm-play" data-go="${sel}">▶ Jogar</button><button class="pill hm-friend" data-go="amigo">Jogar com amigo</button></div>`;
+      prev.querySelectorAll("[data-go]").forEach((b) => (b.onclick = () => P.go(b.dataset.go)));
+      app.querySelectorAll(".hm-card").forEach((b) => b.setAttribute("aria-pressed", b.dataset.k === sel));
+    };
+    showPrev();
+    app.querySelectorAll(".hm-card").forEach((b) => (b.onclick = () => {
+      if (!wide()) return P.go(b.dataset.k);
+      sel = b.dataset.k; P.store.set("home-sel", sel); showPrev(); // computador: mostra a prévia, o botão Jogar abre
+    }));
+    app.querySelectorAll(".hm-tab").forEach((b) => (b.onclick = () => {
+      cat = b.dataset.cat; P.store.set("home-cat", cat);
+      app.querySelectorAll(".hm-tab").forEach((t) => t.setAttribute("aria-selected", t.dataset.cat === cat));
+      app.querySelectorAll(".hm-cat").forEach((s) => s.classList.toggle("on", s.dataset.cat === cat));
+    }));
+    app.querySelectorAll("[data-nav]").forEach((b) => (b.onclick = () => b.dataset.nav && P.go(b.dataset.nav)));
     P.checkAllDone();
   }
 
@@ -87,6 +128,7 @@
     const parts = (location.hash.replace(/^#\/?/, "") || "").split("/"), r = parts[0];
     if (P.mp) P.mp.leave(); // sai da partida com amigo (manda "bye")
     app.innerHTML = "";
+    app.classList.remove("home-wide");
     document.querySelectorAll(".overlay").forEach((o) => o.remove());
     window.scrollTo(0, 0);
     const screens = {
