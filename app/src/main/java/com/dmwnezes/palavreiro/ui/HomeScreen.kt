@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.GridView
+import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 
 /** Destinos da tela inicial. */
 enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
@@ -57,7 +59,7 @@ private data class GameCardInfo(
 )
 
 /**
- * Tela inicial: um cartão por jogo, perfil no canto superior direito e créditos no rodapé.
+ * Tela inicial: abas por categoria, um cartão por jogo, créditos e barra fixa com Jogos, Amigos e Perfil.
  * [badges] traz o selo de cada jogo diário ("Novo", "Feito hoje ✓").
  */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
@@ -70,65 +72,149 @@ fun HomeScreen(
     celebrate: Boolean = false,
     scroll: androidx.compose.foundation.ScrollState = rememberScrollState(),
 ) {
-    val guess = listOf(
+    val info = listOf(
         GameCardInfo(Dest.TERMO, "Termo", "Uma palavra nova por dia", badges[Dest.TERMO]),
         GameCardInfo(Dest.DUETO, "Dueto", "Duas palavras, 7 tentativas", badges[Dest.DUETO]),
         GameCardInfo(Dest.QUARTETO, "Quarteto", "Quatro palavras, 9 tentativas", badges[Dest.QUARTETO]),
-    )
-    val more = listOf(
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
-        GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
-        GameCardInfo(Dest.MEMORIA, "Jogo da Memória", "Ache os pares de sinônimos", null),
-        GameCardInfo(Dest.MATIZ, "Matiz", "Memorize a cor e recrie com R, G e B", badges[Dest.MATIZ]),
-        GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
-        GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
-        GameCardInfo(Dest.SUDOKU, "Quadrante", "Sudoku: um por nível todo dia, ou infinitos", null),
-        GameCardInfo(Dest.XADREZ, "Xeque", "Xadrez contra o computador", null),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
-        GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
         GameCardInfo(Dest.SINONIMOS, "Sinônimo ou Antônimo", "Mesmo sentido ou o contrário? Leia a pergunta!", null),
-        GameCardInfo(Dest.DESAFIAR, "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", null),
+        GameCardInfo(Dest.MEMORIA, "Jogo da Memória", "Ache os pares de sinônimos", null),
+        GameCardInfo(Dest.MESTRE, "Mestre Mandou", "Obedeça só quando o mestre mandar", null),
+        GameCardInfo(Dest.MATIZ, "Matiz", "Memorize a cor e recrie com R, G e B", badges[Dest.MATIZ]),
+        GameCardInfo(Dest.SUDOKU, "Quadrante", "Sudoku: um por nível todo dia, ou infinitos", null),
+        GameCardInfo(Dest.XADREZ, "Xeque", "Xadrez contra o computador", null),
+        GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
+        GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
+        GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
+    ).associateBy { it.dest }
+    // Mesmo layout do site no celular: abas por categoria, cartões em duas colunas e barra fixa embaixo.
+    val cats = listOf(
+        HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
+        HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ)),
+        HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA)),
     )
+    var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
+    val cur = cats[tab]
     Box(Modifier.fillMaxSize().background(Night.background)) {
         Column(
             Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 16.dp),
         ) {
-            Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("Palavreiro", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = Night.text)
-                    Spacer(Modifier.height(6.dp))
-                    FiveSquares(square = 10.dp, gap = 3.dp)
-                }
-                IconButton(
-                    onClick = onProfile,
-                    modifier = Modifier.size(48.dp).clip(CircleShape).background(Night.surfaceHigh),
-                ) {
-                    Icon(Icons.Rounded.Person, contentDescription = "Perfil", tint = Night.text)
-                }
+            Column(Modifier.fillMaxWidth().padding(top = 12.dp, start = 4.dp)) {
+                Text("Palavreiro", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = Night.text)
+                Spacer(Modifier.height(6.dp))
+                FiveSquares(square = 10.dp, gap = 3.dp)
             }
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(14.dp))
             Column(
                 Modifier.weight(1f).verticalScroll(scroll),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 today?.let { TodayPanel(it, onOpen) }
-                SectionLabel("Adivinhe a palavra")
-                guess.forEach { c -> GameCard(c) { onOpen(c.dest) } }
-                Spacer(Modifier.height(4.dp))
-                SectionLabel("Mais jogos")
-                more.forEach { c -> GameCard(c) { onOpen(c.dest) } }
-                Spacer(Modifier.height(8.dp))
+                CategoryTabs(cats, tab) { tab = it }
+                Text(cur.title, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Night.text, modifier = Modifier.padding(start = 6.dp, top = 4.dp))
+                cur.games.chunked(2).forEach { pair ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        pair.forEach { d -> GameTile(info.getValue(d), Modifier.weight(1f)) { onOpen(d) } }
+                        if (pair.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
+                CreatorCredit(Modifier.align(Alignment.CenterHorizontally).padding(vertical = 14.dp))
             }
-            CreatorCredit(Modifier.align(Alignment.CenterHorizontally).padding(vertical = 14.dp))
+            BottomNav(onFriend = { onOpen(Dest.DESAFIAR) }, onProfile = onProfile)
         }
         if (celebrate) Confetti(1) {}
+    }
+}
+
+private data class HomeCat(val short: String, val title: String, val color: Color, val games: List<Dest>)
+
+/** Seletor Palavras / Lógica / Conhecimento; a aba escolhida ganha a cor da categoria. */
+@Composable
+private fun CategoryTabs(cats: List<HomeCat>, selected: Int, onPick: (Int) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(Night.surface).padding(5.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        cats.forEachIndexed { i, c ->
+            val on = i == selected
+            val bg by androidx.compose.animation.animateColorAsState(if (on) c.color else Color.Transparent, label = "aba")
+            Column(
+                Modifier.weight(1f).height(48.dp).clip(RoundedCornerShape(24.dp)).background(bg)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Tab) { onPick(i) }
+                    .semantics { this.selected = on },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                val fg = if (on) Color(0xFF1A1438) else Night.muted
+                Text(c.short, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = fg, maxLines = 1, softWrap = false)
+                Text("${c.games.size} jogos", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = fg.copy(alpha = 0.85f), maxLines = 1)
+            }
+        }
+    }
+}
+
+/** Cartão do jogo em meia largura: ícone, selo no canto, nome e descrição. */
+@Composable
+private fun GameTile(info: GameCardInfo, modifier: Modifier, onClick: () -> Unit) {
+    Box(
+        modifier
+            .height(172.dp)
+            .clip(Shapes.card)
+            .background(Night.surface)
+            .border(1.dp, Night.outline.copy(alpha = 0.45f), Shapes.card)
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(Modifier.size(58.dp), contentAlignment = Alignment.Center) { CardIcon(info.dest) }
+            Text(info.title, fontSize = 17.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold, color = Night.text, maxLines = 2)
+            Text(info.subtitle, fontSize = 13.sp, lineHeight = 16.sp, color = Night.muted, maxLines = 3)
+        }
+        info.badge?.let {
+            val fresh = it == "Novo"
+            Text(
+                it, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                color = if (fresh) Color(0xFF1A1438) else Night.text,
+                modifier = Modifier.align(Alignment.TopEnd).clip(Shapes.pill)
+                    .background(if (fresh) Night.present else Night.surfaceHigh)
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            )
+        }
+    }
+}
+
+/** Barra fixa embaixo: Jogos (tela atual), Amigos (partida ao vivo) e Perfil. */
+@Composable
+private fun BottomNav(onFriend: () -> Unit, onProfile: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 12.dp).height(68.dp).clip(RoundedCornerShape(34.dp)).background(Night.surfaceHigh),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NavItem(Icons.Rounded.GridView, "Jogos", true) {}
+        NavItem(Icons.Rounded.Group, "Amigos", false, onFriend)
+        NavItem(Icons.Rounded.Person, "Perfil", false, onProfile)
+    }
+}
+
+@Composable
+private fun NavItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, on: Boolean, onClick: () -> Unit) {
+    val c = if (on) Night.present else Night.muted
+    Column(
+        Modifier.size(width = 76.dp, height = 56.dp).clip(RoundedCornerShape(20.dp)).clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(icon, contentDescription = null, tint = c, modifier = Modifier.size(24.dp))
+        Text(label, fontSize = 12.sp, fontWeight = if (on) FontWeight.Bold else FontWeight.SemiBold, color = c)
     }
 }
 
@@ -200,57 +286,6 @@ private fun TodayDot(item: TodayItem, onClick: () -> Unit) {
 @Composable
 private fun SectionLabel(text: String) {
     Text(text.uppercase(), color = Night.muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.5.sp, modifier = Modifier.padding(start = 6.dp))
-}
-
-@Composable
-private fun GameCard(info: GameCardInfo, onClick: () -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .clip(Shapes.card)
-            .background(Night.surface)
-            .border(1.dp, Night.outline.copy(alpha = 0.45f), Shapes.card)
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(Modifier.size(58.dp), contentAlignment = Alignment.Center) { CardIcon(info.dest) }
-        Spacer(Modifier.width(16.dp))
-        Column(Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Nomes longos ("Sinônimo ou Antônimo") diminuem um pouco a letra para caber numa linha, sem cortar.
-                FitTitle(info.title, Modifier.weight(1f, fill = false))
-                info.badge?.let {
-                    Spacer(Modifier.width(8.dp))
-                    val fresh = it == "Novo"
-                    Text(
-                        it,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = if (fresh) Color(0xFF1A1438) else Night.text,
-                        maxLines = 1,
-                        modifier = Modifier
-                            .clip(Shapes.pill)
-                            .background(if (fresh) Night.present else Night.surfaceHigh)
-                            .padding(horizontal = 10.dp, vertical = 4.dp),
-                    )
-                }
-            }
-            Text(info.subtitle, fontSize = 14.sp, color = Night.muted)
-        }
-    }
-}
-
-/** Título do cartão numa linha só: começa em 21sp e encolhe (até 16sp) se não couber. */
-@Composable
-private fun FitTitle(text: String, modifier: Modifier = Modifier) {
-    var size by androidx.compose.runtime.remember(text) { androidx.compose.runtime.mutableFloatStateOf(21f) }
-    var ready by androidx.compose.runtime.remember(text) { androidx.compose.runtime.mutableStateOf(false) }
-    Text(
-        text, fontSize = size.sp, fontWeight = FontWeight.SemiBold, color = Night.text, maxLines = 1, softWrap = false,
-        onTextLayout = { r -> if (r.didOverflowWidth && size > 16f) size -= 0.5f else ready = true },
-        modifier = modifier.drawWithContent { if (ready) drawContent() },
-    )
 }
 
 /** Desenhos pequenos de cada cartão (também usados nos recordes do Perfil). */

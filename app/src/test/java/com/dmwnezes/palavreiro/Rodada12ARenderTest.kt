@@ -75,6 +75,7 @@ class Rodada12ARenderTest {
                 HomeScreen(mapOf(Dest.MATIZ to "Novo", Dest.PODIO to "Feito hoje ✓", Dest.AMPULHETA to "Novo"), {}, {})
             }
         }
+        rule.onNode(hasText("Conhecimento")).performClick() // Pódio e Ampulheta ficam na aba Conhecimento
         rule.onAllNodes(hasText("Ampulheta")).onFirst().scrollFree()
         save("r12a-inicio-cartoes")
     }
