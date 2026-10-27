@@ -220,7 +220,7 @@ class Rodada12RenderTest {
         rule.mainClock.autoAdvance = false
         val opened = mutableListOf<Dest>()
         rule.setContent { PalavreiroTheme { HomeScreen(emptyMap(), { opened += it }, {}, scroll = androidx.compose.foundation.ScrollState(1400)) } }
-        rule.onNode(hasText("Lógica")).performClick() // Quadrante e Xeque ficam na aba Lógica
+        rule.onNode(hasText("Lógica")).scrollFree().performClick() // Quadrante e Xeque ficam na aba Lógica
         rule.onNode(hasText("Quadrante")).scrollFree()
         save("73a-inicio-quadrante-xeque")
         rule.onNode(hasText("Quadrante")).performClick()
