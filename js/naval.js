@@ -64,6 +64,18 @@
     for (const [x, k] of owner) for (const y of around(x)) if (owner.has(y) && owner.get(y) !== k) return false;
     return true;
   }
+  const vertOf = (s) => s.length > 1 && s[1] - s[0] === N;
+  /**
+   * Põe o navio k começando na casa start (vertical ou não), encaixando na borda se passar do mar.
+   * Devolve a frota nova, ou null se encostar/sobrepor outro navio.
+   */
+  function move(fleet, k, start, vert) {
+    const len = fleet[k].length;
+    let r = Math.floor(start / N), c = start % N;
+    if (vert) r = Math.min(r, N - len); else c = Math.min(c, N - len);
+    const nf = fleet.map((s, j) => (j === k ? span(r * N + c, len, vert) : s));
+    return valid(nf) ? nf : null;
+  }
   /** Tiro na casa c contra a frota, sabendo os tiros anteriores nesse mar. {hit, ship (índice ou -1), sunk, all}. */
   function fire(fleet, shots, c) {
     const done = new Set(shots); done.add(c);
@@ -125,7 +137,7 @@
     return pick(top);
   }
 
-  const api = { N, SHIPS, LENS, name, around, cross, span, place, valid, fire, aim };
+  const api = { N, SHIPS, LENS, name, around, cross, span, place, valid, move, vertOf, fire, aim };
   root.Naval = api;
   if (root.P) root.P.naval = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -167,6 +179,7 @@
       else if (shot === "m") cls += " miss";
       else if (isShip) cls += " ship";
       if (isShip || sunk) cls += " body";
+      if (o.sel && o.sel.has(i)) cls += " sel";
       if (i === o.aim) cls += " aim";
       if (i === o.last) cls += " last";
       c.className = cls;
@@ -199,19 +212,56 @@
     return NV().LENS.map((_, k) => ({ hits: 0, sunk: sunkIdx.has(k) }));
   }
   /** Moldura do jogo (layout A + frotas ao lado): mar do outro, meu mar e as duas frotas. */
-  const layoutHTML = (oppLabel) => `<div class="nv-status"><p class="nv-turn" data-turn></p><span class="nv-count" data-count></span></div>
+  const layoutHTML = (oppLabel) => `<div class="nv-wrap" data-play><div class="nv-status"><p class="nv-turn" data-turn></p><span class="nv-count" data-count></span><span class="nv-act" data-act></span></div>
     <div class="nv-layout">
-      <section class="nv-card nv-foe"><h2>Mar ${oppLabel}</h2>${boardHTML("foe", true, "Mar do adversário")}</section>
-      <section class="nv-card nv-mine"><h2>Sua frota</h2>${boardHTML("me", false, "Seu mar")}</section>
+      <section class="nv-card nv-foe"><h2>Mar ${oppLabel}</h2><div class="nv-fit">${boardHTML("foe", true, "Mar do adversário")}</div></section>
+      <section class="nv-card nv-mine"><h2>Sua frota</h2><div class="nv-fit">${boardHTML("me", false, "Seu mar")}</div></section>
       <aside class="nv-card nv-fleets" data-fleets></aside>
-    </div>`;
+    </div></div>`;
+
+  /**
+   * Posicionar a frota: toque num navio para escolher, toque numa casa para levar o navio até lá, "Girar" deita ou levanta.
+   * o = {get() frota atual, set(frota), extra: botões a mais (HTML)}. Devolve {draw, el}.
+   */
+  function placer(el, o) {
+    let sel = -1;
+    el.innerHTML = `<div class="nv-status"><p class="nv-turn mine" data-hint></p></div>
+      <div class="nv-card nv-place"><h2>Sua frota</h2><div class="nv-fit">${boardHTML("pl", true, "Posicionar a frota")}</div></div>
+      <div class="row-btns nv-pbtns"><button class="pill ghost" data-rot>Girar</button><button class="pill ghost" data-shuffle>Sortear</button>${o.extra || ""}</div>`;
+    const board = P.$("[data-nb=pl]", el);
+    const draw = () => {
+      const f = o.get();
+      paint(board, { ships: f, shots: new Map(), mine: true, can: true, sel: sel >= 0 ? new Set(f[sel]) : null });
+      P.$("[data-hint]", el).textContent = sel < 0 ? "Toque num navio para mudar de lugar" : `${NV().SHIPS[sel][0]}: toque onde colocar`;
+      P.$("[data-rot]", el).disabled = sel < 0;
+    };
+    const bad = (t) => { P.fx.invalid(); P.toast(t, 1800); };
+    board.addEventListener("click", (e) => {
+      const c = e.target.closest("[data-c]"); if (!c) return;
+      const i = +c.dataset.c, f = o.get(), k = f.findIndex((x) => x.includes(i));
+      if (k >= 0) { sel = k === sel ? -1 : k; P.fx.type(); return draw(); }
+      if (sel < 0) return draw();
+      const nf = NV().move(f, sel, i, NV().vertOf(f[sel]));
+      if (!nf) return bad("Não cabe aí: os navios não podem encostar");
+      o.set(nf); P.fx.type(); draw();
+    });
+    P.$("[data-rot]", el).onclick = () => {
+      const f = o.get(); if (sel < 0) return;
+      const nf = NV().move(f, sel, f[sel][0], !NV().vertOf(f[sel]));
+      if (!nf) return bad("Não dá para girar aqui");
+      o.set(nf); P.fx.type(); draw();
+    };
+    P.$("[data-shuffle]", el).onclick = () => { sel = -1; o.set(NV().place()); P.fx.type(); draw(); };
+    draw();
+    return { draw, el };
+  }
   /** Som do tiro: água, acerto, afundou. */
   const shotFx = (res, mine) => {
     if (res.sunk) { P.tone([[392, 70], [523, 70], [659, 120]], 0.1); P.vibrate([30, 50, 60]); }
     else if (res.hit) { P.tone([[523, 50], [659, 90]], 0.09); P.vibrate(mine ? 30 : 60); }
     else P.tone([[mine ? 330 : 294, 70]], 0.06);
   };
-  P.nboard = { boardHTML, paint, fleetHTML, fleetState, layoutHTML, shotFx };
+  P.nboard = { boardHTML, paint, fleetHTML, fleetState, layoutHTML, placer, shotFx };
 
   // ---------- partida contra o computador ----------
   const LEVELS = [["facil", "Fácil"], ["medio", "Médio"], ["dificil", "Difícil"]];
@@ -229,20 +279,20 @@
     let g = null;
 
     // Antes da partida: nível e a frota sorteada (dá para sortear de novo).
-    function setup(fleet) {
+    // Antes da partida: nível e a frota (o jogador põe cada navio onde quiser, ou sorteia).
+    function setup() {
       g = null;
-      fleet = fleet || NV().place();
+      let fleet = NV().place();
       const won = LEVELS.map(([k, n]) => `${n} ${P.store.get("naval-won-" + k, 0) || 0}`).join(" · ");
-      body.innerHTML = `<div class="section nv-setup">
-          <h3>Nível do computador</h3>
-          <div class="seg" data-lvs>${LEVELS.map(([, n], i) => `<button data-lv="${i}" class="${i === lv ? "on" : ""}">${n}</button>`).join("")}</div>
-          <h3>Sua frota</h3>
-          <div class="nv-card nv-pre">${boardHTML("me", false, "Sua frota")}</div>
-          <div class="row-btns"><button class="pill ghost" data-shuffle>Sortear de novo</button><button class="pill" data-start>Começar partida</button></div>
+      body.innerHTML = `<div class="nv-wrap nv-setup">
+          <div class="seg" data-lvs aria-label="Nível do computador">${LEVELS.map(([, n], i) => `<button data-lv="${i}" class="${i === lv ? "on" : ""}">${n}</button>`).join("")}</div>
+          <div class="nv-wrap" data-place></div>
           <p class="muted center nv-wins">Vitórias: ${won}</p></div>`;
-      paint(P.$("[data-nb=me]", body), { ships: fleet, shots: new Map(), mine: true });
-      body.querySelectorAll("[data-lv]").forEach((b) => (b.onclick = () => { lv = +b.dataset.lv; P.store.set("nv-level", LEVELS[lv][0]); P.fx.type(); setup(fleet); }));
-      P.$("[data-shuffle]", body).onclick = () => { P.fx.type(); setup(NV().place()); };
+      placer(P.$("[data-place]", body), { get: () => fleet, set: (f) => (fleet = f), extra: `<button class="pill" data-start>Começar</button>` });
+      body.querySelectorAll("[data-lv]").forEach((b) => (b.onclick = () => {
+        lv = +b.dataset.lv; P.store.set("nv-level", LEVELS[lv][0]); P.fx.type();
+        body.querySelectorAll("[data-lv]").forEach((x) => x.classList.toggle("on", +x.dataset.lv === lv));
+      }));
       P.$("[data-start]", body).onclick = () => start({ lv: LEVELS[lv][0], me: fleet, ai: NV().place(), ps: [], as: [] });
     }
 
@@ -259,7 +309,8 @@
     function start(sv) {
       const lvi = Math.max(0, LEVELS.findIndex(([k]) => k === sv.lv));
       g = { lv: LEVELS[lvi][0], lvi, me: sv.me, ai: sv.ai, ps: sv.ps.slice(), as: sv.as.slice(), thinking: false, over: null, token: {}, aim: null };
-      body.innerHTML = layoutHTML("do computador") + `<div class="row-btns nv-btns"><button class="pill ghost" data-resign>Desistir</button></div>`;
+      body.innerHTML = layoutHTML("do computador");
+      P.$("[data-act]", body).innerHTML = `<button class="pill ghost nv-mini" data-resign>Desistir</button>`;
       P.$("[data-nb=foe]", body).addEventListener("click", (e) => { const c = e.target.closest("[data-c]"); if (c) tap(+c.dataset.c); });
       P.$("[data-resign]", body).onclick = () => {
         if (!g) return;
@@ -314,16 +365,17 @@
       const foe = seaOf(g.ai, g.ps), mine = seaOf(g.me, g.as);
       paint(P.$("[data-nb=foe]", body), { ships: [...foe.sunkIdx].map((k) => g.ai[k]).concat(g.over ? g.ai : []), shots: foe.shots, sunk: foe.sunk, aim: g.aim, last: g.ps[g.ps.length - 1], can: myTurn() });
       paint(P.$("[data-nb=me]", body), { ships: g.me, shots: mine.shots, sunk: mine.sunk, mine: true, last: g.as[g.as.length - 1] });
-      P.$("[data-fleets]", body).innerHTML = fleetHTML(`Computador · ${LEVELS[g.lvi][1]}`, fleetState(null, null, foe.sunkIdx), false)
+      P.$("[data-fleets]", body).innerHTML = fleetHTML("Computador", fleetState(null, null, foe.sunkIdx), false)
         + fleetHTML("Você", fleetState(g.me, mine.set), true);
       const t = P.$("[data-turn]", body);
       t.className = "nv-turn" + (myTurn() ? " mine" : "");
       t.textContent = g.over ? (g.over === "me" ? "Você venceu! ⚓" : "O computador venceu")
-        : myTurn() ? (g.aim != null ? `Toque de novo em ${NV().name(g.aim)} para atirar` : "Sua vez · escolha uma casa") : "Computador mirando…";
+        : myTurn() ? (g.aim != null ? `Toque de novo em ${NV().name(g.aim)}` : "Sua vez · escolha uma casa") : "Computador mirando…";
       P.$("[data-count]", body).innerHTML = `<span>Computador <b>${5 - foe.sunkIdx.size}</b></span><span>Você <b>${5 - mine.sunkIdx.size}</b></span>`;
       const r = P.$("[data-resign]", body);
       r.textContent = g.over ? "Nova partida" : "Desistir";
       r.classList.toggle("ghost", !g.over);
+      r.classList.toggle("accent", !!g.over);
     }
 
     function finish(who, why) {

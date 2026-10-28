@@ -72,6 +72,20 @@ object Naval {
         return true
     }
 
+    fun vertOf(s: List<Int>): Boolean = s.size > 1 && s[1] - s[0] == N
+    /**
+     * Põe o navio [k] começando na casa [start] (vertical ou não), encaixando na borda se passar do mar.
+     * Devolve a frota nova, ou null se encostar/sobrepor outro navio (igual ao site).
+     */
+    fun move(fleet: List<List<Int>>, k: Int, start: Int, vert: Boolean): List<List<Int>>? {
+        val len = fleet[k].size
+        var r = start / N; var c = start % N
+        if (vert) r = minOf(r, N - len) else c = minOf(c, N - len)
+        val cells = span(r * N + c, len, vert) ?: return null
+        val nf = fleet.mapIndexed { j, s -> if (j == k) cells else s }
+        return if (valid(nf)) nf else null
+    }
+
     data class Fire(val hit: Boolean, val ship: Int, val sunk: Boolean, val all: Boolean)
     /** Tiro na casa [c] contra a frota, sabendo os tiros anteriores nesse mar. */
     fun fire(fleet: List<List<Int>>, shots: Collection<Int>, c: Int): Fire {

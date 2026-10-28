@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -60,7 +62,7 @@ import kotlin.random.Random
 @Composable
 internal fun NavalBoard(
     ships: List<List<Int>>, shots: Map<Int, Boolean>, sunk: Set<Int>, mine: Boolean, modifier: Modifier = Modifier,
-    aim: Int = -1, labels: Boolean = true, enabled: Boolean = false, onTap: (Int) -> Unit = {},
+    aim: Int = -1, labels: Boolean = true, enabled: Boolean = false, selected: Set<Int> = emptySet(), onTap: (Int) -> Unit = {},
 ) {
     val owner = HashMap<Int, Int>()
     ships.forEachIndexed { k, s -> s.forEach { owner[it] = k } }
@@ -88,6 +90,7 @@ internal fun NavalBoard(
                         isSunk -> Night.purple
                         shot == true -> if (mine) Night.red else Night.correct
                         shot == false -> Night.keyAbsent
+                        isShip && i in selected -> Night.present
                         isShip -> Night.flagBlue
                         else -> Night.surfaceHigh
                     }
@@ -131,7 +134,10 @@ internal fun navalFleetState(fleet: List<List<Int>>?, hitSet: Set<Int>, sunkIdx:
 @Composable
 internal fun NavalFleet(title: String, state: List<Pair<Int, Boolean>>, mine: Boolean, names: Boolean, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(if (names) 6.dp else 5.dp)) {
-        Text(title.uppercase(), color = Night.muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp, maxLines = 1)
+        Text(
+            title.uppercase(), color = Night.muted, fontSize = if (names) 11.sp else 9.sp, fontWeight = FontWeight.SemiBold,
+            letterSpacing = if (names) 1.sp else 0.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
         Naval.SHIPS.forEachIndexed { k, (nm, len) ->
             val (hits, sunk) = state.getOrElse(k) { 0 to false }
             Column(
@@ -146,7 +152,7 @@ internal fun NavalFleet(title: String, state: List<Pair<Int, Boolean>>, mine: Bo
                     for (j in 0 until len) {
                         val c = when { sunk -> Night.purple; mine && j < hits -> Night.red; mine -> Night.flagBlue; else -> Night.outline }
                         val shape = when (j) { 0 -> RoundedCornerShape(6.dp, 2.dp, 2.dp, 6.dp); len - 1 -> RoundedCornerShape(2.dp, 6.dp, 6.dp, 2.dp); else -> RoundedCornerShape(2.dp) }
-                        Box(Modifier.size(12.dp, 9.dp).clip(shape).background(c))
+                        Box(Modifier.size(if (names) 12.dp else 10.dp, if (names) 9.dp else 8.dp).clip(shape).background(c))
                     }
                 }
             }
@@ -165,34 +171,105 @@ private fun seaOf(fleet: List<List<Int>>, list: List<Int>): Sea {
     return Sea(shots, idx.flatMap { fleet[it] }.toSet(), idx, set)
 }
 
-/** Moldura do jogo no celular (layout A + frotas ao lado): mar do outro, meu mar pequeno e as duas frotas. */
+/** Quadrado do maior tamanho que cabe (largura ou altura que sobra). */
+@Composable
+private fun FitSquare(modifier: Modifier, content: @Composable (androidx.compose.ui.unit.Dp) -> Unit) {
+    BoxWithConstraints(modifier, contentAlignment = Alignment.TopCenter) {
+        content(minOf(maxWidth, maxHeight))
+    }
+}
+
+/** Botão pequeno no canto da linha de status (Desistir, Nova partida, Ver resultado). */
+@Composable
+internal fun NavalMiniPill(text: String, color: androidx.compose.ui.graphics.Color, ink: androidx.compose.ui.graphics.Color, enabled: Boolean = true, onClick: () -> Unit) {
+    Text(
+        text, color = ink, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+        modifier = Modifier.clip(Shapes.pill).background(color).clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 9.dp).alpha(if (enabled) 1f else 0.4f),
+    )
+}
+
+@Composable
+private fun StatusRow(status: String, mine: Boolean, action: (@Composable () -> Unit)?) {
+    Row(Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(status, color = if (mine) Night.correct else Night.muted, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f), maxLines = 2, lineHeight = 18.sp)
+        action?.invoke()
+    }
+}
+
+/**
+ * Moldura do jogo no celular (layout A + frotas ao lado), sem rolar: o mar do outro ocupa o que sobra da tela
+ * (quadrado), embaixo o meu mar pequeno e as duas frotas.
+ */
 @Composable
 private fun NavalLayout(
     status: String, statusMine: Boolean, oppLabel: String, oppShort: String,
     foeShips: List<List<Int>>, foe: Sea, myFleet: List<List<Int>>, mine: Sea, aim: Int, canTap: Boolean, onTap: (Int) -> Unit,
-    footer: @Composable () -> Unit,
+    action: (@Composable () -> Unit)? = null,
 ) {
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(status, color = if (statusMine) Night.correct else Night.muted, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f), maxLines = 2)
-            Text("$oppShort ${foe.left} · Você ${mine.left}", color = Night.muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-        }
-        Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(horizontal = 8.dp, vertical = 12.dp)) {
-            Text("Mar $oppLabel", color = Night.text, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp, bottom = 8.dp))
-            NavalBoard(foeShips, foe.shots, foe.sunk, mine = false, modifier = Modifier.fillMaxWidth(), aim = aim, enabled = canTap, onTap = onTap)
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Column(Modifier.weight(1.15f).clip(Shapes.card).background(Night.surface).padding(12.dp)) {
-                Text("Sua frota", color = Night.text, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 6.dp))
-                NavalBoard(myFleet, mine.shots, mine.sunk, mine = true, modifier = Modifier.fillMaxWidth(), labels = false)
-            }
-            Column(Modifier.weight(1f).clip(Shapes.card).background(Night.surface).padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                NavalFleet(oppShort, navalFleetState(null, emptySet(), foe.sunkIdx), mine = false, names = false)
-                NavalFleet("Você", navalFleetState(myFleet, mine.hit, mine.sunkIdx), mine = true, names = false)
+    Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatusRow(status, statusMine, action)
+        Column(Modifier.weight(1f, fill = false).fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(horizontal = 8.dp, vertical = 10.dp)) {
+            Text("Mar $oppLabel", color = Night.text, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp, bottom = 6.dp))
+            FitSquare(Modifier.fillMaxWidth()) { side ->
+                NavalBoard(foeShips, foe.shots, foe.sunk, mine = false, modifier = Modifier.width(side), aim = aim, enabled = canTap, onTap = onTap)
             }
         }
-        footer()
-        Spacer(Modifier.height(10.dp))
+        Row(Modifier.fillMaxWidth().height(150.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.weight(1.1f).fillMaxSize().clip(Shapes.card).background(Night.surface).padding(10.dp)) {
+                Text("Sua frota", color = Night.text, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
+                FitSquare(Modifier.fillMaxSize()) { side ->
+                    NavalBoard(myFleet, mine.shots, mine.sunk, mine = true, modifier = Modifier.width(side), labels = false)
+                }
+            }
+            Row(Modifier.weight(1f).fillMaxSize().clip(Shapes.card).background(Night.surface).padding(10.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                NavalFleet(oppShort, navalFleetState(null, emptySet(), foe.sunkIdx), mine = false, names = false, modifier = Modifier.weight(1f))
+                NavalFleet("Você", navalFleetState(myFleet, mine.hit, mine.sunkIdx), mine = true, names = false, modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+/**
+ * Posicionar a frota (igual ao site): toque num navio para escolher, toque numa casa para levar o navio até lá,
+ * "Girar" deita ou levanta. [extra] = botão da direita (Começar / Pronto).
+ */
+@Composable
+internal fun NavalPlacer(
+    fleet: List<List<Int>>, onChange: (List<List<Int>>) -> Unit, feedback: Feedback?, toast: ToastState,
+    hint: String? = null, initialSel: Int = -1, extra: @Composable RowScope.() -> Unit,
+) {
+    var sel by remember { mutableIntStateOf(initialSel) }
+    val live by rememberUpdatedState(fleet)
+    fun bad(t: String) { feedback?.invalid(); toast.show(t, 1800) }
+    Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatusRow(hint ?: if (sel < 0) "Toque num navio para mudar de lugar" else "${Naval.SHIPS[sel].first}: toque onde colocar", true, null)
+        Column(Modifier.weight(1f, fill = false).fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(horizontal = 8.dp, vertical = 10.dp)) {
+            Text("Sua frota", color = Night.text, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp, bottom = 6.dp))
+            FitSquare(Modifier.fillMaxWidth()) { side ->
+                NavalBoard(
+                    fleet, emptyMap(), emptySet(), mine = true, modifier = Modifier.width(side), enabled = true,
+                    selected = if (sel >= 0) fleet[sel].toSet() else emptySet(),
+                    onTap = { i ->
+                        val f = live
+                        val k = f.indexOfFirst { i in it }
+                        when {
+                            k >= 0 -> { sel = if (k == sel) -1 else k; feedback?.type() }
+                            sel >= 0 -> Naval.move(f, sel, i, Naval.vertOf(f[sel]))?.let { onChange(it); feedback?.type() } ?: bad("Não cabe aí: os navios não podem encostar")
+                        }
+                    },
+                )
+            }
+        }
+        Spacer(Modifier.weight(0.001f))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PillButton("Girar", Night.surfaceHigh, Night.text, Modifier.weight(1f), enabled = sel >= 0) {
+                val f = live
+                if (sel >= 0) Naval.move(f, sel, f[sel][0], !Naval.vertOf(f[sel]))?.let { onChange(it); feedback?.type() } ?: bad("Não dá para girar aqui")
+            }
+            PillButton("Sortear", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { sel = -1; onChange(Naval.place()); feedback?.type() }
+            extra()
+        }
     }
 }
 
@@ -258,29 +335,21 @@ fun NavalScreen(store: Store?, feedback: Feedback?, onBack: () -> Unit, initial:
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             TopBar("Batalha Naval", onBack, onHelp = { showHelp = true })
             if (g == null) {
-                Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Spacer(Modifier.height(8.dp))
-                    Text("Nível do computador", color = Night.muted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
-                    Spacer(Modifier.height(6.dp))
-                    LevelPicker(Naval.Level.entries.map { it.label }, level.ordinal) { level = Naval.Level.entries[it] }
-                    Spacer(Modifier.height(16.dp))
-                    Text("Sua frota", color = Night.muted, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
-                    Spacer(Modifier.height(6.dp))
-                    Box(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(10.dp)) {
-                        NavalBoard(preview, emptyMap(), emptySet(), mine = true, modifier = Modifier.fillMaxWidth())
+                Column(Modifier.weight(1f).fillMaxWidth()) {
+                    Box(Modifier.padding(horizontal = 14.dp).padding(bottom = 4.dp)) {
+                        LevelPicker(Naval.Level.entries.map { it.label }, level.ordinal) { level = Naval.Level.entries[it] }
                     }
-                    Spacer(Modifier.height(16.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        PillButton("Sortear de novo", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { preview = Naval.place(rnd); feedback?.type() }
-                        PillButton("Começar", Night.correct, modifier = Modifier.weight(1f)) {
-                            store?.setText("naval_level", level.name)
-                            persist(NavalSave(level, preview, Naval.place(rnd), emptyList(), emptyList()))
+                    Box(Modifier.weight(1f)) {
+                        NavalPlacer(preview, { preview = it }, feedback, toast) {
+                            PillButton("Começar", Night.correct, modifier = Modifier.weight(1f)) {
+                                store?.setText("naval_level", level.name)
+                                persist(NavalSave(level, preview, Naval.place(rnd), emptyList(), emptyList()))
+                            }
                         }
                     }
-                    Spacer(Modifier.height(14.dp))
                     Text(
                         "Vitórias: " + Naval.Level.entries.joinToString(" · ") { "${it.label} ${store?.int("naval_won_${it.key}") ?: 0}" },
-                        color = Night.muted, fontSize = 13.sp, textAlign = TextAlign.Center,
+                        color = Night.muted, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     )
                 }
             } else {
@@ -330,12 +399,11 @@ fun NavalScreen(store: Store?, feedback: Feedback?, onBack: () -> Unit, initial:
                             if (r.hit) feedback?.turn() else feedback?.type()
                             persist(cur.copy(ps = cur.ps + c))
                         },
-                    ) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (outcome == null) PillButton("Desistir", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { confirm = true }
-                            else PillButton("Nova partida", Night.correct, modifier = Modifier.weight(1f)) { showEnd = false; preview = Naval.place(rnd); persist(null) }
-                        }
-                    }
+                        action = {
+                            if (outcome == null) NavalMiniPill("Desistir", Night.surfaceHigh, Night.text) { confirm = true }
+                            else NavalMiniPill("Nova partida", Night.correct, DarkInk) { showEnd = false; preview = Naval.place(rnd); persist(null) }
+                        },
+                    )
                 }
                 if (confirm && outcome == null) {
                     BottomSheet({ confirm = false }) {
@@ -403,6 +471,7 @@ internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? 
     var confirm by remember(d.round) { mutableStateOf(false) }
     var fleetSent by remember(d.round) { mutableStateOf(false) }
     val answered = remember(d.round) { HashSet<Int>() }
+    val toast = rememberToast()
     val myTurn = !counting && turn == d.myId && sentAt != st.shots.size
     val outcome = when {
         st.winner != null -> if (st.winner == d.myId) "me" else "opp"
@@ -466,7 +535,11 @@ internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? 
                 turn == d.myId -> "Atirando…"
                 else -> "Vez de ${d.oppName}"
             }
-            Box(Modifier.weight(1f)) {
+            if (placing && outcome == null) Box(Modifier.weight(1f)) {
+                NavalPlacer(fleet, { fleet = it }, d.feedback, toast, hint = if (counting) status else null) {
+                    PillButton("Pronto", Night.correct, modifier = Modifier.weight(1f), enabled = !counting) { d.send(Msg.Ready(d.myId)) }
+                }
+            } else Box(Modifier.weight(1f)) {
                 NavalLayout(
                     status = status, statusMine = myTurn || outcome == "me", oppLabel = "de ${d.oppName}", oppShort = d.oppName,
                     foeShips = foeShips + (st.oppFleet ?: emptyList()), foe = foe, myFleet = fleet, mine = mySea, aim = aim, canTap = myTurn,
@@ -477,18 +550,11 @@ internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? 
                         aim = -1; sentAt = s.shots.size
                         d.send(Msg.Shot(d.myId, s.shots.size, c))
                     },
-                ) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        when {
-                            outcome != null -> if (!showEnd) PillButton("Ver resultado", Night.correct, modifier = Modifier.weight(1f)) { showEnd = true }
-                            placing -> {
-                                PillButton("Sortear de novo", Night.surfaceHigh, Night.text, Modifier.weight(1f), enabled = !counting) { fleet = Naval.place(); d.feedback?.type() }
-                                PillButton("Pronto", Night.correct, modifier = Modifier.weight(1f), enabled = !counting) { d.send(Msg.Ready(d.myId)) }
-                            }
-                            else -> PillButton("Desistir", Night.surfaceHigh, Night.text, Modifier.weight(1f), enabled = !counting) { confirm = true }
-                        }
-                    }
-                }
+                    action = {
+                        if (outcome != null) { if (!showEnd) NavalMiniPill("Ver resultado", Night.correct, DarkInk) { showEnd = true } }
+                        else NavalMiniPill("Desistir", Night.surfaceHigh, Night.text, enabled = !counting) { confirm = true }
+                    },
+                )
             }
         }
         if (confirm && outcome == null) {
@@ -501,6 +567,7 @@ internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? 
                 }
             }
         }
+        ToastView(toast, Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 70.dp))
         if (outcome != null && showEnd) {
             val mineShots = st.shots.filter { it.by == d.myId && it.res != null }
             val detail = "${mineShots.size} tiros, ${mineShots.count { it.res!!.hit }} acertos"

@@ -12,6 +12,10 @@ import com.dmwnezes.palavreiro.ui.NavalPlay
 import com.dmwnezes.palavreiro.ui.NavalSave
 import com.dmwnezes.palavreiro.ui.NavalScreen
 import com.dmwnezes.palavreiro.ui.PalavreiroTheme
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -51,6 +55,31 @@ class NavalRenderTest {
         val cs = listOf(me[0][0], me[0][1], 7, 63, 88, 21, 40).distinct().take(ps.size)
         rule.setContent { PalavreiroTheme { NavalScreen(null, null, {}, initial = NavalSave(Naval.Level.MEDIO, me, ai, ps, cs)) } }
         save("naval_solo")
+    }
+
+    @Test
+    @Config(qualifiers = "w360dp-h640dp-xhdpi")
+    fun soloTelaBaixaSemRolar() {
+        rule.mainClock.autoAdvance = false
+        val rnd = Random(11)
+        val me = Naval.place(rnd); val ai = Naval.place(rnd)
+        rule.setContent { PalavreiroTheme { NavalScreen(null, null, {}, initial = NavalSave(Naval.Level.DIFICIL, me, ai, listOf(0, 55), listOf(7, 63))) } }
+        save("naval_solo_640")
+        // As frotas de baixo continuam na tela.
+        rule.onNodeWithText("VOCÊ").assertIsDisplayed()
+    }
+
+    @Test
+    fun posicionarNavio() {
+        rule.mainClock.autoAdvance = false
+        rule.setContent { PalavreiroTheme { NavalScreen(null, null, {}, rnd = Random(4)) } }
+        rule.mainClock.advanceTimeBy(500)
+        // Escolhe um navio (toque numa casa dele) e leva para outra casa livre.
+        val fleet = Naval.place(Random(4))
+        val ship = fleet[4]
+        rule.onAllNodesWithContentDescription(Naval.name(ship[0]))[0].performClick()
+        rule.mainClock.advanceTimeBy(300)
+        save("naval_posicionar")
     }
 
     @Test

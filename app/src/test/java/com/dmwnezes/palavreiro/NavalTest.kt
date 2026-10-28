@@ -19,6 +19,14 @@ class NavalTest {
         assertFalse(Naval.valid(listOf(listOf(8, 9, 10, 11, 12), listOf(30, 31, 32, 33), listOf(50, 51, 52), listOf(70, 71, 72), listOf(90, 91))))
     }
 
+    @Test fun moverEGirar() {
+        val f = listOf(listOf(0, 1, 2, 3, 4), listOf(20, 21, 22, 23), listOf(40, 41, 42), listOf(60, 61, 62), listOf(80, 81))
+        assertEquals(listOf(98, 99), Naval.move(f, 4, 98, false)!![4]) // passa da borda: encaixa
+        assertEquals(null, Naval.move(f, 4, 10, false))                // encosta no porta-aviões
+        assertEquals(listOf(49, 59, 69), Naval.move(f, 2, 49, true)!![2])
+        assertEquals(null, Naval.move(f, 0, 0, true))                  // girar em cima de outro navio
+    }
+
     @Test fun computadorAfundaTudoEDificilGastaMenos() {
         val rnd = Random(3)
         val avg = Naval.Level.entries.map { lv ->

@@ -32,8 +32,16 @@
     r.fleet = savedFleet(s, r) || NV().place();
     keepFleet(s, r);
     s.view = "game";
-    X().gameShell(s, "nv nvm", B().layoutHTML(`de ${P.esc(X().oppName(s))}`) + `<div class="nv-foot" data-foot></div><div class="center" data-after></div>`);
+    X().gameShell(s, "nv nvm", B().layoutHTML(`de ${P.esc(X().oppName(s))}`) + `<div class="nv-wrap hidden" data-place></div>`);
     s.root.classList.add("nv-wide");
+    // Antes de "Pronto": cada um põe os navios onde quiser (ou sorteia).
+    r.placer = B().placer(P.$("[data-place]", s.root), {
+      get: () => r.fleet,
+      set: (f) => { if (live(s, r) && !r.rdy[meId(s)]) { r.fleet = f; keepFleet(s, r); } },
+      extra: `<button class="pill" data-ready>Pronto</button>`,
+    });
+    const rd = P.$("[data-ready]", s.root);
+    rd.onclick = () => { if (!live(s, r) || r.rdy[meId(s)] || Date.now() < r.startAt) return; rd.disabled = true; keepFleet(s, r); X().publish({ t: "ready", id: meId(s) }); };
     P.$("[data-nb=foe]", s.root).addEventListener("click", (e) => { const c = e.target.closest("[data-c]"); if (c) tap(s, r, +c.dataset.c); });
     r.api = { redraw: () => draw(s, r) };
     X().drawScore(s);
@@ -152,19 +160,16 @@
     turn.textContent = r.result ? (r.result === "me" ? "Você venceu! ⚓" : `${X().oppName(s)} venceu`)
       : !started ? (r.firstId === meId(s) ? "Você atira primeiro" : `${X().oppName(s)} atira primeiro`)
       : placing ? "Posicione sua frota" : waitOpp ? `Esperando ${X().oppName(s)} posicionar…`
-      : mt ? (r.aim != null ? `Toque de novo em ${NV().name(r.aim)} para atirar` : "Sua vez · escolha uma casa")
+      : mt ? (r.aim != null ? `Toque de novo em ${NV().name(r.aim)}` : "Sua vez · escolha uma casa")
       : r.pend ? "Atirando…" : `Vez de ${X().oppName(s)}`;
-    const foot = P.$("[data-foot]", s.root);
-    const want = r.result ? "" : placing ? "place" : "play";
-    if (foot.dataset.v !== want) {
-      foot.dataset.v = want;
-      foot.innerHTML = want === "place"
-        ? `<div class="row-btns nv-btns"><button class="pill ghost" data-shuffle>Sortear de novo</button><button class="pill" data-ready>Pronto</button></div>`
-        : want === "play" ? `<button class="pill ghost dm-resign" data-resign>Desistir</button>` : "";
-      const sh = P.$("[data-shuffle]", foot), rd = P.$("[data-ready]", foot), rs = P.$("[data-resign]", foot);
-      if (sh) sh.onclick = () => { if (!live(s, r) || r.rdy[meId(s)]) return; r.fleet = NV().place(); keepFleet(s, r); P.fx.type(); draw(s, r); };
-      if (rd) rd.onclick = () => { if (!live(s, r) || r.rdy[meId(s)] || Date.now() < r.startAt) return; rd.disabled = true; keepFleet(s, r); X().publish({ t: "ready", id: meId(s) }); };
-      if (rs) rs.onclick = () => {
+    P.$("[data-play]", s.root).classList.toggle("hidden", placing && !r.result);
+    P.$("[data-place]", s.root).classList.toggle("hidden", !placing || !!r.result);
+    const rd = P.$("[data-ready]", s.root); if (rd && !r.rdy[meId(s)]) rd.disabled = !started;
+    const act = P.$("[data-act]", s.root);
+    if (r.result) X().afterBtn(act, r, () => sheet(s, r));
+    else if (!P.$("[data-resign]", act)) {
+      act.innerHTML = `<button class="pill ghost nv-mini" data-resign>Desistir</button>`;
+      P.$("[data-resign]", act).onclick = () => {
         if (!live(s, r) || r.result) return;
         const ui = P.sheet(`<h2>Desistir da rodada?</h2><p class="subtitle">${on} ganha esta rodada.</p>
           <div class="row-btns"><button class="pill ghost" data-no>Continuar</button><button class="pill danger" data-yes>Desistir</button></div>`);
@@ -172,8 +177,7 @@
         P.$("[data-yes]", ui.el).onclick = () => { ui.close(); if (live(s, r) && !r.result) X().publish({ t: "resign", id: meId(s) }); };
       };
     }
-    const rd = P.$("[data-ready]", foot); if (rd) rd.disabled = !started;
-    X().afterBtn(P.$("[data-after]", s.root), r, () => sheet(s, r));
+    const rs = P.$("[data-resign]", act); if (rs) rs.disabled = !started;
   }
 
   function stats(s, r) {
