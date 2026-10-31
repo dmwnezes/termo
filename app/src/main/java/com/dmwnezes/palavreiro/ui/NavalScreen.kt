@@ -68,7 +68,8 @@ internal fun NavalBoard(
     ships.forEachIndexed { k, s -> s.forEach { owner[it] = k } }
     BoxWithConstraints(modifier) {
         val gap = if (maxWidth < 220.dp) 1.5.dp else 3.dp
-        val cell = if (labels) (maxWidth - gap * 10) / 10.65f else (maxWidth - gap * 9) / 10f
+        // Largura pode chegar 0/minúscula num passe de medida: célula negativa gera fonte negativa e derruba o app.
+        val cell = (if (labels) (maxWidth - gap * 10) / 10.65f else (maxWidth - gap * 9) / 10f).coerceAtLeast(1.dp)
         val font = (cell.value * 0.46f).sp
         Column(verticalArrangement = Arrangement.spacedBy(gap)) {
             if (labels) Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
