@@ -2,7 +2,6 @@ package com.dmwnezes.palavreiro
 
 import com.dmwnezes.palavreiro.data.Store
 import com.dmwnezes.palavreiro.data.Sync
-import com.dmwnezes.palavreiro.game.Connections
 import com.dmwnezes.palavreiro.game.ConnectionsData
 import com.dmwnezes.palavreiro.game.Cruzada
 import com.dmwnezes.palavreiro.game.CruzadaGame
@@ -13,9 +12,7 @@ import com.dmwnezes.palavreiro.game.Achievements
 import com.dmwnezes.palavreiro.game.Words
 import com.dmwnezes.palavreiro.game.WordSearchData
 import com.dmwnezes.palavreiro.system.Ntfy
-import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -33,7 +30,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.File
-import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.time.LocalDate
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -48,20 +45,30 @@ class Rodada13Test {
     /** Servidor mínimo no formato do ntfy.sh (só POST e histórico; o SSE responde vazio). */
     private class FakeNtfy {
         val messages = CopyOnWriteArrayList<String>()
-        val http: HttpServer = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0).apply {
-            createContext("/") { e ->
-                val path = e.requestURI.path
-                val out = when {
-                    e.requestMethod == "POST" -> { messages += e.requestBody.readBytes().toString(Charsets.UTF_8); "{}" }
-                    path.endsWith("/json") -> messages.mapIndexed { i, m -> JSONObject().put("id", "m$i").put("event", "message").put("message", m).toString() }.joinToString("\n")
-                    else -> ""
-                }.toByteArray()
-                e.sendResponseHeaders(200, out.size.toLong().coerceAtLeast(1))
-                e.responseBody.use { if (out.isEmpty()) it.write(' '.code) else it.write(out) }
-            }
-            start()
+        private val socket = ServerSocket(0)
+        val url get() = "http://127.0.0.1:${socket.localPort}"
+        init {
+            Thread {
+                while (!socket.isClosed) {
+                    val c = runCatching { socket.accept() }.getOrNull() ?: break
+                    c.use {
+                        val input = it.getInputStream()
+                        fun line(): String { val b = StringBuilder(); while (true) { val x = input.read(); if (x < 0 || x == 10) break; if (x != 13) b.append(x.toChar()) }; return b.toString() }
+                        val first = line()
+                        var len = 0
+                        while (true) { val h = line(); if (h.isEmpty()) break; if (h.lowercase().startsWith("content-length:")) len = h.substringAfter(':').trim().toInt() }
+                        val out = when {
+                            first.startsWith("POST") -> { messages += String(input.readNBytes(len), Charsets.UTF_8); "{}" }
+                            "/json" in first -> messages.mapIndexed { i, m -> JSONObject().put("id", "m$i").put("event", "message").put("message", m).toString() }.joinToString("\n")
+                            else -> ""
+                        }.toByteArray()
+                        it.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Length: ${out.size}\r\nConnection: close\r\n\r\n".toByteArray() + out)
+                        it.getOutputStream().flush()
+                    }
+                }
+            }.apply { isDaemon = true }.start()
         }
-        val url get() = "http://127.0.0.1:${http.address.port}"
+        fun stop() = socket.close()
     }
     private val dead = "http://127.0.0.1:9"
 
@@ -141,7 +148,7 @@ class Rodada13Test {
         assertTrue(Sync.receive(ntfy, s, code!!))
         assertEquals(7, s.int("mp_won"))
         assertFalse(Sync.receive(ntfy, s, "ZZZZZZ"))
-        reserve.http.stop(0)
+        reserve.stop()
     }
 
     @Test fun ouveOReservaQuandoOPrincipalCai() = runBlocking {
@@ -151,7 +158,7 @@ class Rodada13Test {
         reserve.messages += """{"_u":"dois","t":"y"}"""
         val got = withTimeout(30_000) { Ntfy(OkHttpClient(), dead, reserve.url).events("sala").filterIsInstance<Ntfy.Event.Message>().take(2).toList() }
         assertEquals(listOf("um", "dois"), got.map { JSONObject(it.text).getString("_u") })
-        reserve.http.stop(0)
+        reserve.stop()
     }
 
     @Test fun retrospectivaIgualAoSite() {
