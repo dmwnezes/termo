@@ -112,7 +112,7 @@ fun CruzadaScreen(list: List<CruzadaQ>, store: Store?, feedback: Feedback?, onBa
                     Text(
                         if (game.won) "Resolvida com ${game.checks} ${if (game.checks == 1) "conferência" else "conferências"}! ✏️"
                         else "${if (game.across) "Horizontal" else "Vertical"} · ${game.q.clues[game.clue]}",
-                        color = Night.muted, fontSize = 15.sp, textAlign = TextAlign.Center,
+                        color = Night.muted, fontSize = 15.sp, textAlign = TextAlign.Center, minLines = 2,
                     )
                     Spacer(Modifier.height(10.dp))
                     CruzadaGrid(game) { y, x -> game.select(y, x); feedback?.type(); tick++ }
@@ -178,9 +178,11 @@ fun CruzadaScreen(list: List<CruzadaQ>, store: Store?, feedback: Feedback?, onBa
 }
 
 @Composable
+// O jogo não é um estado do Compose: sem isso, a grade não se redesenha a cada jogada.
+@androidx.compose.runtime.NonSkippableComposable
 private fun CruzadaGrid(g: CruzadaGame, onCell: (Int, Int) -> Unit) {
     val numbers = mapOf((0 to 0) to 1, (0 to 2) to 2, (0 to 4) to 3, (2 to 0) to 4, (4 to 0) to 5)
-    Column(Modifier.widthIn(max = 300.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(Modifier.widthIn(max = 240.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
         for (y in 0 until Cruzada.SIZE) Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             for (x in 0 until Cruzada.SIZE) {
                 val open = g.q.letter(y, x) != null
@@ -211,6 +213,7 @@ private fun CruzadaGrid(g: CruzadaGame, onCell: (Int, Int) -> Unit) {
 }
 
 @Composable
+@androidx.compose.runtime.NonSkippableComposable
 private fun CruzadaClues(g: CruzadaGame, onClue: (Int) -> Unit) {
     @Composable fun block(title: String, range: IntRange, label: (Int) -> Int) {
         Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Night.muted, modifier = Modifier.fillMaxWidth())

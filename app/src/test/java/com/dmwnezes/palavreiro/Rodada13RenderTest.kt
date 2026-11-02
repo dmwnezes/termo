@@ -44,6 +44,25 @@ class Rodada13RenderTest {
         assertTrue(s.text("cruz_state")!!.startsWith("2026-11-03;347;"))
     }
 
+    @Test fun gradeMostraCadaJogada() {
+        val s = store()
+        rule.setContent { PalavreiroTheme { CruzadaScreen(list, s, null, {}, LocalDate.of(2026, 11, 3)) } }
+        rule.onNodeWithText("Q").performClick()
+        rule.onNodeWithText("Z").performClick()
+        rule.onNodeWithContentDescription("Linha 1, coluna 1, Q").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Linha 1, coluna 2, Z").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Apagar").performClick()
+        rule.onNodeWithContentDescription("Apagar").performClick()
+        rule.onNodeWithContentDescription("Linha 1, coluna 2, vazia").assertIsDisplayed()
+        // Tocar de novo na mesma casa troca para a vertical: a próxima letra desce.
+        rule.onNodeWithContentDescription("Linha 3, coluna 1, vazia").performClick()
+        rule.onNodeWithContentDescription("Linha 3, coluna 1, vazia").performClick()
+        rule.onNodeWithText("X").performClick()
+        rule.onNodeWithText("W").performClick()
+        rule.onNodeWithContentDescription("Linha 3, coluna 1, X").assertIsDisplayed()
+        rule.onNodeWithContentDescription("Linha 4, coluna 1, W").assertIsDisplayed()
+    }
+
     @Test fun revelarTudoVenceEContaNoRecorde() {
         val s = store()
         rule.setContent { PalavreiroTheme { CruzadaScreen(list, s, null, {}, LocalDate.of(2026, 11, 3)) } }
