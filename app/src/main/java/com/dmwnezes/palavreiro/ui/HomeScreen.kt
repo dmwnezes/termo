@@ -49,7 +49,7 @@ import com.dmwnezes.palavreiro.game.Multi
 
 /** Destinos da tela inicial. */
 enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
-    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL }
+    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL, CRUZADA }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -79,6 +79,7 @@ fun HomeScreen(
         GameCardInfo(Dest.QUARTETO, "Quarteto", "Quatro palavras, 9 tentativas", badges[Dest.QUARTETO]),
         GameCardInfo(Dest.CONEXOES, "Conexões", "Separe 16 palavras em 4 grupos", badges[Dest.CONEXOES]),
         GameCardInfo(Dest.CACA, "Caça-Palavras", "Ache as palavras do tema do dia", badges[Dest.CACA]),
+        GameCardInfo(Dest.CRUZADA, "Palavra Cruzada", "Seis palavras cruzadas por dia", badges[Dest.CRUZADA]),
         GameCardInfo(Dest.INTRUSO, "Intruso", "Ache a palavra que não pertence ao grupo", null),
         GameCardInfo(Dest.ORTOGRAFIA, "Certo ou Errado", "A palavra está escrita certo?", null),
         GameCardInfo(Dest.DEFINICAO, "Qual é a Palavra?", "Descubra a palavra pela definição", null),
@@ -95,7 +96,7 @@ fun HomeScreen(
     ).associateBy { it.dest }
     // Mesmo layout do site no celular: abas por categoria, cartões em duas colunas e barra fixa embaixo.
     val cats = listOf(
-        HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
+        HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.CRUZADA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
         HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ, Dest.NAVAL)),
         HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA)),
     )
@@ -362,6 +363,19 @@ internal fun CardIcon(dest: Dest) {
         Dest.SUDOKU -> SudokuIcon()
         Dest.XADREZ -> ChessHomeIcon(44.dp)
         Dest.NAVAL -> GameIcon(Multi.NAVAL, 46.dp)
+        Dest.CRUZADA -> CruzadaIcon()
+    }
+}
+
+/** Palavra Cruzada: três fileiras cruzadas em verde. */
+@Composable
+private fun CruzadaIcon() {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        listOf(listOf(1, 1, 1), listOf(1, 0, 1), listOf(1, 1, 1)).forEach { line ->
+            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                line.forEach { on -> Box(Modifier.size(13.dp).clip(RoundedCornerShape(4.dp)).background(if (on == 1) Night.correct else androidx.compose.ui.graphics.Color.Transparent)) }
+            }
+        }
     }
 }
 

@@ -4,8 +4,7 @@
 // Caça-Palavras, Jogo da Velha e Damas ficam em js/multi-games.js; Xeque/Xadrez (k) em js/multi-xadrez.js (registrados em P.mp.kinds).
 (function () {
   "use strict";
-  // Testes: localStorage "pv-ntfy" (ex.: "http://127.0.0.1:8799/") troca o servidor do ntfy.sh.
-  const NTFY = (() => { try { const v = localStorage.getItem("pv-ntfy"); if (v && /^https?:\/\//.test(v)) return v.endsWith("/") ? v : v + "/"; } catch (_) {} return "https://ntfy.sh/"; })();
+  const SERVERS = P.relay.servers;
   // pts = jogo de pontos (rodadas 5/10/15); os outros são séries (1 partida, melhor de 3, melhor de 5).
   const MODES = {
     t: { key: "termo", name: "Termo", pill: "Termo", inv: "um Termo", boards: 1 },
@@ -110,7 +109,7 @@
     clearTimeout(s.retry); clearInterval(s.countTimer); clearTimeout(s.sheetTimer); clearInterval(s.ttlTimer); stopGame(s);
     closePicker();
     if (s.es) s.es.close();
-    if (sendBye && s.joined) { try { fetch(NTFY + s.topic, { method: "POST", body: JSON.stringify({ t: "bye", id: s.me.id }), keepalive: true }).catch(() => {}); } catch (_) {} }
+    if (sendBye && s.joined) { try { P.relay.post(s.topic, JSON.stringify({ t: "bye", id: s.me.id, _u: randStr(8) }), true); } catch (_) {} }
     P.$("#mp-net")?.remove();
     P.fx.muted = false;
   }
@@ -125,7 +124,7 @@
     if (!s || s.closed || !s.loaded || document.visibilityState !== "visible") return;
     if (!s.es || s.es.readyState === 2) { clearTimeout(s.retry); listen(s); }
     try {
-      const r = await fetch(`${NTFY}${s.topic}/json?poll=1&since=all`);
+      const r = await fetch(`${SERVERS[s.srv]}${s.topic}/json?poll=1&since=all`);
       if (!r.ok || s.closed) return;
       (await r.text()).split("\n").forEach((l) => { if (!l.trim()) return; try { ingest(s, JSON.parse(l), false); } catch (_) {} });
       afterHistory(s);
@@ -137,16 +136,23 @@
   // ---------- transporte ----------
   function publish(msg) {
     const s = S; if (!s) return Promise.resolve();
-    const body = JSON.stringify(msg);
-    // Fila: as mensagens chegam no tópico na mesma ordem em que foram enviadas.
-    s.queue = s.queue.then(async () => {
-      for (let i = 0; i < 4; i++) {
-        try { const r = await fetch(NTFY + s.topic, { method: "POST", body }); if (r.ok) return; } catch (_) {}
-        if (s.closed) return;
-        net(true); await P.sleep(1500);
+    const body = JSON.stringify(Object.assign({ _u: randStr(8) }, msg));
+    // Uma fila por servidor: as mensagens chegam em cada tópico na mesma ordem em que foram enviadas.
+    const sends = SERVERS.map((u, i) => (s.queues[i] = s.queues[i].then(async () => {
+      for (let k = 0, tries = i === 0 ? 4 : 1; k < tries; k++) {
+        try { const r = await fetch(u + s.topic, { method: "POST", body, signal: P.relay.signal(8000) }); if (r.ok) return true; } catch (_) {}
+        if (s.closed) return false;
+        if (i === s.srv) net(true);
+        if (k + 1 < tries) await P.sleep(1500);
       }
-    });
-    return s.queue;
+      return false;
+    })));
+    return Promise.any(sends.map((p) => p.then((ok) => ok || Promise.reject()))).catch(() => {});
+  }
+  /** Servidor falhou duas vezes seguidas: passa a ouvir o outro, desde o começo do histórico (repetidas são ignoradas). */
+  function failover(s) {
+    s.fails = (s.fails || 0) + 1;
+    if (s.fails >= 2 && SERVERS.length > 1) { s.fails = 0; s.srv = (s.srv + 1) % SERVERS.length; s.lastId = null; }
   }
 
   function net(down) {
@@ -160,13 +166,14 @@
     s.seen.add(ev.id); s.lastId = ev.id;
     let m; try { m = JSON.parse(ev.message); } catch (_) { return; }
     if (!m || typeof m !== "object" || !m.t) return;
+    if (m._u) { if (s.seen.has(m._u)) return; s.seen.add(m._u); }
     handle(s, m, live);
   }
 
   /** Lê o histórico do tópico e depois fica ouvindo ao vivo (SSE). */
   async function connect(s) {
     try {
-      const r = await fetch(`${NTFY}${s.topic}/json?poll=1&since=${s.lastId || "all"}`);
+      const r = await fetch(`${SERVERS[s.srv]}${s.topic}/json?poll=1&since=${s.lastId || "all"}`);
       if (!r.ok) throw new Error("poll");
       const text = await r.text();
       if (s.closed) return;
@@ -175,7 +182,7 @@
       net(false);
     } catch (_) {
       if (s.closed) return;
-      net(true); s.retry = setTimeout(() => connect(s), 2000); return;
+      failover(s); net(true); s.retry = setTimeout(() => connect(s), 2000); return;
     }
     listen(s);
   }
@@ -197,15 +204,15 @@
   function listen(s) {
     if (s.closed) return;
     if (s.es) s.es.close();
-    const es = (s.es = new EventSource(`${NTFY}${s.topic}/sse?since=${s.lastId || "all"}`));
+    const es = (s.es = new EventSource(`${SERVERS[s.srv]}${s.topic}/sse?since=${s.lastId || "all"}`));
     // O ntfy.sh leva ~1 s para guardar cada mensagem no histórico: relê o histórico logo depois de conectar
     // para não perder nada que chegou entre a leitura inicial e a conexão ao vivo (repetidas são ignoradas).
     es.onopen = () => {
-      net(false);
+      s.fails = 0; net(false);
       setTimeout(async () => {
         if (s.closed || s.es !== es) return;
         try {
-          const r = await fetch(`${NTFY}${s.topic}/json?poll=1&since=all`);
+          const r = await fetch(`${SERVERS[s.srv]}${s.topic}/json?poll=1&since=all`);
           if (!r.ok || s.closed) return;
           (await r.text()).split("\n").forEach((l) => { if (!l.trim()) return; try { ingest(s, JSON.parse(l), true); } catch (_) {} });
         } catch (_) {}
@@ -214,7 +221,7 @@
     es.onmessage = (e) => { try { ingest(s, JSON.parse(e.data), true); } catch (_) {} };
     es.onerror = () => {
       es.close(); if (s.closed || s.es !== es) return;
-      net(true); s.retry = setTimeout(() => listen(s), 2000);
+      failover(s); net(true); s.retry = setTimeout(() => listen(s), 2000);
     };
   }
 
@@ -222,7 +229,7 @@
     leave(false, true);
     S = { room, m, seed, mode: MODES[m], topic: "palavreiro-mp-" + room, me: { id: randStr(8), name, host }, root,
       hostHello: null, guestHello: null, started: false, startSent: false, joined: false, full: false, oppLeft: false,
-      seen: new Set(), lastId: null, es: null, closed: false, queue: Promise.resolve(), round: null, view: null,
+      seen: new Set(), lastId: null, es: null, closed: false, queues: SERVERS.map(() => Promise.resolve()), srv: 0, round: null, view: null,
       series: { me: 0, opp: 0 }, rounds: validR(m, rounds) || RDEF(m),
       rn: -1, // rodada da sala: 0 no start, +1 a cada again (Caça, Velha e Damas usam)
       grids: {}, themes: [] };
@@ -514,12 +521,13 @@
     tick(); s.ttlTimer = setInterval(tick, 1000);
   }
   /** QR da sala: o amigo do lado entra só apontando a câmera. */
+  P.mp.qrSvg = qrSvg;
   function qrSvg(text) {
     if (typeof qrcode !== "function") return "";
     const q = qrcode(0, "M"); q.addData(text); q.make();
     const n = q.getModuleCount(); let d = "";
     for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) d += `M${x} ${y}h1v1h-1z`;
-    return `<svg viewBox="-3 -3 ${n + 6} ${n + 6}" shape-rendering="crispEdges" role="img" aria-label="QR code do link da partida"><rect x="-3" y="-3" width="${n + 6}" height="${n + 6}" fill="#fff"/><path d="${d}" fill="#14102C"/></svg>`;
+    return `<svg viewBox="-3 -3 ${n + 6} ${n + 6}" shape-rendering="crispEdges" role="img" aria-label="QR code do link"><rect x="-3" y="-3" width="${n + 6}" height="${n + 6}" fill="#fff"/><path d="${d}" fill="#14102C"/></svg>`;
   }
   const qrBlock = (link) => { const svg = qrSvg(link); return svg ? `<div class="mp-qr" data-qr>${svg}<p>Amigo do lado? Ele aponta a câmera aqui e entra.</p></div>` : ""; };
 

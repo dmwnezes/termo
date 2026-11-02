@@ -67,6 +67,8 @@
       ["⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", n("amp-day-best"), 10],
       ["🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", n("sudoku-perfect"), 1],
       ["♟️", "Xeque-mate", "Vença o computador no Xeque (Difícil)", n("xadrez-won-dificil"), 1],
+      ["✏️", "Cruzadista", "Resolva 10 Palavras Cruzadas", n("cruz-won"), 10],
+      ["🚢", "Almirante", "Vença o computador na Batalha Naval (Difícil)", n("naval-won-dificil"), 1],
       ["⚔️", "Duelista", "Vença 5 partidas com amigos", n("mp-won"), 5],
       ["🗂️", "Viajante do tempo", "Termine 5 desafios do Arquivo", n("arch-played"), 5],
       ["🌟", "Dia completo", "Faça os 5 desafios do dia", n("alldone-days"), 1],
@@ -106,7 +108,8 @@
     "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
     "matiz_best", "matiz_played", "matiz_top", "podio_won", "podio_played", "podio_streak", "podio_first", "amp_best", "amp_day_best", "amp_played",
     "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil", "sudoku_won", "sudoku_perfect",
-    "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil"];
+    "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil",
+    "naval_won_facil", "naval_won_medio", "naval_won_dificil", "cruz_won", "cruz_perfect"];
   // Contadores em que menor é melhor (tempo e jogadas): 0 = ainda não jogou.
   const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
     "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil"];
@@ -137,6 +140,52 @@
     const fg = cleanGuesses(P.store.get("first-guesses", []));
     if (fg.length) data.firstGuesses = fg;
     return "PV1-" + toB64(JSON.stringify(data));
+  };
+
+  // ---------- sincronizar com código curto ----------
+  // O código longo vai em partes por um tópico temporário do ntfy (limite de 4 KB por mensagem; expira em poucas horas).
+  const SYNC_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ", SYNC_CHUNK = 3000;
+  const syncTopic = (code) => "palavreiro-sync-" + code.toLowerCase();
+  /** Só as letras e números do código curto digitado, ou null se não for um. */
+  P.syncShort = (t) => { const c = String(t || "").trim().toUpperCase().replace(/^.*[?&]SYNC=/, "").replace(/[^0-9A-Z]/g, ""); return c.length === 6 && [...c].every((x) => SYNC_ALPHABET.includes(x)) ? c : null; };
+  P.syncLink = (code) => "https://dmwnezes.com/termo/?sync=" + code;
+  /** Publica o progresso. Devolve o código curto, ou null se nenhum servidor aceitou. */
+  P.syncSend = async () => {
+    const full = P.syncExport(), r = new Uint32Array(6); crypto.getRandomValues(r);
+    const code = Array.from(r, (x) => SYNC_ALPHABET[x % SYNC_ALPHABET.length]).join("");
+    const n = Math.ceil(full.length / SYNC_CHUNK);
+    for (let i = 0; i < n; i++) {
+      if (!(await P.relay.post(syncTopic(code), JSON.stringify({ i, n, d: full.slice(i * SYNC_CHUNK, (i + 1) * SYNC_CHUNK) })))) return null;
+    }
+    return code;
+  };
+  /** Baixa e mescla o progresso do código curto. Devolve true se deu certo. */
+  P.syncReceive = async (code) => {
+    const parts = {}; let n = 0;
+    (await P.relay.history(syncTopic(code))).forEach((m) => { try { const o = JSON.parse(m); if (Number.isInteger(o.i) && Number.isInteger(o.n) && typeof o.d === "string") { parts[o.i] = o.d; n = o.n; } } catch (_) {} });
+    if (!n || Object.keys(parts).length < n) return false;
+    return P.syncImport(Array.from({ length: n }, (_, i) => parts[i]).join(""));
+  };
+
+  // ---------- retrospectiva do ano ----------
+  const RETRO_NAMES = { termo: "Termo", dueto: "Dueto", quarteto: "Quarteto", conn: "Conexões", conexoes: "Conexões", caca: "Caça-Palavras", ws: "Caça-Palavras", cruzada: "Palavra Cruzada" };
+  const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  /** Números do ano a partir do progresso salvo. Mesmo cálculo no app (game/Retro.kt). */
+  P.retro = (year = new Date().getFullYear()) => {
+    const pre = year + "-", act = Object.entries(P.store.get("activity", {})).filter(([d, v]) => d.startsWith(pre) && v > 0).sort();
+    const months = Array(12).fill(0); let run = 0, best = 0, prev = null;
+    act.forEach(([d, v]) => {
+      months[+d.slice(5, 7) - 1] += v;
+      const t = Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 86400000;
+      run = prev !== null && t === prev + 1 ? run + 1 : 1; best = Math.max(best, run); prev = t;
+    });
+    const td = Object.entries(P.store.get("termo-days", {})).filter(([d]) => d.startsWith(pre));
+    const wins = td.filter(([, v]) => v === "w").length;
+    const games = {}; Object.keys(P.store.get("results", {})).forEach((k) => { const [g, d] = k.split("|"); if (d && d.startsWith(pre) && RETRO_NAMES[g]) games[RETRO_NAMES[g]] = (games[RETRO_NAMES[g]] || 0) + 1; });
+    const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0];
+    const guesses = {}; (P.store.get("first-guesses", []) || []).forEach((x) => { if (x && typeof x.w === "string" && String(x.d).startsWith(pre)) guesses[x.w] = (guesses[x.w] || 0) + 1; });
+    const m = months.indexOf(Math.max(...months)), g = top(games), w = top(guesses);
+    return { year, days: act.length, games: act.reduce((a, [, v]) => a + v, 0), bestRun: best, month: act.length ? MONTHS[m] : null, termoPlayed: td.length, termoWon: wins, topGame: g ? g[0] : null, topGuess: w ? w[0] : null };
   };
 
   /** Mescla o código no progresso local. Devolve true se deu certo. */

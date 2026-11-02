@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#2A2058" />
   <meta http-equiv="Cache-Control" content="no-cache" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="img/icon-192.png" />
   <title>Palavreiro</title>
   <meta name="description" content="Jogos de palavras em português: Termo, Dueto, Quarteto, Conexões, Caça-Palavras, Intruso, Certo ou Errado, Mestre Mandou, Trivia, Jogo da Memória e mais." />
   <!-- Prévia ao mandar o link (WhatsApp, Instagram etc.); sem isso o app pega a primeira imagem da página (a foto dos créditos). -->
@@ -21,14 +23,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;800&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%232A2058'/%3E%3Cg%3E%3Crect x='8' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3Crect x='26' y='41' width='14' height='18' rx='4' fill='%23E6C14F'/%3E%3Crect x='44' y='41' width='14' height='18' rx='4' fill='%234A72CF'/%3E%3Crect x='62' y='41' width='14' height='18' rx='4' fill='%23E6C14F'/%3E%3Crect x='80' y='41' width='14' height='18' rx='4' fill='%235FB873'/%3E%3C/g%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=33" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="splash" class="splash" role="dialog" aria-label="Abertura">
     <canvas id="flag" aria-label="Bandeira do Brasil virando a marca do Palavreiro"></canvas>
     <h1 id="splash-title" style="opacity:0">Palavreiro</h1>
     <a class="credit" id="splash-credit" style="opacity:0" href="https://www.instagram.com/dmwnezes/" target="_blank" rel="noopener">
-      <img src="img/criador.jpg?v=7" alt="Foto de @dmwnezes" width="34" height="34" />
+      <img src="img/criador.jpg" alt="Foto de @dmwnezes" width="34" height="34" />
       <span>criado por: <b>@dmwnezes</b></span>
     </a>
   </div>
@@ -36,37 +38,38 @@
   <div id="app"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="shared/words.js?v=17"></script>
-  <script src="js/core.js?v=24"></script>
-  <script src="js/termo.js?v=20"></script>
-  <script src="js/conexoes.js?v=14"></script>
-  <script src="js/caca.js?v=21"></script>
-  <script src="js/quizzes.js?v=16"></script>
-  <script src="js/extras.js?v=22"></script>
-  <script src="js/arquivo.js?v=15"></script>
-  <script src="js/intruso.js?v=15"></script>
-  <script src="js/ortografia.js?v=14"></script>
-  <script src="js/mestre.js?v=15"></script>
-  <script src="js/perfil.js?v=23"></script>
-  <script src="js/trivia.js?v=1"></script>
-  <script src="js/memoria.js?v=1"></script>
-  <script src="js/matiz.js?v=1"></script>
-  <script src="js/podio.js?v=1"></script>
-  <script src="js/ampulheta.js?v=1"></script>
-  <script src="js/sudoku.js?v=1"></script>
-  <script src="js/xadrez.js?v=1"></script>
-  <script src="js/xadrez-solo.js?v=1"></script>
-  <script src="js/vendor/qrcode.js?v=1"></script>
-  <script src="js/damas.js?v=1"></script>
-  <script src="js/naval.js?v=2"></script>
-  <script src="js/multi.js?v=27"></script>
-  <script src="js/multi-games.js?v=1"></script>
-  <script src="js/multi-adedonha.js?v=1"></script>
-  <script src="js/multi-trivia.js?v=2"></script>
-  <script src="js/multi-forca.js?v=1"></script>
-  <script src="js/multi-xadrez.js?v=1"></script>
-  <script src="js/multi-naval.js?v=2"></script>
-  <script src="js/fun.js?v=1"></script>
-  <script src="js/app.js?v=25"></script>
+  <script src="shared/words.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/termo.js"></script>
+  <script src="js/conexoes.js"></script>
+  <script src="js/caca.js"></script>
+  <script src="js/quizzes.js"></script>
+  <script src="js/extras.js"></script>
+  <script src="js/arquivo.js"></script>
+  <script src="js/cruzada.js"></script>
+  <script src="js/intruso.js"></script>
+  <script src="js/ortografia.js"></script>
+  <script src="js/mestre.js"></script>
+  <script src="js/perfil.js"></script>
+  <script src="js/trivia.js"></script>
+  <script src="js/memoria.js"></script>
+  <script src="js/matiz.js"></script>
+  <script src="js/podio.js"></script>
+  <script src="js/ampulheta.js"></script>
+  <script src="js/sudoku.js"></script>
+  <script src="js/xadrez.js"></script>
+  <script src="js/xadrez-solo.js"></script>
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/damas.js"></script>
+  <script src="js/naval.js"></script>
+  <script src="js/multi.js"></script>
+  <script src="js/multi-games.js"></script>
+  <script src="js/multi-adedonha.js"></script>
+  <script src="js/multi-trivia.js"></script>
+  <script src="js/multi-forca.js"></script>
+  <script src="js/multi-xadrez.js"></script>
+  <script src="js/multi-naval.js"></script>
+  <script src="js/fun.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

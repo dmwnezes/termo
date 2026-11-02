@@ -82,7 +82,12 @@
     const seed = inf ? (st && st.seed != null ? st.seed : newSeed()) : null;
     let theme, g, placed;
     if (inf) ({ theme, g, placed } = infinite(pool, seed));
-    else { theme = themes[((i * 11 + 3) % themes.length + themes.length) % themes.length]; ({ g, placed } = build(theme.words, P.rng(i * 31 + 17))); }
+    else {
+      // De 03/11/2026 em diante os temas extras também entram no desafio do dia (com 8 palavras, como no Infinito).
+      const list = i >= 306 ? pool : themes;
+      theme = list[((i * 11 + 3) % list.length + list.length) % list.length];
+      ({ g, placed } = build(i >= 306 ? theme.words.slice(0, 8) : theme.words, P.rng(i * 31 + 17)));
+    }
     const mine = st && (inf ? st.seed === seed : st.day === day);
     let found = mine ? st.found : [];
     let seconds = mine ? st.seconds || 0 : 0;

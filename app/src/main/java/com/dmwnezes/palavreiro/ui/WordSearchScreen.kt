@@ -80,7 +80,7 @@ fun WordSearchScreen(
     val tag = if (infinite) infSeed.toString() else day
     val ws = remember(infinite, infSeed, day) {
         val built = if (infinite) WordSearchData.infinite(infiniteThemes, infSeed)
-        else WordSearch(themes[WordSearchData.dailyIndex(date, themes.size)], seed = Words.dayIndex(date) * 31 + 17)
+        else WordSearchData.daily(date, themes, infiniteThemes)
         built.also { w ->
             val saved = store?.text(stateKey)
             if (saved != null && saved.substringBefore('|') == tag) {

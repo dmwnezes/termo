@@ -43,7 +43,7 @@
     const stateKey = arch ? "conn-arch-state" : inf ? "conn-inf-state" : "conn-state";
     const saved = P.store.get(stateKey, null);
     const seed = inf ? (saved && saved.seed != null ? saved.seed : newSeed()) : null;
-    const groups = inf ? remix(puzzles, fam, seed) : puzzles[((i * 13 + 7) % puzzles.length + puzzles.length) % puzzles.length];
+    const groups = inf ? remix(puzzles, fam, seed) : puzzles[((i * 13 + 7) % P.dailyCount(i, puzzles.length, 46) + P.dailyCount(i, puzzles.length, 46)) % P.dailyCount(i, puzzles.length, 46)];
     const rnd = P.rng(inf ? seed : i * 97 + 5);
     let tiles = P.shuffle(groups.flatMap((g) => g.words), rnd);
     let sel = [], solved = [], tries = [], mistakes = 0, over = false, won = false;

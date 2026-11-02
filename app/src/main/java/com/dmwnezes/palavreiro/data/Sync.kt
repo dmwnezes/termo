@@ -45,6 +45,41 @@ object Sync {
         return "PV1-" + Base64.getUrlEncoder().withoutPadding().encodeToString(o.toString().toByteArray(Charsets.UTF_8))
     }
 
+    private const val ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
+    private const val CHUNK = 3000
+    private fun topic(code: String) = "palavreiro-sync-" + code.lowercase()
+
+    /** O código curto dentro do texto (código sozinho ou link ?sync=), ou null. */
+    fun short(text: String): String? {
+        val c = text.trim().uppercase().substringAfter("SYNC=").filter { it in '0'..'9' || it in 'A'..'Z' }
+        return c.takeIf { it.length == 6 && it.all { x -> x in ALPHABET } }
+    }
+
+    fun link(code: String) = "https://dmwnezes.com/termo/?sync=$code"
+
+    /** Publica o progresso em partes (limite de 4 KB por mensagem). Devolve o código curto, ou null se falhar. */
+    suspend fun send(ntfy: com.dmwnezes.palavreiro.system.Ntfy, store: Store): String? {
+        val rnd = java.security.SecureRandom()
+        val code = String(CharArray(6) { ALPHABET[rnd.nextInt(ALPHABET.length)] })
+        val parts = export(store).chunked(CHUNK)
+        parts.forEachIndexed { i, d ->
+            if (!ntfy.publish(topic(code), JSONObject().put("i", i).put("n", parts.size).put("d", d).toString())) return null
+        }
+        return code
+    }
+
+    /** Baixa e mescla o progresso do código curto. Devolve false se o código não existir ou tiver vencido. */
+    suspend fun receive(ntfy: com.dmwnezes.palavreiro.system.Ntfy, store: Store, code: String): Boolean {
+        val parts = HashMap<Int, String>()
+        var n = 0
+        ntfy.history(topic(code)).forEach { m ->
+            val o = runCatching { JSONObject(m) }.getOrNull() ?: return@forEach
+            if (o.has("i") && o.has("n") && o.has("d")) { parts[o.optInt("i")] = o.optString("d"); n = o.optInt("n") }
+        }
+        if (n == 0 || parts.size < n) return false
+        return import(store, (0 until n).joinToString("") { parts[it].orEmpty() })
+    }
+
     /** Mescla o código no progresso local. Devolve false se o código for inválido. */
     fun import(store: Store, code: String): Boolean {
         val clean = code.filterNot { it.isWhitespace() }

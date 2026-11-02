@@ -155,3 +155,23 @@ Os 5 primeiros meses do ano com 31 dias|Janeiro|Março|Maio|Julho|Agosto|Feverei
 Os planetas do mais distante do Sol para dentro|Netuno|Urano|Saturno|Júpiter|Marte|Terra|Vênus|Mercúrio|Plutão|Lua
 Os 5 primeiros algarismos romanos, do menor valor ao maior|I|V|X|L|C|D|M|IV|IX|XL
 Os 5 primeiros presidentes eleitos da Quinta República francesa, em ordem|Charles de Gaulle|Georges Pompidou|Valéry Giscard d'Estaing|François Mitterrand|Jacques Chirac|Nicolas Sarkozy|François Hollande|Emmanuel Macron|Napoleão III|Philippe Pétain
+Os dias úteis da semana, em ordem|Segunda-feira|Terça-feira|Quarta-feira|Quinta-feira|Sexta-feira|Sábado|Domingo|Feriado|Véspera|Fim de semana
+As vogais, na ordem do alfabeto|A|E|I|O|U|B|C|D|H|Y
+Os 5 primeiros termos diferentes da sequência de Fibonacci, a partir do 1|1|2|3|5|8|4|6|7|9|10
+Os 5 primeiros quadrados perfeitos positivos|1|4|9|16|25|2|8|12|20|27
+As 5 primeiras potências de 2, a partir de 2¹|2|4|8|16|32|6|10|12|24|64
+Os dedos da mão, do polegar ao menor|Polegar|Indicador|Médio|Anelar|Mínimo|Hálux|Punho|Palma|Falange|Unha
+As 5 regiões do Brasil, da maior para a menor em área|Norte|Centro-Oeste|Nordeste|Sudeste|Sul|Amazônia|Pantanal|Sertão|Cerrado|Caatinga
+As 5 primeiras capitais do Nordeste em ordem alfabética|Aracaju|Fortaleza|João Pessoa|Maceió|Natal|Recife|Salvador|São Luís|Teresina|Campina Grande
+Os 5 primeiros estados do Nordeste em ordem alfabética|Alagoas|Bahia|Ceará|Maranhão|Paraíba|Pernambuco|Piauí|Rio Grande do Norte|Sergipe|Tocantins
+Os 5 primeiros estados do Brasil em ordem alfabética|Acre|Alagoas|Amapá|Amazonas|Bahia|Ceará|Goiás|Maranhão|Pará|Piauí
+Os 5 últimos meses do ano, em ordem|Agosto|Setembro|Outubro|Novembro|Dezembro|Janeiro|Março|Abril|Junho|Julho
+Os livros de As Crônicas de Gelo e Fogo, em ordem|A Guerra dos Tronos|A Fúria dos Reis|A Tormenta de Espadas|O Festim dos Corvos|A Dança dos Dragões|O Hobbit|As Duas Torres|Duna|A Sociedade do Anel|O Silmarillion
+Os grandes ciclos econômicos do Brasil, na ordem em que começaram|Pau-brasil|Cana-de-açúcar|Ouro|Café|Borracha|Soja|Petróleo|Etanol|Minério de ferro|Cacau
+As fases da mitose, em ordem|Prófase|Prometáfase|Metáfase|Anáfase|Telófase|Interfase|Meiose|Citocinese|Síntese|Gástrula
+As 5 primeiras notas da escala de dó maior|Dó|Ré|Mi|Fá|Sol|Lá|Si|Sustenido|Bemol|Clave
+Os 5 primeiros filhos de Jacó, segundo a Bíblia|Rúben|Simeão|Levi|Judá|Dã|Naftali|Gade|Aser|Issacar|Zebulom
+Os estados do litoral do Nordeste, indo do Maranhão para o leste|Maranhão|Piauí|Ceará|Rio Grande do Norte|Paraíba|Pernambuco|Alagoas|Sergipe|Bahia|Espírito Santo
+As 5 primeiras palavras do alfabeto fonético da OTAN|Alfa|Bravo|Charlie|Delta|Echo|Foxtrot|Golf|Hotel|India|Juliet
+Os consoles de mesa da Nintendo, a partir do NES|NES|Super Nintendo|Nintendo 64|GameCube|Wii|Mega Drive|Game Boy|Saturn|Dreamcast|PlayStation
+Os 5 primeiros GTA da série principal, em ordem|GTA|GTA 2|GTA III|Vice City|San Andreas|GTA IV|GTA V|Chinatown Wars|Max Payne|Mafia

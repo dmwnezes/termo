@@ -1,6 +1,9 @@
 package com.dmwnezes.palavreiro.system
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -17,6 +20,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
@@ -24,10 +28,12 @@ import java.util.concurrent.TimeUnit
  * [events] entrega primeiro o histórico do tópico e depois as mensagens novas, cada uma uma vez só,
  * reconectando sozinho se a conexão cair.
  */
-class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh") {
+class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh", private val reserve: String? = null) {
     private val client = http.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build()
     private val streamClient = http.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(0, TimeUnit.SECONDS).build()
     private val sendLock = Mutex()
+    private val reserveLock = Mutex()
+    private val background = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     sealed interface Event {
         data class Message(val id: String, val text: String) : Event
@@ -35,24 +41,56 @@ class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh") {
         data class Connection(val online: Boolean) : Event
     }
 
-    /** Publica uma mensagem; tenta de novo algumas vezes. Envios saem na ordem em que foram pedidos. */
+    /** POST simples; false se o servidor recusar ou não responder. */
+    private fun post(server: String, topic: String, text: String): Boolean = runCatching {
+        client.newCall(Request.Builder().url("$server/$topic").post(text.toRequestBody("text/plain".toMediaType())).build())
+            .execute().use { it.isSuccessful }
+    }.getOrDefault(false)
+
+    /** Com servidor reserva, a mensagem leva um "_u" único: quem trocar de servidor não recebe a mesma duas vezes. */
+    private fun tagged(text: String): String {
+        if (reserve == null || !text.startsWith("{")) return text
+        val uid = UUID.randomUUID().toString().take(12)
+        return if (text.length > 2) "{\"_u\":\"$uid\"," + text.substring(1) else text
+    }
+
+    /**
+     * Publica uma mensagem nos dois servidores; tenta de novo algumas vezes no principal.
+     * Envios saem na ordem em que foram pedidos, em cada servidor.
+     */
     suspend fun publish(topic: String, text: String): Boolean = withContext(Dispatchers.IO) {
-        sendLock.withLock {
+        val body = tagged(text)
+        val second = reserve?.let { r -> background.async { reserveLock.withLock { post(r, topic, body) } } }
+        val first = sendLock.withLock {
             repeat(4) { attempt ->
-                val ok = runCatching {
-                    client.newCall(Request.Builder().url("$base/$topic").post(text.toRequestBody("text/plain".toMediaType())).build())
-                        .execute().use { it.isSuccessful }
-                }.getOrDefault(false)
-                if (ok) return@withLock true
+                if (post(base, topic, body)) return@withLock true
                 delay(700L * (attempt + 1))
             }
             false
         }
+        first || (second?.await() ?: false)
+    }
+
+    /** Textos guardados no tópico, do primeiro servidor que tiver alguma mensagem. */
+    suspend fun history(topic: String): List<String> = withContext(Dispatchers.IO) {
+        for (server in listOfNotNull(base, reserve)) {
+            val lines = runCatching {
+                client.newCall(Request.Builder().url("$server/$topic/json?poll=1&since=all").build()).execute().use { r ->
+                    if (r.isSuccessful) r.body?.charStream()?.buffered()?.readLines() else null
+                }
+            }.getOrNull().orEmpty()
+            val out = lines.mapNotNull { l -> runCatching { JSONObject(l) }.getOrNull()?.takeIf { it.optString("event") == "message" }?.optString("message") }
+            if (out.isNotEmpty()) return@withContext out
+        }
+        emptyList()
     }
 
     fun events(topic: String): Flow<Event> = channelFlow {
         val seen = HashSet<String>()
         var last: String? = null
+        // Duas falhas seguidas: passa a ouvir o outro servidor, desde o começo do histórico (repetidas são ignoradas pelo "_u").
+        var server = base
+        var fails = 0
         // Chamada aberta agora (para cancelar na hora em que a tela fecha, sem esperar o servidor).
         var open: okhttp3.Call? = null
         val lock = Mutex()
@@ -63,13 +101,16 @@ class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh") {
             lock.withLock {
                 if (!seen.add(id)) return
                 last = id
-                send(Event.Message(id, o.optString("message")))
+                val text = o.optString("message")
+                val uid = runCatching { JSONObject(text).optString("_u") }.getOrDefault("")
+                if (uid.isNotEmpty() && !seen.add(uid)) return
+                send(Event.Message(id, text))
             }
         }
         // Histórico do tópico. O ntfy.sh leva ~1 s para guardar cada mensagem, então ele é lido
         // de novo logo depois de cada conexão ao vivo, para não perder nada que chegou no meio.
         suspend fun poll(): Boolean = runCatching {
-            client.newCall(Request.Builder().url("$base/$topic/json?poll=1&since=all").build()).execute().use { r ->
+            client.newCall(Request.Builder().url("$server/$topic/json?poll=1&since=all").build()).execute().use { r ->
                 if (!r.isSuccessful) error("HTTP ${r.code}")
                 r.body?.charStream()?.buffered()?.readLines()
             }
@@ -79,10 +120,11 @@ class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh") {
             poll()
             while (isActive) {
                 try {
-                    val url = "$base/$topic/sse?since=${last ?: "all"}"
+                    val url = "$server/$topic/sse?since=${last ?: "all"}"
                     val call = streamClient.newCall(Request.Builder().url(url).build()).also { open = it }
                     call.execute().use { r ->
                         if (!r.isSuccessful) error("HTTP ${r.code}")
+                        fails = 0
                         send(Event.Connection(true))
                         val catchUp = launch { delay(2500); poll() }
                         val reader = r.body!!.charStream().buffered()
@@ -99,6 +141,12 @@ class Ntfy(http: OkHttpClient, private val base: String = "https://ntfy.sh") {
                 if (!isActive) break
                 send(Event.Connection(false))
                 delay(2000)
+                if (++fails >= 2 && reserve != null) {
+                    fails = 0
+                    server = if (server == base) reserve else base
+                    last = null
+                    poll()
+                }
             }
         }
         awaitClose { open?.cancel() }

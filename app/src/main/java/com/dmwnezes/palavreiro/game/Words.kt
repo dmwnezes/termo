@@ -55,11 +55,30 @@ class Words(source: String) {
     fun display(word: String): String = accented[word] ?: word
 
     /** Mesmo cálculo da versão web: dias desde 01/01/2026, com embaralhamento fixo. */
-    fun daily(date: LocalDate = LocalDate.now()): String {
-        val i = dayIndex(date)
+    fun daily(date: LocalDate = LocalDate.now()): String = dailyAt(dayIndex(date))
+
+    private fun oldDaily(i: Long): String {
         val n = poolSize(i)
-        val idx = (((i * 7919L + 104729L) % n) + n) % n
-        return answers[idx.toInt()]
+        return answers[(((i * 7919L + 104729L) % n + n) % n).toInt()]
+    }
+
+    private val newDaily = ArrayList<String>()
+
+    /** De 03/11/2026 em diante a palavra não repete nenhuma dos últimos 1000 dias. Dias anteriores não mudam, por causa do Arquivo. */
+    @Synchronized
+    private fun dailyAt(i: Long): String {
+        if (i < NO_REPEAT_FROM) return oldDaily(i)
+        var j = NO_REPEAT_FROM + newDaily.size
+        while (j <= i) {
+            val recent = HashSet<String>()
+            for (k in maxOf(0L, j - NO_REPEAT_DAYS) until j) recent += if (k < NO_REPEAT_FROM) oldDaily(k) else newDaily[(k - NO_REPEAT_FROM).toInt()]
+            val n = poolSize(j)
+            var at = (((j * 7919L + 104729L) % n + n) % n).toInt()
+            while (answers[at] in recent) at = (at + 1) % n
+            newDaily += answers[at]
+            j++
+        }
+        return newDaily[(i - NO_REPEAT_FROM).toInt()]
     }
 
     /**
@@ -99,6 +118,8 @@ class Words(source: String) {
 
     companion object {
         const val WORD_LENGTH = 5
+        private const val NO_REPEAT_FROM = 306L
+        private const val NO_REPEAT_DAYS = 1000L
         private val START: LocalDate = LocalDate.of(2026, 1, 1)
 
         fun dayIndex(date: LocalDate): Long = ChronoUnit.DAYS.between(START, date)

@@ -22,7 +22,7 @@ object PodioData {
     }
 
     /** Índice do dia: (dia * 7919 + 104729) mod N. */
-    fun dailyIndex(day: Long, n: Int): Int = Math.floorMod(day * 7919 + 104729, n.toLong()).toInt()
+    fun dailyIndex(day: Long, n: Int): Int = Math.floorMod(day * 7919 + 104729, (if (day >= 306) n else minOf(n, 155)).toLong()).toInt()
 
     /** Ordem das 10 opções no dia (MINSTD semeado com (dia + 1) * 7919). */
     fun dailyOptions(q: PodioQ, day: Long): List<String> = q.all.shuffledBy(Minstd.ofDay(day))

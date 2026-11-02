@@ -452,6 +452,17 @@ fun NavalScreen(store: Store?, feedback: Feedback?, onBack: () -> Unit, initial:
 // Com amigo (modo n): mesmas mensagens do site (js/multi-naval.js)
 // ======================================================================
 
+private fun savedDuelFleet(key: String): List<List<Int>>? = runCatching {
+    val o = org.json.JSONObject(com.dmwnezes.palavreiro.AppGraph.storeOrNull?.text("nv_mp") ?: return null)
+    if (o.getString("k") != key) return null
+    val f = o.getJSONArray("f")
+    List(f.length()) { i -> f.getJSONArray(i).let { s -> List(s.length()) { s.getInt(it) } } }.takeIf { Naval.valid(it) }
+}.getOrNull()
+
+private fun saveDuelFleet(key: String, fleet: List<List<Int>>) {
+    com.dmwnezes.palavreiro.AppGraph.storeOrNull?.setText("nv_mp", org.json.JSONObject().put("k", key).put("f", org.json.JSONArray(fleet.map { org.json.JSONArray(it) })).toString())
+}
+
 /** Batalha Naval com amigo. [msgs] = mensagens da rodada na ordem do tópico. */
 @Composable
 internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? = null) {
@@ -460,8 +471,10 @@ internal fun NavalPlay(msgs: List<Msg>, d: Duel, initialFleet: List<List<Int>>? 
     val hostId = if (d.isHost) d.myId else opp
     val guestId = if (d.isHost) opp else d.myId
     val first = Naval.firstId(d.n, hostId, guestId)
-    // shortcut: a frota fica só na memória da tela; se o app for fechado no meio da rodada, ela é sorteada de novo.
-    var fleet by remember(d.round) { mutableStateOf(initialFleet ?: Naval.place()) }
+    // A frota da rodada fica guardada: fechar o app no meio não sorteia outra (igual ao site).
+    val fleetKey = "${d.myId}-${d.n}"
+    var fleet by remember(d.round) { mutableStateOf(initialFleet ?: savedDuelFleet(fleetKey) ?: Naval.place()) }
+    LaunchedEffect(fleet, fleetKey) { saveDuelFleet(fleetKey, fleet) }
     val st = Naval.state(msgs, hostId, guestId, first, d.myId)
     val counting = now < d.localStart
     val placing = d.myId !in st.ready

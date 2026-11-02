@@ -62,6 +62,7 @@ object AppGraph {
         private set
     /** Rankings do Pódio e acontecimentos da Ampulheta (shared/podio.txt, shared/ampulheta.txt). */
     var podio: List<com.dmwnezes.palavreiro.game.PodioQ> = emptyList()
+    var cruzada: List<com.dmwnezes.palavreiro.game.CruzadaQ> = emptyList()
         private set
     var ampulheta: List<com.dmwnezes.palavreiro.game.AmpEvent> = emptyList()
         private set
@@ -73,7 +74,7 @@ object AppGraph {
         private set
 
     /** Mensagens da partida com amigo (ntfy.sh). */
-    val ntfy by lazy { com.dmwnezes.palavreiro.system.Ntfy(http) }
+    val ntfy by lazy { com.dmwnezes.palavreiro.system.Ntfy(http, reserve = "https://ntfy.envs.net") }
 
     private var ready = false
 
@@ -101,6 +102,7 @@ object AppGraph {
         QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
         trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
+        cruzada = runCatching { com.dmwnezes.palavreiro.game.Cruzada.parse(asset("cruzada.txt")) }.getOrDefault(emptyList())
         podio = runCatching { com.dmwnezes.palavreiro.game.PodioData.parse(asset("podio.txt")) }.getOrDefault(emptyList())
         ampulheta = runCatching { com.dmwnezes.palavreiro.game.AmpulhetaData.parse(asset("ampulheta.txt")) }.getOrDefault(emptyList())
         sudoku = runCatching { com.dmwnezes.palavreiro.game.SudokuData.parse(asset("sudoku.txt")) }.getOrDefault(emptyMap())

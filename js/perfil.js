@@ -3,7 +3,35 @@
   "use strict";
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   const TABS = ["Resumo", "Conquistas", "Ajustes"];
-  const SITE_VERSION = "20";
+
+  /** Janela para receber o progresso: aceita o código curto ou o código completo (PV1-…). */
+  P.syncReceiveSheet = (code, done) => {
+    const ui = P.sheet(`<h2>Receber progresso</h2><p class="subtitle">Digite o código de 6 letras ou cole o código completo</p>
+      <textarea class="sync-box" data-code placeholder="Ex.: 7K2MQX" aria-label="Código de sincronização">${P.esc(code || "")}</textarea>
+      <button class="pill wide" data-import style="margin-top:12px">Receber</button>`);
+    P.$("[data-import]", ui.el).onclick = async (e) => {
+      const v = P.$("[data-code]", ui.el).value, short = P.syncShort(v);
+      e.target.disabled = true;
+      const ok = short ? await P.syncReceive(short) : P.syncImport(v);
+      e.target.disabled = false;
+      if (ok) { ui.close(); P.toast("Progresso sincronizado!"); P.fx.win(); if (done) done(); }
+      else { P.fx.invalid(); P.toast(short ? "Código não encontrado ou vencido" : "Código inválido"); }
+    };
+  };
+
+  /** Retrospectiva do ano: resumo na tela e cartão para Stories. */
+  P.retroSheet = () => {
+    const r = P.retro(), pct = r.termoPlayed ? Math.round((r.termoWon / r.termoPlayed) * 100) : 0;
+    if (!r.days) return P.sheet(`<h2>Retrospectiva de ${r.year}</h2><p class="subtitle">Jogue um pouco e volte aqui para ver o seu ano.</p>`);
+    const line = (ico, big, small) => `<div class="retro-row"><span aria-hidden="true">${ico}</span><b>${P.esc(String(big))}</b><small>${small}</small></div>`;
+    const ui = P.sheet(`<h2>Sua retrospectiva de ${r.year}</h2>
+      <div class="retro-list">${line("📅", r.days, r.days === 1 ? "dia jogado" : "dias jogados")}${line("🎮", r.games, r.games === 1 ? "jogo" : "jogos")}${line("🔥", r.bestRun, "dias seguidos, no máximo")}
+      ${line("🗓️", r.month, "seu mês mais animado")}${r.termoPlayed ? line("🟩", pct + "%", `de vitórias em ${r.termoPlayed} ${r.termoPlayed === 1 ? "Termo" : "Termos"} do dia`) : ""}
+      ${r.topGame ? line("🏅", r.topGame, "seu desafio mais jogado") : ""}${r.topGuess ? line("🎯", P.words.display(r.topGuess), "seu chute inicial favorito") : ""}</div>
+      <button class="pill wide" data-story style="margin-top:14px">Compartilhar nos Stories</button>`);
+    P.$("[data-story]", ui.el).onclick = () => P.story({ game: `Retrospectiva ${r.year}`, headline: `${r.days} ${r.days === 1 ? "dia" : "dias"} jogando`, detail: `Meu mês mais animado: ${r.month}`, grids: [],
+      stats: [[String(r.games), "jogos"], [String(r.bestRun), "dias seguidos"], [r.termoPlayed ? pct + "%" : "—", "no Termo"]] });
+  };
 
   P.games.perfil = function (root) {
     const modes = [["termo", "Termo", 6], ["infinito", "Infinito", 6], ["dueto", "Dueto", 7], ["quarteto", "Quarteto", 9]];
@@ -95,6 +123,9 @@
             `${lv.slice().reverse().map(([k, a]) => `${a} ${g("sudoku-best-" + k) ? P.fmtTime(g("sudoku-best-" + k)) : "—"}`).join(" · ")} · ${pl(g("sudoku-won") || 0, "vitória", "vitórias")}`]; })(),
         (() => { const w = ["facil", "medio", "dificil"].map((k) => g("xadrez-won-" + k) || 0), t = w[0] + w[1] + w[2];
           return ["♟️", "Xeque", "var(--accent)", t, t === 1 ? "vitória" : "vitórias", `F ${w[0]} · M ${w[1]} · D ${w[2]}`]; })(),
+        ["✏️", "Palavra Cruzada", "var(--correct)", g("cruz-won"), g("cruz-won") === 1 ? "resolvida" : "resolvidas", pl(g("cruz-perfect"), "de primeira", "de primeira")],
+        (() => { const w = ["facil", "medio", "dificil"].map((k) => g("naval-won-" + k) || 0), t = w[0] + w[1] + w[2];
+          return ["🚢", "Batalha Naval", "var(--blue)", t, t === 1 ? "vitória" : "vitórias", `F ${w[0]} · M ${w[1]} · D ${w[2]}`]; })(),
         ["🗂️", "Arquivo", "var(--present)", g("arch-played"), g("arch-played") === 1 ? "desafio" : "desafios", pl(g("arch-won") || 0, "vencido", "vencidos")],
         ["⚔️", "Com amigos", "var(--blue)", g("mp-won"), g("mp-won") === 1 ? "vitória" : "vitórias", `em ${pl(g("mp-played"), "partida", "partidas")}`],
       ];
@@ -110,6 +141,7 @@
     function resumo() {
       const s = P.stats(modes[tab][0]);
       body.innerHTML = `
+        <button class="retro-btn" data-retro><span aria-hidden="true">🎁</span><span><b>Sua retrospectiva de ${now.getFullYear()}</b><small>Seu ano no Palavreiro, para ver e compartilhar</small></span><span aria-hidden="true">›</span></button>
         <div class="section"><h3>Calendário</h3>${calendar()}</div>
         <div class="section"><h3>Estatísticas</h3>
           <div class="seg">${modes.map(([, n], i) => `<button class="${i === tab ? "on" : ""}" data-tab="${i}">${n}</button>`).join("")}</div>
@@ -120,6 +152,7 @@
           ${P.evolutionHTML(evo)}</div>
         <div class="section"><h3>Seus chutes</h3>${chutes()}</div>
         <div class="section"><h3>Recordes</h3>${records()}</div>`;
+      P.$("[data-retro]", body).onclick = () => P.retroSheet();
       body.querySelectorAll("[data-tab]").forEach((b) => (b.onclick = () => { tab = +b.dataset.tab; draw(); }));
       body.querySelectorAll("[data-evo]").forEach((b) => (b.onclick = () => { evo = b.dataset.evo; draw(); }));
       P.$("[data-prev]", body).onclick = () => { ym = ym[1] === 0 ? [ym[0] - 1, 11] : [ym[0], ym[1] - 1]; draw(); };
@@ -145,12 +178,13 @@
           <div class="toggle"><span>Modo difícil</span><button class="switch ${set.hard ? "on" : ""}" data-set="hard" aria-label="Modo difícil" aria-pressed="${set.hard}"></button></div>
           <p class="muted" style="font-size:.8rem;margin:0">Vale a partir da próxima partida do Termo e do Infinito.</p></div>
         <div class="section"><h3>Sincronizar site e app</h3>
-          <p class="muted" style="font-size:.9rem;margin-top:0">Copie seu código aqui e cole no app (ou o contrário). O progresso dos dois é juntado, sem apagar nada.</p>
-          <div class="row-btns"><button class="pill ghost" data-copy>Copiar meu código</button><button class="pill" data-paste>Colar código</button></div></div>
+          <p class="muted" style="font-size:.9rem;margin-top:0">Envie daqui e receba no outro aparelho. O progresso dos dois é juntado, sem apagar nada.</p>
+          <div class="row-btns"><button class="pill" data-send>Enviar progresso</button><button class="pill ghost" data-get>Receber progresso</button></div>
+          <button class="link-btn" data-copy>Copiar código completo</button></div>
         <div class="section">
           <div class="toggle"><span>Como jogar</span><button class="icon-btn" data-howto aria-label="Como jogar">›</button></div>
           <div class="toggle"><span>App para Android</span><a class="pill ghost" style="text-decoration:none;padding:9px 14px" href="https://github.com/dmwnezes/termo/releases/latest/download/Palavreiro.apk">Baixar</a></div>
-          <p class="muted" style="font-size:.8rem;margin:4px 0 0">Versão do site ${SITE_VERSION}</p></div>`;
+          <p class="muted" style="font-size:.8rem;margin:4px 0 0">Site atualizado em ${new Date(document.lastModified).toLocaleDateString("pt-BR")}</p></div>`;
       body.querySelectorAll("[data-set]").forEach((b) => (b.onclick = () => { const s2 = P.settings(); s2[b.dataset.set] = !s2[b.dataset.set]; P.saveSettings(s2); draw(); }));
       P.$("[data-howto]", body).onclick = () => P.games.help();
       P.$("[data-copy]", body).onclick = async () => {
@@ -161,15 +195,16 @@
           const ta = P.$("textarea", ui.el); ta.focus(); ta.select();
         }
       };
-      P.$("[data-paste]", body).onclick = () => {
-        const ui = P.sheet(`<h2>Colar código</h2><p class="subtitle">Cole o código copiado no app ou em outro navegador</p>
-          <textarea class="sync-box" data-code placeholder="PV1-…" aria-label="Código de sincronização"></textarea>
-          <button class="pill wide" data-import style="margin-top:12px">Importar</button>`);
-        P.$("[data-import]", ui.el).onclick = () => {
-          if (P.syncImport(P.$("[data-code]", ui.el).value)) { ui.close(); P.toast("Progresso sincronizado!"); P.fx.win(); draw(); }
-          else { P.fx.invalid(); P.toast("Código inválido"); }
-        };
+      P.$("[data-send]", body).onclick = async (e) => {
+        e.target.disabled = true;
+        const code = await P.syncSend();
+        e.target.disabled = false;
+        if (!code) return P.toast("Sem conexão. Use o código completo.");
+        const link = P.syncLink(code);
+        P.sheet(`<h2>Código para receber</h2><p class="subtitle">Digite no outro aparelho ou aponte a câmera. Vale por algumas horas.</p>
+          <div class="sync-code">${code}</div><div class="sync-qr">${P.mp.qrSvg ? P.mp.qrSvg(link) : ""}</div>`);
       };
+      P.$("[data-get]", body).onclick = () => P.syncReceiveSheet("", draw);
     }
 
     function draw() { head(); [resumo, conquistas, ajustes][page](); }

@@ -3,7 +3,6 @@
 (function () {
   "use strict";
   const P = (window.P = { games: {} });
-  const V = "21"; // versão dos arquivos de conteúdo
 
   P.$ = (sel, root = document) => root.querySelector(sel);
   P.h = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -27,13 +26,56 @@
     return { answers: list, base, from, display: (w) => acc[w] || w, ok: (w) => accepted.has(w), all: accepted };
   })();
 
+  // ---------- mensagens (ntfy) ----------
+  // Tudo é publicado nos dois servidores; quem recebe ouve um só e troca para o outro se ele cair.
+  // Testes: localStorage "pv-ntfy" e "pv-ntfy2" trocam os servidores.
+  const relayUrl = (k) => { try { const v = localStorage.getItem(k); if (v && /^https?:\/\//.test(v)) return v.endsWith("/") ? v : v + "/"; } catch (_) {} return null; };
+  P.relay = {
+    servers: (() => { const a = relayUrl("pv-ntfy"), b = relayUrl("pv-ntfy2"); return a ? (b ? [a, b] : [a]) : ["https://ntfy.sh/", "https://ntfy.envs.net/"]; })(),
+    signal: (ms) => (typeof AbortSignal !== "undefined" && AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined),
+    /** Publica em todos os servidores. Devolve true se algum aceitou. */
+    post(topic, body, keepalive = false) {
+      return Promise.all(P.relay.servers.map((u) => fetch(u + topic, { method: "POST", body, keepalive, signal: P.relay.signal(8000) }).then((r) => r.ok).catch(() => false))).then((l) => l.some(Boolean));
+    },
+    /** Lê o histórico do tópico no primeiro servidor que tiver mensagens. Devolve a lista de textos. */
+    async history(topic) {
+      for (const u of P.relay.servers) {
+        try {
+          const r = await fetch(`${u}${topic}/json?poll=1&since=all`, { signal: P.relay.signal(8000) });
+          if (!r.ok) continue;
+          const l = (await r.text()).split("\n").filter(Boolean).map((x) => JSON.parse(x)).filter((e) => e.event === "message").map((e) => e.message);
+          if (l.length) return l;
+        } catch (_) {}
+      }
+      return [];
+    },
+  };
+
   // ---------- datas ----------
   P.dayIndex = (d = new Date()) => Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 0, 1)) / 86400000);
   P.dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const mod = (a, n) => ((a % n) + n) % n;
   /** Quantas palavras entram no sorteio do dia nessa data (as novas só a partir de ANSWERS2_FROM). */
+  /** Quantos itens de um conteúdo diário valem no dia i: os novos só de 03/11/2026 em diante, por causa do Arquivo. */
+  P.dailyCount = (i, total, base) => (i >= 306 ? total : Math.min(total, base));
   const poolSize = (i) => (i >= P.words.from ? P.words.answers.length : P.words.base);
-  P.daily = (d = new Date()) => { const i = P.dayIndex(d); return P.words.answers[mod(i * 7919 + 104729, poolSize(i))]; };
+  // De 03/11/2026 em diante a palavra não repete nenhuma dos últimos 1000 dias. Dias anteriores não mudam, por causa do Arquivo. Mesmo cálculo no app.
+  const NO_REPEAT_FROM = 306, NO_REPEAT_DAYS = 1000;
+  const oldDaily = (i) => P.words.answers[mod(i * 7919 + 104729, poolSize(i))];
+  const newDaily = [];
+  const dailyAt = (i) => {
+    if (i < NO_REPEAT_FROM) return oldDaily(i);
+    for (let j = NO_REPEAT_FROM + newDaily.length; j <= i; j++) {
+      const recent = new Set();
+      for (let k = Math.max(0, j - NO_REPEAT_DAYS); k < j; k++) recent.add(k < NO_REPEAT_FROM ? oldDaily(k) : newDaily[k - NO_REPEAT_FROM]);
+      const n = poolSize(j);
+      let at = mod(j * 7919 + 104729, n);
+      while (recent.has(P.words.answers[at])) at = (at + 1) % n;
+      newDaily.push(P.words.answers[at]);
+    }
+    return newDaily[i - NO_REPEAT_FROM];
+  };
+  P.daily = (d = new Date()) => dailyAt(P.dayIndex(d));
   /** Palavras do dia para Dueto (salt 1) e Quarteto (salt 2). */
   P.dailySet = (d, count, salt) => {
     if (count === 1 && salt === 0) return [P.daily(d)];
@@ -120,7 +162,7 @@
 
   // ---------- conteúdo (arquivos .txt compartilhados com o app) ----------
   const cache = {};
-  P.text = (name) => cache[name] || (cache[name] = fetch(`shared/${name}?v=${V}`).then((r) => r.text()));
+  P.text = (name) => cache[name] || (cache[name] = fetch(`shared/${name}`).then((r) => r.text()));
   P.meanings = () => P.text("significados.txt").then((t) => {
     const m = {};
     t.split("\n").forEach((l) => { const i = l.indexOf("|"); if (i > 0) m[P.norm(l.slice(0, i).trim())] = l.slice(i + 1).trim(); });
@@ -175,7 +217,7 @@
   };
 
   P.creditHTML = () => `<a class="credit" href="https://www.instagram.com/dmwnezes/" target="_blank" rel="noopener">
-      <img src="img/criador.jpg?v=7" alt="Foto de @dmwnezes" width="34" height="34" /><span>criado por: <b>@dmwnezes</b></span></a>`;
+      <img src="img/criador.jpg" alt="Foto de @dmwnezes" width="34" height="34" /><span>criado por: <b>@dmwnezes</b></span></a>`;
 
   P.topbar = (title, { help, extra = "" } = {}) => `<div class="topbar">
       <button class="icon-btn" data-back aria-label="Voltar">←</button>

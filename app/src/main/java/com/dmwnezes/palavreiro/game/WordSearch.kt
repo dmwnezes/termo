@@ -37,6 +37,15 @@ object WordSearchData {
         throw lastError ?: IllegalStateException()
     }
 
+    /** De 03/11/2026 em diante os temas extras também entram no desafio do dia (com 8 palavras, como no Infinito). */
+    fun daily(date: LocalDate, themes: List<SearchTheme>, all: List<SearchTheme>): WordSearch {
+        val i = Words.dayIndex(date)
+        val seed = i * 31 + 17
+        if (i < 306) return WordSearch(themes[dailyIndex(date, themes.size)], seed = seed)
+        val t = all[dailyIndex(date, all.size)]
+        return WordSearch(t.copy(words = t.words.take(8)), seed = seed)
+    }
+
     fun dailyIndex(date: LocalDate, count: Int): Int {
         val i = Words.dayIndex(date)
         return (((i * 11L + 3L) % count + count) % count).toInt()

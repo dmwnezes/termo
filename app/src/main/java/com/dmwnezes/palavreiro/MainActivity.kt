@@ -106,6 +106,8 @@ object Launch {
     var challenge by mutableStateOf<String?>(null)
     /** Código da partida com amigo (?mp=...). */
     var multi by mutableStateOf<String?>(null)
+    /** Código curto de sincronização (?sync=...). */
+    var sync by mutableStateOf<String?>(null)
     /** Muda quando o app deve voltar para a sala guardada (aviso "seu amigo entrou"). */
     var resume by mutableIntStateOf(0)
     /** Toque na notificação "Atualização pronta". */
@@ -116,6 +118,7 @@ object Launch {
         intent.getStringExtra("dest")?.let { pending = it }
         intent.data?.getQueryParameter("d")?.let { code -> Challenge.decode(code)?.let { challenge = it } }
         intent.data?.getQueryParameter("mp")?.let { multi = it }
+        intent.data?.getQueryParameter("sync")?.let { sync = com.dmwnezes.palavreiro.data.Sync.short(it) }
         if (intent.getBooleanExtra("mp_resume", false)) resume++
         if (intent.getBooleanExtra(com.dmwnezes.palavreiro.update.AutoUpdate.EXTRA_INSTALL, false)) installUpdate = true
     }
@@ -168,8 +171,9 @@ fun PalavreiroApp() {
     }
 
     // Abre o destino pedido por atalho, widget, notificação ou link.
-    LaunchedEffect(Launch.pending, Launch.challenge, Launch.multi, Launch.resume, splash) {
+    LaunchedEffect(Launch.pending, Launch.challenge, Launch.multi, Launch.resume, Launch.sync, splash) {
         if (splash) return@LaunchedEffect
+        if (Launch.sync != null) { screen = Screen.Profile; return@LaunchedEffect } // a aba Ajustes abre a janela de receber
         Launch.multi?.let { code ->
             Launch.multi = null
             // O link da mesma sala em que você já está guardado: volta para ela em vez de entrar de novo.
@@ -234,6 +238,7 @@ fun PalavreiroApp() {
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.MATIZ to if (store.text("matiz_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.CRUZADA to if (store.text("cruz_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.PODIO to if (store.text("podio_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.AMPULHETA to if (store.text("amp_done") == today) "Feito hoje ✓" else "Novo",
                         )
@@ -268,6 +273,7 @@ fun PalavreiroApp() {
                         Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
                         Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         Dest.MATIZ -> com.dmwnezes.palavreiro.ui.MatizScreen(store, AppGraph.feedback, back)
+                        Dest.CRUZADA -> com.dmwnezes.palavreiro.ui.CruzadaScreen(AppGraph.cruzada, store, AppGraph.feedback, back)
                         Dest.PODIO -> com.dmwnezes.palavreiro.ui.PodioScreen(AppGraph.podio, store, AppGraph.feedback, back)
                         Dest.AMPULHETA -> com.dmwnezes.palavreiro.ui.AmpulhetaScreen(AppGraph.ampulheta, store, AppGraph.feedback, back)
                         Dest.SUDOKU -> com.dmwnezes.palavreiro.ui.SudokuScreen(AppGraph.sudoku, store, AppGraph.feedback, back)

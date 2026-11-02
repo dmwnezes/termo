@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.LocalContext
 import com.dmwnezes.palavreiro.system.Reminder
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +75,7 @@ fun ProfileScreen(
     scroll: androidx.compose.foundation.ScrollState = rememberScrollState(),
 ) {
     var page by remember { mutableIntStateOf(startTab) }
+    LaunchedEffect(com.dmwnezes.palavreiro.Launch.sync) { if (com.dmwnezes.palavreiro.Launch.sync != null) page = 2 }
     val daily = stats[Mode.DIARIO] ?: Stats()
     val infinite = stats[Mode.INFINITO] ?: Stats()
     val achievements = Achievements.all(daily, infinite, stats[Mode.DUETO] ?: Stats(), stats[Mode.QUARTETO] ?: Stats(), records)
@@ -119,6 +122,7 @@ fun ProfileScreen(
 private fun SummaryTab(store: Store?, stats: Map<Mode, Stats>, records: Records) {
     var tab by remember { mutableStateOf(0) }
     val modes = Mode.entries.filter { it != Mode.DESAFIO }
+    store?.let { RetroCard(it) }
     Section("Calendário") {
         StreakCalendar(store?.activity() ?: emptyMap(), store?.termoResults() ?: emptyMap())
     }
@@ -231,8 +235,15 @@ private fun AchievementsTab(list: List<com.dmwnezes.palavreiro.game.Achievement>
 
 @Composable
 private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () -> Unit, onSynced: () -> Unit, toast: ToastState) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var syncBusy by remember { mutableStateOf(false) }
+    var sentCode by remember { mutableStateOf<String?>(null) }
+    var code by remember { mutableStateOf("") }
     val context = LocalContext.current
     var showImport by remember { mutableStateOf(false) }
+    LaunchedEffect(com.dmwnezes.palavreiro.Launch.sync) {
+        com.dmwnezes.palavreiro.Launch.sync?.let { code = it; showImport = true; com.dmwnezes.palavreiro.Launch.sync = null }
+    }
     Section("Jogo") {
         var sound by remember { mutableStateOf(store?.sound ?: true) }
         var vib by remember { mutableStateOf(store?.vibration ?: true) }
@@ -290,17 +301,30 @@ private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () ->
         }
     }
     Section("Sincronizar site e app") {
-        Text("Leve seu progresso entre o app e o site com um código. Nada é apagado: os dados são somados.", fontSize = 13.sp, color = Night.muted)
+        Text("Envie daqui e receba no outro aparelho. O progresso dos dois é juntado, sem apagar nada.", fontSize = 13.sp, color = Night.muted)
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PillButton("Copiar meu código", Night.accent, modifier = Modifier.weight(1f)) {
+            PillButton("Enviar progresso", Night.accent, modifier = Modifier.weight(1f), enabled = !syncBusy) {
                 val st = store ?: return@PillButton
+                syncBusy = true
+                scope.launch {
+                    val c = com.dmwnezes.palavreiro.data.Sync.send(com.dmwnezes.palavreiro.AppGraph.ntfy, st)
+                    syncBusy = false
+                    if (c == null) toast.show("Sem conexão. Use o código completo.") else sentCode = c
+                }
+            }
+            PillButton("Receber progresso", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { showImport = true }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Copiar código completo", fontSize = 13.sp, color = Night.muted, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+            modifier = Modifier.clip(Shapes.pill).clickable {
+                val st = store ?: return@clickable
                 val cm = context.getSystemService(android.content.ClipboardManager::class.java)
                 cm?.setPrimaryClip(android.content.ClipData.newPlainText("Código Palavreiro", com.dmwnezes.palavreiro.data.Sync.export(st)))
                 toast.show("Código copiado! Cole no site.")
-            }
-            PillButton("Colar código", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { showImport = true }
-        }
+            }.padding(vertical = 6.dp),
+        )
     }
     Section("Sobre") {
         ActionRow("Como jogar", onClick = onHelp)
@@ -313,38 +337,135 @@ private fun SettingsTab(store: Store?, onCheckUpdates: () -> Unit, onHelp: () ->
         Text("Baixa a versão nova sozinho e instala quando o app não estiver na tela.", fontSize = 12.sp, color = Night.muted)
         ActionRow("Buscar atualização", detail = "Versão ${Updater.currentName}", onClick = onCheckUpdates)
     }
+    sentCode?.let { c ->
+        androidx.compose.ui.window.Dialog(onDismissRequest = { sentCode = null }) {
+            Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Código para receber", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
+                Spacer(Modifier.height(6.dp))
+                Text("Digite no outro aparelho ou aponte a câmera. Vale por algumas horas.", fontSize = 13.sp, color = Night.muted)
+                Spacer(Modifier.height(12.dp))
+                Text(c, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = Night.text, letterSpacing = 4.sp)
+                Spacer(Modifier.height(12.dp))
+                QrCode(com.dmwnezes.palavreiro.data.Sync.link(c), Modifier.size(200.dp))
+                Spacer(Modifier.height(14.dp))
+                PillButton("Fechar", Night.surfaceHigh, Night.text, Modifier.fillMaxWidth()) { sentCode = null }
+            }
+        }
+    }
     if (showImport) {
-        var code by remember { mutableStateOf("") }
+        var scanning by remember { mutableStateOf(false) }
+        if (scanning) {
+            androidx.compose.ui.window.Dialog(
+                onDismissRequest = { scanning = false },
+                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            ) {
+                QrScanner(
+                    onResult = { t -> scanning = false; code = com.dmwnezes.palavreiro.data.Sync.short(t) ?: t },
+                    onClose = { scanning = false },
+                    accept = { com.dmwnezes.palavreiro.data.Sync.short(it) != null },
+                )
+            }
+        }
         androidx.compose.ui.window.Dialog(onDismissRequest = { showImport = false }) {
             Column(Modifier.fillMaxWidth().clip(Shapes.card).background(Night.surface).padding(20.dp)) {
-                Text("Colar código", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
+                Text("Receber progresso", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
                 Spacer(Modifier.height(6.dp))
-                Text("No site, abra Perfil › Ajustes › Copiar meu código e cole aqui.", fontSize = 13.sp, color = Night.muted)
+                Text("Digite o código de 6 letras, leia o QR ou cole o código completo.", fontSize = 13.sp, color = Night.muted)
                 Spacer(Modifier.height(12.dp))
                 androidx.compose.material3.OutlinedTextField(
-                    value = code, onValueChange = { code = it }, placeholder = { Text("PV1-…") },
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    value = code, onValueChange = { code = it }, placeholder = { Text("Ex.: 7K2MQX") },
+                    modifier = Modifier.fillMaxWidth().height(96.dp),
                     colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Night.text, unfocusedTextColor = Night.text,
                         focusedBorderColor = Night.accent, unfocusedBorderColor = Night.outline, cursorColor = Night.accent,
                     ),
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    "Colar da área de transferência", fontSize = 14.sp, color = Night.accent, fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clip(Shapes.pill).clickable {
-                        val cm = context.getSystemService(android.content.ClipboardManager::class.java)
-                        cm?.primaryClip?.getItemAt(0)?.text?.let { code = it.toString() }
-                    }.padding(vertical = 6.dp),
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        "Ler QR", fontSize = 14.sp, color = Night.accent, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(Shapes.pill).clickable { scanning = true }.padding(vertical = 6.dp),
+                    )
+                    Text(
+                        "Colar", fontSize = 14.sp, color = Night.accent, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(Shapes.pill).clickable {
+                            val cm = context.getSystemService(android.content.ClipboardManager::class.java)
+                            cm?.primaryClip?.getItemAt(0)?.text?.let { code = it.toString() }
+                        }.padding(vertical = 6.dp),
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PillButton("Cancelar", Night.surfaceHigh, Night.text, Modifier.weight(1f)) { showImport = false }
-                    PillButton("Importar", Night.correct, modifier = Modifier.weight(1f), enabled = code.isNotBlank()) {
-                        val ok = store != null && com.dmwnezes.palavreiro.data.Sync.import(store, code)
-                        if (ok) { showImport = false; toast.show("Progresso sincronizado!"); onSynced() } else toast.show("Código inválido")
+                    PillButton("Receber", Night.correct, modifier = Modifier.weight(1f), enabled = code.isNotBlank() && !syncBusy) {
+                        val st = store ?: return@PillButton
+                        val short = com.dmwnezes.palavreiro.data.Sync.short(code)
+                        syncBusy = true
+                        scope.launch {
+                            val ok = if (short != null) com.dmwnezes.palavreiro.data.Sync.receive(com.dmwnezes.palavreiro.AppGraph.ntfy, st, short)
+                            else com.dmwnezes.palavreiro.data.Sync.import(st, code)
+                            syncBusy = false
+                            if (ok) { showImport = false; code = ""; toast.show("Progresso sincronizado!"); onSynced() }
+                            else toast.show(if (short != null) "Código não encontrado ou vencido" else "Código inválido")
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** Retrospectiva do ano: cartão no Resumo, janela com os números e imagem para os Stories. */
+@Composable
+private fun RetroCard(store: Store) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var open by remember { mutableStateOf(false) }
+    val year = LocalDate.now().year
+    Row(
+        Modifier.fillMaxWidth().padding(bottom = 16.dp).clip(Shapes.card).background(Night.surface).clickable { open = true }.padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("🎁", fontSize = 24.sp)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text("Sua retrospectiva de $year", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Night.text)
+            Text("Seu ano no Palavreiro, para ver e compartilhar", fontSize = 13.sp, color = Night.muted)
+        }
+        Text("›", fontSize = 22.sp, color = Night.muted)
+    }
+    if (!open) return
+    val guesses = store.firstGuesses().let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it) }.map { it.optString("w") to it.optString("d") } }
+    val r = com.dmwnezes.palavreiro.game.Retro.of(year, store.activity(), store.termoResults(), store.results().keys, guesses)
+    BottomSheet({ open = false }) {
+        SheetTitle("Sua retrospectiva de $year", if (r.days == 0) "Jogue um pouco e volte aqui para ver o seu ano." else null)
+        if (r.days > 0) {
+            @Composable fun line(icon: String, big: String, small: String) {
+                Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(icon, fontSize = 22.sp)
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text(big, fontSize = 19.sp, fontWeight = FontWeight.ExtraBold, color = Night.text)
+                        Text(small, fontSize = 13.sp, color = Night.muted)
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            line("📅", "${r.days}", if (r.days == 1) "dia jogado" else "dias jogados")
+            line("🎮", "${r.games}", if (r.games == 1) "jogo" else "jogos")
+            line("🔥", "${r.bestRun}", "dias seguidos, no máximo")
+            r.month?.let { line("🗓️", it, "seu mês mais animado") }
+            if (r.termoPlayed > 0) line("🟩", "${r.termoPct}%", "de vitórias em ${r.termoPlayed} ${if (r.termoPlayed == 1) "Termo" else "Termos"} do dia")
+            r.topGame?.let { line("🏅", it, "seu desafio mais jogado") }
+            r.topGuess?.let { line("🎯", com.dmwnezes.palavreiro.AppGraph.displayWord(it), "seu chute inicial favorito") }
+            Spacer(Modifier.height(12.dp))
+            PillButton("Compartilhar nos Stories", Night.correct, modifier = Modifier.fillMaxWidth()) {
+                StoryCard.share(
+                    context,
+                    StoryData(
+                        "Retrospectiva $year", "${r.days} ${if (r.days == 1) "dia" else "dias"} jogando", "Meu mês mais animado: ${r.month}", emptyList(),
+                        listOf("${r.games}" to "jogos", "${r.bestRun}" to "dias seguidos", (if (r.termoPlayed > 0) "${r.termoPct}%" else "—") to "no Termo"),
+                    ),
+                )
             }
         }
     }

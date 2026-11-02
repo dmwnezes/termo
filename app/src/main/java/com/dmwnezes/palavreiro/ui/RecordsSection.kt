@@ -59,6 +59,10 @@ fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
         (r["xadrez_won_facil"] + r["xadrez_won_medio"] + r["xadrez_won_dificil"]).let { w ->
             RecordCardInfo(Dest.XADREZ, "Xeque", v(w), if (w == 1) "vitória" else "vitórias", "${r["xadrez_won_dificil"]} no Difícil")
         },
+        RecordCardInfo(Dest.CRUZADA, "Palavra Cruzada", v(r["cruz_won"]), if (r["cruz_won"] == 1) "resolvida" else "resolvidas", plural(r["cruz_perfect"], "de primeira", "de primeira")),
+        (r["naval_won_facil"] + r["naval_won_medio"] + r["naval_won_dificil"]).let { w ->
+            RecordCardInfo(Dest.NAVAL, "Batalha Naval", v(w), if (w == 1) "vitória" else "vitórias", "${r["naval_won_dificil"]} no Difícil")
+        },
         RecordCardInfo(Dest.ARQUIVO, "Arquivo", v(r["arch_played"]), if (r["arch_played"] == 1) "desafio" else "desafios", plural(r["arch_won"], "vencido", "vencidos")),
         RecordCardInfo(Dest.DESAFIAR, "Com amigos", v(r["mp_won"]), if (r["mp_won"] == 1) "vitória" else "vitórias", "em ${plural(r["mp_played"], "partida", "partidas")}"),
     )

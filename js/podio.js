@@ -11,7 +11,7 @@
   const parse = (t) => t.split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"))
     .map((l) => l.split("|").map((s) => s.trim())).filter((f) => f.length >= 11 && f.slice(0, 11).every(Boolean))
     .map((f) => ({ title: f[0], top: f.slice(1, 6), wrong: f.slice(6, 11) }));
-  const dailyIdx = (day, n) => (((day * 7919 + 104729) % n) + n) % n;
+  const dailyIdx = (day, n) => { const c = P.dailyCount(day, n, 155); return (((day * 7919 + 104729) % c) + c) % c; };
   /** Ordem do dia: Fisher–Yates (i de 9 a 1, j = próximo MINSTD mod (i+1)) sobre 1º..5º seguidos das 5 erradas. */
   const dailyOrder = (q, day) => { const next = P.minstd(day), a = q.top.concat(q.wrong); for (let i = a.length - 1; i > 0; i--) { const j = next() % (i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const judge = (q, row) => row.map((w, i) => (w === q.top[i] ? "c" : q.top.includes(w) ? "p" : "a"));

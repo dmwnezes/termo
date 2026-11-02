@@ -70,7 +70,9 @@ object ConnectionsData {
     /** Desafio do dia, sempre o mesmo para todos na mesma data. */
     fun dailyIndex(date: LocalDate, count: Int): Int {
         val i = Words.dayIndex(date)
-        return (((i * 13L + 7L) % count + count) % count).toInt()
+        // Desafios novos só de 03/11/2026 em diante, por causa do Arquivo.
+        val n = if (i >= 306) count else minOf(count, 46)
+        return (((i * 13L + 7L) % n + n) % n).toInt()
     }
 }
 

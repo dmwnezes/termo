@@ -40,6 +40,7 @@
     quadrante: `<div class="sdk-ico" aria-hidden="true">${[5, 3, "", "", 7, "", 6, "", 9].map((d, i) => `<i class="${i === 4 ? "on" : ""}">${d}</i>`).join("")}</div>`,
     xeque: `<div class="xz-ico" aria-hidden="true"><i></i><i></i><i></i><i></i><b>♞&#xFE0E;</b></div>`,
     // Batalha Naval: pedaço do mar com um navio (cápsula) e um acerto.
+    cruzada: `<div class="cz-ico" aria-hidden="true">${[1, 1, 1, 0, 1, 0, 1, 1, 1].map((v) => `<i class="${v ? "" : "b"}"></i>`).join("")}</div>`,
     naval: `<div class="nv-ico" aria-hidden="true"><i></i><i class="h"></i><i></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="m"></i><i></i><i></i></div>`,
     desafiar: `<div style="text-align:center"><div style="font-size:22px;color:var(--present)">✉</div><div class="mini" style="grid-template-columns:repeat(5,8px)">${'<i style="width:8px;height:8px;background:var(--accent)"></i>'.repeat(5)}</div></div>`,
   };
@@ -56,6 +57,7 @@
     const more = [
       ["conexoes", "Conexões", "Separe 16 palavras em 4 grupos", badge(P.store.get("conn-done") === today)],
       ["caca", "Caça-Palavras", "Ache as palavras do tema do dia", badge(P.store.get("ws-done") === today)],
+      ["cruzada", "Palavra Cruzada", "Seis palavras cruzadas por dia", badge(dd("cruzada"))],
       ["intruso", "Intruso", "Ache a palavra que não pertence ao grupo", ""],
       ["ortografia", "Certo ou Errado", "A palavra está escrita certo?", ""],
       ["mestre", "Mestre Mandou", "Obedeça só quando o mestre mandar", ""],
@@ -73,7 +75,7 @@
     ];
     // Celular: abas por categoria (layout B). Computador: grade de ícones + prévia ao lado (layout E).
     const CATS = [
-      ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
+      ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "cruzada", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
       ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque", "naval"]],
       ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta"]],
     ];
@@ -148,6 +150,7 @@
       desafiar: () => P.games.challengeCreate(app),
       amigo: () => (parts[1] === "entrar" ? P.games.mpJoin(app) : (parts[1] === "sala" && P.games.mpResume(app)) || P.games.mpCreate(app)),
       perfil: () => P.games.perfil(app),
+      cruzada: () => P.games.cruzada(app),
       intruso: () => P.games.intruso(app),
       ortografia: () => P.games.ortografia(app),
       trivia: () => P.games.trivia(app),
@@ -202,6 +205,13 @@
 
   window.addEventListener("hashchange", route);
   route();
+
+  // Link de sincronização (?sync=CÓDIGO): abre a janela de receber já preenchida.
+  const syncCode = P.syncShort(new URLSearchParams(location.search).get("sync"));
+  if (syncCode) { history.replaceState(null, "", location.pathname + location.hash); P.syncReceiveSheet(syncCode, route); }
+
+  // Jogos solo funcionam sem internet depois da primeira visita.
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
   // Abertura: a bandeira do Brasil em quadradinhos tremula e vira a marca (mesma animação do app).
   const sp = P.$("#splash");
