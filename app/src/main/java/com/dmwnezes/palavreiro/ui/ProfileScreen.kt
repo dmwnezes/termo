@@ -436,7 +436,11 @@ private fun RetroCard(store: Store) {
     if (!open) return
     val guesses = store.firstGuesses().let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it) }.map { it.optString("w") to it.optString("d") } }
     val r = com.dmwnezes.palavreiro.game.Retro.of(year, store.activity(), store.termoResults(), store.results().keys, guesses)
-    BottomSheet({ open = false }) {
+    // Em Dialog: esta aba rola, e o BottomSheet precisa da altura da tela.
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = { open = false },
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+    ) { BottomSheet({ open = false }) {
         SheetTitle("Sua retrospectiva de $year", if (r.days == 0) "Jogue um pouco e volte aqui para ver o seu ano." else null)
         if (r.days > 0) {
             @Composable fun line(icon: String, big: String, small: String) {
@@ -468,7 +472,7 @@ private fun RetroCard(store: Store) {
                 )
             }
         }
-    }
+    } }
 }
 
 @Composable
