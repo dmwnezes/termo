@@ -74,7 +74,7 @@ class Rodada12ATest {
     @Test
     fun podioDoDia() {
         assertEquals(2, PodioData.dailyIndex(dia, 3))
-        assertEquals(29, PodioData.dailyIndex(dia, 200))
+        assertEquals(119, PodioData.dailyIndex(dia, 200)) // antes de 03/11/2026 só valem os 155 primeiros
         assertEquals("HDAEBGCFJI".map { "$it" }, PodioData.dailyOptions(q, dia))
         assertEquals("HDAEBGCFJI".map { "$it" }, ('A'..'J').map { "$it" }.shuffledBy(Minstd.ofDay(dia)))
 

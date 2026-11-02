@@ -185,3 +185,211 @@ Sabores de sorvete: comida
 Animais da Amazônia: animal, natureza, comida
 No trânsito: transporte, lugar
 Cabo de ___: lacuna, jogo, casa, mineral, trabalho
+Coisas de churrasco: comida
+Ingredientes de pizza: comida
+Tipos de massa: comida
+Tipos de café: comida
+Na padaria: comida
+Comidas de boteco: comida
+Bebidas nordestinas: comida
+Sucos típicos: comida
+Tipos de queijo: comida
+Tipos de carne: comida
+Tipos de feijão: comida
+Tipos de pão: comida
+Bolos do Nordeste: comida
+Coisas doces: comida
+Grãos: comida
+Compositores brasileiros: gente
+Autores brasileiros: gente
+Heróis da Marvel: gente
+Personagens do Sítio: gente
+Personagens da Turma da Mônica: gente
+Vilões da Disney: gente
+Princesas da Disney: gente
+Pintores famosos: gente
+Cientistas: gente
+Filósofos gregos: gente
+Reis de Israel na Bíblia: gente
+Evangelistas: gente
+Nomes do forró: gente
+Bandas de rock brasileiras: gente
+Grandes navegadores: gente
+Presidentes do Brasil: gente
+Astronautas: gente
+Campeões da Fórmula 1: gente
+Craques brasileiros: gente
+Esporte brasileiro: gente
+Cantoras brasileiras: gente
+Personagens de jogos: gente
+Bairros de Fortaleza: lugar
+Praias do Ceará: lugar
+Capitais do Sudeste: lugar
+Cidades do Sul: lugar
+Capitais do Centro-Oeste: lugar
+Cidades do Ceará: lugar
+Países da América do Sul: lugar
+Países da África: lugar
+Países da Ásia: lugar
+Países de 4 letras: lugar
+Capitais da Europa: lugar
+Capitais da América do Sul: lugar
+Capitais da Ásia: lugar
+Capitais da África: lugar
+Biomas do Brasil: lugar
+Na praça: lugar
+Partes da igreja: lugar
+Na rua: lugar
+Times do Ceará: esporte
+Times paulistas: esporte
+Times cariocas: esporte
+Times do Nordeste: esporte
+Na academia: esporte
+Jogos com bola: esporte
+Na quadra: esporte
+Posições do futebol: esporte
+Peças de roupa de cama: casa
+Coisas de bebê: casa
+Coisas da garagem: casa
+Nas redes sociais: tecnologia
+Na internet: tecnologia
+Linguagens de programação: tecnologia
+Videogames: tecnologia
+No aeroporto: transporte
+Placas de trânsito: transporte
+Veículos de duas rodas: transporte
+Coisas de ônibus: transporte
+No metrô: transporte
+Partes do navio: transporte
+Na farmácia: saude
+No salão de beleza: saude
+Partes do cabelo: saude
+No cinema: arte
+Tipos de filme: arte
+Óperas famosas: arte
+Obras de Machado: arte
+Romances do Nordeste: arte
+Gêneros literários: arte
+Partes do poema: arte
+Contos de fadas: arte
+No circo: arte
+Coisas do Natal: festa
+Coisas do Carnaval: festa
+Na festa junina: festa
+Festas religiosas: festa
+Festas populares: festa
+Cantigas de roda: festa
+Na lavoura: trabalho
+Na obra: trabalho
+No tribunal: trabalho
+Poderes e cargos: trabalho
+Tipos de governo: trabalho
+Coisas de escritório: trabalho
+Na reunião: trabalho
+Cargos: trabalho
+Tipos de pedra: mineral
+Rochas e solos: mineral
+Partes do violão: musica
+Teoria musical: musica
+Danças de salão: musica
+Danças nordestinas: musica
+Virtudes: sentimento
+No banco: dinheiro
+Moedas do mundo: dinheiro
+Dinheiro na gíria: dinheiro
+Folclore brasileiro: mito
+Do sertão: natureza
+Tipos de nuvem: natureza
+Coisas da Lua: ceu
+Fases da Lua: ceu
+Ossos do corpo: corpo
+Órgãos: corpo
+Sentidos: corpo
+Tecidos: roupa
+Estampas: roupa
+Na costura: artesanato
+Coisas do artesanato: artesanato
+Rendas e bordados: artesanato
+Na pesca: animal
+Bichos do mangue: animal
+Coisas de cachorro: animal
+Raças de cachorro: animal
+Raças de gato: animal
+Primatas: animal
+Felinos: animal
+Canídeos: animal
+Cascudos: animal
+Cobras: animal
+Lagartos: animal
+Aves brasileiras: animal
+Aves domésticas: animal
+Aves do mar: animal
+Peixes de água doce: animal
+Peixes do mar: animal
+No aquário: animal
+Palavras com Ç: palavra
+Palavras com X som de Z: palavra
+Palavras com X som de CH: palavra
+Palavras com dois R: palavra
+Sinônimos de bonito: palavra
+Sinônimos de rápido: palavra
+Sinônimos de feliz: palavra
+Sinônimos de cansado: palavra
+Antônimos de quente: palavra
+Antônimos de grande: palavra
+Antônimos de cheio: palavra
+Antônimos de claro: palavra
+Tempos verbais: palavra
+Classes de palavras: palavra
+Sinais de pontuação: palavra
+Acentos: palavra
+Números em romano: escola
+Operações: escola
+Ângulos e figuras: escola
+Coisas de geometria: escola
+Coisas de cearense: comida, casa
+Rede de ___: lacuna
+Casa de ___: lacuna
+Sopa de ___: lacuna
+Rio ___: lacuna
+Vira-___: lacuna
+Sobre___: lacuna
+Cor de ___: lacuna
+Passa-___: lacuna
+Abre-___: lacuna
+Lava-___: lacuna
+Cata-___: lacuna
+Banco de ___: lacuna
+Corta-___: lacuna
+Lança-___: lacuna
+Mata-___: lacuna
+Pega-___: lacuna
+Salva-___: lacuna
+Bota-___: lacuna
+Grão-___: lacuna
+Santa ___: lacuna
+Conta-___: lacuna
+Bolsa de ___: lacuna
+Bicho-___: lacuna
+Cuca ___: lacuna
+Pai ___: lacuna
+Água de ___: lacuna
+Bico de ___: lacuna
+Hora ___: lacuna
+Lua de ___: lacuna
+Mar de ___: lacuna
+Carne de ___: lacuna
+Doce de ___: lacuna
+Calça ___: lacuna
+Chapéu de ___: lacuna
+Fio de ___: lacuna
+Carro de ___: lacuna
+Trem ___: lacuna
+Cachorro-___: lacuna
+Macaco ___: lacuna
+Cobra ___: lacuna
+Pato ___: lacuna
+Peixe ___: lacuna
+Gol de ___: lacuna
+Rei do ___: lacuna
+Cantor ___: lacuna

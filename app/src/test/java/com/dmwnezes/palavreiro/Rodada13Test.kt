@@ -147,6 +147,7 @@ class Rodada13Test {
         s.setInt("mp_won", 0)
         assertTrue(Sync.receive(ntfy, s, code!!))
         assertEquals(7, s.int("mp_won"))
+        reserve.messages.clear()
         assertFalse(Sync.receive(ntfy, s, "ZZZZZZ"))
         reserve.stop()
     }
