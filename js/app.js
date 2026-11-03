@@ -35,6 +35,8 @@
     // Matiz: três bolhas de cor sobrepostas; Pódio: degraus 2-1-3; Ampulheta: ampulheta em CSS.
     matiz: `<div class="mz-ico" aria-hidden="true"><i></i><i></i><i></i></div>`,
     podio: `<div class="pd-ico" aria-hidden="true"><i>2</i><i>1</i><i>3</i></div>`,
+    silhueta: `<svg class="sil-ico" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 62 12 75 14 78 28 96 38 92 54 80 64 76 80 62 84 52 98 44 90 48 78 36 68 30 54 12 50 4 38 16 26 30 26 38 14Z"/></svg>`,
+    maismenos: `<div class="mm-ico" aria-hidden="true"><b>▲</b><i>▼</i></div>`,
     ampulheta: `<div class="amp-ico" aria-hidden="true"><i></i><i></i></div>`,
     // Quadrante (Sudoku): pedaço de grade com números; Xeque (Xadrez): o cavalo num tabuleiro.
     quadrante: `<div class="sdk-ico" aria-hidden="true">${[5, 3, "", "", 7, "", 6, "", 9].map((d, i) => `<i class="${i === 4 ? "on" : ""}">${d}</i>`).join("")}</div>`,
@@ -68,6 +70,8 @@
       ["matiz", "Matiz", "Memorize a cor e recrie-a", badge(dd("matiz"))],
       ["podio", "Pódio", "Monte o top 5 do ranking", badge(dd("podio"))],
       ["ampulheta", "Ampulheta", "O que veio antes? Monte a linha do tempo", badge(dd("ampulheta"))],
+      ["silhueta", "Silhueta", "Adivinhe o país ou estado pelo contorno", badge(dd("silhueta"))],
+      ["maismenos", "Mais ou Menos", "Compare números de temas gerais", badge(dd("maismenos"))],
       ["quadrante", "Quadrante", "Sudoku: um por nível todo dia, ou sem fim", ""],
       ["xeque", "Xeque", "Xadrez contra o computador", ""],
       ["naval", "Batalha Naval", "Afunde a frota do computador ou do amigo", ""],
@@ -77,7 +81,7 @@
     const CATS = [
       ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "cruzada", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
       ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque", "naval"]],
-      ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta"]],
+      ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta", "silhueta", "maismenos"]],
     ];
     const info = {};
     guess.concat(more).forEach(([k, t, s, b]) => (info[k] = { t, s, b }));
@@ -158,6 +162,8 @@
       matiz: () => P.games.matiz(app),
       podio: () => P.games.podio(app),
       ampulheta: () => P.games.ampulheta(app),
+      silhueta: () => P.games.silhueta(app),
+      maismenos: () => P.games.maismenos(app),
       quadrante: () => P.games.sudoku(app),
       sudoku: () => P.games.sudoku(app),
       xeque: () => P.games.xadrez(app),

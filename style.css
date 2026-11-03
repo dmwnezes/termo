@@ -1401,3 +1401,43 @@ button { font-family: inherit; color: inherit; }
 .sync-qr { width: min(70%, 220px); margin: 0 auto; }
 .sync-qr svg { display: block; width: 100%; height: auto; border-radius: 16px; }
 .link-btn { display: block; margin: 12px auto 0; background: none; border: 0; color: var(--muted); font: inherit; font-size: .85rem; text-decoration: underline; cursor: pointer; }
+
+/* Silhueta */
+.sil { max-width: 460px; margin: 0 auto; width: 100%; }
+.sil .hint, .mm .hint { text-align: center; color: var(--muted); margin: 0 0 10px; }
+.sil-map { display: block; width: min(70vw, 230px); height: min(70vw, 230px); margin: 0 auto 12px; }
+.sil-map path { fill: var(--accent); }
+.sil-answer { text-align: center; font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; }
+.sil-search { margin-bottom: 10px; }
+.sil-search input { width: 100%; box-sizing: border-box; }
+.sil-opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; min-height: 38px; }
+.sil-opt { background: var(--surface-high); color: var(--text); border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: .92rem; cursor: pointer; }
+.sil-rows { display: grid; gap: 6px; margin-top: 8px; }
+.sil-row { display: grid; grid-template-columns: 1fr auto 26px 44px; gap: 8px; align-items: center; background: var(--surface); border-radius: 14px; padding: 9px 12px; font-size: .9rem; }
+.sil-row b { font-weight: 600; min-width: 0; }
+.sil-row span:last-child { text-align: right; }
+.sil-row.ok { grid-template-columns: 1fr auto; background: var(--correct); }
+.sil-dir { font-size: 1.2rem; text-align: center; color: var(--present); font-weight: 800; }
+.sil-ico { width: 46px; height: 46px; }
+.sil-ico path { fill: var(--blue); }
+
+/* Mais ou Menos */
+.mm { max-width: 460px; margin: 0 auto; width: 100%; }
+.mm-theme { text-align: center; font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; }
+.mm-card { display: flex; flex-direction: column; align-items: center; gap: 4px; background: var(--surface); border-radius: 22px; padding: 18px 14px; margin-bottom: 10px; text-align: center; }
+.mm-card span { font-weight: 600; }
+.mm-card b { font-size: 1.7rem; font-weight: 800; }
+.mm-card.second { background: var(--surface-high); }
+.mm-card.ok { background: var(--correct); }
+.mm-card.bad { background: color-mix(in srgb, var(--red) 65%, var(--surface)); }
+.mm-q { margin-top: 12px !important; }
+.mm .row-btns .pill { flex: 1; }
+.mm-less { background: var(--present); color: var(--dark-text); }
+.mm-end { text-align: center; padding-top: 18px; }
+.mm-big { font-size: 3.4rem; font-weight: 800; }
+.mm-dots { display: flex; justify-content: center; gap: 5px; margin: 14px 0; }
+.mm-dots i { width: 18px; height: 18px; border-radius: 6px; background: var(--red); }
+.mm-dots i.ok { background: var(--correct); }
+.mm-ico { display: flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: 20px; }
+.mm-ico b { color: var(--correct); font-weight: 400; }
+.mm-ico i { color: var(--present); font-style: normal; }

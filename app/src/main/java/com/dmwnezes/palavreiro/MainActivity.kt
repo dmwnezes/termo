@@ -238,6 +238,8 @@ fun PalavreiroApp() {
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.MATIZ to if (store.text("matiz_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.SILHUETA to if (store.text("sil_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.MAISMENOS to if (store.text("mm_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CRUZADA to if (store.text("cruz_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.PODIO to if (store.text("podio_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.AMPULHETA to if (store.text("amp_done") == today) "Feito hoje ✓" else "Novo",
@@ -273,6 +275,8 @@ fun PalavreiroApp() {
                         Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
                         Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         Dest.MATIZ -> com.dmwnezes.palavreiro.ui.MatizScreen(store, AppGraph.feedback, back)
+                        Dest.SILHUETA -> com.dmwnezes.palavreiro.ui.SilhuetaScreen(AppGraph.silhueta, store, AppGraph.feedback, back)
+                        Dest.MAISMENOS -> com.dmwnezes.palavreiro.ui.MaisMenosScreen(AppGraph.maisMenos, store, AppGraph.feedback, back)
                         Dest.CRUZADA -> com.dmwnezes.palavreiro.ui.CruzadaScreen(AppGraph.cruzada, store, AppGraph.feedback, back)
                         Dest.PODIO -> com.dmwnezes.palavreiro.ui.PodioScreen(AppGraph.podio, store, AppGraph.feedback, back)
                         Dest.AMPULHETA -> com.dmwnezes.palavreiro.ui.AmpulhetaScreen(AppGraph.ampulheta, store, AppGraph.feedback, back)

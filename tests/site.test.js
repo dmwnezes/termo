@@ -208,3 +208,49 @@ test("na partida real, o convidado passa a ouvir o servidor reserva quando o pri
   assert.deepStrictEqual(h.errors.concat(g.errors), []);
   await h.context().close(); await g.context().close();
 });
+
+test("Silhueta: dados válidos, dica correta, derrota e vitória", async () => {
+  const p = await open("#/silhueta");
+  await p.waitForSelector(".sil-map");
+  const data = await p.evaluate(async () => {
+    const l = P.silhuetaParse(await P.text("silhueta.txt")), by = (n) => l.find((x) => x.name === n);
+    return { n: l.length, names: new Set(l.map((x) => x.name)).size, ok: l.every((x) => /^M[\d.]/.test(x.d) && x.d.endsWith("Z") && Math.abs(x.lat) <= 90 && Math.abs(x.lon) <= 180), e: l.filter((x) => x.kind === "e").length,
+      hint: P.silhuetaHint(by("Ceará"), by("São Paulo")), far: P.silhuetaHint(by("Brasil"), by("Japão")), norte: P.silhuetaHint(by("Paraná"), by("Ceará")) };
+  });
+  assert.strictEqual(data.n, data.names); assert.strictEqual(data.e, 27); assert.ok(data.ok);
+  assert.ok(data.hint.km > 1800 && data.hint.km < 2600, "Ceará-SP " + data.hint.km);
+  assert.ok(data.far.km > 15000, "Brasil-Japão " + data.far.km);
+  assert.ok([0, 1].includes(data.norte.dir), "Ceará fica a nordeste do Paraná: " + data.norte.dir);
+  const st = await p.evaluate(() => P.silhuetaState());
+  await p.fill("[data-input]", st.name.slice(0, 4));
+  await p.locator(".sil-opt", { hasText: st.name }).first().click();
+  assert.ok((await p.evaluate(() => P.silhuetaState())).won);
+  assert.strictEqual(await p.evaluate(() => P.store.get("sil-first")), 1);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});
+
+test("Mais ou Menos: rodadas justas, dia igual e fim com 10", async () => {
+  const p = await open("#/maismenos");
+  await p.waitForSelector(".mm-card");
+  const r = await p.evaluate(async () => {
+    const cats = P.mmParse(await P.text("maismenos.txt")), bad = [];
+    for (let d = 0; d < 800; d++) P.mmDaily(cats, d).forEach((x) => {
+      const c = cats[x.c], a = c.items[x.a].v, b = c.items[x.b].v;
+      if (a === b || (c.year ? Math.abs(a - b) < 3 : Math.abs(a - b) < 0.1 * Math.max(Math.abs(a), Math.abs(b)))) bad.push(c.title);
+    });
+    const d306 = P.mmDaily(cats, 306);
+    return { cats: cats.length, bad, same: JSON.stringify(d306) === JSON.stringify(P.mmDaily(cats, 306)), d306: d306.map((x) => `${cats[x.c].items[x.a].name}/${cats[x.c].items[x.b].name}`), distinct: new Set(d306.map((x) => x.c)).size };
+  });
+  assert.deepStrictEqual(r.bad, []); assert.ok(r.same); assert.strictEqual(r.distinct, 10); assert.ok(r.cats >= 20);
+  console.log("referência para o app:", JSON.stringify(r.d306));
+  for (let i = 0; i < 10; i++) {
+    await p.locator("[data-more]").click();
+    await p.locator("[data-next]").click();
+  }
+  await p.waitForSelector(".mm-end");
+  assert.strictEqual(await p.evaluate(() => P.store.get("mm-played")), 1);
+  assert.strictEqual(await p.evaluate(() => P.store.get("daily-done-maismenos")), await p.evaluate(() => P.dayKey()));
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});

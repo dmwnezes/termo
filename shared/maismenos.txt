@@ -1,0 +1,332 @@
+# Mais ou Menos: "## tema|unidade|n ou ano", depois "Nome|valor". Valores aproximados: o jogo só compara itens com diferença de ao menos 10% (ano: 3 anos ou mais).
+## Altura de montanhas|m|n
+Monte Everest|8849
+K2|8611
+Kangchenjunga|8586
+Aconcágua|6961
+Denali|6190
+Elbrus|5642
+Kilimanjaro|5895
+Mont Blanc|4808
+Matterhorn|4478
+Monte Fuji|3776
+Pico da Neblina|2995
+Pico da Bandeira|2891
+## Comprimento de rios|km|n
+Nilo|6650
+Amazonas|6400
+Yangtzé|6300
+Paraná|4880
+Volga|3530
+Danúbio|2850
+São Francisco|2830
+Reno|1230
+Sena|777
+Jaguaribe|610
+Tâmisa|346
+## Área de países|km²|n
+Rússia|17098000
+Canadá|9985000
+China|9597000
+Brasil|8516000
+Austrália|7692000
+Índia|3287000
+Argentina|2780000
+México|1964000
+França|551000
+Espanha|506000
+Japão|378000
+Alemanha|357000
+Itália|301000
+Uruguai|176000
+Portugal|92000
+## População de estados (Censo 2022)|habitantes|n
+São Paulo|44411000
+Minas Gerais|20539000
+Rio de Janeiro|16055000
+Bahia|14141000
+Paraná|11444000
+Rio Grande do Sul|10883000
+Pernambuco|9059000
+Ceará|8794000
+Pará|8121000
+Santa Catarina|7610000
+Goiás|7056000
+Maranhão|6776000
+Paraíba|3974000
+Amazonas|3941000
+Espírito Santo|3834000
+Mato Grosso|3658000
+Rio Grande do Norte|3302000
+Piauí|3271000
+Alagoas|3127000
+Distrito Federal|2817000
+Mato Grosso do Sul|2757000
+Sergipe|2210000
+Rondônia|1582000
+Tocantins|1511000
+Acre|830000
+Amapá|734000
+Roraima|636000
+## População de países (aprox.)|milhões|n
+Índia|1428
+China|1425
+Estados Unidos|340
+Indonésia|278
+Paquistão|240
+Nigéria|224
+Brasil|210
+Rússia|144
+México|128
+Japão|123
+Alemanha|84
+França|65
+Itália|59
+Argentina|46
+Portugal|10
+Uruguai|3
+## Altura de construções e monumentos|m|n
+Burj Khalifa|828
+Shanghai Tower|632
+One World Trade Center|541
+Taipei 101|508
+Torres Petronas|452
+Empire State Building|443
+Torre Eiffel|330
+Grande Pirâmide de Gizé|139
+Big Ben|96
+Estátua da Liberdade|93
+Torre de Pisa|56
+Cristo Redentor|38
+## Velocidade máxima de animais|km/h|n
+Falcão-peregrino|320
+Guepardo|110
+Cavalo|88
+Leão|80
+Galgo|72
+Avestruz|70
+Urso-pardo|56
+Gato|48
+Ser humano (Usain Bolt)|44
+Elefante|40
+Galinha|14
+## Peso de animais adultos (aprox.)|kg|n
+Baleia-azul|150000
+Elefante-africano|6000
+Rinoceronte-branco|2300
+Hipopótamo|1500
+Girafa|1200
+Urso-polar|450
+Leão|190
+Gorila|160
+Avestruz|120
+Onça-pintada|100
+São-bernardo|80
+Capivara|50
+## Gestação de animais (aprox.)|dias|n
+Elefante|640
+Girafa|450
+Cavalo|340
+Vaca|283
+Ser humano|280
+Porco|114
+Gato|65
+Cachorro|63
+Coelho|31
+Rato|21
+## Diâmetro no Sistema Solar|km|n
+Sol|1392700
+Júpiter|139820
+Saturno|116460
+Urano|50724
+Netuno|49244
+Terra|12742
+Vênus|12104
+Marte|6779
+Mercúrio|4879
+Lua|3474
+Plutão|2377
+## Distância até o Sol|milhões de km|n
+Mercúrio|58
+Vênus|108
+Terra|150
+Marte|228
+Júpiter|778
+Saturno|1434
+Urano|2871
+Netuno|4495
+## Ponto de fusão de metais|°C|n
+Tungstênio|3422
+Titânio|1668
+Ferro|1538
+Cobre|1085
+Ouro|1064
+Prata|962
+Alumínio|660
+Chumbo|327
+Estanho|232
+Mercúrio|-39
+## Número atômico|na tabela periódica|n
+Hidrogênio|1
+Hélio|2
+Carbono|6
+Oxigênio|8
+Sódio|11
+Ferro|26
+Cobre|29
+Prata|47
+Ouro|79
+Chumbo|82
+Urânio|92
+## Números do corpo humano adulto||n
+Ossos|206
+Cromossomos|46
+Vértebras|33
+Dentes|32
+Costelas|24
+Litros de sangue|5
+Câmaras do coração|4
+Pulmões|2
+## Capítulos de livros da Bíblia|capítulos|n
+Salmos|150
+Isaías|66
+Jeremias|52
+Gênesis|50
+Êxodo|40
+Provérbios|31
+Mateus|28
+Apocalipse|22
+João|21
+Romanos|16
+Daniel|12
+Rute|4
+Judas|1
+## Jogadores em quadra ou campo, por time|jogadores|n
+Rúgbi|15
+Futebol|11
+Beisebol|9
+Handebol|7
+Vôlei|6
+Basquete|5
+## Altitude de cidades (aprox.)|m|n
+La Paz|3640
+Quito|2850
+Bogotá|2640
+Cidade do México|2240
+Campos do Jordão|1628
+Brasília|1170
+Curitiba|930
+Belo Horizonte|850
+São Paulo|760
+Madri|650
+Fortaleza|20
+## Calorias em 100 g (aprox.)|kcal|n
+Óleo|884
+Manteiga|717
+Chocolate ao leite|535
+Açúcar|387
+Pão francês|270
+Peito de frango grelhado|165
+Arroz cozido|130
+Banana|89
+Feijão cozido|76
+Maçã|52
+Alface|15
+## Ano de lançamento de filmes|ano|ano
+Psicose|1960
+O Poderoso Chefão|1972
+Tubarão|1975
+Star Wars|1977
+E.T.|1982
+De Volta para o Futuro|1985
+Jurassic Park|1993
+O Rei Leão|1994
+Toy Story|1995
+Titanic|1997
+Central do Brasil|1998
+Matrix|1999
+O Auto da Compadecida|2000
+Cidade de Deus|2002
+Tropa de Elite|2007
+Avatar|2009
+Os Vingadores|2012
+Frozen|2013
+Parasita|2019
+## Ano de lançamento de jogos e consoles|ano|ano
+Pong|1972
+Atari 2600|1977
+Tetris|1984
+Super Mario Bros.|1985
+Game Boy|1989
+PlayStation|1994
+Nintendo 64|1996
+PlayStation 2|2000
+Xbox|2001
+Wii|2006
+Minecraft|2011
+GTA V|2013
+Nintendo Switch|2017
+PlayStation 5|2020
+## Ano de criação na tecnologia|ano|ano
+Telefone|1876
+Lâmpada de Edison|1879
+Voo do 14-Bis|1906
+Penicilina|1928
+World Wide Web|1989
+Google|1998
+Wikipédia|2001
+Facebook|2004
+YouTube|2005
+iPhone|2007
+WhatsApp|2009
+Instagram|2010
+TikTok|2016
+## Ano de fundação de clubes|ano|ano
+Flamengo|1895
+Vasco|1898
+Barcelona|1899
+Real Madrid|1902
+Grêmio|1903
+Sport|1905
+Atlético Mineiro|1908
+Internacional|1909
+Corinthians|1910
+Santos|1912
+Ceará|1914
+Fortaleza|1918
+Cruzeiro|1921
+São Paulo|1930
+Bahia|1931
+## Ano de nascimento de personalidades|ano|ano
+Leonardo da Vinci|1452
+Shakespeare|1564
+Mozart|1756
+Napoleão|1769
+Darwin|1809
+Machado de Assis|1839
+Marie Curie|1867
+Santos Dumont|1873
+Einstein|1879
+Rachel de Queiroz|1910
+Luiz Gonzaga|1912
+Clarice Lispector|1920
+Tom Jobim|1927
+Pelé|1940
+Michael Jackson|1958
+Ayrton Senna|1960
+## Ano de fundação de cidades brasileiras|ano|ano
+Recife|1537
+Salvador|1549
+São Paulo|1554
+Rio de Janeiro|1565
+Natal|1599
+São Luís|1612
+Belém|1616
+Manaus|1669
+Curitiba|1693
+Fortaleza|1726
+Porto Alegre|1772
+Belo Horizonte|1897
+Goiânia|1933
+Brasília|1960
+Palmas|1989

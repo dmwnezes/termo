@@ -38,6 +38,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil", "sudoku_won", "sudoku_perfect",
             "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil",
             "naval_won_facil", "naval_won_medio", "naval_won_dificil", "cruz_won", "cruz_perfect",
+            "sil_won", "sil_played", "sil_first", "mm_best", "mm_day_best", "mm_played",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
@@ -86,6 +87,8 @@ object Achievements {
             a("⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", r["amp_day_best"], 10),
             a("🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", r["sudoku_perfect"], 1),
             a("♟️", "Xeque-mate", "Vença o computador no Difícil do Xeque", r["xadrez_won_dificil"], 1),
+            a("🗺️", "Cartógrafo", "Acerte 10 Silhuetas", r["sil_won"], 10),
+            a("⚖️", "Bom de conta", "Acerte as 10 rodadas do dia no Mais ou Menos", r["mm_day_best"], 10),
             a("✏️", "Cruzadista", "Resolva 10 Palavras Cruzadas", r["cruz_won"], 10),
             a("🚢", "Almirante", "Vença o computador na Batalha Naval (Difícil)", r["naval_won_dificil"], 1),
             a("⚔️", "Duelista", "Vença 5 partidas com amigos", r["mp_won"], 5),

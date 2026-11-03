@@ -123,6 +123,8 @@
             `${lv.slice().reverse().map(([k, a]) => `${a} ${g("sudoku-best-" + k) ? P.fmtTime(g("sudoku-best-" + k)) : "—"}`).join(" · ")} · ${pl(g("sudoku-won") || 0, "vitória", "vitórias")}`]; })(),
         (() => { const w = ["facil", "medio", "dificil"].map((k) => g("xadrez-won-" + k) || 0), t = w[0] + w[1] + w[2];
           return ["♟️", "Xeque", "var(--accent)", t, t === 1 ? "vitória" : "vitórias", `F ${w[0]} · M ${w[1]} · D ${w[2]}`]; })(),
+        ["🗺️", "Silhueta", "var(--blue)", g("sil-won"), g("sil-won") === 1 ? "acerto" : "acertos", `em ${pl(g("sil-played"), "partida", "partidas")} · ${g("sil-first") || 0} de primeira`],
+        ["⚖️", "Mais ou Menos", "var(--present)", g("mm-best"), "recorde no Infinito", `do dia ${g("mm-day-best") || 0}/10 · ${pl(g("mm-played"), "partida", "partidas")}`],
         ["✏️", "Palavra Cruzada", "var(--correct)", g("cruz-won"), g("cruz-won") === 1 ? "resolvida" : "resolvidas", pl(g("cruz-perfect"), "de primeira", "de primeira")],
         (() => { const w = ["facil", "medio", "dificil"].map((k) => g("naval-won-" + k) || 0), t = w[0] + w[1] + w[2];
           return ["🚢", "Batalha Naval", "var(--blue)", t, t === 1 ? "vitória" : "vitórias", `F ${w[0]} · M ${w[1]} · D ${w[2]}`]; })(),

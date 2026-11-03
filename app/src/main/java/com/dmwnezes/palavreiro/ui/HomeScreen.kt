@@ -49,7 +49,7 @@ import com.dmwnezes.palavreiro.game.Multi
 
 /** Destinos da tela inicial. */
 enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
-    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL, CRUZADA }
+    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL, CRUZADA, SILHUETA, MAISMENOS }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -93,12 +93,14 @@ fun HomeScreen(
         GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
         GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
         GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
+        GameCardInfo(Dest.SILHUETA, "Silhueta", "Adivinhe o país ou estado pelo contorno", badges[Dest.SILHUETA]),
+        GameCardInfo(Dest.MAISMENOS, "Mais ou Menos", "Compare números de temas gerais", badges[Dest.MAISMENOS]),
     ).associateBy { it.dest }
     // Mesmo layout do site no celular: abas por categoria, cartões em duas colunas e barra fixa embaixo.
     val cats = listOf(
         HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.CRUZADA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
         HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ, Dest.NAVAL)),
-        HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA)),
+        HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA, Dest.SILHUETA, Dest.MAISMENOS)),
     )
     var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
     val cur = cats[tab]
@@ -364,6 +366,26 @@ internal fun CardIcon(dest: Dest) {
         Dest.XADREZ -> ChessHomeIcon(44.dp)
         Dest.NAVAL -> GameIcon(Multi.NAVAL, 46.dp)
         Dest.CRUZADA -> CruzadaIcon()
+        Dest.SILHUETA -> SilhuetaIcon()
+        Dest.MAISMENOS -> MaisMenosIcon()
+    }
+}
+
+/** Silhueta: contorno simplificado do Brasil. */
+@Composable
+private fun SilhuetaIcon() {
+    val shape = androidx.compose.runtime.remember {
+        com.dmwnezes.palavreiro.game.SilhuetaItem("", "p", 0.0, 0.0, "M50 4L62 12L75 14L78 28L96 38L92 54L80 64L76 80L62 84L52 98L44 90L48 78L36 68L30 54L12 50L4 38L16 26L30 26L38 14Z")
+    }
+    SilhuetaShape(shape, 46.dp, Night.blue)
+}
+
+/** Mais ou Menos: setas para cima e para baixo. */
+@Composable
+private fun MaisMenosIcon() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("▲", fontSize = 20.sp, color = Night.correct, lineHeight = 21.sp)
+        Text("▼", fontSize = 20.sp, color = Night.present, lineHeight = 21.sp)
     }
 }
 
