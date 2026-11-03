@@ -63,6 +63,9 @@ object AppGraph {
     /** Rankings do Pódio e acontecimentos da Ampulheta (shared/podio.txt, shared/ampulheta.txt). */
     var podio: List<com.dmwnezes.palavreiro.game.PodioQ> = emptyList()
     var cruzada: List<com.dmwnezes.palavreiro.game.CruzadaQ> = emptyList()
+    var pesquisa: List<com.dmwnezes.palavreiro.game.RespQ> = emptyList()
+    var top10: List<com.dmwnezes.palavreiro.game.RespQ> = emptyList()
+    var placas: List<com.dmwnezes.palavreiro.game.PlacaQ> = emptyList()
     var caminhos: List<com.dmwnezes.palavreiro.game.CaminhosQ> = emptyList()
     var fatoMito: List<com.dmwnezes.palavreiro.game.FatoQ> = emptyList()
     var silhueta: List<com.dmwnezes.palavreiro.game.SilhuetaItem> = emptyList()
@@ -106,6 +109,9 @@ object AppGraph {
         QuizData.antonyms(asset("antonimos.txt"), families).let { (p, f) -> antonyms = p; antonymFamilies = f }
         meanings = QuizData.meanings(asset("significados.txt"))
         trivia = runCatching { com.dmwnezes.palavreiro.game.TriviaData.parse(asset("trivia.txt")) }.getOrDefault(emptyList())
+        pesquisa = runCatching { com.dmwnezes.palavreiro.game.Respostas.parsePesquisa(asset("pesquisa.txt")) }.getOrDefault(emptyList())
+        top10 = runCatching { com.dmwnezes.palavreiro.game.Respostas.parseTop10(asset("top10.txt")) }.getOrDefault(emptyList())
+        placas = runCatching { com.dmwnezes.palavreiro.game.Placas.parse(asset("placas.txt")) }.getOrDefault(emptyList())
         caminhos = runCatching { com.dmwnezes.palavreiro.game.CaminhosData.parse(asset("caminhos.txt")) }.getOrDefault(emptyList())
         fatoMito = runCatching { com.dmwnezes.palavreiro.game.FatoMito.parse(asset("fatomito.txt")) }.getOrDefault(emptyList())
         silhueta = runCatching { com.dmwnezes.palavreiro.game.Silhueta.parse(asset("silhueta.txt")) }.getOrDefault(emptyList())

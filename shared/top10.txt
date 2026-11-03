@@ -1,0 +1,28 @@
+# Top 10: título|item~outro nome~outro nome|… (exatamente 10 itens). Listas estáveis; a ordem não importa no jogo.
+Os 10 maiores países do mundo em área|Rússia|Canadá|Estados Unidos~EUA~USA|China|Brasil|Austrália|Índia|Argentina|Cazaquistão|Argélia
+Os 10 maiores estados do Brasil em área|Amazonas|Pará|Mato Grosso|Minas Gerais|Bahia|Mato Grosso do Sul|Goiás|Maranhão|Rio Grande do Sul|Tocantins
+Os 10 estados mais populosos no Censo 2022|São Paulo|Minas Gerais|Rio de Janeiro|Bahia|Paraná|Rio Grande do Sul|Pernambuco|Ceará|Pará|Santa Catarina
+As 10 cidades mais populosas do Brasil no Censo 2022|São Paulo|Rio de Janeiro~Rio|Brasília|Fortaleza|Salvador|Belo Horizonte~BH|Manaus|Curitiba|Recife|Goiânia
+As 10 cidades mais populosas do Ceará no Censo 2022|Fortaleza|Caucaia|Juazeiro do Norte~Juazeiro|Maracanaú|Sobral|Crato|Itapipoca|Maranguape|Iguatu|Quixadá
+Os 10 menores estados do Brasil em área, com o DF|Distrito Federal~DF|Sergipe|Alagoas|Rio de Janeiro|Espírito Santo|Rio Grande do Norte|Paraíba|Santa Catarina|Pernambuco|Ceará
+Os 10 países vizinhos do Brasil|Uruguai|Argentina|Paraguai|Bolívia|Peru|Colômbia|Venezuela|Guiana|Suriname|França~Guiana Francesa
+Os 10 maiores países da África em área|Argélia|República Democrática do Congo~RD Congo~Congo|Sudão|Líbia|Chade|Níger|Angola|Mali|África do Sul|Etiópia
+As 10 montanhas mais altas do mundo|Everest|K2|Kangchenjunga|Lhotse|Makalu|Cho Oyu|Dhaulagiri|Manaslu|Nanga Parbat|Annapurna
+As 10 maiores ilhas do mundo|Groenlândia|Nova Guiné|Bornéu|Madagascar|Baffin|Sumatra|Honshu|Vitória|Grã-Bretanha|Ellesmere
+Os 10 primeiros elementos da tabela periódica|Hidrogênio|Hélio|Lítio|Berílio|Boro|Carbono|Nitrogênio|Oxigênio|Flúor|Neônio
+Os elementos de número atômico 11 a 20|Sódio|Magnésio|Alumínio|Silício|Fósforo|Enxofre|Cloro|Argônio|Potássio|Cálcio
+Os 10 primeiros números primos|2|3|5|7|11|13|17|19|23|29
+Os 10 primeiros quadrados perfeitos positivos|1|4|9|16|25|36|49|64|81|100
+Os 10 primeiros presidentes do Brasil|Deodoro da Fonseca~Deodoro|Floriano Peixoto~Floriano|Prudente de Morais~Prudente|Campos Sales|Rodrigues Alves|Afonso Pena|Nilo Peçanha|Hermes da Fonseca~Hermes|Venceslau Brás~Wenceslau Braz|Delfim Moreira
+Os 10 primeiros imperadores romanos|Augusto|Tibério|Calígula|Cláudio|Nero|Galba|Otão~Oto|Vitélio|Vespasiano|Tito
+Os 10 primeiros países-sede da Copa do Mundo|Uruguai|Itália|França|Brasil|Suíça|Suécia|Chile|Inglaterra|México|Alemanha~Alemanha Ocidental
+Os 10 primeiros livros da Bíblia|Gênesis|Êxodo|Levítico|Números|Deuteronômio|Josué|Juízes|Rute|1 Samuel~I Samuel~Primeiro Samuel|2 Samuel~II Samuel~Segundo Samuel
+Os 10 primeiros livros do Novo Testamento|Mateus|Marcos|Lucas|João|Atos|Romanos|1 Coríntios~I Coríntios~Primeira Coríntios|2 Coríntios~II Coríntios~Segunda Coríntios|Gálatas|Efésios
+As 10 pragas do Egito|Sangue~água em sangue|Rãs|Piolhos|Moscas|Peste~peste nos animais|Úlceras~feridas|Granizo~chuva de pedras|Gafanhotos|Trevas~escuridão|Primogênitos~morte dos primogênitos
+As 10 primeiras letras do alfabeto grego|Alfa|Beta|Gama|Delta|Épsilon~Epsilon|Zeta|Eta|Teta|Iota|Capa~Kappa
+Os 10 primeiros signos do zodíaco|Áries|Touro|Gêmeos|Câncer|Leão|Virgem|Libra|Escorpião|Sagitário|Capricórnio
+Os 10 primeiros animais do horóscopo chinês|Rato|Boi|Tigre|Coelho|Dragão|Serpente~Cobra|Cavalo|Cabra|Macaco|Galo
+Os 10 primeiros Pokémon da Pokédex|Bulbasaur|Ivysaur|Venusaur|Charmander|Charmeleon|Charizard|Squirtle|Wartortle|Blastoise|Caterpie
+Os 10 primeiros longas da Pixar|Toy Story|Vida de Inseto|Toy Story 2|Monstros S.A.~Monstros SA|Procurando Nemo|Os Incríveis|Carros|Ratatouille|WALL-E~Wall E|Up
+Os 10 primeiros meses do ano|Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro
+Os 10 maiores países em população, por volta de 2023|Índia|China|Estados Unidos~EUA|Indonésia|Paquistão|Nigéria|Brasil|Bangladesh|Rússia|México

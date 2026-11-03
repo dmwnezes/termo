@@ -1,0 +1,41 @@
+# Pesquisa: pergunta|resposta~sinônimo~sinônimo:pontos|… As respostas e os pontos foram escritos para o jogo: não vêm de uma pesquisa real.
+Algo que se leva para a praia|Protetor solar~protetor~filtro solar:30|Toalha~canga:25|Guarda-sol~sombrinha:20|Chinelo~sandália~havaianas:15|Cooler~isopor~caixa térmica:10
+Comida típica de festa junina|Pamonha:30|Canjica~mungunzá:25|Milho~milho verde~milho assado:20|Pé de moleque~pe de moleque:15|Bolo de milho~bolo:10
+Motivo para chegar atrasado ao trabalho|Trânsito~engarrafamento:35|Ônibus~onibus atrasado:25|Perdi a hora~despertador~dormir demais:20|Chuva:12|Filho~crianca~escola:8
+Coisa que se perde com facilidade|Chave~chaves:35|Celular~telefone:25|Carteira:20|Guarda-chuva~sombrinha:12|Óculos:8
+Algo que se faz ao acordar|Escovar os dentes~escovar dentes:30|Tomar café~cafe~cafe da manha:30|Olhar o celular~celular:20|Tomar banho~banho:12|Rezar~orar:8
+Animal comum em uma fazenda|Vaca~boi:35|Galinha~galo:25|Cavalo:20|Porco:12|Bode~cabra~ovelha:8
+Coisa que tem na mochila de escola|Caderno:30|Lápis~caneta~estojo:30|Livro:20|Lanche~merenda:12|Garrafa de água~garrafa:8
+Fruta típica do Nordeste|Caju:35|Manga:20|Cajá~caja:15|Graviola:12|Seriguela~siriguela:10|Umbu:8
+Lugar onde se pega fila|Banco:35|Supermercado~mercado:25|Hospital~posto de saude:20|Cartório~cartorio:12|Lotérica~loterica:8
+Item de um bom café da manhã|Pão~pao:35|Café~cafe:30|Tapioca:15|Cuscuz~cuscuz com ovo:12|Ovo~ovos:8
+Presente clássico de Dia das Mães|Flores~flor~buque:30|Perfume:25|Roupa:20|Chocolate~bombom:15|Joia~anel~colar:10
+Motivo de briga entre vizinhos|Barulho~som alto:45|Lixo:20|Cachorro~latido:15|Garagem~vaga:12|Muro~cerca:8
+Coisa que sempre acaba na hora errada|Gás~gas~botijao:35|Bateria~celular:30|Papel higiênico~papel:15|Internet~wifi:12|Água~agua:8
+Algo que se faz em dia de chuva|Dormir:30|Ver filme~assistir filme~netflix:30|Ficar em casa:20|Comer~lanche:12|Ler~ler um livro:8
+Profissão que trabalha de uniforme branco|Médico~medico~doutor:35|Enfermeira~enfermeiro:30|Dentista:15|Cozinheiro~chef:12|Farmacêutico~farmaceutico:8
+O que se vê em uma feira livre|Fruta~frutas:30|Verdura~verduras~legumes:25|Peixe:15|Pastel:15|Caldo de cana~garapa:15
+Coisa que não pode faltar em um churrasco|Carne~picanha:40|Farofa:20|Carvão~carvao:15|Vinagrete:13|Pão de alho~pao de alho:12
+Algo que o brasileiro faz no Carnaval|Pular~dançar~dancar~brincar:30|Viajar:25|Ver o desfile~desfile:20|Descansar~dormir:15|Bloco~ir para o bloco:10
+Coisa que se guarda na geladeira|Leite:30|Água~agua:25|Ovos~ovo:20|Queijo:15|Refrigerante~refri:10
+Motivo para ligar para a mãe|Saudade:35|Pedir receita~receita:25|Dar notícia~noticia:20|Pedir dinheiro~dinheiro:12|Aniversário~aniversario:8
+Coisa que tem em toda sala de casa|Sofá~sofa:40|Televisão~tv~televisao:30|Tapete:12|Mesa~mesinha:10|Quadro:8
+Bicho que dá medo em muita gente|Barata:35|Cobra:30|Aranha:20|Rato:10|Escorpião~escorpiao:5
+Aplicativo que se abre todo dia|WhatsApp~zap:40|Instagram~insta:25|YouTube:15|TikTok:12|Banco~app do banco:8
+Coisa que se compra na farmácia|Remédio~remedio:50|Fralda:15|Xampu~shampoo:12|Protetor solar~protetor:12|Escova de dente~escova:11
+Lugar para um primeiro encontro|Restaurante:30|Cinema:25|Sorveteria~sorvete:15|Shopping:15|Praia:15
+Esporte mais assistido no Brasil|Futebol:50|Vôlei~volei:25|Fórmula 1~formula 1~f1:12|Basquete:8|MMA~luta:5
+Palavra que se ouve muito no Ceará|Oxente:30|Macho~macho veio:25|Arretado:20|Rapaz~mah:15|Pai d'égua~pai degua:10
+Coisa que se faz em uma festa de aniversário|Cantar parabéns~parabens:40|Comer bolo~bolo:30|Soprar a vela~vela:15|Tirar foto~foto:8|Dançar~dancar:7
+Coisa que se leva numa viagem longa|Mala~roupa:30|Documento~rg~identidade:25|Carregador~celular:20|Lanche~comida:15|Remédio~remedio:10
+Coisa que dá sono|Filme chato~filme:25|Reunião~reuniao:25|Almoço~comida:25|Aula:15|Rede:10
+Motivo para acordar de madrugada|Banheiro~xixi:40|Sede~agua:20|Barulho:15|Pesadelo~sonho ruim:15|Choro do bebê~bebe:10
+Coisa que tem em uma cozinha|Fogão~fogao:35|Geladeira:30|Panela:15|Pia:12|Micro-ondas~microondas:8
+Algo que se faz no fim de semana|Dormir~descansar:30|Sair~passear:25|Ir à praia~praia:20|Ver futebol~futebol:15|Limpar a casa~faxina:10
+Coisa que quebra com facilidade|Copo:35|Prato:25|Celular~tela:20|Óculos:12|Espelho:8
+Ingrediente de um bom cuscuz|Flocão~flocao~flocos de milho~milho:35|Água~agua:20|Sal:20|Ovo:15|Manteiga:10
+Coisa que se paga todo mês|Luz~energia:30|Água~agua:25|Internet:20|Aluguel:15|Cartão~cartao:10
+Personagem de festa infantil|Palhaço~palhaco:30|Super-herói~heroi:25|Princesa:20|Mágico~magico:15|Galinha Pintadinha:10
+Coisa que todo mundo esquece em casa|Celular:30|Chave~chaves:25|Guarda-chuva~sombrinha:20|Carteira:15|Carregador:10
+Som típico de cidade grande|Buzina:40|Sirene~ambulancia:25|Motor~moto:15|Obra~britadeira:12|Carro de som:8
+Coisa que se faz ao entrar no ônibus|Pagar~passar o cartao~cartao:35|Procurar lugar~sentar:30|Segurar~segurar firme:15|Dar bom dia~bom dia:12|Olhar o celular~celular:8

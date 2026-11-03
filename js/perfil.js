@@ -127,6 +127,10 @@
           return ["💣", "Campo Minado", "var(--red)", top ? P.fmtTime(g("mina-best-" + top[0])) : "—", top ? `no ${top[1]}` : "melhor tempo", `${pl(g("mina-won"), "vitória", "vitórias")} em ${pl(g("mina-played"), "partida", "partidas")}`]; })(),
         (() => { const lv = [["dificil", "Difícil"], ["medio", "Médio"], ["facil", "Fácil"]], top = lv.find(([k]) => g("cam-best-" + k) > 0);
           return ["🔗", "Caminhos", "var(--correct)", top ? P.fmtTime(g("cam-best-" + top[0])) : "—", top ? `no ${top[1]}` : "melhor tempo", pl(g("cam-won"), "grade completa", "grades completas")]; })(),
+        ["📋", "Pesquisa", "var(--present)", g("pq-best"), "melhor pontuação", `${pl(g("pq-full"), "completa", "completas")} em ${pl(g("pq-played"), "partida", "partidas")}`],
+        ["🔟", "Top 10", "var(--blue)", g("t10-best"), "melhor lista", `${pl(g("t10-full"), "completa", "completas")} em ${pl(g("t10-played"), "partida", "partidas")}`],
+        ["🚦", "Placas", "var(--correct)", g("pl-best"), "recorde no Infinito", `do dia ${g("pl-day-best") || 0}/10 · ${pl(g("pl-played"), "partida", "partidas")}`],
+        ["🧱", "Empilha", "var(--accent)", g("emp-best"), "maior altura", pl(g("emp-played"), "partida", "partidas")],
         ["🧐", "Fato ou Mito", "var(--accent)", g("fm-best"), "recorde no Infinito", `do dia ${g("fm-day-best") || 0}/10 · ${pl(g("fm-played"), "partida", "partidas")}`],
         ["🗺️", "Silhueta", "var(--blue)", g("sil-won"), g("sil-won") === 1 ? "acerto" : "acertos", `em ${pl(g("sil-played"), "partida", "partidas")} · ${g("sil-first") || 0} de primeira`],
         ["⚖️", "Mais ou Menos", "var(--present)", g("mm-best"), "recorde no Infinito", `do dia ${g("mm-day-best") || 0}/10 · ${pl(g("mm-played"), "partida", "partidas")}`],

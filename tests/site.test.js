@@ -323,3 +323,64 @@ test("Fato ou Mito: dados, dia igual e fim com 10", async () => {
   assert.deepStrictEqual(p.errors, []);
   await p.context().close();
 });
+
+test("Pesquisa e Top 10: dados, comparação de texto, derrota e vitória", async () => {
+  const p = await open("#/top10");
+  await p.waitForSelector("[data-input]");
+  const r = await p.evaluate(async () => {
+    const t = P.top10Parse(await P.text("top10.txt")), q = P.pesquisaParse(await P.text("pesquisa.txt"));
+    const m = (items, text) => P.respMatch(items, text);
+    return { nt: t.length, nq: q.length, all10: t.every((x) => x.items.length === 10), sum100: q.every((x) => x.items.reduce((a, i) => a + i.pts, 0) === 100),
+      a: m(t[0].items, "russia"), b: m(t[0].items, "  EUA "), c: m(t[6].items, "guiana francesa"), d: m(t[0].items, "o brasil"), e: m(t[0].items, "bras"), dup: t.some((x) => { const n = x.items.flatMap((i) => [...new Set(i.names.map(P.respClean))]); return new Set(n).size !== n.length; }) };
+  });
+  assert.strictEqual(r.nt, 27); assert.strictEqual(r.nq, 40); assert.ok(r.all10 && r.sum100); assert.strictEqual(r.dup, false);
+  assert.ok(r.a === 0 && r.b === 2 && r.c === 9 && r.d === 4 && r.e === -1, JSON.stringify(r));
+  const names = await p.evaluate(() => P.top10State().q.items.map((i) => i.names[0]));
+  for (const n of names) { await p.fill("[data-input]", n); await p.keyboard.press("Enter"); }
+  assert.strictEqual(await p.evaluate(() => P.store.get("t10-full")), 1);
+  await p.evaluate(() => { location.hash = "#/pesquisa"; });
+  await p.waitForFunction(() => P.pesquisaState);
+  await p.waitForSelector("[data-input]");
+  for (const w of ["xxx", "yyy", "zzz"]) { await p.fill("[data-input]", w); await p.keyboard.press("Enter"); }
+  assert.ok(await p.evaluate(() => P.pesquisaState().finished));
+  assert.strictEqual(await p.evaluate(() => P.store.get("pq-played")), 1);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});
+
+test("Placas: dados, ordem do dia e fim com 10", async () => {
+  const p = await open("#/placas");
+  await p.waitForSelector(".pl-opt");
+  const r = await p.evaluate(async () => { const l = P.placasParse(await P.text("placas.txt")); return { n: l.length, ok: l.every((q) => q.options.length === 4 && new Set(q.options).size === 4 && q.why && q.text), shapes: [...new Set(l.map((q) => q.shape))].sort(), d: P.placasDaily(l.length, 306), o: P.placasOrder(5) }; });
+  assert.strictEqual(r.n, 44); assert.ok(r.ok); assert.strictEqual(new Set(r.d).size, 10);
+  assert.deepStrictEqual(r.shapes, ["circulo", "contramao", "losango", "pare", "proibido", "regra", "triangulo"]);
+  console.log("referência placas 306:", JSON.stringify(r.d), JSON.stringify(r.o));
+  for (let i = 0; i < 10; i++) { await p.locator('[data-o="0"]').click(); await p.locator("[data-next]").click(); }
+  await p.waitForSelector(".mm-end");
+  assert.strictEqual(await p.evaluate(() => P.store.get("pl-day-best")), 10);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});
+
+test("Empilha: encaixe, corte, velocidade e fim", async () => {
+  const p = await open("#/empilha");
+  await p.waitForSelector(".emp-board");
+  const r = await p.evaluate(() => {
+    const E = P.empilha, g = E.create();
+    E.tick(g, 0.1); const moved = g.x;
+    g.x = 20; E.drop(g); const perfect = g.perfect && g.w === 60 && E.score(g) === 1;
+    g.x = 30; E.drop(g); const cut = g.w === 50 && g.tower[g.tower.length - 1].x === 30;
+    const s0 = E.speed(g);
+    for (let i = 0; i < 2000; i++) E.tick(g, 0.016);
+    const inside = g.x >= 0 && g.x + g.w <= 100;
+    g.x = 0; g.w = 5; g.tower[g.tower.length - 1] = { x: 90, w: 5 }; E.drop(g);
+    return { moved, perfect, cut, inside, s0, over: g.over };
+  });
+  assert.ok(r.moved > 0 && r.perfect && r.cut && r.inside && r.over, JSON.stringify(r));
+  await p.evaluate(() => { const g = P.empilhaState(); g.x = 0; g.w = 5; g.tower = [{ x: 90, w: 5 }, { x: 90, w: 5 }]; });
+  await p.locator("[data-drop]").click();
+  await p.waitForSelector("[data-again]");
+  assert.strictEqual(await p.evaluate(() => P.store.get("emp-played")), 1);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});

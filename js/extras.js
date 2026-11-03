@@ -67,6 +67,10 @@
       ["⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", n("amp-day-best"), 10],
       ["🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", n("sudoku-perfect"), 1],
       ["♟️", "Xeque-mate", "Vença o computador no Xeque (Difícil)", n("xadrez-won-dificil"), 1],
+      ["📋", "Opinião pública", "Ache todas as respostas de uma Pesquisa", n("pq-full"), 1],
+      ["🔟", "Lista completa", "Complete um Top 10", n("t10-full"), 1],
+      ["🚦", "Motorista exemplar", "Acerte as 10 do dia no Placas", n("pl-day-best"), 10],
+      ["🧱", "Mestre de obras", "Chegue à altura 30 no Empilha", n("emp-best"), 30],
       ["💣", "Desarmador", "Limpe um Campo Minado no Difícil", n("mina-best-dificil") > 0 ? 1 : 0, 1],
       ["🔗", "Tudo ligado", "Complete um Caminhos no Difícil", n("cam-best-dificil") > 0 ? 1 : 0, 1],
       ["🧐", "Caça-mitos", "Acerte as 10 do dia no Fato ou Mito", n("fm-day-best"), 10],
@@ -117,7 +121,8 @@
     "naval_won_facil", "naval_won_medio", "naval_won_dificil", "cruz_won", "cruz_perfect",
     "sil_won", "sil_played", "sil_first", "mm_best", "mm_day_best", "mm_played",
     "mina_won", "mina_played", "mina_best_facil", "mina_best_medio", "mina_best_dificil",
-    "cam_won", "cam_best_facil", "cam_best_medio", "cam_best_dificil", "fm_best", "fm_day_best", "fm_played"];
+    "cam_won", "cam_best_facil", "cam_best_medio", "cam_best_dificil", "fm_best", "fm_day_best", "fm_played",
+    "pq_best", "pq_played", "pq_full", "t10_best", "t10_played", "t10_full", "pl_best", "pl_day_best", "pl_played", "emp_best", "emp_played"];
   // Contadores em que menor é melhor (tempo e jogadas): 0 = ainda não jogou.
   const LOWER = ["ws_best", "ws_inf_best", "mem_best_facil", "mem_best_medio", "mem_best_dificil", "mem_moves_facil", "mem_moves_medio", "mem_moves_dificil",
     "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil",
@@ -177,7 +182,7 @@
   };
 
   // ---------- retrospectiva do ano ----------
-  const RETRO_NAMES = { termo: "Termo", dueto: "Dueto", quarteto: "Quarteto", conn: "Conexões", conexoes: "Conexões", caca: "Caça-Palavras", ws: "Caça-Palavras", cruzada: "Palavra Cruzada", silhueta: "Silhueta", maismenos: "Mais ou Menos", minado: "Campo Minado", caminhos: "Caminhos", fatomito: "Fato ou Mito" };
+  const RETRO_NAMES = { termo: "Termo", dueto: "Dueto", quarteto: "Quarteto", conn: "Conexões", conexoes: "Conexões", caca: "Caça-Palavras", ws: "Caça-Palavras", cruzada: "Palavra Cruzada", silhueta: "Silhueta", maismenos: "Mais ou Menos", minado: "Campo Minado", caminhos: "Caminhos", fatomito: "Fato ou Mito", pesquisa: "Pesquisa", top10: "Top 10", placas: "Placas" };
   const MONTHS = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
   /** Números do ano a partir do progresso salvo. Mesmo cálculo no app (game/Retro.kt). */
   P.retro = (year = new Date().getFullYear()) => {

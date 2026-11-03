@@ -1468,3 +1468,34 @@ button { font-family: inherit; color: inherit; }
 .fm-ico { display: flex; align-items: center; gap: 6px; font-size: 25px; font-weight: 800; }
 .fm-ico b { color: var(--correct); }
 .fm-ico i { color: var(--red); font-style: normal; }
+
+/* Pesquisa e Top 10 */
+.resp { max-width: 460px; margin: 0 auto; width: 100%; }
+.resp .hint { text-align: center; color: var(--muted); margin: 0 0 8px; }
+.resp-form { display: flex; gap: 8px; margin-bottom: 10px; }
+.resp-form input { flex: 1; min-width: 0; box-sizing: border-box; }
+.resp-end { margin-bottom: 10px; }
+.resp-list { display: grid; gap: 6px; }
+.resp-row { display: flex; justify-content: space-between; gap: 8px; background: var(--surface); border-radius: 14px; padding: 10px 14px; color: var(--muted); }
+.resp-row b { font-weight: 600; }
+.resp-row.ok { background: var(--correct); color: var(--text); }
+.resp-row.miss { background: var(--surface-high); color: var(--text); }
+.resp-errors { color: var(--red); font-size: .9rem; margin: 10px 0 0; text-align: center; }
+.resp-note { color: var(--muted); font-size: .8rem; margin: 12px 0 0; text-align: center; }
+.pq-ico, .emp-ico { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.pq-ico { align-items: flex-start; }
+.pq-ico i { height: 9px; border-radius: 4px; background: var(--present); }
+.emp-ico i { height: 11px; border-radius: 4px; }
+.t10-ico { font-size: 30px; font-weight: 800; color: var(--blue); line-height: 1; }
+
+/* Placas */
+.pl-sign { display: block; width: 130px; height: 130px; margin: 2px auto 10px; }
+.pl-q { font-size: 1.05rem; }
+.pl-opts { display: grid; gap: 8px; }
+.pl-opt { background: var(--surface-high); color: var(--text); border: 0; border-radius: 16px; padding: 13px 14px; font: inherit; cursor: pointer; }
+.pl-ans { padding: 16px; margin-bottom: 8px; }
+.pl-ans b { font-size: 1.05rem; }
+
+/* Empilha */
+.emp { max-width: 400px; margin: 0 auto; width: 100%; }
+.emp-board { display: block; width: 100%; aspect-ratio: 400 / 560; background: var(--surface); border-radius: 22px; margin: 8px 0 12px; touch-action: manipulation; cursor: pointer; }

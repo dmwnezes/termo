@@ -1,6 +1,6 @@
 # Palavreiro
 
-Jogos em português: 11 de palavras (Termo, Dueto, Quarteto, Conexões, Caça-Palavras, Palavra Cruzada, Intruso, Certo ou Errado, Qual é a Palavra?, Sinônimo ou Antônimo e Jogo da Memória), 7 de lógica (Mestre Mandou, Matiz, Quadrante, Xeque, Campo Minado, Caminhos e Batalha Naval) e 6 de conhecimento (Trivia, Pódio, Ampulheta, Silhueta, Mais ou Menos e Fato ou Mito), mais partidas ao vivo com amigos. O site e o app Android têm a mesma palavra do dia.
+Jogos em português: 11 de palavras (Termo, Dueto, Quarteto, Conexões, Caça-Palavras, Palavra Cruzada, Intruso, Certo ou Errado, Qual é a Palavra?, Sinônimo ou Antônimo e Jogo da Memória), 8 de lógica e reflexo (Mestre Mandou, Matiz, Quadrante, Xeque, Campo Minado, Caminhos, Empilha e Batalha Naval) e 9 de conhecimento (Trivia, Pódio, Ampulheta, Silhueta, Mais ou Menos, Fato ou Mito, Pesquisa, Top 10 e Placas), mais partidas ao vivo com amigos. O site e o app Android têm a mesma palavra do dia.
 
 - **Site:** https://dmwnezes.com/termo/ (funciona sem internet depois da primeira visita, menos as partidas com amigos)
 - **App Android:** https://github.com/dmwnezes/termo/releases/latest/download/Palavreiro.apk (o app avisa sozinho quando há versão nova)

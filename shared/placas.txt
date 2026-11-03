@@ -1,0 +1,45 @@
+# Placas: forma|símbolo|pergunta|resposta certa|errada|errada|errada|explicação. Formas: pare, triangulo, contramao, circulo, proibido, losango, regra. Símbolos simplificados.
+pare|PARE|O que esta placa manda fazer?|Parar o veículo antes de seguir|Reduzir sem parar|Parar só se vier outro carro|Dar passagem a pedestres apenas|R-1: parada obrigatória. Ela é a única placa octogonal.
+triangulo||Qual é o significado desta placa?|Dê a preferência|Parada obrigatória|Sentido proibido|Pista interrompida|R-2: reduza e deixe passar quem já está na via preferencial.
+contramao||Qual é o significado desta placa?|Sentido proibido|Proibido estacionar|Parada obrigatória|Via em obras|R-3: entrar nessa direção é seguir na contramão.
+proibido|↰|Qual é o significado desta placa?|Proibido virar à esquerda|Vire à esquerda|Proibido retornar|Curva à esquerda|R-4a: a seta cortada indica o movimento proibido.
+proibido|↱|Qual é o significado desta placa?|Proibido virar à direita|Vire à direita|Proibido ultrapassar|Curva à direita|R-4b: a seta cortada indica o movimento proibido.
+proibido|↶|Qual é o significado desta placa?|Proibido retornar à esquerda|Retorno obrigatório|Proibido virar à direita|Pista sinuosa|R-5a: não é permitido fazer o retorno.
+proibido|E|Qual é o significado desta placa?|Proibido estacionar|Proibido parar e estacionar|Estacionamento regulamentado|Via exclusiva|R-6a: parar para embarque é permitido, estacionar não.
+circulo|E|Qual é o significado desta placa?|Estacionamento regulamentado|Proibido estacionar|Estrada à frente|Entrada obrigatória|R-6b: estacionar é permitido, seguindo as regras indicadas.
+proibido|E✕|Qual é o significado desta placa?|Proibido parar e estacionar|Proibido estacionar só à noite|Estacionamento regulamentado|Via sem saída|R-6c: é a mais restritiva das três placas de estacionamento.
+proibido|🚗🚗|Qual é o significado desta placa?|Proibido ultrapassar|Proibido carros|Trânsito lento|Pista dupla|R-7: não é permitido ultrapassar nesse trecho.
+proibido|🚚|Qual é o significado desta placa?|Proibido o trânsito de caminhões|Carga e descarga|Caminhões à frente|Peso máximo|R-9: caminhões não podem circular ali.
+proibido|🚲|Qual é o significado desta placa?|Proibido o trânsito de bicicletas|Ciclovia|Ciclistas à frente|Bicicletas têm preferência|R-12: bicicletas não podem circular ali.
+proibido|🚶|Qual é o significado desta placa?|Proibido o trânsito de pedestres|Faixa de pedestres|Área escolar|Pedestres têm preferência|R-29: pedestres não podem andar nesse trecho.
+proibido|📯|Qual é o significado desta placa?|Proibido acionar buzina|Buzine antes de passar|Hospital à frente|Festa na via|R-20: é proibido buzinar ou usar sinal sonoro.
+circulo|60|Qual é o significado desta placa?|Velocidade máxima de 60 km/h|Velocidade mínima de 60 km/h|Distância de 60 km|Peso máximo de 60 t|R-19: o número mostra a velocidade máxima permitida.
+circulo|↑|Qual é o significado desta placa?|Siga em frente|Proibido seguir|Subida à frente|Via de mão dupla|R-26: a seta indica a única direção permitida.
+losango|↰|Esta placa avisa sobre o quê?|Curva acentuada à esquerda|Vire à esquerda obrigatoriamente|Proibido virar à esquerda|Retorno à esquerda|A-1a: é uma advertência, para reduzir e redobrar a atenção.
+losango|✚|Esta placa avisa sobre o quê?|Cruzamento de vias|Hospital|Fim de pista|Igreja|A-6: há um cruzamento à frente.
+losango|🚦|Esta placa avisa sobre o quê?|Semáforo à frente|Parada obrigatória|Radar|Passagem de nível|A-14: prepare-se para a parada no semáforo.
+losango|⌒|Esta placa avisa sobre o quê?|Saliência ou lombada|Túnel|Ponte estreita|Curva|A-18: reduza para passar pela lombada.
+losango|◡|Esta placa avisa sobre o quê?|Depressão na pista|Lombada|Ponte móvel|Pista molhada|A-19: há um desnível para baixo na via.
+losango|↑↓|Esta placa avisa sobre o quê?|Sentido duplo|Sentido único|Proibido retornar|Rotatória|A-26b: a partir daí os veículos também vêm na direção contrária.
+losango|👷|Esta placa avisa sobre o quê?|Obras|Pedestres na via|Área escolar|Fiscalização|A-24: há obras e possíveis desvios à frente.
+losango|💧|Esta placa avisa sobre o quê?|Pista escorregadia|Enchente|Ponte sobre rio|Área de lazer|A-28: o trecho pode derrapar, principalmente com chuva.
+losango|🚲|Esta placa avisa sobre o quê?|Trânsito de ciclistas|Proibido bicicletas|Ciclovia obrigatória|Aluguel de bicicletas|A-30a: pode haver ciclistas na via.
+losango|🚶|Esta placa avisa sobre o quê?|Passagem sinalizada de pedestres|Proibido pedestres|Ponto de ônibus|Calçada interditada|A-32b: dê preferência a quem atravessa.
+losango|🚸|Esta placa avisa sobre o quê?|Área escolar|Parque infantil|Pedestres proibidos|Ponto de táxi|A-33a: reduza, pois pode haver crianças perto da via.
+losango|🐄|Esta placa avisa sobre o quê?|Animais na pista|Fazenda à venda|Feira de gado|Proibido animais|A-35: animais podem cruzar a pista.
+regra||Sem placa, qual é a velocidade máxima em uma via local urbana?|30 km/h|40 km/h|50 km/h|60 km/h|Art. 61 do CTB: via local, 30 km/h.
+regra||Sem placa, qual é a velocidade máxima em uma via coletora urbana?|40 km/h|30 km/h|60 km/h|80 km/h|Art. 61 do CTB: via coletora, 40 km/h.
+regra||Sem placa, qual é a velocidade máxima em uma via arterial urbana?|60 km/h|40 km/h|80 km/h|100 km/h|Art. 61 do CTB: via arterial, 60 km/h.
+regra||Sem placa, qual é a velocidade máxima em uma via de trânsito rápido?|80 km/h|60 km/h|100 km/h|110 km/h|Art. 61 do CTB: via de trânsito rápido, 80 km/h.
+regra||Sem placa, qual é a máxima para carros em rodovia de pista dupla?|110 km/h|80 km/h|100 km/h|120 km/h|Art. 61 do CTB: automóveis, camionetas e motos, 110 km/h.
+regra||Sem placa, qual é a máxima para carros em rodovia de pista simples?|100 km/h|80 km/h|90 km/h|110 km/h|Art. 61 do CTB: automóveis, camionetas e motos, 100 km/h.
+regra||Sem placa, qual é a velocidade máxima em estradas não pavimentadas?|60 km/h|40 km/h|80 km/h|100 km/h|Art. 61 do CTB: estradas, 60 km/h.
+regra||Quem deve ir no banco de trás, com equipamento de retenção?|Crianças de até 10 anos incompletos com menos de 1,45 m|Toda criança até 12 anos|Só bebês de até 1 ano|Só quem tem menos de 1 m|Regra do CTB desde a Lei 14.071/2020.
+regra||Com quantos pontos em 12 meses a CNH é suspensa, sem infração gravíssima?|40 pontos|20 pontos|30 pontos|50 pontos|Lei 14.071/2020: 40 sem gravíssima, 30 com uma e 20 com duas ou mais.
+regra||Com duas ou mais infrações gravíssimas, a CNH é suspensa com quantos pontos?|20 pontos|30 pontos|40 pontos|10 pontos|Lei 14.071/2020: 20 pontos em 12 meses.
+regra||Qual é a idade mínima para levar criança na garupa de moto?|10 anos|7 anos|5 anos|12 anos|A Lei 14.071/2020 elevou a idade de 7 para 10 anos.
+regra||Quem precisa usar cinto de segurança em um carro?|Todos os ocupantes|Só o motorista|Só quem vai na frente|Só em rodovias|Art. 65 do CTB: o cinto vale para condutor e passageiros em todas as vias.
+regra||Dirigir com o celular na mão é uma infração de que tipo?|Gravíssima|Leve|Média|Não é infração|Art. 252 do CTB: segurar ou manusear o celular é infração gravíssima.
+regra||Na motocicleta, quem deve usar capacete?|Condutor e passageiro|Só o condutor|Só em rodovias|Só o passageiro|Art. 54 e 55 do CTB: capacete obrigatório para os dois.
+regra||Qual é a cor das placas de advertência?|Amarela|Vermelha|Azul|Verde|As placas de advertência têm fundo amarelo e, em geral, formato de losango.
+regra||Qual é a forma das placas de regulamentação, em geral?|Círculo|Losango|Quadrado|Hexágono|A maioria é circular com borda vermelha; R-1 e R-2 têm forma própria.

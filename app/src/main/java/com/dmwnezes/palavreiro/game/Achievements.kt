@@ -41,6 +41,7 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "sil_won", "sil_played", "sil_first", "mm_best", "mm_day_best", "mm_played",
             "mina_won", "mina_played", "mina_best_facil", "mina_best_medio", "mina_best_dificil",
             "cam_won", "cam_best_facil", "cam_best_medio", "cam_best_dificil", "fm_best", "fm_day_best", "fm_played",
+            "pq_best", "pq_played", "pq_full", "t10_best", "t10_played", "t10_full", "pl_best", "pl_day_best", "pl_played", "emp_best", "emp_played",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
@@ -90,6 +91,10 @@ object Achievements {
             a("⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", r["amp_day_best"], 10),
             a("🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", r["sudoku_perfect"], 1),
             a("♟️", "Xeque-mate", "Vença o computador no Difícil do Xeque", r["xadrez_won_dificil"], 1),
+            a("📋", "Opinião pública", "Ache todas as respostas de uma Pesquisa", r["pq_full"], 1),
+            a("🔟", "Lista completa", "Complete um Top 10", r["t10_full"], 1),
+            a("🚦", "Motorista exemplar", "Acerte as 10 do dia no Placas", r["pl_day_best"], 10),
+            a("🧱", "Mestre de obras", "Chegue à altura 30 no Empilha", r["emp_best"], 30),
             a("💣", "Desarmador", "Limpe um Campo Minado no Difícil", if (r["mina_best_dificil"] > 0) 1 else 0, 1),
             a("🔗", "Tudo ligado", "Complete um Caminhos no Difícil", if (r["cam_best_dificil"] > 0) 1 else 0, 1),
             a("🧐", "Caça-mitos", "Acerte as 10 do dia no Fato ou Mito", r["fm_day_best"], 10),

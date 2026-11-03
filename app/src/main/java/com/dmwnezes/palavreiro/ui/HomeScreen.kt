@@ -49,7 +49,7 @@ import com.dmwnezes.palavreiro.game.Multi
 
 /** Destinos da tela inicial. */
 enum class Dest { TERMO, INFINITO, DUETO, QUARTETO, CONEXOES, CACA, DEFINICAO, SINONIMOS, DESAFIAR, MESTRE, INTRUSO, ORTOGRAFIA, ARQUIVO, TRIVIA, MEMORIA,
-    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL, CRUZADA, SILHUETA, MAISMENOS, MINADO, CAMINHOS, FATOMITO }
+    MATIZ, PODIO, AMPULHETA, SUDOKU, XADREZ, NAVAL, CRUZADA, SILHUETA, MAISMENOS, MINADO, CAMINHOS, FATOMITO, PESQUISA, TOP10, PLACAS, EMPILHA }
 
 /** Informação de cada cartão da tela inicial. */
 private data class GameCardInfo(
@@ -91,19 +91,23 @@ fun HomeScreen(
         GameCardInfo(Dest.XADREZ, "Xeque", "Xadrez contra o computador", null),
         GameCardInfo(Dest.MINADO, "Campo Minado", "Abra o campo sem pisar nas minas", badges[Dest.MINADO]),
         GameCardInfo(Dest.CAMINHOS, "Caminhos", "Ligue as cores e preencha a grade", badges[Dest.CAMINHOS]),
+        GameCardInfo(Dest.EMPILHA, "Empilha", "Solte os blocos e suba a torre", null),
         GameCardInfo(Dest.NAVAL, "Batalha Naval", "Afunde a frota do computador ou do amigo", null),
         GameCardInfo(Dest.TRIVIA, "Trivia", "Gire a roleta e junte as 6 medalhas", null),
         GameCardInfo(Dest.PODIO, "Pódio", "Monte o top 5 em 5 tentativas", badges[Dest.PODIO]),
         GameCardInfo(Dest.AMPULHETA, "Ampulheta", "Encaixe os fatos na linha do tempo", badges[Dest.AMPULHETA]),
         GameCardInfo(Dest.SILHUETA, "Silhueta", "Adivinhe o país ou estado pelo contorno", badges[Dest.SILHUETA]),
+        GameCardInfo(Dest.PESQUISA, "Pesquisa", "Adivinhe as respostas mais prováveis", badges[Dest.PESQUISA]),
+        GameCardInfo(Dest.TOP10, "Top 10", "Lembre os 10 itens da lista", badges[Dest.TOP10]),
+        GameCardInfo(Dest.PLACAS, "Placas", "Teste as placas e regras de trânsito", badges[Dest.PLACAS]),
         GameCardInfo(Dest.FATOMITO, "Fato ou Mito", "Verdade ou crença popular?", badges[Dest.FATOMITO]),
         GameCardInfo(Dest.MAISMENOS, "Mais ou Menos", "Compare números de temas gerais", badges[Dest.MAISMENOS]),
     ).associateBy { it.dest }
     // Mesmo layout do site no celular: abas por categoria, cartões em duas colunas e barra fixa embaixo.
     val cats = listOf(
         HomeCat("Palavras", "Jogos de Palavras", Night.correct, listOf(Dest.TERMO, Dest.DUETO, Dest.QUARTETO, Dest.CONEXOES, Dest.CACA, Dest.CRUZADA, Dest.INTRUSO, Dest.ORTOGRAFIA, Dest.DEFINICAO, Dest.SINONIMOS, Dest.MEMORIA)),
-        HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ, Dest.MINADO, Dest.CAMINHOS, Dest.NAVAL)),
-        HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA, Dest.SILHUETA, Dest.MAISMENOS, Dest.FATOMITO)),
+        HomeCat("Lógica", "Jogos de Lógica", Night.blue, listOf(Dest.MESTRE, Dest.MATIZ, Dest.SUDOKU, Dest.XADREZ, Dest.MINADO, Dest.CAMINHOS, Dest.EMPILHA, Dest.NAVAL)),
+        HomeCat("Conhecimento", "Jogos de Conhecimento", Night.present, listOf(Dest.TRIVIA, Dest.PODIO, Dest.AMPULHETA, Dest.SILHUETA, Dest.MAISMENOS, Dest.FATOMITO, Dest.PESQUISA, Dest.TOP10, Dest.PLACAS)),
     )
     var tab by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableIntStateOf(0) }
     val cur = cats[tab]
@@ -374,6 +378,10 @@ internal fun CardIcon(dest: Dest) {
         Dest.MINADO -> Text("💣", fontSize = 34.sp)
         Dest.CAMINHOS -> Text("🔗", fontSize = 34.sp)
         Dest.FATOMITO -> Text("🧐", fontSize = 34.sp)
+        Dest.PESQUISA -> Text("📋", fontSize = 34.sp)
+        Dest.TOP10 -> Text("🔟", fontSize = 34.sp)
+        Dest.PLACAS -> Text("🚦", fontSize = 34.sp)
+        Dest.EMPILHA -> Text("🧱", fontSize = 34.sp)
     }
 }
 

@@ -19,7 +19,7 @@ data class Retro(
     companion object {
         private val NAMES = mapOf(
             "termo" to "Termo", "dueto" to "Dueto", "quarteto" to "Quarteto", "conn" to "Conexões", "conexoes" to "Conexões",
-            "caca" to "Caça-Palavras", "ws" to "Caça-Palavras", "cruzada" to "Palavra Cruzada", "silhueta" to "Silhueta", "maismenos" to "Mais ou Menos", "minado" to "Campo Minado", "caminhos" to "Caminhos", "fatomito" to "Fato ou Mito",
+            "caca" to "Caça-Palavras", "ws" to "Caça-Palavras", "cruzada" to "Palavra Cruzada", "silhueta" to "Silhueta", "maismenos" to "Mais ou Menos", "minado" to "Campo Minado", "caminhos" to "Caminhos", "fatomito" to "Fato ou Mito", "pesquisa" to "Pesquisa", "top10" to "Top 10", "placas" to "Placas",
         )
         private val MONTHS = listOf("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro")
 

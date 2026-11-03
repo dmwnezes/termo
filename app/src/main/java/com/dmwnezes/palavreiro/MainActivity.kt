@@ -238,6 +238,9 @@ fun PalavreiroApp() {
                             Dest.CONEXOES to if (store.text("conn_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CACA to if (store.text("ws_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.MATIZ to if (store.text("matiz_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.PESQUISA to if (store.text("pq_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.TOP10 to if (store.text("t10_done") == today) "Feito hoje ✓" else "Novo",
+                            Dest.PLACAS to if (store.text("pl_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.MINADO to if (store.text("mina_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.CAMINHOS to if (store.text("cam_done") == today) "Feito hoje ✓" else "Novo",
                             Dest.FATOMITO to if (store.text("fm_done") == today) "Feito hoje ✓" else "Novo",
@@ -278,6 +281,10 @@ fun PalavreiroApp() {
                         Dest.TRIVIA -> com.dmwnezes.palavreiro.ui.TriviaScreen(AppGraph.trivia, store, AppGraph.feedback, back)
                         Dest.MEMORIA -> com.dmwnezes.palavreiro.ui.MemoryScreen(AppGraph.synonyms, AppGraph.families, store, AppGraph.feedback, back)
                         Dest.MATIZ -> com.dmwnezes.palavreiro.ui.MatizScreen(store, AppGraph.feedback, back)
+                        Dest.PESQUISA -> com.dmwnezes.palavreiro.ui.PesquisaScreen(AppGraph.pesquisa, store, AppGraph.feedback, back)
+                        Dest.TOP10 -> com.dmwnezes.palavreiro.ui.Top10Screen(AppGraph.top10, store, AppGraph.feedback, back)
+                        Dest.PLACAS -> com.dmwnezes.palavreiro.ui.PlacasScreen(AppGraph.placas, store, AppGraph.feedback, back)
+                        Dest.EMPILHA -> com.dmwnezes.palavreiro.ui.EmpilhaScreen(store, AppGraph.feedback, back)
                         Dest.MINADO -> com.dmwnezes.palavreiro.ui.MinadoScreen(store, AppGraph.feedback, back)
                         Dest.CAMINHOS -> com.dmwnezes.palavreiro.ui.CaminhosScreen(AppGraph.caminhos, store, AppGraph.feedback, back)
                         Dest.FATOMITO -> com.dmwnezes.palavreiro.ui.FatoMitoScreen(AppGraph.fatoMito, store, AppGraph.feedback, back)
