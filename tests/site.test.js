@@ -254,3 +254,72 @@ test("Mais ou Menos: rodadas justas, dia igual e fim com 10", async () => {
   assert.deepStrictEqual(p.errors, []);
   await p.context().close();
 });
+
+test("Campo Minado: mesma grade do dia, começa aberto, vence e perde", async () => {
+  const p = await open("#/minado");
+  await p.waitForSelector(".mina-c");
+  const r = await p.evaluate(() => {
+    const out = [];
+    [0, 1, 2].forEach((lv) => { for (let s = 0; s < 300; s++) { const g = P.minado.create(lv, s); if (g.mine.filter(Boolean).length !== P.minado.LEVELS[lv][4] || !g.open[g.start] || g.mine[g.start] || g.lost) out.push([lv, s]); } });
+    const a = P.minado.create(0, 921), ref = a.mine.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
+    const w = P.minado.create(0, 7); w.mine.forEach((m, c) => { if (!m) P.minado.reveal(w, c); });
+    const l = P.minado.create(0, 7); P.minado.reveal(l, l.mine.indexOf(true));
+    const f = P.minado.create(0, 7), c = f.mine.indexOf(true); P.minado.toggleFlag(f, c); P.minado.reveal(f, c);
+    return { bad: out, ref, start: a.start, won: w.won, lost: l.lost, flagSafe: !f.lost };
+  });
+  assert.deepStrictEqual(r.bad, []); assert.ok(r.won && r.lost && r.flagSafe);
+  console.log("referência minado 921:", JSON.stringify(r.ref), r.start);
+  // Pela tela: abre tudo o que não é mina.
+  const cells = await p.evaluate(() => { const g = P.minadoState(); return g.mine.map((m, c) => (!m && !g.open[c] ? c : -1)).filter((c) => c >= 0); });
+  for (const c of cells) if (await p.evaluate((x) => !P.minadoState().open[x], c)) await p.locator(`[data-c="${c}"]`).click();
+  assert.ok(await p.evaluate(() => P.minadoState().won));
+  assert.strictEqual(await p.evaluate(() => P.store.get("mina-won")), 1);
+  assert.ok((await p.evaluate(() => P.store.get("mina-best-facil"))) >= 0);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});
+
+test("Caminhos: toda grade tem solução e o arrasto funciona", async () => {
+  const p = await open("#/caminhos");
+  await p.waitForSelector(".cam-cell");
+  const r = await p.evaluate(async () => {
+    const list = P.caminhosParse(await P.text("caminhos.txt")), bad = [];
+    list.forEach((q, i) => { const all = q.pairs.flat(); if (new Set(all).size !== all.length || all.some((c) => c < 0 || c >= q.n * q.n)) bad.push(i); });
+    const g = P.caminhos.create({ n: 3, pairs: [[0, 8], [1, 5]] });
+    P.caminhos.start(g, 0); P.caminhos.dragTo(g, 3); P.caminhos.dragTo(g, 6); P.caminhos.dragTo(g, 8);
+    const blockedByOtherEnd = !P.caminhos.step(Object.assign(P.caminhos.create({ n: 3, pairs: [[0, 8], [1, 5]] }), { active: 0, paths: [[0], []] }), 1);
+    P.caminhos.start(g, 1); P.caminhos.dragTo(g, 2); P.caminhos.dragTo(g, 5);
+    const s = { n: list.length, bad, conn: P.caminhos.connected(g, 0) && P.caminhos.connected(g, 1), won: P.caminhos.won(g), blockedByOtherEnd };
+    const cut = P.caminhos.create({ n: 3, pairs: [[0, 2], [6, 8]] });
+    P.caminhos.start(cut, 0); P.caminhos.dragTo(cut, 3); P.caminhos.dragTo(cut, 4);
+    P.caminhos.start(cut, 6); P.caminhos.dragTo(cut, 7); P.caminhos.dragTo(cut, 4);
+    s.cutOther = cut.paths[0].join() === "0,3" && cut.paths[1].join() === "6,7,4";
+    s.d306 = P.caminhosDaily(list, 1, 306);
+    return s;
+  });
+  assert.strictEqual(r.n, 450); assert.deepStrictEqual(r.bad, []); assert.ok(r.conn && r.blockedByOtherEnd && r.cutOther);
+  assert.strictEqual(r.won, false, "faltam casas: a grade não está cheia");
+  console.log("referência caminhos médio 306:", JSON.stringify(r.d306));
+  // Arrasto real com o ponteiro, depois da abertura.
+  await p.waitForFunction(() => { const s = document.querySelector("#splash"); return !s || getComputedStyle(s).display === "none" || !s.isConnected; }, null, { timeout: 15000 });
+  const g = await p.evaluate(() => { const g = P.caminhosState(); return { n: g.q.n, a: g.q.pairs[0][0] }; });
+  const box = await p.locator(".cam-board").boundingBox(), at = (c) => [box.x + ((c % g.n) + 0.5) * (box.width / g.n), box.y + (Math.floor(c / g.n) + 0.5) * (box.height / g.n)];
+  const nb = g.a % g.n < g.n - 1 ? g.a + 1 : g.a - 1;
+  await p.mouse.move(...at(g.a)); await p.mouse.down(); await p.mouse.move(...at(nb), { steps: 3 }); await p.mouse.up();
+  assert.ok((await p.evaluate(() => P.caminhosState().paths.reduce((a, x) => a + x.length, 0))) >= 1);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});
+
+test("Fato ou Mito: dados, dia igual e fim com 10", async () => {
+  const p = await open("#/fatomito");
+  await p.waitForSelector(".fm-card");
+  const r = await p.evaluate(async () => { const l = P.fmParse(await P.text("fatomito.txt")); return { n: l.length, f: l.filter((x) => x.fact).length, ok: l.every((x) => x.text && x.why), d: P.fmDaily(l, 306) }; });
+  assert.strictEqual(r.n, 100); assert.strictEqual(r.f, 50); assert.ok(r.ok); assert.strictEqual(new Set(r.d).size, 10);
+  console.log("referência fato 306:", JSON.stringify(r.d));
+  for (let i = 0; i < 10; i++) { await p.locator("[data-fact]").click(); await p.locator("[data-next]").click(); }
+  await p.waitForSelector(".mm-end");
+  assert.strictEqual(await p.evaluate(() => P.store.get("fm-played")), 1);
+  assert.deepStrictEqual(p.errors, []);
+  await p.context().close();
+});

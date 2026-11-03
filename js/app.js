@@ -35,6 +35,9 @@
     // Matiz: três bolhas de cor sobrepostas; Pódio: degraus 2-1-3; Ampulheta: ampulheta em CSS.
     matiz: `<div class="mz-ico" aria-hidden="true"><i></i><i></i><i></i></div>`,
     podio: `<div class="pd-ico" aria-hidden="true"><i>2</i><i>1</i><i>3</i></div>`,
+    minado: `<div class="mina-ico" aria-hidden="true"><i>1</i><i>2</i><i class="c"></i><i class="c"></i><i>💣</i><i class="c"></i></div>`,
+    caminhos: `<svg class="cam-ico" viewBox="0 0 46 46" aria-hidden="true"><path d="M8 8H38V24H16V38H38" fill="none" stroke="#5FB873" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="6" fill="#5FB873"/><circle cx="38" cy="38" r="6" fill="#5FB873"/></svg>`,
+    fatomito: `<div class="fm-ico" aria-hidden="true"><b>✓</b><i>✕</i></div>`,
     silhueta: `<svg class="sil-ico" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 62 12 75 14 78 28 96 38 92 54 80 64 76 80 62 84 52 98 44 90 48 78 36 68 30 54 12 50 4 38 16 26 30 26 38 14Z"/></svg>`,
     maismenos: `<div class="mm-ico" aria-hidden="true"><b>▲</b><i>▼</i></div>`,
     ampulheta: `<div class="amp-ico" aria-hidden="true"><i></i><i></i></div>`,
@@ -71,17 +74,20 @@
       ["podio", "Pódio", "Monte o top 5 do ranking", badge(dd("podio"))],
       ["ampulheta", "Ampulheta", "O que veio antes? Monte a linha do tempo", badge(dd("ampulheta"))],
       ["silhueta", "Silhueta", "Adivinhe o país ou estado pelo contorno", badge(dd("silhueta"))],
+      ["fatomito", "Fato ou Mito", "Verdade ou crença popular?", badge(dd("fatomito"))],
       ["maismenos", "Mais ou Menos", "Compare números de temas gerais", badge(dd("maismenos"))],
       ["quadrante", "Quadrante", "Sudoku: um por nível todo dia, ou sem fim", ""],
       ["xeque", "Xeque", "Xadrez contra o computador", ""],
+      ["minado", "Campo Minado", "Abra o campo sem pisar nas minas", badge(dd("minado"))],
+      ["caminhos", "Caminhos", "Ligue as cores e preencha a grade", badge(dd("caminhos"))],
       ["naval", "Batalha Naval", "Afunde a frota do computador ou do amigo", ""],
       ["amigo", "Jogar com amigo", "Partida ao vivo: quem acertar primeiro ganha", ""],
     ];
     // Celular: abas por categoria (layout B). Computador: grade de ícones + prévia ao lado (layout E).
     const CATS = [
       ["p", "Palavras", "Jogos de Palavras", ["termo", "dueto", "quarteto", "conexoes", "caca", "cruzada", "intruso", "ortografia", "definicao", "sinonimos", "memoria"]],
-      ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque", "naval"]],
-      ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta", "silhueta", "maismenos"]],
+      ["l", "Lógica", "Jogos de Lógica", ["mestre", "matiz", "quadrante", "xeque", "minado", "caminhos", "naval"]],
+      ["c", "Conhecimento", "Jogos de Conhecimento", ["trivia", "podio", "ampulheta", "silhueta", "maismenos", "fatomito"]],
     ];
     const info = {};
     guess.concat(more).forEach(([k, t, s, b]) => (info[k] = { t, s, b }));
@@ -162,6 +168,9 @@
       matiz: () => P.games.matiz(app),
       podio: () => P.games.podio(app),
       ampulheta: () => P.games.ampulheta(app),
+      minado: () => P.games.minado(app),
+      caminhos: () => P.games.caminhos(app),
+      fatomito: () => P.games.fatomito(app),
       silhueta: () => P.games.silhueta(app),
       maismenos: () => P.games.maismenos(app),
       quadrante: () => P.games.sudoku(app),

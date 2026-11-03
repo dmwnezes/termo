@@ -36,6 +36,12 @@ data class RecordCardInfo(val dest: Dest, val title: String, val value: String?,
 
 private fun plural(n: Int, one: String, many: String) = "$n ${if (n == 1) one else many}"
 
+/** Melhor tempo do nível mais difícil já vencido. */
+private fun bestTimeCard(dest: Dest, title: String, r: Records, prefix: String, detail: String): RecordCardInfo {
+    val top = listOf("dificil" to "Difícil", "medio" to "Médio", "facil" to "Fácil").firstOrNull { r["${prefix}_best_${it.first}"] > 0 }
+    return RecordCardInfo(dest, title, top?.let { formatTime(r["${prefix}_best_${it.first}"]) }, top?.let { "no ${it.second}" } ?: "melhor tempo", detail)
+}
+
 /** Todos os recordes, na ordem da grade (mesmos dados de antes, agora em cartões). */
 fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
     fun v(n: Int) = n.takeIf { it > 0 }?.toString()
@@ -59,6 +65,9 @@ fun recordCards(infinite: Stats, r: Records): List<RecordCardInfo> {
         (r["xadrez_won_facil"] + r["xadrez_won_medio"] + r["xadrez_won_dificil"]).let { w ->
             RecordCardInfo(Dest.XADREZ, "Xeque", v(w), if (w == 1) "vitória" else "vitórias", "${r["xadrez_won_dificil"]} no Difícil")
         },
+        bestTimeCard(Dest.MINADO, "Campo Minado", r, "mina", "${plural(r["mina_won"], "vitória", "vitórias")} em ${plural(r["mina_played"], "partida", "partidas")}"),
+        bestTimeCard(Dest.CAMINHOS, "Caminhos", r, "cam", plural(r["cam_won"], "grade completa", "grades completas")),
+        RecordCardInfo(Dest.FATOMITO, "Fato ou Mito", v(r["fm_best"]), "recorde no Infinito", "do dia ${r["fm_day_best"]}/10 · ${plural(r["fm_played"], "partida", "partidas")}"),
         RecordCardInfo(Dest.SILHUETA, "Silhueta", v(r["sil_won"]), if (r["sil_won"] == 1) "acerto" else "acertos", "em ${plural(r["sil_played"], "partida", "partidas")} · ${r["sil_first"]} de primeira"),
         RecordCardInfo(Dest.MAISMENOS, "Mais ou Menos", v(r["mm_best"]), "recorde no Infinito", "do dia ${r["mm_day_best"]}/10 · ${plural(r["mm_played"], "partida", "partidas")}"),
         RecordCardInfo(Dest.CRUZADA, "Palavra Cruzada", v(r["cruz_won"]), if (r["cruz_won"] == 1) "resolvida" else "resolvidas", plural(r["cruz_perfect"], "de primeira", "de primeira")),

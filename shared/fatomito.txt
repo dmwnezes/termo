@@ -1,0 +1,101 @@
+# Fato ou Mito: F (fato) ou M (mito)|afirmação|explicação
+F|O Brasil é o maior produtor de café do mundo.|O país lidera a produção mundial há mais de um século.
+F|Polvos têm três corações.|Dois bombeiam sangue para as brânquias e um para o resto do corpo.
+F|O sangue do polvo é azul.|Ele transporta oxigênio com hemocianina, que tem cobre em vez de ferro.
+F|O mel pode durar milhares de anos sem estragar.|Com pouca água e muito açúcar, os micróbios quase não sobrevivem nele.
+F|A banana é levemente radioativa.|Ela contém potássio-40, em quantidade inofensiva.
+F|A Austrália é mais larga que a Lua.|A Austrália tem cerca de 4.000 km de largura; a Lua, cerca de 3.474 km de diâmetro.
+F|Vênus é mais quente que Mercúrio.|A atmosfera densa de Vênus prende o calor, mesmo ele estando mais longe do Sol.
+F|Um dia em Vênus dura mais que um ano em Vênus.|Vênus gira tão devagar que uma volta nele mesmo demora mais que uma volta no Sol.
+F|Os tubarões existem há mais tempo que as árvores.|Os tubarões têm cerca de 400 milhões de anos; as primeiras árvores, cerca de 350 milhões.
+F|O olho do avestruz é maior que o cérebro dele.|O olho chega a cerca de 5 cm de diâmetro, o maior entre os animais terrestres.
+F|As cenouras antigas eram principalmente roxas e amarelas.|As laranjas só se tornaram comuns com o cultivo na Europa, séculos atrás.
+F|A Torre Eiffel fica mais alta no calor.|O ferro se dilata e a torre pode ganhar cerca de 15 cm.
+F|A Universidade de Oxford é mais antiga que o Império Asteca.|Já havia aulas em Oxford por volta de 1096; Tenochtitlán foi fundada em 1325.
+F|Cleópatra viveu mais perto da chegada à Lua que da Grande Pirâmide.|A pirâmide é de cerca de 2560 a.C.; Cleópatra, de 69 a.C.; a Lua, de 1969.
+F|O Rio Amazonas despeja mais água no mar que qualquer outro rio.|Ele responde por cerca de um quinto da água doce que chega aos oceanos.
+F|Na América do Sul, só Chile e Equador não fazem fronteira com o Brasil.|O Brasil faz fronteira com todos os outros países sul-americanos.
+F|O nome Fortaleza vem de um forte.|A cidade nasceu ao redor do Forte Schoonenborch, erguido por holandeses.
+F|O Ceará aboliu a escravidão antes do resto do Brasil.|A abolição cearense é de 25 de março de 1884, quatro anos antes da Lei Áurea.
+F|O primeiro voo do 14-Bis foi em Paris.|Santos Dumont voou com ele no campo de Bagatelle, em 1906.
+F|Beija-flores conseguem voar para trás.|O movimento das asas permite voar para trás e parar no ar.
+F|O cavalo-marinho macho é quem carrega os filhotes.|A fêmea põe os ovos numa bolsa do macho, onde eles se desenvolvem.
+F|Abelhas dançam para indicar onde há comida.|A dança informa a direção e a distância das flores às outras abelhas.
+F|O som não se propaga no vácuo.|O som precisa de um meio material, como ar, água ou metal.
+F|O diamante é feito de carbono.|É carbono cristalizado sob alta pressão e temperatura.
+F|Recém-nascidos têm mais ossos que adultos.|São cerca de 300, e muitos se fundem até chegar aos 206 do adulto.
+F|O fêmur é o maior osso do corpo humano.|Ele fica na coxa; o menor é o estribo, dentro da orelha.
+F|Pelé foi campeão de três Copas do Mundo.|Ele venceu em 1958, 1962 e 1970.
+F|O Monte Everest ainda cresce.|O choque entre placas tectônicas o eleva alguns milímetros por ano.
+F|A Rússia tem 11 fusos horários.|Nenhum outro país contínuo tem tantos.
+F|A Lua está se afastando da Terra.|O afastamento é de cerca de 3,8 cm por ano.
+F|A luz do Sol leva cerca de 8 minutos para chegar à Terra.|Ela percorre cerca de 150 milhões de km a 300 mil km por segundo.
+F|O mercúrio é um metal líquido em temperatura ambiente.|Ele só se solidifica a cerca de −39 °C.
+F|Não há pinguins selvagens no Polo Norte.|Eles vivem no Hemisfério Sul e, em Galápagos, perto da linha do Equador.
+F|O maior cajueiro do mundo fica no Rio Grande do Norte.|O Cajueiro de Pirangi cobre mais de 8 mil m² com a sua copa.
+F|A castanha é o verdadeiro fruto do caju.|A parte carnuda que comemos é um pseudofruto, formado pelo pedúnculo.
+F|O tomate é, botanicamente, uma fruta.|Ele se desenvolve da flor e guarda sementes, mesmo sendo usado como legume.
+F|O amendoim não é uma noz.|Ele é uma leguminosa, da mesma família do feijão.
+F|A Mona Lisa já foi roubada do Louvre.|Ela sumiu em 1911 e foi recuperada na Itália em 1913.
+F|Einstein ganhou o Nobel pelo efeito fotoelétrico.|O prêmio de Física de 1921 não foi pela teoria da relatividade.
+F|Machado de Assis foi o primeiro presidente da Academia Brasileira de Letras.|Ele presidiu a instituição desde a fundação, em 1897.
+F|O Rio Nilo corre de sul para norte.|Ele nasce no centro-leste da África e deságua no Mediterrâneo.
+F|A Antártida é o maior deserto do mundo.|Deserto é definido pela pouca chuva ou neve, não pelo calor.
+F|O pão francês, como conhecemos, foi criado no Brasil.|Ele surgiu aqui no início do século 20, inspirado em pães europeus.
+F|O Brasil é o único país que jogou todas as Copas do Mundo.|A Seleção participou de todas as edições desde 1930.
+F|Preguiças podem prender a respiração por mais tempo que golfinhos.|Elas diminuem os batimentos e ficam até cerca de 40 minutos submersas.
+F|O Sudão tem mais pirâmides que o Egito.|O antigo reino de Kush deixou cerca de 200 pirâmides por lá.
+F|Astronautas ficam mais altos no espaço.|Sem a gravidade, a coluna se alonga e eles ganham alguns centímetros.
+F|Saturno é menos denso que a água.|Em média, sua densidade é de cerca de 0,7 g/cm³.
+F|Marte tem o maior vulcão conhecido do Sistema Solar.|O Monte Olimpo tem mais que o dobro da altura do Everest.
+F|As digitais dos coalas são muito parecidas com as humanas.|Elas são tão parecidas que é difícil diferenciar mesmo ao microscópio.
+M|A Grande Muralha da China pode ser vista da Lua a olho nu.|Ela é longa, mas estreita demais; nem da órbita baixa é fácil de ver.
+M|Um raio nunca cai duas vezes no mesmo lugar.|O Empire State é atingido cerca de 20 vezes por ano.
+M|Usamos só 10% do cérebro.|Exames mostram atividade em todo o cérebro, mesmo durante o sono.
+M|O touro fica furioso com a cor vermelha.|Touros não distinguem bem o vermelho; o que chama atenção é o movimento da capa.
+M|Camaleões mudam de cor principalmente para se camuflar.|A mudança serve mais para comunicação e controle de temperatura.
+M|Morcegos são cegos.|Todas as espécies enxergam, e muitas também usam ecolocalização.
+M|Avestruzes enterram a cabeça na areia quando têm medo.|Elas fogem ou deitam; parece enterrar quando mexem nos ovos no chão.
+M|O peixinho-dourado só tem 3 segundos de memória.|Eles aprendem e lembram tarefas por meses.
+M|Napoleão era muito baixo.|Ele tinha cerca de 1,68 m, altura normal para a época.
+M|Vikings usavam capacetes com chifres.|Não há indícios disso em batalha; a imagem vem de óperas e ilustrações do século 19.
+M|Einstein ia mal em matemática na escola.|Ele dominava cálculo avançado desde a adolescência.
+M|Cabelo e unhas continuam crescendo depois da morte.|A pele se retrai ao desidratar, o que dá essa impressão.
+M|Açúcar deixa as crianças hiperativas.|Estudos controlados não encontraram essa relação.
+M|Estalar os dedos causa artrite.|Estudos não mostraram maior risco de artrite em quem estala os dedos.
+M|Misturar manga com leite faz mal.|A combinação não faz mal: a crença não tem base científica.
+M|Sair no frio de cabelo molhado causa gripe.|Gripes são causadas por vírus, não pelo cabelo molhado.
+M|Vitamina C cura a gripe.|Ela não cura e, em geral, não previne a doença.
+M|Cachorros enxergam só em preto e branco.|Eles veem cores, principalmente tons de azul e amarelo.
+M|O sangue dentro das veias é azul.|O sangue é sempre vermelho; as veias só parecem azuis através da pele.
+M|O lado oculto da Lua nunca recebe luz do Sol.|Ele só não fica voltado para a Terra; recebe tanto Sol quanto o outro lado.
+M|As estações do ano mudam pela distância entre a Terra e o Sol.|Elas vêm da inclinação do eixo da Terra.
+M|Cabelo raspado volta a crescer mais grosso.|A ponta reta só dá essa impressão; a espessura não muda.
+M|Chiclete engolido fica 7 anos no estômago.|Ele não é digerido, mas sai pelo intestino em poucos dias.
+M|Ursos-polares caçam pinguins.|Os ursos vivem no Ártico, e os pinguins, no Hemisfério Sul.
+M|Santos Dumont inventou o relógio de pulso.|Relógios de pulso já existiam; a Cartier criou um modelo famoso para ele.
+M|Na época de Colombo, as pessoas cultas achavam que a Terra era plana.|Desde a Grécia Antiga já se sabia que ela é redonda.
+M|Uma maçã caiu na cabeça de Newton.|Ele contou ter visto uma maçã cair; a pancada na cabeça é invenção posterior.
+M|Maria Antonieta disse "que comam brioches".|Não há registro de que ela tenha dito a frase.
+M|Frankenstein é o nome do monstro.|Victor Frankenstein é o cientista; a criatura não tem nome no livro.
+M|Polvos têm dez tentáculos.|Eles têm oito braços.
+M|Aranhas são insetos.|Aranhas têm oito patas e são aracnídeos; insetos têm seis.
+M|Baleias são peixes.|São mamíferos: respiram ar e amamentam os filhotes.
+M|Morcegos são aves.|São mamíferos, os únicos capazes de voo verdadeiro.
+M|Pinguins não são aves.|São aves que não voam, com penas e bico, e botam ovos.
+M|A tartaruga consegue sair do casco.|O casco faz parte do esqueleto, unido à coluna e às costelas.
+M|Todo deserto é quente.|Há desertos frios, como a Antártida e o de Gobi no inverno.
+M|Cobras são viscosas.|A pele delas é seca e coberta de escamas.
+M|Minhoca cortada ao meio vira duas.|No máximo, a parte da cabeça pode sobreviver e se regenerar.
+M|O sudoku foi inventado no Japão.|Ele surgiu nos Estados Unidos, em 1979; o Japão o popularizou e deu o nome.
+M|Dormindo, engolimos em média oito aranhas por ano.|Aranhas evitam pessoas, e essa estatística não tem fonte.
+M|Ler no escuro estraga a visão para sempre.|Cansa os olhos, mas não causa dano permanente.
+M|Comer cenoura dá visão noturna.|A ideia foi espalhada na Segunda Guerra para esconder o uso do radar britânico.
+M|Homens têm uma costela a menos que mulheres.|Homens e mulheres costumam ter o mesmo número de costelas.
+M|O Everest é a montanha mais alta medida da base ao topo.|O Mauna Kea, no Havaí, é maior a partir da base, no fundo do mar.
+M|As pirâmides do Egito foram erguidas por escravos.|Indícios apontam para trabalhadores pagos, alimentados e alojados.
+M|O Rio de Janeiro ainda é a capital do Brasil.|A capital é Brasília desde 1960.
+M|O coração fica totalmente no lado esquerdo do peito.|Ele fica no centro, com a ponta voltada para a esquerda.
+M|O Sol é uma bola de fogo.|Ele é plasma e brilha por fusão nuclear, não por combustão.
+M|Temos apenas cinco sentidos.|Também há equilíbrio, dor, temperatura e a noção da posição do corpo, entre outros.
+M|A língua tem uma região para cada sabor.|Todos os sabores são percebidos em várias partes da língua.

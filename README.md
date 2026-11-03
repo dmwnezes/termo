@@ -1,6 +1,6 @@
 # Palavreiro
 
-Jogos em português: 11 de palavras (Termo, Dueto, Quarteto, Conexões, Caça-Palavras, Palavra Cruzada, Intruso, Certo ou Errado, Qual é a Palavra?, Sinônimo ou Antônimo e Jogo da Memória), 5 de lógica (Mestre Mandou, Matiz, Quadrante, Xeque e Batalha Naval) e 5 de conhecimento (Trivia, Pódio, Ampulheta, Silhueta e Mais ou Menos), mais partidas ao vivo com amigos. O site e o app Android têm a mesma palavra do dia.
+Jogos em português: 11 de palavras (Termo, Dueto, Quarteto, Conexões, Caça-Palavras, Palavra Cruzada, Intruso, Certo ou Errado, Qual é a Palavra?, Sinônimo ou Antônimo e Jogo da Memória), 7 de lógica (Mestre Mandou, Matiz, Quadrante, Xeque, Campo Minado, Caminhos e Batalha Naval) e 6 de conhecimento (Trivia, Pódio, Ampulheta, Silhueta, Mais ou Menos e Fato ou Mito), mais partidas ao vivo com amigos. O site e o app Android têm a mesma palavra do dia.
 
 - **Site:** https://dmwnezes.com/termo/ (funciona sem internet depois da primeira visita, menos as partidas com amigos)
 - **App Android:** https://github.com/dmwnezes/termo/releases/latest/download/Palavreiro.apk (o app avisa sozinho quando há versão nova)
@@ -15,7 +15,7 @@ Regras das respostas: sem pronomes, sem verbos conjugados (só infinitivo), sem 
 
 - `shared/`: palavras (`words.js`), significados, desafios do Conexões, temas do Caça-Palavras, definições e sinônimos, usados pelo site e pelo app
 - `index.html`, `style.css`, `js/`, `sw.js`, `manifest.webmanifest`: site
-- `tests/`: testes do site; `scripts/`: geram `shared/cruzada.txt` e `shared/silhueta.txt`
+- `tests/`: testes do site; `scripts/`: geram `shared/cruzada.txt`, `shared/silhueta.txt` e `shared/caminhos.txt`
 - `app/`: app Android (Kotlin + Compose)
 - `DESIGN.md`: decisões de design e recursos
 

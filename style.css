@@ -1441,3 +1441,30 @@ button { font-family: inherit; color: inherit; }
 .mm-ico { display: flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: 20px; }
 .mm-ico b { color: var(--correct); font-weight: 400; }
 .mm-ico i { color: var(--present); font-style: normal; }
+
+/* Campo Minado */
+.mina { max-width: 460px; margin: 0 auto; width: 100%; }
+.mina .hint, .cam .hint { text-align: center; color: var(--muted); margin: 8px 0 10px; }
+.mina-lv { margin-bottom: 4px; }
+.mina-grid { display: grid; gap: 3px; width: 100%; margin-bottom: 12px; touch-action: manipulation; }
+.mina-c { aspect-ratio: 1; min-width: 0; border: 0; padding: 0; border-radius: 7px; background: var(--key); color: var(--text); font: 800 1rem Outfit, sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.mina-c.on { background: var(--surface); cursor: default; }
+.mina-c.boom { background: var(--red); }
+.mina-ico { display: grid; grid-template-columns: repeat(3, 15px); gap: 2px; }
+.mina-ico i { height: 15px; border-radius: 4px; background: var(--surface-high); color: var(--blue); font: 800 10px/15px Outfit, sans-serif; text-align: center; font-style: normal; }
+.mina-ico i.c { background: var(--key); }
+
+/* Caminhos */
+.cam { max-width: 460px; margin: 0 auto; width: 100%; }
+.cam-board { display: block; width: 100%; max-width: 400px; aspect-ratio: 1; margin: 0 auto 12px; touch-action: none; user-select: none; }
+.cam-cell { fill: var(--surface-high); }
+.cam-ico { width: 46px; height: 46px; }
+
+/* Fato ou Mito */
+.fm-card b { font-size: 1.25rem; line-height: 1.35; font-weight: 700; }
+.fm-card { padding: 28px 18px; }
+.fm-verdict { text-align: center; font-weight: 800; font-size: 1.1rem; margin: 6px 0 4px; }
+.fm-why { text-align: center; color: var(--muted); margin: 0 0 14px; line-height: 1.4; }
+.fm-ico { display: flex; align-items: center; gap: 6px; font-size: 25px; font-weight: 800; }
+.fm-ico b { color: var(--correct); }
+.fm-ico i { color: var(--red); font-style: normal; }

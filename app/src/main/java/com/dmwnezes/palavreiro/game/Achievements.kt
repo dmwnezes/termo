@@ -39,12 +39,15 @@ data class Records(val values: Map<String, Int> = emptyMap()) {
             "xadrez_won_facil", "xadrez_won_medio", "xadrez_won_dificil",
             "naval_won_facil", "naval_won_medio", "naval_won_dificil", "cruz_won", "cruz_perfect",
             "sil_won", "sil_played", "sil_first", "mm_best", "mm_day_best", "mm_played",
+            "mina_won", "mina_played", "mina_best_facil", "mina_best_medio", "mina_best_dificil",
+            "cam_won", "cam_best_facil", "cam_best_medio", "cam_best_dificil", "fm_best", "fm_day_best", "fm_played",
         )
         /** Contadores em que o menor valor positivo é o melhor (tempos). */
         val LOWER_IS_BETTER = setOf(
             "ws_best", "ws_inf_best",
             "mem_best_facil", "mem_best_facil_moves", "mem_best_medio", "mem_best_medio_moves", "mem_best_dificil", "mem_best_dificil_moves",
             "sudoku_best_facil", "sudoku_best_medio", "sudoku_best_dificil",
+            "mina_best_facil", "mina_best_medio", "mina_best_dificil", "cam_best_facil", "cam_best_medio", "cam_best_dificil",
         )
     }
 }
@@ -87,6 +90,9 @@ object Achievements {
             a("⏳", "Historiador", "Acerte as 10 cartas do dia na Ampulheta", r["amp_day_best"], 10),
             a("🔢", "Mestre do Quadrante", "Termine um Quadrante Difícil sem errar", r["sudoku_perfect"], 1),
             a("♟️", "Xeque-mate", "Vença o computador no Difícil do Xeque", r["xadrez_won_dificil"], 1),
+            a("💣", "Desarmador", "Limpe um Campo Minado no Difícil", if (r["mina_best_dificil"] > 0) 1 else 0, 1),
+            a("🔗", "Tudo ligado", "Complete um Caminhos no Difícil", if (r["cam_best_dificil"] > 0) 1 else 0, 1),
+            a("🧐", "Caça-mitos", "Acerte as 10 do dia no Fato ou Mito", r["fm_day_best"], 10),
             a("🗺️", "Cartógrafo", "Acerte 10 Silhuetas", r["sil_won"], 10),
             a("⚖️", "Bom de conta", "Acerte as 10 rodadas do dia no Mais ou Menos", r["mm_day_best"], 10),
             a("✏️", "Cruzadista", "Resolva 10 Palavras Cruzadas", r["cruz_won"], 10),
